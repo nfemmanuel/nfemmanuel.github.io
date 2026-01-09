@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <title>NF Emmanuel - Portfolio</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/projects.css">
+    <link rel="stylesheet" href="styles/resume.css">
+</head>
+
+<body>
+    <!-- Matrix background -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">NF Emmanuel</a>
+            
+            <!-- Hamburger Menu -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <nav class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="resume.html">Resume</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+            
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main>
+        
+<div class="project-detail-page">
+    <div class="project-detail-card">
+        <!-- Header -->
+        <div class="detail-header">
+            <div>
+                <h1>Static Site Generator</h1>
+                <span class="project-status-badge">Ready</span>
+            </div>
+            <div class="detail-actions">
+                
+                <a href="https://github.com/nfemmanuel/portfolio-generator" class="btn btn-primary" target="_blank">View Code</a>
+                
+                
+            </div>
+        </div>
+        
+        <!-- Description -->
+        <section class="detail-section">
+            <h2>About</h2>
+            <p>Python-based portfolio generator with Jinja2 templating, real-time file monitoring, and automated GitHub Pages deployment. The tool you're using right now to build this portfolio.</p>
+        </section>
+        
+        <!-- Motivation -->
+        <section class="detail-section">
+            <h2>Motivation</h2>
+            <p>While building my portfolio, I realized I was manually copying HTML across pages and fighting with template inconsistencies. I needed a tool that could generate a multi-page site from templates while maintaining design consistency and enabling rapid iteration. This generator became the foundation of my entire portfolio workflow.</p>
+        </section>
+        
+        <!-- Use Cases -->
+        
+        <section class="detail-section">
+            <h2>Use Cases</h2>
+            <div class="use-cases-grid">
+                
+                <div class="use-case-card">
+                    <h3>Portfolio Development</h3>
+                    <p>Rapidly iterate on portfolio design with instant regeneration and preview</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3>Template Reuse</h3>
+                    <p>Maintain consistent design across multiple pages with template inheritance</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3>Automated Deployment</h3>
+                    <p>Push changes to GitHub and automatically deploy to live site</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3>Content Management</h3>
+                    <p>Update portfolio content by editing simple JSON files instead of HTML</p>
+                </div>
+                
+            </div>
+        </section>
+        
+        
+        <!-- Code Samples -->
+        
+        <section class="detail-section">
+            <h2>Examples</h2>
+            
+                
+                <div class="code-sample">
+                    <h3>Core Generator Logic</h3>
+                    <pre><code>def generate():
+    os.makedirs('portfolio-site', exist_ok=True)
+    with open('projects.json', 'r') as file:
+        data = json.load(file)
+    projects = data['projects']
+    env = Environment(loader=FileSystemLoader('templates'))
+    
+    # Generate all pages
+    for template_name in ['portfolio.html', 'projects.html', 'resume.html']:
+        template = env.get_template(template_name)
+        output = template.render(projects=projects)
+        with open(f'portfolio-site/{template_name}', 'w') as f:
+            f.write(output)</code></pre>
+                </div>
+                
+            
+        </section>
+        
+        
+        <!-- Key Achievements -->
+        <section class="detail-section">
+            <h2>Key Achievements</h2>
+            <ul class="achievements-list">
+                
+                <li>Built Python generator with Jinja2 templating engine supporting template inheritance and dynamic content injection from JSON</li>
+                
+                <li>Implemented two-repository architecture separating build tool from deployment site with automated CI/CD pipeline</li>
+                
+                <li>Designed recursive directory traversal system for copying static assets with real-time file system monitoring using watchdog library</li>
+                
+                <li>Created watch mode with automated regeneration enabling rapid development iteration and immediate preview</li>
+                
+            </ul>
+        </section>
+        
+        <!-- Technology Logos Section -->
+        
+        <section class="detail-section">
+            <h2>Technologies Used</h2>
+            <div class="tech-logos">
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/python.svg" 
+                        alt="Python" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Python</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/jinja2.svg" 
+                        alt="Jinja2" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Jinja2</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/watchdog.svg" 
+                        alt="Watchdog" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Watchdog</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/file-i-o.svg" 
+                        alt="File I/O" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">File I/O</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/github-actions.svg" 
+                        alt="GitHub Actions" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">GitHub Actions</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/ci-cd.svg" 
+                        alt="CI/CD" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">CI/CD</span>
+                </div>
+                
+            </div>
+        </section>
+        
+        
+        <!-- Language Breakdown -->
+        
+        <section class="detail-section">
+            <h2>Language Breakdown</h2>
+            <div class="language-bars">
+                
+                <div class="language-item">
+                    <div class="language-header">
+                        <span class="language-name">Python</span>
+                        <span class="language-percent">100.0%%</span>
+                    </div>
+                    <div class="language-bar-bg">
+                        <div class="language-bar-fill" style="width: 100.0%%"></div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+    </div>
+</div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p class="footer-text">© 2026 NF Emmanuel. Built with Python & Jinja2.</p>
+            
+            <div class="footer-links">
+                <a href="https://github.com/nfemmanuel">GitHub</a>
+                <a href="https://linkedin.com/in/oluwaniifemi-emmanuel">LinkedIn</a>
+                <a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu" title="Send me an email">Email</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="scripts/background.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/carousel.js"></script>
+    
+</body>
+</html>

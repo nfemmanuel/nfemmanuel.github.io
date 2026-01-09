@@ -1,0 +1,66 @@
+/* Fonts: Faustina & Inter & Fira Code */
+@import url('https://fonts.googleapis.com/css2?family=Faustina:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wght@12..36,300..900&display=swap');
+
+:root {
+    /* Light mode colors (default) */
+    --bg-primary: #FFFDF6;
+    --bg-secondary: #FAF6E9;
+    --accent-1: #DDEB9D;
+    --accent-2: #A0C878;
+    --text: #2d2d2d;
+
+    /* Glass effect (light mode) */
+    --glass-bg: color-mix(in srgb, var(--bg-secondary), transparent 30%);
+    --glass-border: 1px solid color-mix(in srgb, var(--accent-1), transparent 50%);
+    --glass-blur: 10px;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    --progress-fill: #5D7A45;
+}
+
+body.dark-mode {
+    /* Dark mode colors */
+    --bg-primary: #1A1916;
+    --bg-secondary: #2D2A23;
+    --accent-1: #4A5C2E;
+    --accent-2: #5D7A45;
+    --text: #e8e8e8;
+
+    /* Glass effect (dark mode - recalculated) */
+    --glass-bg: color-mix(in srgb, var(--bg-secondary), transparent 30%);
+    --glass-border: 1px solid color-mix(in srgb, var(--accent-1), transparent 50%);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    --progress-fill: #A0C878;
+}
+
+body {
+    background-color: var(--bg-primary);
+    padding: 3%;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+}
+
+/* Hide matrix background in light mode */
+body:not(.dark-mode) #matrix-bg {
+    display: none;
+}
+
+/* Show matrix background only in dark mode */
+body.dark-mode #matrix-bg {
+    display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'TikTok Sans', serif;
+    font-weight: 600;
+}

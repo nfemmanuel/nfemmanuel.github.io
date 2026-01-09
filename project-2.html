@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <title>NF Emmanuel - Portfolio</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/projects.css">
+    <link rel="stylesheet" href="styles/resume.css">
+</head>
+
+<body>
+    <!-- Matrix background -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">NF Emmanuel</a>
+            
+            <!-- Hamburger Menu -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <nav class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="resume.html">Resume</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+            
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main>
+        
+<div class="project-detail-page">
+    <div class="project-detail-card">
+        <!-- Header -->
+        <div class="detail-header">
+            <div>
+                <h1>Game Night App</h1>
+                <span class="project-status-badge">Demo Ready</span>
+            </div>
+            <div class="detail-actions">
+                
+                <a href="https://github.com/nfemmanuel/game-night" class="btn btn-primary" target="_blank">View Code</a>
+                
+                
+                <a href="https://game-night-one.vercel.app" class="btn btn-secondary" target="_blank">Live Demo</a>
+                
+            </div>
+        </div>
+        
+        <!-- Description -->
+        <section class="detail-section">
+            <h2>About</h2>
+            <p>React PWA for organizing game nights with drag-and-drop player management and an Imposter game mode</p>
+        </section>
+        
+        <!-- Motivation -->
+        <section class="detail-section">
+            <h2>Motivation</h2>
+            <p>Created to solve the common problem of organizing game nights with friends - tracking who's playing, managing teams, and keeping games fair. The Imposter game mode was inspired by social deduction games like Among Us and Mafia. Built with React and modern web technologies, featuring a custom theme system, mobile-first design, and smooth animations using Framer Motion.</p>
+        </section>
+        
+        <!-- Use Cases -->
+        
+        
+        <!-- Code Samples -->
+        
+        
+        <!-- Key Achievements -->
+        <section class="detail-section">
+            <h2>Key Achievements</h2>
+            <ul class="achievements-list">
+                
+                <li>Developed Progressive Web App using React with custom theme system and mobile-first responsive design</li>
+                
+                <li>Implemented drag-and-drop player management using @dnd-kit library with touch-friendly interactions</li>
+                
+                <li>Built game state management with React Context for consistent data flow across components</li>
+                
+                <li>Created smooth page transitions and animations using Framer Motion for enhanced UX</li>
+                
+            </ul>
+        </section>
+        
+        <!-- Technology Logos Section -->
+        
+        <section class="detail-section">
+            <h2>Technologies Used</h2>
+            <div class="tech-logos">
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/react.svg" 
+                        alt="React" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">React</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/pwa.svg" 
+                        alt="PWA" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">PWA</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/framer-motion.svg" 
+                        alt="Framer Motion" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Framer Motion</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/context-api.svg" 
+                        alt="Context API" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Context API</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/@dnd-kit.svg" 
+                        alt="@dnd-kit" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">@dnd-kit</span>
+                </div>
+                
+            </div>
+        </section>
+        
+        
+        <!-- Language Breakdown -->
+        
+        <section class="detail-section">
+            <h2>Language Breakdown</h2>
+            <div class="language-bars">
+                
+                <div class="language-item">
+                    <div class="language-header">
+                        <span class="language-name">JavaScript</span>
+                        <span class="language-percent">92.4%</span>
+                    </div>
+                    <div class="language-bar-bg">
+                        <div class="language-bar-fill" style="width: 92.4%"></div>
+                    </div>
+                </div>
+                
+                <div class="language-item">
+                    <div class="language-header">
+                        <span class="language-name">CSS</span>
+                        <span class="language-percent">7.3%</span>
+                    </div>
+                    <div class="language-bar-bg">
+                        <div class="language-bar-fill" style="width: 7.3%"></div>
+                    </div>
+                </div>
+                
+                <div class="language-item">
+                    <div class="language-header">
+                        <span class="language-name">Others</span>
+                        <span class="language-percent">0.3%</span>
+                    </div>
+                    <div class="language-bar-bg">
+                        <div class="language-bar-fill" style="width: 0.3%"></div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+    </div>
+</div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p class="footer-text">© 2026 NF Emmanuel. Built with Python & Jinja2.</p>
+            
+            <div class="footer-links">
+                <a href="https://github.com/nfemmanuel">GitHub</a>
+                <a href="https://linkedin.com/in/oluwaniifemi-emmanuel">LinkedIn</a>
+                <a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu" title="Send me an email">Email</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="scripts/background.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/carousel.js"></script>
+    
+</body>
+</html>

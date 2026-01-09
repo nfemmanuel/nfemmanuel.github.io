@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <title>NF Emmanuel - Portfolio</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/projects.css">
+    <link rel="stylesheet" href="styles/resume.css">
+</head>
+
+<body>
+    <!-- Matrix background -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">NF Emmanuel</a>
+            
+            <!-- Hamburger Menu -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <nav class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="resume.html">Resume</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+            
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main>
+        
+<div class="project-detail-page">
+    <div class="project-detail-card">
+        <!-- Header -->
+        <div class="detail-header">
+            <div>
+                <h1>Tic-Tac-Toe Android Game</h1>
+                <span class="project-status-badge">Ready</span>
+            </div>
+            <div class="detail-actions">
+                
+                <a href="https://github.com/nfemmanuel/tic-tac-toe" class="btn btn-primary" target="_blank">View Code</a>
+                
+                
+            </div>
+        </div>
+        
+        <!-- Description -->
+        <section class="detail-section">
+            <h2>About</h2>
+            <p>Android game featuring single-player mode with Minimax AI opponent and two-player pass-and-play</p>
+        </section>
+        
+        <!-- Motivation -->
+        <section class="detail-section">
+            <h2>Motivation</h2>
+            <p>First Android project to learn mobile development fundamentals. Chose tic-tac-toe because it's simple enough to complete quickly but complex enough to learn proper Android architecture. Implemented Minimax algorithm for unbeatable AI, learning about game theory and recursive algorithms in the process.</p>
+        </section>
+        
+        <!-- Use Cases -->
+        
+        
+        <!-- Code Samples -->
+        
+        
+        <!-- Key Achievements -->
+        <section class="detail-section">
+            <h2>Key Achievements</h2>
+            <ul class="achievements-list">
+                
+                <li>Developed Android game using Kotlin with multiple activities and Intent-based navigation</li>
+                
+                <li>Implemented Minimax algorithm for unbeatable AI opponent with strategic move evaluation</li>
+                
+                <li>Created custom animations using Kotlin coroutines for smooth difficulty toggle transitions</li>
+                
+                <li>Built dual game modes (single-player AI, two-player pass-and-play) with conditional UI rendering</li>
+                
+            </ul>
+        </section>
+        
+        <!-- Technology Logos Section -->
+        
+        <section class="detail-section">
+            <h2>Technologies Used</h2>
+            <div class="tech-logos">
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/kotlin.svg" 
+                        alt="Kotlin" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Kotlin</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/android-sdk.svg" 
+                        alt="Android SDK" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Android SDK</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/minimax-algorithm.svg" 
+                        alt="Minimax Algorithm" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Minimax Algorithm</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/coroutines.svg" 
+                        alt="Coroutines" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Coroutines</span>
+                </div>
+                
+            </div>
+        </section>
+        
+        
+        <!-- Language Breakdown -->
+        
+        <section class="detail-section">
+            <h2>Language Breakdown</h2>
+            <div class="language-bars">
+                
+                <div class="language-item">
+                    <div class="language-header">
+                        <span class="language-name">Kotlin</span>
+                        <span class="language-percent">100.0%</span>
+                    </div>
+                    <div class="language-bar-bg">
+                        <div class="language-bar-fill" style="width: 100.0%"></div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+    </div>
+</div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p class="footer-text">© 2026 NF Emmanuel. Built with Python & Jinja2.</p>
+            
+            <div class="footer-links">
+                <a href="https://github.com/nfemmanuel">GitHub</a>
+                <a href="https://linkedin.com/in/oluwaniifemi-emmanuel">LinkedIn</a>
+                <a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu" title="Send me an email">Email</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="scripts/background.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/carousel.js"></script>
+    
+</body>
+</html>

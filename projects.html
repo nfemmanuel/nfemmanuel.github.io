@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <title>NF Emmanuel - Portfolio</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/projects.css">
+    <link rel="stylesheet" href="styles/resume.css">
+</head>
+
+<body>
+    <!-- Matrix background -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">NF Emmanuel</a>
+            
+            <!-- Hamburger Menu -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <nav class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="resume.html">Resume</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+            
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main>
+        
+<div class="projects-page">
+    <h1 class="projects-page-title">Projects</h1>
+    
+    <!-- Side navigation indicators -->
+    <div class="side-indicators">
+        
+        <div class="side-dot" data-index="0"></div>
+        
+        <div class="side-dot" data-index="1"></div>
+        
+        <div class="side-dot" data-index="2"></div>
+        
+        <div class="side-dot" data-index="3"></div>
+        
+        <div class="side-dot" data-index="4"></div>
+        
+        <div class="side-dot" data-index="5"></div>
+        
+    </div>
+    
+    <!-- Projects scroll container -->
+    <div class="projects-scroll-container">
+        
+        <div class="full-project-card" data-index="0" id="project-1">
+            <div class="project-card-content">
+                <div class="project-header">
+                    <h2>ProofScript</h2>
+                    <span class="project-status-badge">In Development</span>
+                </div>
+                
+                <p class="project-full-description">A custom programming language designed for verified algorithm development with built-in correctness checking and LaTeX documentation generation</p>
+                
+                <ul class="project-resume-lines">
+                    
+                    <li>Designed and implemented a domain-specific language with custom lexer and parser achieving Turing completeness</li>
+                    
+                    <li>Built interpreter using visitor pattern for clean AST traversal and extensible node handling</li>
+                    
+                    <li>Implemented control flow structures (if/else, while, for loops) and array operations with proper scoping</li>
+                    
+                    <li>Solved complex grammar parsing issues through systematic debugging and architecture refactoring</li>
+                    
+                </ul>
+                
+                <div class="project-tech-stack">
+                    
+                    <span class="tech-tag">Python</span>
+                    
+                    <span class="tech-tag">Language Design</span>
+                    
+                    <span class="tech-tag">Parser Design</span>
+                    
+                    <span class="tech-tag">Visitor Pattern</span>
+                    
+                </div>
+                
+                <div class="project-actions">
+                    
+                    <a href="https://github.com/nfemmanuel/ProofScript" class="btn btn-primary" target="_blank">View Code</a>
+                    
+                    
+                    
+                    
+                    <a href="project-1.html" class="btn btn-secondary">View Page</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="full-project-card" data-index="1" id="project-2">
+            <div class="project-card-content">
+                <div class="project-header">
+                    <h2>Game Night App</h2>
+                    <span class="project-status-badge">Demo Ready</span>
+                </div>
+                
+                <p class="project-full-description">React PWA for organizing game nights with drag-and-drop player management and an Imposter game mode</p>
+                
+                <ul class="project-resume-lines">
+                    
+                    <li>Developed Progressive Web App using React with custom theme system and mobile-first responsive design</li>
+                    
+                    <li>Implemented drag-and-drop player management using @dnd-kit library with touch-friendly interactions</li>
+                    
+                    <li>Built game state management with React Context for consistent data flow across components</li>
+                    
+                    <li>Created smooth page transitions and animations using Framer Motion for enhanced UX</li>
+                    
+                </ul>
+                
+                <div class="project-tech-stack">
+                    
+                    <span class="tech-tag">React</span>
+                    
+                    <span class="tech-tag">PWA</span>
+                    
+                    <span class="tech-tag">Framer Motion</span>
+                    
+                    <span class="tech-tag">Context API</span>
+                    
+                    <span class="tech-tag">@dnd-kit</span>
+                    
+                </div>
+                
+                <div class="project-actions">
+                    
+                    <a href="https://github.com/nfemmanuel/game-night" class="btn btn-primary" target="_blank">View Code</a>
+                    
+                    
+                    
+                    <a href="https://game-night-one.vercel.app" class="btn btn-secondary" target="_blank">Live Demo</a>
+                    
+                    
+                    <a href="project-2.html" class="btn btn-secondary">View Page</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="full-project-card" data-index="2" id="project-3">
+            <div class="project-card-content">
+                <div class="project-header">
+                    <h2>Claude Branch Tracker</h2>
+                    <span class="project-status-badge">In Development</span>
+                </div>
+                
+                <p class="project-full-description">Chrome extension that visualizes conversation branches in Claude.ai, helping users track different conversation paths</p>
+                
+                <ul class="project-resume-lines">
+                    
+                    <li>Developed Chrome extension using Manifest V3 with content scripts for deep webpage integration</li>
+                    
+                    <li>Implemented content hashing algorithm for generating unique message IDs and branch detection</li>
+                    
+                    <li>Built sidebar UI with tree visualization showing conversation structure and branch points</li>
+                    
+                    <li>Used Chrome Local Storage API for persistent conversation data across sessions</li>
+                    
+                </ul>
+                
+                <div class="project-tech-stack">
+                    
+                    <span class="tech-tag">JavaScript</span>
+                    
+                    <span class="tech-tag">Chrome Extension API</span>
+                    
+                    <span class="tech-tag">DOM Manipulation</span>
+                    
+                    <span class="tech-tag">Content Hashing</span>
+                    
+                </div>
+                
+                <div class="project-actions">
+                    
+                    <a href="https://github.com/nfemmanuel/branch-tracker" class="btn btn-primary" target="_blank">View Code</a>
+                    
+                    
+                    
+                    
+                    <a href="project-3.html" class="btn btn-secondary">View Page</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="full-project-card" data-index="3" id="project-4">
+            <div class="project-card-content">
+                <div class="project-header">
+                    <h2>Tic-Tac-Toe Android Game</h2>
+                    <span class="project-status-badge">Ready</span>
+                </div>
+                
+                <p class="project-full-description">Android game featuring single-player mode with Minimax AI opponent and two-player pass-and-play</p>
+                
+                <ul class="project-resume-lines">
+                    
+                    <li>Developed Android game using Kotlin with multiple activities and Intent-based navigation</li>
+                    
+                    <li>Implemented Minimax algorithm for unbeatable AI opponent with strategic move evaluation</li>
+                    
+                    <li>Created custom animations using Kotlin coroutines for smooth difficulty toggle transitions</li>
+                    
+                    <li>Built dual game modes (single-player AI, two-player pass-and-play) with conditional UI rendering</li>
+                    
+                </ul>
+                
+                <div class="project-tech-stack">
+                    
+                    <span class="tech-tag">Kotlin</span>
+                    
+                    <span class="tech-tag">Android SDK</span>
+                    
+                    <span class="tech-tag">Minimax Algorithm</span>
+                    
+                    <span class="tech-tag">Coroutines</span>
+                    
+                </div>
+                
+                <div class="project-actions">
+                    
+                    <a href="https://github.com/nfemmanuel/tic-tac-toe" class="btn btn-primary" target="_blank">View Code</a>
+                    
+                    
+                    
+                    
+                    <a href="project-4.html" class="btn btn-secondary">View Page</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="full-project-card" data-index="4" id="project-5">
+            <div class="project-card-content">
+                <div class="project-header">
+                    <h2>Static Site Generator</h2>
+                    <span class="project-status-badge">Ready</span>
+                </div>
+                
+                <p class="project-full-description">Python-based portfolio generator with Jinja2 templating, real-time file monitoring, and automated GitHub Pages deployment. The tool you're using right now to build this portfolio.</p>
+                
+                <ul class="project-resume-lines">
+                    
+                    <li>Built Python generator with Jinja2 templating engine supporting template inheritance and dynamic content injection from JSON</li>
+                    
+                    <li>Implemented two-repository architecture separating build tool from deployment site with automated CI/CD pipeline</li>
+                    
+                    <li>Designed recursive directory traversal system for copying static assets with real-time file system monitoring using watchdog library</li>
+                    
+                    <li>Created watch mode with automated regeneration enabling rapid development iteration and immediate preview</li>
+                    
+                </ul>
+                
+                <div class="project-tech-stack">
+                    
+                    <span class="tech-tag">Python</span>
+                    
+                    <span class="tech-tag">Jinja2</span>
+                    
+                    <span class="tech-tag">Watchdog</span>
+                    
+                    <span class="tech-tag">File I/O</span>
+                    
+                    <span class="tech-tag">GitHub Actions</span>
+                    
+                    <span class="tech-tag">CI/CD</span>
+                    
+                </div>
+                
+                <div class="project-actions">
+                    
+                    <a href="https://github.com/nfemmanuel/portfolio-generator" class="btn btn-primary" target="_blank">View Code</a>
+                    
+                    
+                    
+                    
+                    <a href="project-5.html" class="btn btn-secondary">View Page</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="full-project-card" data-index="5" id="project-6">
+            <div class="project-card-content">
+                <div class="project-header">
+                    <h2>CLI-UNO</h2>
+                    <span class="project-status-badge">Ready</span>
+                </div>
+                
+                <p class="project-full-description">Full-featured UNO card game with Flask REST API and multiple AI difficulty levels using game theory algorithms. Implements utility-based decision making and strategic play patterns.</p>
+                
+                <ul class="project-resume-lines">
+                    
+                    <li>Designed object-oriented architecture with Card, Deck, and GameState classes following inheritance patterns for extensibility</li>
+                    
+                    <li>Implemented three AI difficulty tiers using game theory concepts: random selection, heuristic strategy, and utility-based decision making</li>
+                    
+                    <li>Developed utility function evaluating card plays based on threat assessment, card value management, and optimal color selection</li>
+                    
+                    <li>Built Flask REST API with JSON serialization enabling seamless transition from CLI to web platform</li>
+                    
+                </ul>
+                
+                <div class="project-tech-stack">
+                    
+                    <span class="tech-tag">Python</span>
+                    
+                    <span class="tech-tag">Flask</span>
+                    
+                    <span class="tech-tag">REST APIs</span>
+                    
+                    <span class="tech-tag">OOP Design</span>
+                    
+                    <span class="tech-tag">Game Theory</span>
+                    
+                    <span class="tech-tag">Utility Functions</span>
+                    
+                    <span class="tech-tag">JSON</span>
+                    
+                </div>
+                
+                <div class="project-actions">
+                    
+                    <a href="https://github.com/nfemmanuel/cli-uno" class="btn btn-primary" target="_blank">View Code</a>
+                    
+                    
+                    
+                    
+                    <a href="project-6.html" class="btn btn-secondary">View Page</a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script src="scripts/projects-page.js"></script>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p class="footer-text">© 2026 NF Emmanuel. Built with Python & Jinja2.</p>
+            
+            <div class="footer-links">
+                <a href="https://github.com/nfemmanuel">GitHub</a>
+                <a href="https://linkedin.com/in/oluwaniifemi-emmanuel">LinkedIn</a>
+                <a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu" title="Send me an email">Email</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="scripts/background.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/carousel.js"></script>
+    
+</body>
+</html>

@@ -1,52 +1,467 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <title>NF Emmanuel - Portfolio</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/projects.css">
+    <link rel="stylesheet" href="styles/resume.css">
+</head>
 
-<html>
-
-    <head>
-        <title>NF's Page</title>
-        <link rel="stylesheet" href="styles/main.css">
-        <link rel="stylesheet" href="styles/portolio">
-    </head>
-
-    <body>
-
-        <!DOCTYPE html>
-
-<html>
-
-    <head>
-        <link rel="stylesheet" href="styles/base.css">
-    </head>
-
-    <body>
-
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="#projects">All Projects</a>
-        </nav>
-
+<body>
+    <!-- Matrix background -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">NF Emmanuel</a>
+            
+            <!-- Hamburger Menu -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <nav class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="resume.html">Resume</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+            
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main>
         
-            <h1>NF's Portfolio</h1>
 
-            <!-- Introductory Paragraph for the site -->
+<!-- Matrix background -->
+<canvas id="matrix-bg"></canvas>
 
-            <p>
-                Welcome to my portfolio. Here are some of my recent projects:
-            </p>
-
-            <div class="projects-list">
-                
-                    <div class="project-preview">
-                        <h2>Task Scheduler API</h2>
-                        <p>Backend API for intelligent task scheduling system with database persistence</p>
-                    </div>
-                
+<main>
+    <section id="home" class="hero-section">
+        <div id="header-text">
+            <div class="hero-container">
+                <div id="hero-content">
+                    <h1 class="hero-title">Oluwaniifemi "NF" Emmanuel</h1>
+                    <p class="hero-tagline">Product Manager & Software Engineer</p>
+                    <p class="hero-hook">Building thoughtful products with code</p>
+                </div>
+                <div class="hero-buttons">
+                    <a href="#projects" class="btn btn-primary">View Projects</a>
+                    <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+                </div>
             </div>
 
-        
+            <div id="about-section">
+                <h2>About Me</h2>
+                <p>
+                    I'm a Junior at Minerva University who works at the intersection of product and
+                    engineering. I love building solutions that make people's daily lives easier and more efficient.
+                </p>
+                <p>
+                    Whether I'm writing code or designing systems, I focus on understanding the "why"
+                    behind what we build and ensuring it actually solves real problems.
+                </p>
+                <p>
+                    Currently building an advanced task scheduler, exploring AI/ML, and seeking PM, SWE,
+                    or TPM internships for Summer 2026 where I can contribute to products that matter.
+                </p>
+            </div>
+        </div>
+        <div id="profile">
+            <div class="profile-container">
+                <img src="images/profile.png" alt="NF Emmanuel" class="profile-photo">
+            </div>
 
-        <footer>
-            <p>&copy; 2024 NF's Portfolio</p>
-        </footer>
-    </body>
+            <!-- Orbiting tech icons -->
+            <div class="orbit-ring">
+                <img src="images/tech/python.svg" class="orbit-icon orbit-icon-1" alt="Python">
+                <img src="images/tech/react.svg" class="orbit-icon orbit-icon-2" alt="React">
+                <img src="images/tech/kotlin.svg" class="orbit-icon orbit-icon-3" alt="Kotlin">
+                <img src="images/tech/flask.svg" class="orbit-icon orbit-icon-4" alt="Flask">
+                <img src="images/tech/postgresql.svg" class="orbit-icon orbit-icon-5" alt="SQL">
+                <img src="images/tech/git.svg" class="orbit-icon orbit-icon-6" alt="Git">
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <div class="projects-container">
+
+            <h2 class="section-title">My Projects</h2>
+
+            <!-- Carousel Wrapper -->
+            <div class="carousel-wrapper">
+
+                <!-- Project Cards Container (this scrolls) -->
+                <div class="project-cards">
+
+                    
+                    <div class="project-card">
+                        <h3>ProofScript</h3>
+                        <p class="project-status">In Development</p>
+                        <p class="project-description">A custom programming language designed for verified algorithm development with built-in correctness checking and LaTeX documentation generation</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            
+                            <span class="tech-badge">Python</span>
+                            
+                            <span class="tech-badge">Language Design</span>
+                            
+                            <span class="tech-badge">Parser Design</span>
+                            
+                            <span class="tech-badge">Visitor Pattern</span>
+                            
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            
+                            <a href="https://github.com/nfemmanuel/ProofScript" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            
+                            
+                            <a href="project-1.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <h3>Game Night App</h3>
+                        <p class="project-status">Demo Ready</p>
+                        <p class="project-description">React PWA for organizing game nights with drag-and-drop player management and an Imposter game mode</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            
+                            <span class="tech-badge">React</span>
+                            
+                            <span class="tech-badge">PWA</span>
+                            
+                            <span class="tech-badge">Framer Motion</span>
+                            
+                            <span class="tech-badge">Context API</span>
+                            
+                            <span class="tech-badge">@dnd-kit</span>
+                            
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            
+                            <a href="https://github.com/nfemmanuel/game-night" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            
+                            
+                            <a href="https://game-night-one.vercel.app" class="btn btn-small btn-primary" target="_blank">View Demo</a>
+                            
+                            <a href="project-2.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <h3>Claude Branch Tracker</h3>
+                        <p class="project-status">In Development</p>
+                        <p class="project-description">Chrome extension that visualizes conversation branches in Claude.ai, helping users track different conversation paths</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            
+                            <span class="tech-badge">JavaScript</span>
+                            
+                            <span class="tech-badge">Chrome Extension API</span>
+                            
+                            <span class="tech-badge">DOM Manipulation</span>
+                            
+                            <span class="tech-badge">Content Hashing</span>
+                            
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            
+                            <a href="https://github.com/nfemmanuel/branch-tracker" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            
+                            
+                            <a href="project-3.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <h3>Tic-Tac-Toe Android Game</h3>
+                        <p class="project-status">Ready</p>
+                        <p class="project-description">Android game featuring single-player mode with Minimax AI opponent and two-player pass-and-play</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            
+                            <span class="tech-badge">Kotlin</span>
+                            
+                            <span class="tech-badge">Android SDK</span>
+                            
+                            <span class="tech-badge">Minimax Algorithm</span>
+                            
+                            <span class="tech-badge">Coroutines</span>
+                            
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            
+                            <a href="https://github.com/nfemmanuel/tic-tac-toe" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            
+                            
+                            <a href="project-4.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <h3>Static Site Generator</h3>
+                        <p class="project-status">Ready</p>
+                        <p class="project-description">Python-based portfolio generator with Jinja2 templating, real-time file monitoring, and automated GitHub Pages deployment. The tool you're using right now to build this portfolio.</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            
+                            <span class="tech-badge">Python</span>
+                            
+                            <span class="tech-badge">Jinja2</span>
+                            
+                            <span class="tech-badge">Watchdog</span>
+                            
+                            <span class="tech-badge">File I/O</span>
+                            
+                            <span class="tech-badge">GitHub Actions</span>
+                            
+                            <span class="tech-badge">CI/CD</span>
+                            
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            
+                            <a href="https://github.com/nfemmanuel/portfolio-generator" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            
+                            
+                            <a href="project-5.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <h3>CLI-UNO</h3>
+                        <p class="project-status">Ready</p>
+                        <p class="project-description">Full-featured UNO card game with Flask REST API and multiple AI difficulty levels using game theory algorithms. Implements utility-based decision making and strategic play patterns.</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            
+                            <span class="tech-badge">Python</span>
+                            
+                            <span class="tech-badge">Flask</span>
+                            
+                            <span class="tech-badge">REST APIs</span>
+                            
+                            <span class="tech-badge">OOP Design</span>
+                            
+                            <span class="tech-badge">Game Theory</span>
+                            
+                            <span class="tech-badge">Utility Functions</span>
+                            
+                            <span class="tech-badge">JSON</span>
+                            
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            
+                            <a href="https://github.com/nfemmanuel/cli-uno" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            
+                            
+                            <a href="project-6.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+                    
+
+                </div>
+
+            </div>
+
+            <!-- Carousel Indicators (● ○ ○ ○) -->
+            <div class="carousel-indicators">
+                <!-- We'll generate these with JS later -->
+            </div>
+
+            <!-- Progress Text (1 of 4) -->
+            <p class="carousel-progress">
+                <span id="current-project">1</span> of <span id="total-projects">6</span>
+            </p>
+
+        </div>
+    </section>
+
+    <section id="skills">
+        <div class="skills-container">
+            <h2 class="section-title">My Skills & Technologies</h2>
+
+            <div class="skills-grid">
+
+                <div class="skill-category">
+                    <h3>Backend</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <span>Python</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>Flask</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>REST APIs</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>SQL / PostgreSQL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Frontend</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <span>JavaScript</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>React</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>HTML/CSS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Mobile</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <span>Kotlin</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>Android SDK</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Tools & CS</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <span>Git / GitHub</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>DSA</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>OOP Design</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>System Architecture</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>Product Management</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <span>Figma / Prototyping</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>Product Strategy</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>User Research</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>A/B Testing</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>PRDs & Roadmaps</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>AI & ML</h3>
+                    <div class="skill-items">
+                        <div class="skill-item">
+                            <span>Prompt Engineering</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>OpenAI API</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>LLM Integration</span>
+                        </div>
+                        <div class="skill-item">
+                            <span>AI Product Design</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="contact-container">
+            <h2 class="section-title">Get In Touch</h2>
+
+            <div class="contact-content">
+                <p>
+                    Interested in collaborating or have a project in mind?
+                    Let's connect and build something great together.
+                </p>
+
+                <div class="contact-links">
+                    <a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu" class="btn btn-primary" target="_blank">Email
+                        Me</a>
+                    <a href="https://linkedin.com/in/oluwaniifemi-emmanuel" class="btn btn-secondary"
+                        target="_blank">LinkedIn</a>
+                    <a href="https://github.com/nfemmanuel" class="btn btn-secondary" target="_blank">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p class="footer-text">© 2026 NF Emmanuel. Built with Python & Jinja2.</p>
+            
+            <div class="footer-links">
+                <a href="https://github.com/nfemmanuel">GitHub</a>
+                <a href="https://linkedin.com/in/oluwaniifemi-emmanuel">LinkedIn</a>
+                <a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu" title="Send me an email">Email</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="scripts/background.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/carousel.js"></script>
+    
+</body>
 </html>

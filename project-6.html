@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <title>NF Emmanuel - Portfolio</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/projects.css">
+    <link rel="stylesheet" href="styles/resume.css">
+</head>
+
+<body>
+    <!-- Matrix background -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">NF Emmanuel</a>
+            
+            <!-- Hamburger Menu -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <nav class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="resume.html">Resume</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+            
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main>
+        
+<div class="project-detail-page">
+    <div class="project-detail-card">
+        <!-- Header -->
+        <div class="detail-header">
+            <div>
+                <h1>CLI-UNO</h1>
+                <span class="project-status-badge">Ready</span>
+            </div>
+            <div class="detail-actions">
+                
+                <a href="https://github.com/nfemmanuel/cli-uno" class="btn btn-primary" target="_blank">View Code</a>
+                
+                
+            </div>
+        </div>
+        
+        <!-- Description -->
+        <section class="detail-section">
+            <h2>About</h2>
+            <p>Full-featured UNO card game with Flask REST API and multiple AI difficulty levels using game theory algorithms. Implements utility-based decision making and strategic play patterns.</p>
+        </section>
+        
+        <!-- Motivation -->
+        <section class="detail-section">
+            <h2>Motivation</h2>
+            <p>After learning adversarial search and utility functions in my AI Algorithms course, I wanted to apply minimax thinking to a real game. UNO provided the perfect testbed - complex enough to showcase strategic AI but simple enough to implement in an afternoon. The project evolved from CLI to REST API, demonstrating how clean architecture enables seamless platform transitions.</p>
+        </section>
+        
+        <!-- Use Cases -->
+        
+        <section class="detail-section">
+            <h2>Use Cases</h2>
+            <div class="use-cases-grid">
+                
+                <div class="use-case-card">
+                    <h3>Ai Learning</h3>
+                    <p>Practical application of adversarial search, utility functions, and strategic decision-making algorithms</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3>Architecture Demo</h3>
+                    <p>Demonstrates clean separation between game logic, AI, and interface layers enabling platform flexibility</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3>Difficulty Scaling</h3>
+                    <p>Shows progression from random play to strategic utility-based AI across three difficulty tiers</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3>Api Design</h3>
+                    <p>REST API architecture supporting multiplayer game state management and JSON serialization</p>
+                </div>
+                
+            </div>
+        </section>
+        
+        
+        <!-- Code Samples -->
+        
+        <section class="detail-section">
+            <h2>Examples</h2>
+            
+                
+                <div class="code-sample">
+                    <h3>Utility-Based AI Decision Making</h3>
+                    <pre><code>def calculate_card_utility(self, card, opponent_hand_size):
+    utility = 0
+    # Threat response for low opponent hand count
+    if opponent_hand_size <= 3:
+        if card.value == 'draw2': utility += 15
+        if card.value == 'wild_draw4': utility += 20
+        if card.value in ['skip', 'reverse']: utility += 10
+    
+    # Card value management
+    if card.card_type == 'number':
+        utility += int(card.value)  # Prefer high numbers
+    
+    # Wild management (save as backup)
+    if card.card_type == 'wild' and card.value == 'wild':
+        utility -= 5
+    
+    return utility</code></pre>
+                </div>
+                
+            
+        </section>
+        
+        
+        <!-- Key Achievements -->
+        <section class="detail-section">
+            <h2>Key Achievements</h2>
+            <ul class="achievements-list">
+                
+                <li>Designed object-oriented architecture with Card, Deck, and GameState classes following inheritance patterns for extensibility</li>
+                
+                <li>Implemented three AI difficulty tiers using game theory concepts: random selection, heuristic strategy, and utility-based decision making</li>
+                
+                <li>Developed utility function evaluating card plays based on threat assessment, card value management, and optimal color selection</li>
+                
+                <li>Built Flask REST API with JSON serialization enabling seamless transition from CLI to web platform</li>
+                
+            </ul>
+        </section>
+        
+        <!-- Technology Logos Section -->
+        
+        <section class="detail-section">
+            <h2>Technologies Used</h2>
+            <div class="tech-logos">
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/python.svg" 
+                        alt="Python" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Python</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/flask.svg" 
+                        alt="Flask" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Flask</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/rest-apis.svg" 
+                        alt="REST APIs" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">REST APIs</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/oop-design.svg" 
+                        alt="OOP Design" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">OOP Design</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/game-theory.svg" 
+                        alt="Game Theory" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Game Theory</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/utility-functions.svg" 
+                        alt="Utility Functions" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Utility Functions</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/json.svg" 
+                        alt="JSON" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">JSON</span>
+                </div>
+                
+            </div>
+        </section>
+        
+        
+        <!-- Language Breakdown -->
+        
+        <section class="detail-section">
+            <h2>Language Breakdown</h2>
+            <div class="language-bars">
+                
+                <div class="language-item">
+                    <div class="language-header">
+                        <span class="language-name">Python</span>
+                        <span class="language-percent">100.0%%</span>
+                    </div>
+                    <div class="language-bar-bg">
+                        <div class="language-bar-fill" style="width: 100.0%%"></div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+    </div>
+</div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p class="footer-text">© 2026 NF Emmanuel. Built with Python & Jinja2.</p>
+            
+            <div class="footer-links">
+                <a href="https://github.com/nfemmanuel">GitHub</a>
+                <a href="https://linkedin.com/in/oluwaniifemi-emmanuel">LinkedIn</a>
+                <a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu" title="Send me an email">Email</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="scripts/background.js"></script>
+    <script src="scripts/theme.js"></script>
+    <script src="scripts/carousel.js"></script>
+    
+</body>
+</html>

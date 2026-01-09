@@ -1,0 +1,17 @@
+/* Light mode (default) */
+:root {
+    --bg-primary: #FFFDF6;
+    --bg-secondary: #FAF6E9;
+    --text: #2d2d2d;
+    --accent-1: #DDEB9D;
+    --accent-2: #A0C878;
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+    --bg-primary: #1A1916;
+    --bg-secondary: #2D2A23;
+    --text: #e8e8e8;
+    --accent-1: #4A5C2E;
+    --accent-2: #5D7A45;
+}

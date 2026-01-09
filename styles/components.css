@@ -1,0 +1,247 @@
+/* ============================================
+    SECTION CONTAINERS
+   ============================================ */
+
+.skills-container,
+.contact-container,
+.footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+/* ============================================
+    SKILLS SECTION
+   ============================================ */
+
+#skills {
+    padding: 80px 0;
+}
+
+.skills-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+    justify-content: center;
+}
+
+.skill-category {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--glass-shadow);
+
+    padding: 32px;
+    transition: all 0.3s ease;
+}
+
+.skill-category:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.skill-category h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--text);
+    text-align: center;
+    font-weight: 600;
+}
+
+.skill-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skill-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: color-mix(in srgb, var(--accent-2), transparent 85%);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.skill-item:hover {
+    background: color-mix(in srgb, var(--accent-2), transparent 75%);
+    transform: translateX(4px);
+}
+
+.skill-item span {
+    font-size: 1rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.skill-item img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+/* ============================================
+    CONTACT SECTION
+   ============================================ */
+
+#contact {
+    padding: 80px 0;
+}
+
+.contact-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.contact-content {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--glass-shadow);
+
+    padding: 60px 40px;
+    margin-top: 40px;
+}
+
+.contact-content p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.contact-links {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.contact-links .btn {
+    min-width: 140px;
+}
+
+/* ============================================
+    FOOTER
+   ============================================ */
+
+footer {
+    padding: 40px 0;
+    border-top: 2px solid color-mix(in srgb, var(--accent-2), transparent 80%);
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-text {
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.footer-links a:hover {
+    opacity: 1;
+    color: var(--accent-2);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    #skills {
+        padding: 60px 0;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        padding: 0 20px;
+    }
+
+    .skills-container {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    /* Horizontal scroll */
+    .skills-grid {
+        display: flex !important;
+        /* Override grid */
+        grid-template-columns: none;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        /* Override center from desktop */
+
+        overflow-x: auto;
+        overflow-y: visible;
+
+        gap: 16px;
+        padding: 20px;
+        margin-top: 30px;
+
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .skills-grid::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .skills-grid::-webkit-scrollbar-track {
+        background: color-mix(in srgb, var(--accent-2), transparent 90%);
+        border-radius: 2px;
+    }
+
+    .skills-grid::-webkit-scrollbar-thumb {
+        background: var(--accent-2);
+        border-radius: 2px;
+    }
+
+    .skill-category {
+        min-width: 280px;
+        max-width: 280px;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
+
+    .skill-category h3 {
+        font-size: 1.3rem;
+    }
+
+    .skill-item span {
+        font-size: 0.95rem;
+    }
+}

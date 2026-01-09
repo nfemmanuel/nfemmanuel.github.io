@@ -1,0 +1,327 @@
+/* ============================================
+   RESUME PAGE
+   ============================================ */
+
+.resume-page {
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+}
+
+.resume-page-title {
+    font-size: 3rem;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* Toggle Switch */
+.resume-toggle {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.toggle-btn {
+    padding: 12px 32px;
+    background: color-mix(in srgb, var(--accent-1), transparent 60%);
+    color: var(--text);
+    border: 1px solid color-mix(in srgb, var(--accent-1), transparent 50%);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.toggle-btn:first-child {
+    border-radius: 12px 0 0 12px;
+    border-right: none;
+}
+
+.toggle-btn:last-child {
+    border-radius: 0 12px 12px 0;
+    border-left: none;
+}
+
+.toggle-btn:hover {
+    background: color-mix(in srgb, var(--accent-2), transparent 50%);
+}
+
+.toggle-btn.active {
+    background: var(--accent-2);
+    color: white;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-2), transparent 50%);
+}
+
+/* Resume Container */
+.resume-container {
+    max-width: 900px;
+    margin: 0 auto 30px;
+}
+
+.resume-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--glass-shadow);
+    padding: 60px;
+    transition: opacity 0.3s ease;
+}
+
+.resume-card.hidden {
+    display: none;
+}
+
+/* Resume Header */
+.resume-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--accent-2);
+}
+
+.resume-header h1 {
+    font-size: 2.5rem;
+    color: var(--text);
+    margin-bottom: 15px;
+}
+
+.resume-contact {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+/* Resume Sections */
+.resume-section {
+    margin-bottom: 30px;
+}
+
+.resume-section h2 {
+    font-size: 1.5rem;
+    color: var(--accent-2);
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent-1), transparent 70%);
+}
+
+.resume-section p {
+    line-height: 1.7;
+    margin-bottom: 10px;
+}
+
+/* Resume Items */
+.resume-item {
+    margin-bottom: 20px;
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.item-header h3 {
+    font-size: 1.2rem;
+    color: var(--text);
+    margin-bottom: 5px;
+}
+
+.company {
+    font-size: 1rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.date {
+    font-size: 0.95rem;
+    opacity: 0.7;
+    white-space: nowrap;
+}
+
+.achievements {
+    list-style: none;
+    padding-left: 0;
+}
+
+.achievements li {
+    padding-left: 20px;
+    margin-bottom: 8px;
+    position: relative;
+    line-height: 1.6;
+}
+
+.achievements li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent-2);
+    font-weight: bold;
+}
+
+/* Skills Grid */
+.skills-grid-resume {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    line-height: 1.7;
+}
+
+/* Download Actions */
+.resume-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+
+    header,
+    .resume-toggle,
+    .resume-actions,
+    .resume-page-title,
+    footer,
+    #matrix-bg {
+        display: none !important;
+    }
+
+    .resume-card {
+        background: white;
+        border: none;
+        box-shadow: none;
+        padding: 40px;
+        max-width: 100%;
+    }
+
+    .resume-section {
+        page-break-inside: avoid;
+    }
+}
+
+/* ============================================
+    MOBILE RESPONSIVENESS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .resume-page {
+        padding: 20px 10px 40px;
+    }
+
+    .resume-page-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .resume-container {
+        max-width: 100%;
+        margin: 0 auto 15px;
+    }
+
+    .resume-card {
+        padding: 25px 15px;
+        border-radius: 12px;
+    }
+
+    /* Header - A4 style */
+    .resume-header h1 {
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+    }
+
+    .resume-contact {
+        font-size: 0.65rem;
+        gap: 6px;
+    }
+
+    /* Section titles */
+    .resume-section {
+        margin-bottom: 20px;
+    }
+
+    .resume-section h2 {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        padding-bottom: 4px;
+    }
+
+    .resume-section p {
+        font-size: 0.7rem;
+        line-height: 1.4;
+        margin-bottom: 6px;
+    }
+
+    /* Items */
+    .resume-item {
+        margin-bottom: 12px;
+    }
+
+    .item-header {
+        flex-direction: column;
+        gap: 2px;
+        align-items: flex-start;
+        margin-bottom: 6px;
+    }
+
+    .item-header h3 {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+    }
+
+    .company {
+        font-size: 0.7rem;
+    }
+
+    .date {
+        font-size: 0.65rem;
+    }
+
+    /* Bullet points - very compact A4 style */
+    .achievements li {
+        font-size: 0.7rem;
+        /* ~9.5pt */
+        padding-left: 15px;
+        margin-bottom: 5px;
+        line-height: 1.4;
+    }
+
+    .achievements li::before {
+        font-size: 0.7rem;
+    }
+
+    /* Skills grid */
+    .skills-grid-resume {
+        gap: 6px;
+        font-size: 0.7rem;
+        line-height: 1.5;
+    }
+
+    /* Toggle buttons */
+    .resume-toggle {
+        margin-bottom: 25px;
+    }
+
+    .toggle-btn {
+        padding: 8px 20px;
+        font-size: 0.8rem;
+    }
+
+    /* Download button */
+    .resume-actions .btn {
+        width: 100%;
+        max-width: 300px;
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+}
