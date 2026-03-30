@@ -45,6 +45,10 @@ body {
     font-weight: 300;
 }
 
+a:visited {
+    color: inherit;
+}
+
 /* Hide matrix background in light mode */
 body:not(.dark-mode) #matrix-bg {
     display: none;
