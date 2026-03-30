@@ -55,7 +55,7 @@
 
 /* Resume Container */
 .resume-container {
-    max-width: 900px;
+    max-width: 1120px;
     margin: 0 auto 30px;
 }
 
@@ -68,6 +68,7 @@
     box-shadow: var(--glass-shadow);
     padding: 60px;
     transition: opacity 0.3s ease;
+    aspect-ratio: 210 / 297;
 }
 
 .resume-card.hidden {
@@ -173,6 +174,17 @@
     line-height: 1.7;
 }
 
+/* Links inside resume card */
+.resume-card a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.resume-card a:hover {
+    color: var(--accent-2);
+}
+
 /* Download Actions */
 .resume-actions {
     display: flex;
@@ -234,7 +246,6 @@
         border-radius: 12px;
     }
 
-    /* Header - A4 style */
     .resume-header h1 {
         font-size: 1.3rem;
         margin-bottom: 8px;
@@ -245,7 +256,6 @@
         gap: 6px;
     }
 
-    /* Section titles */
     .resume-section {
         margin-bottom: 20px;
     }
@@ -262,7 +272,6 @@
         margin-bottom: 6px;
     }
 
-    /* Items */
     .resume-item {
         margin-bottom: 12px;
     }
@@ -287,10 +296,8 @@
         font-size: 0.65rem;
     }
 
-    /* Bullet points - very compact A4 style */
     .achievements li {
         font-size: 0.7rem;
-        /* ~9.5pt */
         padding-left: 15px;
         margin-bottom: 5px;
         line-height: 1.4;
@@ -300,14 +307,12 @@
         font-size: 0.7rem;
     }
 
-    /* Skills grid */
     .skills-grid-resume {
         gap: 6px;
         font-size: 0.7rem;
         line-height: 1.5;
     }
 
-    /* Toggle buttons */
     .resume-toggle {
         margin-bottom: 25px;
     }
@@ -317,7 +322,6 @@
         font-size: 0.8rem;
     }
 
-    /* Download button */
     .resume-actions .btn {
         width: 100%;
         max-width: 300px;

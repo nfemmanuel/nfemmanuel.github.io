@@ -50,12 +50,12 @@
         <!-- Header -->
         <div class="detail-header">
             <div>
-                <h1>ProofScript</h1>
-                <span class="project-status-badge">In Development</span>
+                <h1>USD Exchange</h1>
+                <span class="project-status-badge">Demo Ready</span>
             </div>
             <div class="detail-actions">
                 
-                <a href="https://github.com/nfemmanuel/ProofScript" class="btn btn-primary" target="_blank">View Code</a>
+                <a href="https://github.com/nfemmanuel/usd-exchange" class="btn btn-primary" target="_blank">View Code</a>
                 
                 
             </div>
@@ -64,13 +64,13 @@
         <!-- Description -->
         <section class="detail-section">
             <h2>About</h2>
-            <p>A custom programming language designed for verified algorithm development with built-in correctness checking and LaTeX documentation generation</p>
+            <p>A pipeline for importing USD 3D scene files into a live metaverse fabric â€” parsing geometry, computing world-space transforms, and publishing signed payloads with cryptographic author attribution.</p>
         </section>
         
         <!-- Motivation -->
         <section class="detail-section">
             <h2>Motivation</h2>
-            <p>Inspired by formal verification methods learned in CS152, ProofScript was born from the frustration of manually proving algorithm correctness. The goal was to create a language that bridges the gap between algorithm design and formal proof, making it easier to write provably correct code. Built using Python with custom lexer/parser, implementing the visitor pattern for AST traversal, and achieving Turing completeness through careful implementation of control flow structures.</p>
+            <p>Built at the First Annual Open Metaverse Hackathon (March 2026). The challenge: USD is the lingua franca of 3D content but metaverse platforms have no standard import path. The goal was to build the bridge â€” a pipeline that could read any USD scene, walk the prim hierarchy, resolve inherited transforms, and publish each object as a cryptographically signed payload to a live metaverse fabric. Author identity is baked in from the start using Ed25519 DID stubs, laying groundwork for on-chain ownership.</p>
         </section>
         
         <!-- Use Cases -->
@@ -84,13 +84,15 @@
             <h2>Key Achievements</h2>
             <ul class="achievements-list">
                 
-                <li>Designed and implemented a domain-specific language with custom lexer and parser achieving Turing completeness</li>
+                <li>Implemented USD scene traversal using pxr (usd-core) to walk prim hierarchies and extract geometry, attributes, and world-space transforms</li>
                 
-                <li>Built interpreter using visitor pattern for clean AST traversal and extensible node handling</li>
+                <li>Designed multi-language pipeline (Python parser â†’ Node.js publisher) with clean handoff via structured JSON payloads</li>
                 
-                <li>Implemented control flow structures (if/else, while, for loops) and array operations with proper scoping</li>
+                <li>Integrated ManifolderClient and MSF_Map_Svc APIs to write signed objects to live Patched Reality / Metaversal Corp fabric</li>
                 
-                <li>Solved complex grammar parsing issues through systematic debugging and architecture refactoring</li>
+                <li>Built Ed25519 DID stub identity system for cryptographic author attribution, with roadmap toward on-chain ownership verification</li>
+                
+                <li>Delivered working end-to-end demo from sample USD scene to live metaverse environment within hackathon timeframe</li>
                 
             </ul>
         </section>
@@ -116,33 +118,66 @@
                     
                     
                     <!-- Try to load image, hide if fails -->
-                    <img src="images/tech/language-design.svg" 
-                        alt="Language Design" 
+                    <img src="images/tech/usd-core-(pxr).svg" 
+                        alt="usd-core (pxr)" 
                         onerror="this.style.display='none'">
                     
-                    <span class="tech-name">Language Design</span>
+                    <span class="tech-name">usd-core (pxr)</span>
                 </div>
                 
                 <div class="tech-logo-item">
                     
                     
                     <!-- Try to load image, hide if fails -->
-                    <img src="images/tech/parser-design.svg" 
-                        alt="Parser Design" 
+                    <img src="images/tech/nodejs.svg" 
+                        alt="Node.js" 
                         onerror="this.style.display='none'">
                     
-                    <span class="tech-name">Parser Design</span>
+                    <span class="tech-name">Node.js</span>
                 </div>
                 
                 <div class="tech-logo-item">
                     
                     
                     <!-- Try to load image, hide if fails -->
-                    <img src="images/tech/visitor-pattern.svg" 
-                        alt="Visitor Pattern" 
+                    <img src="images/tech/ed25519.svg" 
+                        alt="Ed25519" 
                         onerror="this.style.display='none'">
                     
-                    <span class="tech-name">Visitor Pattern</span>
+                    <span class="tech-name">Ed25519</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/socketio.svg" 
+                        alt="Socket.io" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">Socket.io</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/websocket.svg" 
+                        alt="WebSocket" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">WebSocket</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/manifolderclient.svg" 
+                        alt="ManifolderClient" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">ManifolderClient</span>
                 </div>
                 
             </div>
@@ -158,10 +193,20 @@
                 <div class="language-item">
                     <div class="language-header">
                         <span class="language-name">Python</span>
-                        <span class="language-percent">100.0%</span>
+                        <span class="language-percent">55.0%</span>
                     </div>
                     <div class="language-bar-bg">
-                        <div class="language-bar-fill" style="width: 100.0%"></div>
+                        <div class="language-bar-fill" style="width: 55.0%"></div>
+                    </div>
+                </div>
+                
+                <div class="language-item">
+                    <div class="language-header">
+                        <span class="language-name">JavaScript</span>
+                        <span class="language-percent">45.0%</span>
+                    </div>
+                    <div class="language-bar-bg">
+                        <div class="language-bar-fill" style="width: 45.0%"></div>
                     </div>
                 </div>
                 
@@ -191,5 +236,14 @@
     <script src="scripts/theme.js"></script>
     <script src="scripts/carousel.js"></script>
     
+    <script>
+        document.querySelectorAll('a[href]').forEach(a => {
+            const href = a.getAttribute('href');
+            if (href.startsWith('http') || href.startsWith('//') || a.hasAttribute('download')) {
+                a.setAttribute('target', '_blank');
+                a.setAttribute('rel', 'noopener noreferrer');
+            }
+        });
+    </script>
 </body>
 </html>

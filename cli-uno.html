@@ -50,12 +50,12 @@
         <!-- Header -->
         <div class="detail-header">
             <div>
-                <h1>Static Site Generator</h1>
+                <h1>CLI-UNO</h1>
                 <span class="project-status-badge">Ready</span>
             </div>
             <div class="detail-actions">
                 
-                <a href="https://github.com/nfemmanuel/portfolio-generator" class="btn btn-primary" target="_blank">View Code</a>
+                <a href="https://github.com/nfemmanuel/cli-uno" class="btn btn-primary" target="_blank">View Code</a>
                 
                 
             </div>
@@ -64,13 +64,13 @@
         <!-- Description -->
         <section class="detail-section">
             <h2>About</h2>
-            <p>Python-based portfolio generator with Jinja2 templating, real-time file monitoring, and automated GitHub Pages deployment. The tool you're using right now to build this portfolio.</p>
+            <p>Full-featured UNO card game with Flask REST API and multiple AI difficulty levels using game theory algorithms. Implements utility-based decision making and strategic play patterns.</p>
         </section>
         
         <!-- Motivation -->
         <section class="detail-section">
             <h2>Motivation</h2>
-            <p>While building my portfolio, I realized I was manually copying HTML across pages and fighting with template inconsistencies. I needed a tool that could generate a multi-page site from templates while maintaining design consistency and enabling rapid iteration. This generator became the foundation of my entire portfolio workflow.</p>
+            <p>After learning adversarial search and utility functions in my AI Algorithms course, I wanted to apply minimax thinking to a real game. UNO provided the perfect testbed - complex enough to showcase strategic AI but simple enough to implement in an afternoon. The project evolved from CLI to REST API, demonstrating how clean architecture enables seamless platform transitions.</p>
         </section>
         
         <!-- Use Cases -->
@@ -80,23 +80,23 @@
             <div class="use-cases-grid">
                 
                 <div class="use-case-card">
-                    <h3>Portfolio Development</h3>
-                    <p>Rapidly iterate on portfolio design with instant regeneration and preview</p>
+                    <h3>Ai Learning</h3>
+                    <p>Practical application of adversarial search, utility functions, and strategic decision-making algorithms</p>
                 </div>
                 
                 <div class="use-case-card">
-                    <h3>Template Reuse</h3>
-                    <p>Maintain consistent design across multiple pages with template inheritance</p>
+                    <h3>Architecture Demo</h3>
+                    <p>Demonstrates clean separation between game logic, AI, and interface layers enabling platform flexibility</p>
                 </div>
                 
                 <div class="use-case-card">
-                    <h3>Automated Deployment</h3>
-                    <p>Push changes to GitHub and automatically deploy to live site</p>
+                    <h3>Difficulty Scaling</h3>
+                    <p>Shows progression from random play to strategic utility-based AI across three difficulty tiers</p>
                 </div>
                 
                 <div class="use-case-card">
-                    <h3>Content Management</h3>
-                    <p>Update portfolio content by editing simple JSON files instead of HTML</p>
+                    <h3>Api Design</h3>
+                    <p>REST API architecture supporting multiplayer game state management and JSON serialization</p>
                 </div>
                 
             </div>
@@ -110,20 +110,24 @@
             
                 
                 <div class="code-sample">
-                    <h3>Core Generator Logic</h3>
-                    <pre><code>def generate():
-    os.makedirs('portfolio-site', exist_ok=True)
-    with open('projects.json', 'r') as file:
-        data = json.load(file)
-    projects = data['projects']
-    env = Environment(loader=FileSystemLoader('templates'))
+                    <h3>Utility-Based AI Decision Making</h3>
+                    <pre><code>def calculate_card_utility(self, card, opponent_hand_size):
+    utility = 0
+    # Threat response for low opponent hand count
+    if opponent_hand_size <= 3:
+        if card.value == 'draw2': utility += 15
+        if card.value == 'wild_draw4': utility += 20
+        if card.value in ['skip', 'reverse']: utility += 10
     
-    # Generate all pages
-    for template_name in ['portfolio.html', 'projects.html', 'resume.html']:
-        template = env.get_template(template_name)
-        output = template.render(projects=projects)
-        with open(f'portfolio-site/{template_name}', 'w') as f:
-            f.write(output)</code></pre>
+    # Card value management
+    if card.card_type == 'number':
+        utility += int(card.value)  # Prefer high numbers
+    
+    # Wild management (save as backup)
+    if card.card_type == 'wild' and card.value == 'wild':
+        utility -= 5
+    
+    return utility</code></pre>
                 </div>
                 
             
@@ -135,13 +139,13 @@
             <h2>Key Achievements</h2>
             <ul class="achievements-list">
                 
-                <li>Built Python generator with Jinja2 templating engine supporting template inheritance and dynamic content injection from JSON</li>
+                <li>Designed object-oriented architecture with Card, Deck, and GameState classes following inheritance patterns for extensibility</li>
                 
-                <li>Implemented two-repository architecture separating build tool from deployment site with automated CI/CD pipeline</li>
+                <li>Implemented three AI difficulty tiers using game theory concepts: random selection, heuristic strategy, and utility-based decision making</li>
                 
-                <li>Designed recursive directory traversal system for copying static assets with real-time file system monitoring using watchdog library</li>
+                <li>Developed utility function evaluating card plays based on threat assessment, card value management, and optimal color selection</li>
                 
-                <li>Created watch mode with automated regeneration enabling rapid development iteration and immediate preview</li>
+                <li>Built Flask REST API with JSON serialization enabling seamless transition from CLI to web platform</li>
                 
             </ul>
         </section>
@@ -167,55 +171,66 @@
                     
                     
                     <!-- Try to load image, hide if fails -->
-                    <img src="images/tech/jinja2.svg" 
-                        alt="Jinja2" 
+                    <img src="images/tech/flask.svg" 
+                        alt="Flask" 
                         onerror="this.style.display='none'">
                     
-                    <span class="tech-name">Jinja2</span>
+                    <span class="tech-name">Flask</span>
                 </div>
                 
                 <div class="tech-logo-item">
                     
                     
                     <!-- Try to load image, hide if fails -->
-                    <img src="images/tech/watchdog.svg" 
-                        alt="Watchdog" 
+                    <img src="images/tech/rest-apis.svg" 
+                        alt="REST APIs" 
                         onerror="this.style.display='none'">
                     
-                    <span class="tech-name">Watchdog</span>
+                    <span class="tech-name">REST APIs</span>
                 </div>
                 
                 <div class="tech-logo-item">
                     
                     
                     <!-- Try to load image, hide if fails -->
-                    <img src="images/tech/file-i-o.svg" 
-                        alt="File I/O" 
+                    <img src="images/tech/oop-design.svg" 
+                        alt="OOP Design" 
                         onerror="this.style.display='none'">
                     
-                    <span class="tech-name">File I/O</span>
+                    <span class="tech-name">OOP Design</span>
                 </div>
                 
                 <div class="tech-logo-item">
                     
                     
                     <!-- Try to load image, hide if fails -->
-                    <img src="images/tech/github-actions.svg" 
-                        alt="GitHub Actions" 
+                    <img src="images/tech/game-theory.svg" 
+                        alt="Game Theory" 
                         onerror="this.style.display='none'">
                     
-                    <span class="tech-name">GitHub Actions</span>
+                    <span class="tech-name">Game Theory</span>
                 </div>
                 
                 <div class="tech-logo-item">
                     
                     
                     <!-- Try to load image, hide if fails -->
-                    <img src="images/tech/ci-cd.svg" 
-                        alt="CI/CD" 
+                    <img src="images/tech/utility-functions.svg" 
+                        alt="Utility Functions" 
                         onerror="this.style.display='none'">
                     
-                    <span class="tech-name">CI/CD</span>
+                    <span class="tech-name">Utility Functions</span>
+                </div>
+                
+                <div class="tech-logo-item">
+                    
+                    
+                    <!-- Try to load image, hide if fails -->
+                    <img src="images/tech/json.svg" 
+                        alt="JSON" 
+                        onerror="this.style.display='none'">
+                    
+                    <span class="tech-name">JSON</span>
                 </div>
                 
             </div>
@@ -264,5 +279,14 @@
     <script src="scripts/theme.js"></script>
     <script src="scripts/carousel.js"></script>
     
+    <script>
+        document.querySelectorAll('a[href]').forEach(a => {
+            const href = a.getAttribute('href');
+            if (href.startsWith('http') || href.startsWith('//') || a.hasAttribute('download')) {
+                a.setAttribute('target', '_blank');
+                a.setAttribute('rel', 'noopener noreferrer');
+            }
+        });
+    </script>
 </body>
 </html>

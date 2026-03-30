@@ -47,107 +47,120 @@
         
 <div class="resume-page">
     <h1 class="resume-page-title">Resume</h1>
-    
-    <!-- Toggle Switch -->
+
     <div class="resume-toggle">
         <button class="toggle-btn active" data-resume="pm">Product Manager</button>
         <button class="toggle-btn" data-resume="swe">Software Engineer</button>
     </div>
-    
-    <!-- Download Buttons -->
+
     <div class="resume-actions">
-        <button onclick="window.print()" class="btn btn-primary">
-            Download as PDF
-        </button>
+        <a href="files/NF_Emmanuel_PM_Resume.pdf" download class="btn btn-primary" id="download-btn">
+            Download PDF
+        </a>
     </div>
-    
-    <!-- Resume Display -->
+
     <div class="resume-container">
+
         <!-- PM Resume -->
         <div class="resume-card" id="pm-resume">
             <div class="resume-header">
                 <h1>Oluwaniifemi "NF" Emmanuel</h1>
                 <div class="resume-contact">
-                    <span>+1 (415) 792-8813</span>
-                    <span>oluwaniifemi.emmanuel@uni.minerva.edu</span>
-                    <span>github.com/nfemmanuel</span>
-                    <span>linkedin.com/in/oluwaniifemi-emmanuel</span>
+                    <span><a href="tel:+14157928813">+1 (415) 792-8813</a></span>
+                    <span><a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu">oluwaniifemi.emmanuel@uni.minerva.edu</a></span>
+                    <span><a href="https://nfemmanuel.com" target="_blank">nfemmanuel.com</a></span>
+                    <span><a href="https://github.com/nfemmanuel" target="_blank">github.com/nfemmanuel</a></span>
+                    <span><a href="https://linkedin.com/in/oluwaniifemi-emmanuel" target="_blank">linkedin.com/in/oluwaniifemi-emmanuel</a></span>
                 </div>
             </div>
-            
+
             <section class="resume-section">
                 <h2>Education</h2>
                 <div class="resume-item">
                     <div class="item-header">
                         <div>
-                            <h3>Minerva University</h3>
-                            <p class="company">Bachelor of Science, Computer Science & Artificial Intelligence</p>
+                            <h3>Minerva University <span style="font-weight:400; font-size:1rem;">(1% acceptance rate)</span></h3>
+                            <p class="company">Bachelor of Science, Computer Science &amp; Artificial Intelligence &mdash; San Francisco, CA</p>
                         </div>
                         <span class="date">Sep 2023 – May 2027</span>
                     </div>
                     <ul class="achievements">
-                        <li>Relevant Coursework: Data Structures & Algorithms, Formal Analysis, Complex Systems, Linear Algebra</li>
+                        <li>Relevant Coursework: Data Structures &amp; Algorithms, Formal Analysis, Complex Systems, Linear Algebra</li>
                     </ul>
                 </div>
             </section>
-            
+
             <section class="resume-section">
                 <h2>Experience</h2>
-                
+
+                <div class="resume-item">
+                    <div class="item-header">
+                        <div>
+                            <h3>Technical Product Manager</h3>
+                            <p class="company">Cofactor &mdash; San Francisco, CA (Remote)</p>
+                        </div>
+                        <span class="date">Feb 2026 – Present</span>
+                    </div>
+                    <ul class="achievements">
+                        <li>Shipped B2B SaaS platform 0-to-production in 4 weeks, onboarding European research community and validating two-tier marketplace model</li>
+                        <li>Managed 3-platform roadmap across PRDs, Jira backlog (3 Epics, 9 Features), and VC stakeholder coordination</li>
+                        <li>Reduced research validation time 60-80% via AI-powered system using Anthropic Claude API and academic APIs</li>
+                        <li>Led GDPR-compliant product launch enabling EU market entry through privacy architecture and cross-functional technical execution</li>
+                    </ul>
+                </div>
+
                 <div class="resume-item">
                     <div class="item-header">
                         <div>
                             <h3>Process Optimization Intern</h3>
-                            <p class="company">UL Solutions, Fremont, CA</p>
+                            <p class="company">UL Solutions &mdash; Fremont, CA</p>
                         </div>
                         <span class="date">May 2025 – Aug 2025</span>
                     </div>
                     <ul class="achievements">
-                        <li>Collaborated with cross-functional engineering team to integrate Python automation scripts, reducing test data errors by 50% across product lines</li>
-                        <li>Analyzed workflow data using statistical methods and visualization libraries to identify process bottlenecks, presenting findings to stakeholders</li>
-                        <li>Redesigned operational workflows reducing project timelines by 3 weeks, achieving $XM+ in cost savings through systematic process optimization</li>
-                        <li>Implemented validation protocols ensuring regulatory compliance across 200+ technical procedures, coordinating with QA and compliance teams</li>
+                        <li>Integrated Python automation scripts with cross-functional team, reducing test data errors by 50% across product lines</li>
+                        <li>Analyzed workflow data using statistical methods to identify bottlenecks, presenting findings to stakeholders</li>
+                        <li>Redesigned operational workflows reducing timelines by 3 weeks, achieving $XM+ cost savings through systematic optimization and implementing validation protocols ensuring regulatory compliance across 200+ procedures</li>
                     </ul>
                 </div>
-                
+
                 <div class="resume-item">
                     <div class="item-header">
                         <div>
                             <h3>Product Builder</h3>
-                            <p class="company">Google Academic Collaboration, San Francisco, CA</p>
+                            <p class="company">Google Academic Collaboration &mdash; San Francisco, CA</p>
                         </div>
                         <span class="date">Sep 2023 – May 2024</span>
                     </div>
                     <ul class="achievements">
-                        <li>Developed 4 product features for Google Photos platform, collaborating with 5-person cross-functional engineering team through full development cycle</li>
-                        <li>Built interactive Figma prototypes and conducted quantitative analysis on user behavior from 50+ participant studies, iterating based on feedback</li>
-                        <li>Improved user engagement by 40% through data-driven A/B testing frameworks and systematic feature validation methodologies</li>
-                        <li>Analyzed engagement metrics and implemented testing strategies to validate feature performance improvements against success criteria</li>
-                    </ul>
-                </div>
-                
-                <div class="resume-item">
-                    <div class="item-header">
-                        <div>
-                            <h3>Cybersecurity Risk Assessment Analyst</h3>
-                            <p class="company">Proficient Dynamics LLC, Cranston, RI</p>
-                        </div>
-                        <span class="date">Jun 2024 – Jul 2024</span>
-                    </div>
-                    <ul class="achievements">
-                        <li>Developed comprehensive risk assessment frameworks and technical documentation for enterprise security systems serving multiple stakeholders</li>
-                        <li>Created cybersecurity roadmaps across 20 security domains through systematic analysis, stakeholder interviews, and technical specifications</li>
-                        <li>Designed training materials translating complex security concepts into actionable technical recommendations for cross-functional teams</li>
+                        <li>Developed 4 product features for Google Photos with 5-person cross-functional team through full development cycle</li>
+                        <li>Built Figma prototypes and conducted quantitative analysis on 50+ participant user studies, iterating with feedback</li>
+                        <li>Improved user engagement by 40% through data-driven A/B testing frameworks and systematic feature validation</li>
+                        <li>Analyzed engagement metrics and implemented testing strategies to validate feature performance against success criteria</li>
                     </ul>
                 </div>
             </section>
-            
+
             <section class="resume-section">
                 <h2>Technical Projects</h2>
-                
+
                 <div class="resume-item">
                     <div class="item-header">
-                        <h3>Game Night - Multiplayer Web App</h3>
+                        <h3><a href="https://github.com/nfemmanuel/iranti" target="_blank">Iranti &mdash; Shared Memory Substrate for Multi-Agent Coding</a></h3>
+                    </div>
+                    <p class="company">TypeScript, Python, PostgreSQL, pgvector</p>
+                    <ul class="achievements">
+                        <li>Built shared memory substrate enabling Claude Code → Codex handoff with 30 releases across 3 packages (npm + PyPI)</li>
+                        <li>Designed session lifecycle (handshake/checkpoint/resume/abandon) solving state loss across session boundaries</li>
+                        <li>Implemented per-identity distributed locking using pg_advisory_xact_lock with Promise queuing eliminating write races</li>
+                        <li>Built ELO-adaptive conflict resolution with self-updating reliability and relationship-graph semantic integrity checks</li>
+                        <li>Shipped React dashboard (35 API routes) with memory explorer, lifecycle management, and one-click integration</li>
+                    </ul>
+                </div>
+
+                <div class="resume-item">
+                    <div class="item-header">
+                        <h3><a href="https://github.com/nfemmanuel/game-night" target="_blank">Game Night &mdash; Multiplayer Web App</a></h3>
                     </div>
                     <p class="company">React, PWA, Product Design, Vercel</p>
                     <ul class="achievements">
@@ -156,10 +169,10 @@
                         <li>Defined product roadmap balancing local gameplay deployment with future multiplayer architecture</li>
                     </ul>
                 </div>
-                
+
                 <div class="resume-item">
                     <div class="item-header">
-                        <h3>ProofScript - Domain-Specific Language</h3>
+                        <h3><a href="https://github.com/nfemmanuel/ProofScript" target="_blank">ProofScript &mdash; Domain-Specific Language</a></h3>
                     </div>
                     <p class="company">Language Design, Python, System Architecture</p>
                     <ul class="achievements">
@@ -168,64 +181,117 @@
                         <li>Built 6-week roadmap prioritizing MVP features before advanced verification capabilities</li>
                     </ul>
                 </div>
-                
-                <div class="resume-item">
-                    <div class="item-header">
-                        <h3>Claude Branch Tracker - Chrome Extension</h3>
-                    </div>
-                    <p class="company">System Design, Multi-Platform Architecture, UI/UX</p>
-                    <ul class="achievements">
-                        <li>Designed conversation visualization system for LLM platforms with comprehensive architecture documentation</li>
-                        <li>Developed phased rollout strategy from single-platform prototype to multi-platform support (ChatGPT, Gemini)</li>
-                        <li>Created interaction patterns and accessibility specifications for sidebar UI and tree visualization</li>
-                    </ul>
-                </div>
             </section>
-            
+
             <section class="resume-section">
                 <h2>Technical Skills</h2>
                 <div class="skills-grid-resume">
-                    <div><strong>Product & Design:</strong> Figma, System Design, User Research, Product Roadmapping, A/B Testing, Requirements Gathering</div>
-                    <div><strong>Technical Implementation:</strong> Python, JavaScript, React, Kotlin, SQL, REST APIs, Git/GitHub, CI/CD, Chrome Extensions</div>
-                    <div><strong>Frameworks & Tools:</strong> Agile Development, Data Analysis, Process Optimization, Cross-Functional Collaboration</div>
+                    <div><strong>Product &amp; Design:</strong> Figma, System Design, User Research, Roadmapping, A/B Testing, PRDs</div>
+                    <div><strong>Technical:</strong> Python, JavaScript, React, Next.js, TypeScript, SQL, REST APIs, Git/GitHub</div>
+                    <div><strong>AI &amp; Tools:</strong> Prompt Engineering, LLM Integration, OpenAI API, Anthropic API, Jira, Confluence</div>
                 </div>
             </section>
         </div>
-        
+
         <!-- SWE Resume -->
         <div class="resume-card hidden" id="swe-resume">
             <div class="resume-header">
                 <h1>Oluwaniifemi "NF" Emmanuel</h1>
                 <div class="resume-contact">
-                    <span>+1 (415) 792-8813</span>
-                    <span>oluwaniifemi.emmanuel@uni.minerva.edu</span>
-                    <span>github.com/nfemmanuel</span>
-                    <span>linkedin.com/in/oluwaniifemi-emmanuel</span>
+                    <span><a href="tel:+14157928813">+1 (415) 792-8813</a></span>
+                    <span><a href="mailto:oluwaniifemi.emmanuel@uni.minerva.edu">oluwaniifemi.emmanuel@uni.minerva.edu</a></span>
+                    <span><a href="https://nfemmanuel.com" target="_blank">nfemmanuel.com</a></span>
+                    <span><a href="https://github.com/nfemmanuel" target="_blank">github.com/nfemmanuel</a></span>
+                    <span><a href="https://linkedin.com/in/oluwaniifemi-emmanuel" target="_blank">linkedin.com/in/oluwaniifemi-emmanuel</a></span>
                 </div>
             </div>
-            
+
             <section class="resume-section">
                 <h2>Education</h2>
                 <div class="resume-item">
                     <div class="item-header">
                         <div>
                             <h3>Minerva University</h3>
-                            <p class="company">Bachelor of Science, Computer Science & Artificial Intelligence</p>
+                            <p class="company">B.S. Computer Science &amp; Artificial Intelligence (1% acceptance rate) &mdash; San Francisco, CA</p>
                         </div>
                         <span class="date">Sep 2023 – May 2027</span>
                     </div>
                     <ul class="achievements">
-                        <li>Relevant Coursework: Data Structures & Algorithms, Formal Analysis, Complex Systems, Linear Algebra</li>
+                        <li>Relevant Coursework: Data Structures &amp; Algorithms, Formal Analysis, Complex Systems, Linear Algebra</li>
                     </ul>
                 </div>
             </section>
-            
+
             <section class="resume-section">
-                <h2>Technical Projects</h2>
-                
+                <h2>Experience</h2>
+
                 <div class="resume-item">
                     <div class="item-header">
-                        <h3>Tic-Tac-Toe with Minimax AI</h3>
+                        <div>
+                            <h3>Technical Product Manager</h3>
+                            <p class="company">Cofactor &mdash; San Francisco, CA (Remote)</p>
+                        </div>
+                        <span class="date">Feb 2026 – Present</span>
+                    </div>
+                    <ul class="achievements">
+                        <li>Built and deployed B2B SaaS platform using Next.js, React, TypeScript, and Supabase, shipping production system in 4 weeks</li>
+                        <li>Integrated Anthropic Claude API and academic data APIs, reducing research validation time by 60-80% through AI automation</li>
+                        <li>Implemented GDPR-compliant architecture with data mapping, privacy controls, and EU regulatory compliance infrastructure</li>
+                        <li>Managed full-stack development across frontend (React/TypeScript), backend (Supabase), and third-party API integrations</li>
+                    </ul>
+                </div>
+
+                <div class="resume-item">
+                    <div class="item-header">
+                        <div>
+                            <h3>Process Optimization Intern</h3>
+                            <p class="company">UL Solutions &mdash; Fremont, CA</p>
+                        </div>
+                        <span class="date">May 2025 – Aug 2025</span>
+                    </div>
+                    <ul class="achievements">
+                        <li>Developed Python automation scripts integrating with cross-functional systems, reducing test data errors by 50%</li>
+                        <li>Analyzed workflow data using statistical methods and data visualization libraries to identify process bottlenecks</li>
+                        <li>Implemented validation protocols ensuring regulatory compliance across 200+ technical test procedures</li>
+                    </ul>
+                </div>
+
+                <div class="resume-item">
+                    <div class="item-header">
+                        <div>
+                            <h3>Product Builder</h3>
+                            <p class="company">Google Academic Collaboration &mdash; San Francisco, CA</p>
+                        </div>
+                        <span class="date">Sep 2023 – May 2024</span>
+                    </div>
+                    <ul class="achievements">
+                        <li>Developed 4 product features for Google Photos platform collaborating with 5-person engineering team</li>
+                        <li>Built interactive prototypes using Figma and conducted quantitative analysis on 50+ participant user studies</li>
+                        <li>Implemented A/B testing frameworks improving user engagement by 40% through data-driven iteration</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="resume-section">
+                <h2>Technical Projects</h2>
+
+                <div class="resume-item">
+                    <div class="item-header">
+                        <h3>Iranti &mdash; Shared Memory Substrate for Multi-Agent Coding</h3>
+                    </div>
+                    <p class="company">TypeScript, Python, PostgreSQL, pgvector</p>
+                    <ul class="achievements">
+                        <li>Built shared memory substrate enabling Claude Code → Codex handoff with 30 releases across 3 packages (npm + PyPI)</li>
+                        <li>Designed session lifecycle (handshake/checkpoint/resume/abandon) solving state loss across session boundaries</li>
+                        <li>Implemented per-identity distributed locking using pg_advisory_xact_lock with Promise queuing eliminating write races</li>
+                        <li>Built ELO-adaptive conflict resolution with self-updating reliability and relationship-graph semantic integrity checks</li>
+                        <li>Shipped React dashboard (35 API routes) with memory explorer, lifecycle management, and one-click integration</li>
+                    </ul>
+                </div>
+
+                <div class="resume-item">
+                    <div class="item-header">
+                        <h3><a href="https://github.com/nfemmanuel/tic-tac-toe" target="_blank">Tic-Tac-Toe with Minimax AI</a></h3>
                     </div>
                     <p class="company">Kotlin, Android SDK, Coroutines, Game Theory</p>
                     <ul class="achievements">
@@ -234,10 +300,10 @@
                         <li>Architected modular game engine with separate logic/presentation layers and Intent-based navigation system</li>
                     </ul>
                 </div>
-                
+
                 <div class="resume-item">
                     <div class="item-header">
-                        <h3>Static Site Generator</h3>
+                        <h3><a href="https://github.com/nfemmanuel/portfolio-generator" target="_blank">Static Site Generator</a></h3>
                     </div>
                     <p class="company">Python, Jinja2, File I/O, GitHub Actions</p>
                     <ul class="achievements">
@@ -246,34 +312,10 @@
                         <li>Designed template inheritance system using recursive directory traversal and dynamic content injection</li>
                     </ul>
                 </div>
-                
+
                 <div class="resume-item">
                     <div class="item-header">
-                        <h3>UNO Card Game REST API</h3>
-                    </div>
-                    <p class="company">Python, Flask, REST, OOP, JSON</p>
-                    <ul class="achievements">
-                        <li>Built full-stack UNO implementation with Flask REST API supporting complete game rules and state management</li>
-                        <li>Designed object-oriented architecture with Card, Deck, and GameState classes using OOP design patterns</li>
-                        <li>Implemented AI opponent system with configurable heuristic algorithms and JSON-based state serialization</li>
-                    </ul>
-                </div>
-                
-                <div class="resume-item">
-                    <div class="item-header">
-                        <h3>Game Night - Progressive Web App</h3>
-                    </div>
-                    <p class="company">React, JavaScript, Service Workers, Vercel</p>
-                    <ul class="achievements">
-                        <li>Engineered installable PWA with service worker implementation for offline functionality and native app experience</li>
-                        <li>Implemented drag-and-drop player ordering with React state management and game state persistence</li>
-                        <li>Deployed responsive web application to Vercel with automated builds and cross-platform compatibility</li>
-                    </ul>
-                </div>
-                
-                <div class="resume-item">
-                    <div class="item-header">
-                        <h3>ProofScript - Turing-Complete DSL</h3>
+                        <h3><a href="https://github.com/nfemmanuel/ProofScript" target="_blank">ProofScript &mdash; Turing-Complete DSL</a></h3>
                     </div>
                     <p class="company">Python, Lark Parser, Language Design</p>
                     <ul class="achievements">
@@ -283,67 +325,17 @@
                     </ul>
                 </div>
             </section>
-            
-            <section class="resume-section">
-                <h2>Experience</h2>
-                
-                <div class="resume-item">
-                    <div class="item-header">
-                        <div>
-                            <h3>Process Optimization Intern</h3>
-                            <p class="company">UL Solutions, Fremont, CA</p>
-                        </div>
-                        <span class="date">May 2025 – Aug 2025</span>
-                    </div>
-                    <ul class="achievements">
-                        <li>Collaborated with engineering team to integrate Python automation scripts, reducing test data errors by 50% across product lines</li>
-                        <li>Analyzed workflow data using statistical methods and data visualization libraries to identify bottlenecks and optimize processes</li>
-                        <li>Redesigned operational workflows that reduced project timelines by 3 weeks, saving clients $XM+ through process optimization</li>
-                        <li>Implemented systematic validation protocols ensuring regulatory compliance across 200+ SAR technical test procedures</li>
-                    </ul>
-                </div>
-                
-                <div class="resume-item">
-                    <div class="item-header">
-                        <div>
-                            <h3>Product Builder</h3>
-                            <p class="company">Google Academic Collaboration, San Francisco, CA</p>
-                        </div>
-                        <span class="date">Sep 2023 – May 2024</span>
-                    </div>
-                    <ul class="achievements">
-                        <li>Developed 4 product features for Google Photos platform, collaborating with 5-person cross-functional engineering team</li>
-                        <li>Built interactive prototypes using Figma and conducted quantitative analysis on user behavior from 50+ participant studies</li>
-                        <li>Improved user engagement by 40% through data-driven iteration cycles and A/B testing frameworks</li>
-                        <li>Analyzed engagement metrics and implemented testing methodologies to validate feature performance improvements</li>
-                    </ul>
-                </div>
-                
-                <div class="resume-item">
-                    <div class="item-header">
-                        <div>
-                            <h3>Cybersecurity Risk Assessment Analyst</h3>
-                            <p class="company">Proficient Dynamics LLC, Cranston, RI</p>
-                        </div>
-                        <span class="date">Jun 2024 – Jul 2024</span>
-                    </div>
-                    <ul class="achievements">
-                        <li>Developed comprehensive risk assessment frameworks and technical documentation for enterprise security systems</li>
-                        <li>Created cybersecurity roadmaps across 20 security domains through systematic analysis and technical specifications</li>
-                        <li>Designed training materials translating complex security concepts into actionable technical recommendations</li>
-                    </ul>
-                </div>
-            </section>
-            
+
             <section class="resume-section">
                 <h2>Technical Skills</h2>
                 <div class="skills-grid-resume">
-                    <div><strong>Languages:</strong> Python, Kotlin, JavaScript, Java, C++, HTML/CSS, SQL</div>
-                    <div><strong>Frameworks & Tools:</strong> Flask, Jinja2, React, Android SDK, Git/GitHub, REST APIs, Coroutines, Service Workers</div>
-                    <div><strong>CS Fundamentals:</strong> Data Structures & Algorithms, OOP Design Patterns, System Architecture, Parser Design</div>
+                    <div><strong>Languages:</strong> Python, TypeScript, JavaScript, Kotlin, Java, SQL, HTML/CSS</div>
+                    <div><strong>Frameworks &amp; Tools:</strong> React, Next.js, Flask, PostgreSQL, Android SDK, Git/GitHub, REST APIs, Prisma ORM</div>
+                    <div><strong>CS Fundamentals:</strong> Data Structures &amp; Algorithms, Distributed Systems, OOP Design, System Architecture, Parser Design</div>
                 </div>
             </section>
         </div>
+
     </div>
 </div>
 
@@ -369,5 +361,14 @@
     <script src="scripts/theme.js"></script>
     <script src="scripts/carousel.js"></script>
     
+    <script>
+        document.querySelectorAll('a[href]').forEach(a => {
+            const href = a.getAttribute('href');
+            if (href.startsWith('http') || href.startsWith('//') || a.hasAttribute('download')) {
+                a.setAttribute('target', '_blank');
+                a.setAttribute('rel', 'noopener noreferrer');
+            }
+        });
+    </script>
 </body>
 </html>

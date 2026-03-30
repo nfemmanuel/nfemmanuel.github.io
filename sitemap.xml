@@ -15,19 +15,59 @@
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
+    
     <url>
-        <loc>https://nfemmanuel.com/project-1.html</loc>
+        <loc>https://nfemmanuel.com/proof-script.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
+    
     <url>
-        <loc>https://nfemmanuel.com/project-2.html</loc>
+        <loc>https://nfemmanuel.com/game-night-app.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
+    
     <url>
-        <loc>https://nfemmanuel.com/project-3.html</loc>
+        <loc>https://nfemmanuel.com/claude-branch-tracker.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
+    
+    <url>
+        <loc>https://nfemmanuel.com/tic-tac-toe.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://nfemmanuel.com/static-site-generator.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://nfemmanuel.com/cli-uno.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://nfemmanuel.com/iranti.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://nfemmanuel.com/humantype.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://nfemmanuel.com/usd-exchange.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
 </urlset>
