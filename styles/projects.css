@@ -607,13 +607,19 @@ body:not(.dark-mode) .tech-logo-item img {
     transition: width 0.5s ease;
 }
 
-/* Next Project Navigation Card */
-.next-project-card {
+/* Project Navigation (Prev / Next) */
+.project-navigation {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.project-nav-card {
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 24px 30px;
-    margin-top: 20px;
+    flex: 1;
     background: color-mix(in srgb, var(--accent-2), transparent 90%);
     border: 1px solid color-mix(in srgb, var(--accent-1), transparent 70%);
     border-radius: 16px;
@@ -622,13 +628,32 @@ body:not(.dark-mode) .tech-logo-item img {
     transition: all 0.3s ease;
 }
 
-.next-project-card:hover {
+.project-nav-card:hover {
     background: color-mix(in srgb, var(--accent-2), transparent 80%);
-    transform: translateX(6px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.next-project-label {
+.project-nav-card.nav-next {
+    text-align: right;
+    justify-content: flex-end;
+}
+
+.project-nav-card.nav-prev:hover {
+    transform: translateX(-6px);
+}
+
+.project-nav-card.nav-next:hover {
+    transform: translateX(6px);
+}
+
+.project-nav-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.project-nav-label {
     font-size: 0.85rem;
     font-weight: 500;
     opacity: 0.6;
@@ -636,21 +661,27 @@ body:not(.dark-mode) .tech-logo-item img {
     letter-spacing: 0.05em;
 }
 
-.next-project-title {
+.project-nav-title {
     font-size: 1.3rem;
     font-weight: 700;
-    flex: 1;
 }
 
-.next-project-arrow {
+.project-nav-arrow {
     font-size: 1.5rem;
     opacity: 0.6;
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.next-project-card:hover .next-project-arrow {
-    transform: translateX(4px);
+.project-nav-card:hover .project-nav-arrow {
     opacity: 1;
+}
+
+.project-nav-card.nav-prev:hover .project-nav-arrow {
+    transform: translateX(-4px);
+}
+
+.project-nav-card.nav-next:hover .project-nav-arrow {
+    transform: translateX(4px);
 }
 
 /* ============================================
@@ -981,13 +1012,18 @@ body:not(.dark-mode) .tech-logo-item img {
         font-size: 0.8rem;
     }
 
-    /* Next Project Card */
-    .next-project-card {
+    /* Project Navigation */
+    .project-navigation {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .project-nav-card {
         padding: 18px 20px;
         gap: 12px;
     }
 
-    .next-project-title {
+    .project-nav-title {
         font-size: 1.1rem;
     }
 }
