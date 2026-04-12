@@ -201,19 +201,77 @@ cardsContainer.addEventListener('mouseleave', () => {
 
 // Touch/Swipe handling for mobile
 let touchStartX = 0;
-let touchEndX = 0;
+let touchStartY = 0;
+let touchCurrentX = 0;
+let isDragging = false;
+let dragStartOffset = 0;
+let swipeLocked = false; // once we decide horizontal vs vertical, lock it
 
 if (cardsContainer) {
     cardsContainer.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
+        if (isTransitioning) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchCurrentX = touchStartX;
+        isDragging = true;
+        swipeLocked = false;
+        dragStartOffset = getOffset(currentSlide + 1);
+        stopAutoScroll();
+        cardsContainer.classList.add('no-transition');
     }, { passive: true });
 
-    cardsContainer.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        const swipeDistance = touchStartX - touchEndX;
+    cardsContainer.addEventListener('touchmove', (e) => {
+        if (!isDragging || isTransitioning) return;
+
+        const dx = e.touches[0].clientX - touchStartX;
+        const dy = e.touches[0].clientY - touchStartY;
+
+        // Decide direction on first significant move
+        if (!swipeLocked) {
+            if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+                swipeLocked = true;
+                if (Math.abs(dy) > Math.abs(dx)) {
+                    // Vertical scroll — bail out
+                    isDragging = false;
+                    cardsContainer.classList.remove('no-transition');
+                    startAutoScroll();
+                    return;
+                }
+            } else {
+                return; // not enough movement yet
+            }
+        }
+
+        // Horizontal swipe — prevent page scroll and drag the carousel
+        e.preventDefault();
+        touchCurrentX = e.touches[0].clientX;
+        const dragDelta = touchCurrentX - touchStartX;
+        cardsContainer.style.transform = `translateX(${dragStartOffset + dragDelta}px)`;
+    }, { passive: false });
+
+    cardsContainer.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        cardsContainer.classList.remove('no-transition');
+
+        const swipeDistance = touchStartX - touchCurrentX;
         if (Math.abs(swipeDistance) > 50) {
             if (swipeDistance > 0) nextSlide();
             else prevSlide();
+        } else {
+            // Snap back to current slide
+            const offset = getOffset(currentSlide + 1);
+            setPosition(offset, false);
+            startAutoScroll();
         }
+    }, { passive: true });
+
+    cardsContainer.addEventListener('touchcancel', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        cardsContainer.classList.remove('no-transition');
+        const offset = getOffset(currentSlide + 1);
+        setPosition(offset, false);
+        startAutoScroll();
     }, { passive: true });
 }
