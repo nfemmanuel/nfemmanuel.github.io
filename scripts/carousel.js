@@ -1,78 +1,67 @@
-// Carousel state
-let currentSlide = 0;
+// Carousel — translateX approach for seamless infinite wrapping
 const originalCards = document.querySelectorAll('.project-card');
 const cardsContainer = document.querySelector('.project-cards');
+const wrapper = document.querySelector('.carousel-wrapper');
 const totalSlides = originalCards.length;
+
+let currentSlide = 0;
 let autoScrollInterval;
 let isTransitioning = false;
 
 // Clone first and last cards for infinite loop
 function createInfiniteLoop() {
-    // Clone last card and prepend
     const lastClone = originalCards[totalSlides - 1].cloneNode(true);
     lastClone.classList.add('clone');
-    lastClone.dataset.index = '-1';
     cardsContainer.insertBefore(lastClone, cardsContainer.firstChild);
 
-    // Clone first card and append
     const firstClone = originalCards[0].cloneNode(true);
     firstClone.classList.add('clone');
-    firstClone.dataset.index = totalSlides.toString();
     cardsContainer.appendChild(firstClone);
-
-    // Add click handlers to clones
-    lastClone.addEventListener('click', () => {
-        if (!isTransitioning) {
-            goToSlide(totalSlides - 1);
-        }
-    });
-
-    firstClone.addEventListener('click', () => {
-        if (!isTransitioning) {
-            goToSlide(0);
-        }
-    });
 }
 
-// Get all cards including clones
 function getAllCards() {
     return document.querySelectorAll('.project-card');
 }
 
-// Create indicator dots
-function createIndicators() {
-    const container = document.querySelector('.carousel-indicators');
-    container.innerHTML = ''; // Clear existing
+// Calculate the translateX offset to center a card at a given index
+// Index is in the "all cards" array (including clones), so real card 0 = index 1
+function getOffset(allCardsIndex) {
+    const allCards = getAllCards();
+    const card = allCards[allCardsIndex];
+    if (!card) return 0;
+    const wrapperWidth = wrapper.clientWidth;
+    const cardLeft = card.offsetLeft;
+    const cardWidth = card.offsetWidth;
+    return -(cardLeft - (wrapperWidth / 2) + (cardWidth / 2));
+}
 
-    for (let i = 0; i < totalSlides; i++) {
-        const dot = document.createElement('div');
-        dot.classList.add('indicator-dot');
-        if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => goToSlide(i));
-        container.appendChild(dot);
+function setPosition(offset, instant) {
+    if (instant) {
+        cardsContainer.classList.add('no-transition');
+    }
+    cardsContainer.style.transform = `translateX(${offset}px)`;
+    if (instant) {
+        // Force reflow so the no-transition class takes effect before we remove it
+        void cardsContainer.offsetHeight;
+        cardsContainer.classList.remove('no-transition');
     }
 }
 
-// Update active states
-function updateSlide(index, instant = false) {
+// Update active card styling and indicators
+function updateActiveStates(index) {
     const allCards = getAllCards();
-
-    // Update cards - offset by 1 because of prepended clone
+    // allCards index: clone at 0, real cards at 1..totalSlides, clone at totalSlides+1
     allCards.forEach((card, i) => {
         card.classList.toggle('active', i === index + 1);
     });
 
-    // Update indicators (use modulo for real index)
     const realIndex = ((index % totalSlides) + totalSlides) % totalSlides;
+
+    // Update indicators
     const indicators = document.querySelectorAll('.indicator-dot');
-
     indicators.forEach((dot, i) => {
-        const isActive = i === realIndex;
-
-        if (isActive) {
-            // Remove and re-add active class to restart animation
+        if (i === realIndex) {
             dot.classList.remove('active');
-            // Force reflow to restart animation
             void dot.offsetWidth;
             dot.classList.add('active');
         } else {
@@ -82,62 +71,40 @@ function updateSlide(index, instant = false) {
 
     // Update progress text
     document.getElementById('current-project').textContent = realIndex + 1;
-
-    // Scroll to card (offset by 1 for the prepended clone)
-    // Scroll within carousel container only (no page scroll)
-    const targetCard = allCards[index + 1];
-    if (targetCard) {
-        const container = document.querySelector('.project-cards');
-        const cardLeft = targetCard.offsetLeft;
-        const containerWidth = container.clientWidth;
-        const cardWidth = targetCard.clientWidth;
-        const scrollPosition = cardLeft - (containerWidth / 2) + (cardWidth / 2);
-
-        container.scrollTo({
-            left: scrollPosition,
-            behavior: instant ? 'auto' : 'smooth'
-        });
-    }
 }
 
-// Handle infinite loop logic
-function handleInfiniteTransition(index) {
-    const allCards = getAllCards();
-
-    // If we just scrolled to the first clone (before actual first card)
-    if (index < 0) {
-        isTransitioning = true;
-        // Wait for scroll animation, then jump to actual last card
-        setTimeout(() => {
-            currentSlide = totalSlides - 1;
-            updateSlide(currentSlide, true); // instant scroll
-            isTransitioning = false;
-        }, 500);
-    }
-    // If we just scrolled to the last clone (after actual last card)
-    else if (index >= totalSlides) {
-        isTransitioning = true;
-        // Wait for scroll animation, then jump to actual first card
-        setTimeout(() => {
-            currentSlide = 0;
-            updateSlide(currentSlide, true); // instant scroll
-            isTransitioning = false;
-        }, 500);
-    }
-}
-
-// Go to specific slide
 function goToSlide(index) {
     if (isTransitioning) return;
 
     stopAutoScroll();
     currentSlide = index;
-    updateSlide(currentSlide);
-    handleInfiniteTransition(index);
-    startAutoScroll();
+    updateActiveStates(index);
+
+    // allCards index is index + 1 (because of prepended clone)
+    const offset = getOffset(index + 1);
+    setPosition(offset, false);
+
+    // Handle wrapping: after animating to the clone, instantly jump to the real card
+    if (index < 0 || index >= totalSlides) {
+        isTransitioning = true;
+        // Wait for the CSS transition to finish (500ms matches transition duration)
+        setTimeout(() => {
+            if (index < 0) {
+                currentSlide = totalSlides - 1;
+            } else {
+                currentSlide = 0;
+            }
+            updateActiveStates(currentSlide);
+            const jumpOffset = getOffset(currentSlide + 1);
+            setPosition(jumpOffset, true); // instant jump — no visible rewind
+            isTransitioning = false;
+            startAutoScroll();
+        }, 520);
+    } else {
+        startAutoScroll();
+    }
 }
 
-// Navigate next/previous
 function nextSlide() {
     if (isTransitioning) return;
     goToSlide(currentSlide + 1);
@@ -148,14 +115,25 @@ function prevSlide() {
     goToSlide(currentSlide - 1);
 }
 
-// Auto-advance
-function autoAdvance() {
-    if (isTransitioning) return;
-    currentSlide = (currentSlide + 1) % totalSlides;
-    updateSlide(currentSlide);
+// Create indicator dots
+function createIndicators() {
+    const container = document.querySelector('.carousel-indicators');
+    container.innerHTML = '';
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('indicator-dot');
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(i));
+        container.appendChild(dot);
+    }
 }
 
-// Auto-scroll controls
+// Auto-scroll
+function autoAdvance() {
+    if (isTransitioning) return;
+    goToSlide(currentSlide + 1);
+}
+
 function startAutoScroll() {
     stopAutoScroll();
     autoScrollInterval = setInterval(autoAdvance, 5000);
@@ -167,7 +145,7 @@ function stopAutoScroll() {
     }
 }
 
-// Make original cards clickable
+// Card click handlers
 function addCardClickHandlers() {
     originalCards.forEach((card, index) => {
         card.addEventListener('click', () => {
@@ -175,73 +153,51 @@ function addCardClickHandlers() {
                 goToSlide(index);
             }
         });
-
-        // Prevent clicks on buttons inside cards from triggering navigation
         card.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
+            btn.addEventListener('click', (e) => e.stopPropagation());
         });
+    });
+
+    // Clone click handlers
+    const allCards = getAllCards();
+    // First element is the last-clone
+    allCards[0].addEventListener('click', () => {
+        if (!isTransitioning) goToSlide(totalSlides - 1);
+    });
+    // Last element is the first-clone
+    allCards[allCards.length - 1].addEventListener('click', () => {
+        if (!isTransitioning) goToSlide(0);
     });
 }
 
 // Keyboard navigation
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') {
-        prevSlide();
-    } else if (e.key === 'ArrowRight') {
-        nextSlide();
-    }
+    if (e.key === 'ArrowLeft') prevSlide();
+    else if (e.key === 'ArrowRight') nextSlide();
 });
 
 // Initialize
 createInfiniteLoop();
 createIndicators();
 addCardClickHandlers();
-updateSlide(0);
+
+// Set initial position instantly
+updateActiveStates(0);
+setPosition(getOffset(1), true);
 startAutoScroll();
 
 // Pause auto-scroll on hover
 cardsContainer.addEventListener('mouseenter', () => {
     stopAutoScroll();
-    // Pause progress bar animation
     const activeIndicator = document.querySelector('.indicator-dot.active');
-    if (activeIndicator) {
-        activeIndicator.classList.add('paused');
-    }
+    if (activeIndicator) activeIndicator.classList.add('paused');
 });
 
 cardsContainer.addEventListener('mouseleave', () => {
     startAutoScroll();
-    // Resume progress bar animation
     const activeIndicator = document.querySelector('.indicator-dot.active');
-    if (activeIndicator) {
-        activeIndicator.classList.remove('paused');
-    }
+    if (activeIndicator) activeIndicator.classList.remove('paused');
 });
-
-// Make cloned cards also visually respond (opacity/scale)
-// This ensures side cards look proper even when they're clones
-const observer = new MutationObserver(() => {
-    const allCards = getAllCards();
-    allCards.forEach((card, i) => {
-        if (card.classList.contains('active')) {
-            // Make sure z-index is high for clickability
-            card.style.zIndex = '10';
-        } else {
-            card.style.zIndex = '5';
-        }
-    });
-});
-
-// Observe the container for class changes
-observer.observe(cardsContainer, {
-    attributes: true,
-    subtree: true,
-    attributeFilter: ['class']
-});
-
-// Add after existing carousel code
 
 // Touch/Swipe handling for mobile
 let touchStartX = 0;
@@ -254,33 +210,10 @@ if (cardsContainer) {
 
     cardsContainer.addEventListener('touchend', (e) => {
         touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    }, { passive: true });
-}
-
-function handleSwipe() {
-    const swipeThreshold = 50; // Minimum distance for swipe
-    const swipeDistance = touchStartX - touchEndX;
-
-    if (Math.abs(swipeDistance) > swipeThreshold) {
-        if (swipeDistance > 0) {
-            // Swiped left - go to next
-            nextSlide();
-        } else {
-            // Swiped right - go to previous
-            prevSlide();
+        const swipeDistance = touchStartX - touchEndX;
+        if (Math.abs(swipeDistance) > 50) {
+            if (swipeDistance > 0) nextSlide();
+            else prevSlide();
         }
-    }
-}
-
-function nextSlide() {
-    currentIndex = (currentIndex + 1) % originalProjectCount;
-    updateSlide(false);
-    resetAutoScroll();
-}
-
-function prevSlide() {
-    currentIndex = (currentIndex - 1 + originalProjectCount) % originalProjectCount;
-    updateSlide(false);
-    resetAutoScroll();
+    }, { passive: true });
 }

@@ -87,16 +87,19 @@
             <div id="about-section">
                 <h2>About Me</h2>
                 <p>
-                    I'm a Junior at Minerva University who works at the intersection of product and
-                    engineering. I love building solutions that make people's daily lives easier and more efficient.
+                    I'm a Junior at Minerva University working at the intersection of product and
+                    engineering. Currently Technical Product Manager at Cofactor, where I shipped a B2B
+                    SaaS platform connecting university research with venture capital — 0 to production in 4 weeks.
                 </p>
                 <p>
-                    Whether I'm writing code or designing systems, I focus on understanding the "why"
-                    behind what we build and ensuring it actually solves real problems.
+                    I also built Iranti, an open-source memory infrastructure for AI agents that hit
+                    8,000+ npm downloads in its first month. It outperformed Mem0, Graphiti, and Shodh
+                    on persistence benchmarks and works across Claude Code, Codex, and Copilot CLI.
                 </p>
                 <p>
-                    Currently building an advanced task scheduler, exploring AI/ML, and seeking PM, SWE,
-                    or TPM internships for Summer 2026 where I can contribute to products that matter.
+                    I focus on understanding the "why" behind what we build and shipping things that
+                    solve real problems. Seeking PM or founding roles at early-stage startups where I
+                    can own outcomes and move fast.
                 </p>
             </div>
         </div>
@@ -117,6 +120,29 @@
         </div>
     </section>
 
+    <section id="experience" class="experience-section">
+        <div class="experience-container">
+            <h2 class="section-title">Experience</h2>
+            <div class="experience-card">
+                <div class="experience-header">
+                    <div>
+                        <h3>Technical Product Manager</h3>
+                        <p class="experience-company">Cofactor &mdash; San Francisco, CA (Remote)</p>
+                    </div>
+                    <span class="experience-date">Feb 2026 &ndash; Present</span>
+                </div>
+                <p class="experience-description">
+                    B2B SaaS platform connecting university research with venture capital. Shipped 0-to-production
+                    in 4 weeks, managing roadmap across PRDs and Jira backlog. Integrated Anthropic Claude API
+                    reducing research validation time by 60-80%. Led GDPR-compliant launch enabling EU market entry.
+                </p>
+                <div class="experience-actions">
+                    <a href="https://scout.cofactor.world" class="btn btn-small btn-primary" target="_blank">Visit Cofactor</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="projects">
         <div class="projects-container">
 
@@ -128,35 +154,32 @@
                 <!-- Project Cards Container (this scrolls) -->
                 <div class="project-cards">
 
-                    
                     <div class="project-card">
-                        <h3>ProofScript</h3>
-                        <p class="project-status">In Development</p>
-                        <p class="project-description">A custom programming language designed for verified algorithm development with built-in correctness checking and LaTeX documentation generation</p>
+                        <h3>Iranti</h3>
+                        <p class="project-status status-shipped">Shipped</p>
+                        <p class="project-description">Open-source memory infrastructure for AI agents with 8,000+ npm downloads. Enables Claude Code, Codex, and Copilot CLI to share persistent memory across sessions. Outperformed Mem0, Graphiti, and Shodh on persistence benchmarks.</p>
 
                         <!-- Tech Stack -->
                         <div class="project-tech">
-                            
+                            <span class="tech-badge">TypeScript</span>
+                            <span class="tech-badge">Node.js</span>
+                            <span class="tech-badge">PostgreSQL</span>
+                            <span class="tech-badge">pgvector</span>
+                            <span class="tech-badge">MCP</span>
+                            <span class="tech-badge">Prisma</span>
+                            <span class="tech-badge">React</span>
+                            <span class="tech-badge">Express</span>
                             <span class="tech-badge">Python</span>
-                            
-                            <span class="tech-badge">Language Design</span>
-                            
-                            <span class="tech-badge">Parser Design</span>
-                            
-                            <span class="tech-badge">Visitor Pattern</span>
-                            
                         </div>
 
                         <!-- Buttons -->
                         <div class="project-buttons">
-                            
-                            <a href="https://github.com/nfemmanuel/ProofScript" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
-                            <a href="proof-script.html" class="btn btn-small btn-secondary">View Page</a>
+                            <a href="https://iranti.dev" class="btn btn-small btn-primary" target="_blank">View Site</a>
+                            <a href="https://github.com/nfemmanuel/iranti" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            <a href="iranti.html" class="btn btn-small btn-secondary">View Page</a>
                         </div>
                     </div>
-                    
+
                     <div class="project-card">
                         <h3>Game Night App</h3>
                         <p class="project-status">Demo Ready</p>
@@ -164,191 +187,41 @@
 
                         <!-- Tech Stack -->
                         <div class="project-tech">
-                            
                             <span class="tech-badge">React</span>
-                            
                             <span class="tech-badge">PWA</span>
-                            
                             <span class="tech-badge">Framer Motion</span>
-                            
                             <span class="tech-badge">Context API</span>
-                            
                             <span class="tech-badge">@dnd-kit</span>
-                            
                         </div>
 
                         <!-- Buttons -->
                         <div class="project-buttons">
-                            
                             <a href="https://github.com/nfemmanuel/game-night" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
                             <a href="https://game-night-one.vercel.app" class="btn btn-small btn-primary" target="_blank">View Demo</a>
-                            
                             <a href="game-night-app.html" class="btn btn-small btn-secondary">View Page</a>
                         </div>
                     </div>
-                    
+
                     <div class="project-card">
-                        <h3>Claude Branch Tracker</h3>
+                        <h3>ProofScript</h3>
                         <p class="project-status">In Development</p>
-                        <p class="project-description">Chrome extension that visualizes conversation branches in Claude.ai, helping users track different conversation paths</p>
+                        <p class="project-description">A custom programming language designed for verified algorithm development with built-in correctness checking and LaTeX documentation generation</p>
 
                         <!-- Tech Stack -->
                         <div class="project-tech">
-                            
-                            <span class="tech-badge">JavaScript</span>
-                            
-                            <span class="tech-badge">Chrome Extension API</span>
-                            
-                            <span class="tech-badge">DOM Manipulation</span>
-                            
-                            <span class="tech-badge">Content Hashing</span>
-                            
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="project-buttons">
-                            
-                            <a href="https://github.com/nfemmanuel/branch-tracker" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
-                            <a href="claude-branch-tracker.html" class="btn btn-small btn-secondary">View Page</a>
-                        </div>
-                    </div>
-                    
-                    <div class="project-card">
-                        <h3>Tic-Tac-Toe Android Game</h3>
-                        <p class="project-status">Ready</p>
-                        <p class="project-description">Android game featuring single-player mode with Minimax AI opponent and two-player pass-and-play</p>
-
-                        <!-- Tech Stack -->
-                        <div class="project-tech">
-                            
-                            <span class="tech-badge">Kotlin</span>
-                            
-                            <span class="tech-badge">Android SDK</span>
-                            
-                            <span class="tech-badge">Minimax Algorithm</span>
-                            
-                            <span class="tech-badge">Coroutines</span>
-                            
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="project-buttons">
-                            
-                            <a href="https://github.com/nfemmanuel/tic-tac-toe" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
-                            <a href="tic-tac-toe.html" class="btn btn-small btn-secondary">View Page</a>
-                        </div>
-                    </div>
-                    
-                    <div class="project-card">
-                        <h3>Static Site Generator</h3>
-                        <p class="project-status">Ready</p>
-                        <p class="project-description">Python-based portfolio generator with Jinja2 templating, real-time file monitoring, and automated GitHub Pages deployment. The tool you're using right now to build this portfolio.</p>
-
-                        <!-- Tech Stack -->
-                        <div class="project-tech">
-                            
                             <span class="tech-badge">Python</span>
-                            
-                            <span class="tech-badge">Jinja2</span>
-                            
-                            <span class="tech-badge">Watchdog</span>
-                            
-                            <span class="tech-badge">File I/O</span>
-                            
-                            <span class="tech-badge">GitHub Actions</span>
-                            
-                            <span class="tech-badge">CI/CD</span>
-                            
+                            <span class="tech-badge">Language Design</span>
+                            <span class="tech-badge">Parser Design</span>
+                            <span class="tech-badge">Visitor Pattern</span>
                         </div>
 
                         <!-- Buttons -->
                         <div class="project-buttons">
-                            
-                            <a href="https://github.com/nfemmanuel/portfolio-generator" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
-                            <a href="static-site-generator.html" class="btn btn-small btn-secondary">View Page</a>
+                            <a href="https://github.com/nfemmanuel/ProofScript" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            <a href="proof-script.html" class="btn btn-small btn-secondary">View Page</a>
                         </div>
                     </div>
-                    
-                    <div class="project-card">
-                        <h3>CLI-UNO</h3>
-                        <p class="project-status">Ready</p>
-                        <p class="project-description">Full-featured UNO card game with Flask REST API and multiple AI difficulty levels using game theory algorithms. Implements utility-based decision making and strategic play patterns.</p>
 
-                        <!-- Tech Stack -->
-                        <div class="project-tech">
-                            
-                            <span class="tech-badge">Python</span>
-                            
-                            <span class="tech-badge">Flask</span>
-                            
-                            <span class="tech-badge">REST APIs</span>
-                            
-                            <span class="tech-badge">OOP Design</span>
-                            
-                            <span class="tech-badge">Game Theory</span>
-                            
-                            <span class="tech-badge">Utility Functions</span>
-                            
-                            <span class="tech-badge">JSON</span>
-                            
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="project-buttons">
-                            
-                            <a href="https://github.com/nfemmanuel/cli-uno" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
-                            <a href="cli-uno.html" class="btn btn-small btn-secondary">View Page</a>
-                        </div>
-                    </div>
-                    
-                    <div class="project-card">
-                        <h3>Iranti</h3>
-                        <p class="project-status">In Development</p>
-                        <p class="project-description">Memory infrastructure for multi-agent AI systems — giving agents durable, shared, identity-based memory that survives context windows, process restarts, and agent handoffs. Published on npm.</p>
-
-                        <!-- Tech Stack -->
-                        <div class="project-tech">
-                            
-                            <span class="tech-badge">TypeScript</span>
-                            
-                            <span class="tech-badge">Node.js</span>
-                            
-                            <span class="tech-badge">PostgreSQL</span>
-                            
-                            <span class="tech-badge">pgvector</span>
-                            
-                            <span class="tech-badge">MCP</span>
-                            
-                            <span class="tech-badge">Prisma</span>
-                            
-                            <span class="tech-badge">React</span>
-                            
-                            <span class="tech-badge">Express</span>
-                            
-                            <span class="tech-badge">Python</span>
-                            
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="project-buttons">
-                            
-                            <a href="https://github.com/nfemmanuel/iranti" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
-                            <a href="iranti.html" class="btn btn-small btn-secondary">View Page</a>
-                        </div>
-                    </div>
-                    
                     <div class="project-card">
                         <h3>HumanType</h3>
                         <p class="project-status">Ready</p>
@@ -356,29 +229,105 @@
 
                         <!-- Tech Stack -->
                         <div class="project-tech">
-                            
                             <span class="tech-badge">JavaScript</span>
-                            
                             <span class="tech-badge">Chrome Extension API</span>
-                            
                             <span class="tech-badge">Chrome Debugger Protocol</span>
-                            
                             <span class="tech-badge">DOM Manipulation</span>
-                            
                             <span class="tech-badge">jsdom</span>
-                            
                         </div>
 
                         <!-- Buttons -->
                         <div class="project-buttons">
-                            
                             <a href="https://github.com/nfemmanuel/humantype" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
                             <a href="humantype.html" class="btn btn-small btn-secondary">View Page</a>
                         </div>
                     </div>
-                    
+
+                    <div class="project-card">
+                        <h3>Claude Branch Tracker</h3>
+                        <p class="project-status">In Development</p>
+                        <p class="project-description">Chrome extension that visualizes conversation branches in Claude.ai, helping users track different conversation paths</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            <span class="tech-badge">JavaScript</span>
+                            <span class="tech-badge">Chrome Extension API</span>
+                            <span class="tech-badge">DOM Manipulation</span>
+                            <span class="tech-badge">Content Hashing</span>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            <a href="https://github.com/nfemmanuel/branch-tracker" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            <a href="claude-branch-tracker.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <h3>Tic-Tac-Toe Android Game</h3>
+                        <p class="project-status">Ready</p>
+                        <p class="project-description">Android game featuring single-player mode with Minimax AI opponent and two-player pass-and-play</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            <span class="tech-badge">Kotlin</span>
+                            <span class="tech-badge">Android SDK</span>
+                            <span class="tech-badge">Minimax Algorithm</span>
+                            <span class="tech-badge">Coroutines</span>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            <a href="https://github.com/nfemmanuel/tic-tac-toe" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            <a href="tic-tac-toe.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <h3>CLI-UNO</h3>
+                        <p class="project-status">Ready</p>
+                        <p class="project-description">Full-featured UNO card game with Flask REST API and multiple AI difficulty levels using game theory algorithms. Implements utility-based decision making and strategic play patterns.</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">Flask</span>
+                            <span class="tech-badge">REST APIs</span>
+                            <span class="tech-badge">OOP Design</span>
+                            <span class="tech-badge">Game Theory</span>
+                            <span class="tech-badge">Utility Functions</span>
+                            <span class="tech-badge">JSON</span>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            <a href="https://github.com/nfemmanuel/cli-uno" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            <a href="cli-uno.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <h3>Static Site Generator</h3>
+                        <p class="project-status">Ready</p>
+                        <p class="project-description">Python-based portfolio generator with Jinja2 templating, real-time file monitoring, and automated GitHub Pages deployment. The tool you're using right now to build this portfolio.</p>
+
+                        <!-- Tech Stack -->
+                        <div class="project-tech">
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">Jinja2</span>
+                            <span class="tech-badge">Watchdog</span>
+                            <span class="tech-badge">File I/O</span>
+                            <span class="tech-badge">GitHub Actions</span>
+                            <span class="tech-badge">CI/CD</span>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="project-buttons">
+                            <a href="https://github.com/nfemmanuel/portfolio-generator" class="btn btn-small btn-primary" target="_blank">View Code</a>
+                            <a href="static-site-generator.html" class="btn btn-small btn-secondary">View Page</a>
+                        </div>
+                    </div>
+
                     <div class="project-card">
                         <h3>USD Exchange</h3>
                         <p class="project-status">Demo Ready</p>
@@ -386,33 +335,21 @@
 
                         <!-- Tech Stack -->
                         <div class="project-tech">
-                            
                             <span class="tech-badge">Python</span>
-                            
                             <span class="tech-badge">usd-core (pxr)</span>
-                            
                             <span class="tech-badge">Node.js</span>
-                            
                             <span class="tech-badge">Ed25519</span>
-                            
                             <span class="tech-badge">Socket.io</span>
-                            
                             <span class="tech-badge">WebSocket</span>
-                            
                             <span class="tech-badge">ManifolderClient</span>
-                            
                         </div>
 
                         <!-- Buttons -->
                         <div class="project-buttons">
-                            
                             <a href="https://github.com/nfemmanuel/usd-exchange" class="btn btn-small btn-primary" target="_blank">View Code</a>
-                            
-                            
                             <a href="usd-exchange.html" class="btn btn-small btn-secondary">View Page</a>
                         </div>
                     </div>
-                    
 
                 </div>
 

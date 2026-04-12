@@ -71,20 +71,19 @@
         <div class="detail-header">
             <div>
                 <h1>Iranti</h1>
-                <span class="project-status-badge">In Development</span>
+                <span class="project-status-badge status-badge-shipped">Shipped</span>
             </div>
             <div class="detail-actions">
-                
+                <a href="https://iranti.dev" class="btn btn-primary" target="_blank">View Site</a>
+                <a href="https://www.npmjs.com/package/iranti" class="btn btn-primary" target="_blank">npm Package</a>
                 <a href="https://github.com/nfemmanuel/iranti" class="btn btn-primary" target="_blank">View Code</a>
-                
-                
             </div>
         </div>
-        
+
         <!-- Description -->
         <section class="detail-section">
             <h2>About</h2>
-            <p>Memory infrastructure for multi-agent AI systems — giving agents durable, shared, identity-based memory that survives context windows, process restarts, and agent handoffs. Published on npm.</p>
+            <p>Open-source memory infrastructure for AI agents &mdash; giving them durable, shared, identity-based memory that survives context windows, process restarts, and agent handoffs. 8,000+ npm downloads in the first 4 weeks with zero marketing. Works across Claude Code, Codex, Copilot CLI, CrewAI, and any MCP-compatible tool.</p>
         </section>
         
         <!-- Motivation -->
@@ -93,27 +92,33 @@
             <p>Current AI agents forget everything the moment a context window closes. Vector databases give similarity search but no identity. Framework-specific memory locks you into one tool. Iranti was built to solve all three problems: exact entity+key retrieval, conflict-aware writes with human escalation, and cross-agent fact sharing that works regardless of which framework or tool the agent is using. The goal is a memory layer so reliable that agents can coordinate across sessions without any shared context at all.</p>
         </section>
         
+        <!-- Traction -->
+        <section class="detail-section">
+            <h2>Traction</h2>
+            <ul class="achievements-list">
+                <li>8,000+ npm downloads in 4 weeks with zero marketing budget</li>
+                <li>Outperformed Mem0, Graphiti, and Shodh on persistence benchmarks (20/20 reruns, 14/14 multi-agent coordination)</li>
+                <li>Organic adoption across r/ClaudeAI, r/ChatGPT, and r/vibecoding developer communities</li>
+                <li>3 published packages: iranti CLI, @iranti/sdk, iranti-control-plane</li>
+            </ul>
+        </section>
+
         <!-- Use Cases -->
-        
-        
+
+
         <!-- Code Samples -->
-        
-        
+
+
         <!-- Key Achievements -->
         <section class="detail-section">
             <h2>Key Achievements</h2>
             <ul class="achievements-list">
-                
-                <li>Designed identity-first memory model with entity+key deterministic lookup, explicit confidence scores, and source attribution across agent sessions</li>
-                
-                <li>Built conflict-aware write engine with automatic detection, LLM arbitration, and human-in-the-loop escalation for unresolvable disagreements</li>
-                
-                <li>Published iranti CLI, @iranti/sdk TypeScript package, and iranti-control-plane operator dashboard to npm with cross-platform binary support</li>
-                
-                <li>Validated session persistence (8/8 cross-boundary) and exact retrieval (10/10 zero-context) through structured benchmark experiments</li>
-                
-                <li>Integrated with MCP, Claude Code hooks, Codex, CrewAI, and Python middleware — framework-agnostic memory for any agent stack</li>
-                
+                <li>Reached 8,000+ npm downloads in 4 weeks through organic developer community adoption with zero marketing</li>
+                <li>Outperformed Mem0, Graphiti, and Shodh on persistence benchmarks (20/20 reruns, 14/14 multi-agent coordination scenarios)</li>
+                <li>Designed cross-tool memory layer over PostgreSQL + pgvector enabling Claude Code, Codex, and Copilot CLI to share state via MCP</li>
+                <li>Built ELO-adaptive conflict resolution with self-updating source reliability and relationship-graph semantic integrity checks</li>
+                <li>Implemented per-identity distributed locking using pg_advisory_xact_lock with Promise queuing eliminating write races</li>
+                <li>Shipped 3 packages to npm: iranti CLI, @iranti/sdk TypeScript package, and iranti-control-plane React dashboard (35 API routes)</li>
             </ul>
         </section>
         
@@ -264,7 +269,13 @@
                 
             </div>
         </section>
-        
+
+        <!-- Next Project -->
+        <a href="game-night-app.html" class="next-project-card">
+            <span class="next-project-label">Next Project</span>
+            <span class="next-project-title">Game Night App</span>
+            <span class="next-project-arrow">&rarr;</span>
+        </a>
     </div>
 </div>
 

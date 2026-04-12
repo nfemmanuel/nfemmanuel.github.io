@@ -17,22 +17,19 @@
     position: relative;
     width: 100%;
     padding: 20px 0;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .project-cards {
     display: flex;
     gap: 0;
-    overflow-x: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    padding: 60px calc(50vw - 550px);
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    padding: 60px 0;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
 }
 
-.project-cards::-webkit-scrollbar {
-    display: none;
+.project-cards.no-transition {
+    transition: none;
 }
 
 .project-card {
@@ -40,7 +37,6 @@
     max-width: 1100px;
     height: 500px;
     padding: 45px;
-    scroll-snap-align: center;
     flex-shrink: 0;
 
     display: flex;
@@ -104,6 +100,7 @@
     font-weight: 600;
     margin-bottom: 20px;
 }
+
 
 .project-description {
     line-height: 1.7;
@@ -610,6 +607,52 @@ body:not(.dark-mode) .tech-logo-item img {
     transition: width 0.5s ease;
 }
 
+/* Next Project Navigation Card */
+.next-project-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 30px;
+    margin-top: 20px;
+    background: color-mix(in srgb, var(--accent-2), transparent 90%);
+    border: 1px solid color-mix(in srgb, var(--accent-1), transparent 70%);
+    border-radius: 16px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+.next-project-card:hover {
+    background: color-mix(in srgb, var(--accent-2), transparent 80%);
+    transform: translateX(6px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.next-project-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.next-project-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    flex: 1;
+}
+
+.next-project-arrow {
+    font-size: 1.5rem;
+    opacity: 0.6;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.next-project-card:hover .next-project-arrow {
+    transform: translateX(4px);
+    opacity: 1;
+}
+
 /* ============================================
     MOBILE RESPONSIVE - ALL PROJECTS
    ============================================ */
@@ -936,5 +979,15 @@ body:not(.dark-mode) .tech-logo-item img {
 
     .tech-logo-item:has(img) .tech-name {
         font-size: 0.8rem;
+    }
+
+    /* Next Project Card */
+    .next-project-card {
+        padding: 18px 20px;
+        gap: 12px;
+    }
+
+    .next-project-title {
+        font-size: 1.1rem;
     }
 }
