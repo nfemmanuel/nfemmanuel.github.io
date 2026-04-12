@@ -1,4 +1,6 @@
-// Carousel — translateX approach for seamless infinite wrapping
+// Carousel — ticker repositioning for seamless infinite scrolling
+// Inspired by Motion.dev's autoplay carousel: items reposition dynamically
+// instead of cloning, so there's never a jump or glitch.
 const originalCards = document.querySelectorAll('.project-card');
 const cardsContainer = document.querySelector('.project-cards');
 const wrapper = document.querySelector('.carousel-wrapper');
@@ -6,33 +8,59 @@ const totalSlides = originalCards.length;
 
 let currentSlide = 0;
 let autoScrollInterval;
-let isTransitioning = false;
 
-// Clone first and last cards for infinite loop
-function createInfiniteLoop() {
-    const lastClone = originalCards[totalSlides - 1].cloneNode(true);
-    lastClone.classList.add('clone');
-    cardsContainer.insertBefore(lastClone, cardsContainer.firstChild);
+// Layout measurements (computed once, updated on resize)
+let cardPitch = 0;
+let cardWidth = 0;
+let firstCardLeft = 0;
+let totalTrackWidth = 0;
 
-    const firstClone = originalCards[0].cloneNode(true);
-    firstClone.classList.add('clone');
-    cardsContainer.appendChild(firstClone);
+function measureLayout() {
+    cardWidth = originalCards[0].offsetWidth;
+    firstCardLeft = originalCards[0].offsetLeft;
+    if (totalSlides > 1) {
+        cardPitch = originalCards[1].offsetLeft - originalCards[0].offsetLeft;
+    } else {
+        cardPitch = cardWidth;
+    }
+    totalTrackWidth = totalSlides * cardPitch;
 }
 
-function getAllCards() {
-    return document.querySelectorAll('.project-card');
-}
-
-// Calculate the translateX offset to center a card at a given index
-// Index is in the "all cards" array (including clones), so real card 0 = index 1
-function getOffset(allCardsIndex) {
-    const allCards = getAllCards();
-    const card = allCards[allCardsIndex];
-    if (!card) return 0;
+// Calculate the translateX offset to center a slide at a given continuous index.
+// The index can go beyond [0, totalSlides) — that's how infinite scrolling works.
+function getOffset(slideIndex) {
     const wrapperWidth = wrapper.clientWidth;
-    const cardLeft = card.offsetLeft;
-    const cardWidth = card.offsetWidth;
-    return -(cardLeft - (wrapperWidth / 2) + (cardWidth / 2));
+    const cardCenter = firstCardLeft + slideIndex * cardPitch + cardWidth / 2;
+    return -(cardCenter - wrapperWidth / 2);
+}
+
+// Reposition cards that have scrolled off-screen to the opposite side.
+// Each card gets a `left` offset via position:relative, which is instant
+// (not transitioned) so the repositioning is invisible.
+function repositionCards(containerOffset) {
+    const wrapperWidth = wrapper.clientWidth;
+
+    originalCards.forEach((card, i) => {
+        const baseLeft = firstCardLeft + i * cardPitch;
+        let tickerOffset = parseFloat(card.dataset.tickerOffset) || 0;
+        let visualLeft = baseLeft + tickerOffset + containerOffset;
+
+        // If card is completely off the left edge, wrap it to the right
+        while (visualLeft + cardWidth < -cardWidth) {
+            tickerOffset += totalTrackWidth;
+            visualLeft += totalTrackWidth;
+        }
+        // If card is completely off the right edge, wrap it to the left
+        while (visualLeft > wrapperWidth + cardWidth) {
+            tickerOffset -= totalTrackWidth;
+            visualLeft -= totalTrackWidth;
+        }
+
+        if (parseFloat(card.dataset.tickerOffset || 0) !== tickerOffset) {
+            card.dataset.tickerOffset = tickerOffset;
+            card.style.left = tickerOffset + 'px';
+        }
+    });
 }
 
 function setPosition(offset, instant) {
@@ -40,22 +68,18 @@ function setPosition(offset, instant) {
         cardsContainer.classList.add('no-transition');
     }
     cardsContainer.style.transform = `translateX(${offset}px)`;
+    repositionCards(offset);
     if (instant) {
-        // Force reflow so the no-transition class takes effect before we remove it
         void cardsContainer.offsetHeight;
         cardsContainer.classList.remove('no-transition');
     }
 }
 
 // Update active card styling and indicators
-function updateActiveStates(index) {
-    const allCards = getAllCards();
-    // allCards index: clone at 0, real cards at 1..totalSlides, clone at totalSlides+1
-    allCards.forEach((card, i) => {
-        card.classList.toggle('active', i === index + 1);
+function updateActiveStates(realIndex) {
+    originalCards.forEach((card, i) => {
+        card.classList.toggle('active', i === realIndex);
     });
-
-    const realIndex = ((index % totalSlides) + totalSlides) % totalSlides;
 
     // Update indicators
     const indicators = document.querySelectorAll('.indicator-dot');
@@ -74,44 +98,22 @@ function updateActiveStates(index) {
 }
 
 function goToSlide(index) {
-    if (isTransitioning) return;
-
     stopAutoScroll();
     currentSlide = index;
-    updateActiveStates(index);
 
-    // allCards index is index + 1 (because of prepended clone)
-    const offset = getOffset(index + 1);
+    const realIndex = ((index % totalSlides) + totalSlides) % totalSlides;
+    updateActiveStates(realIndex);
+
+    const offset = getOffset(index);
     setPosition(offset, false);
-
-    // Handle wrapping: after animating to the clone, instantly jump to the real card
-    if (index < 0 || index >= totalSlides) {
-        isTransitioning = true;
-        // Wait for the CSS transition to finish (500ms matches transition duration)
-        setTimeout(() => {
-            if (index < 0) {
-                currentSlide = totalSlides - 1;
-            } else {
-                currentSlide = 0;
-            }
-            updateActiveStates(currentSlide);
-            const jumpOffset = getOffset(currentSlide + 1);
-            setPosition(jumpOffset, true); // instant jump — no visible rewind
-            isTransitioning = false;
-            startAutoScroll();
-        }, 520);
-    } else {
-        startAutoScroll();
-    }
+    startAutoScroll();
 }
 
 function nextSlide() {
-    if (isTransitioning) return;
     goToSlide(currentSlide + 1);
 }
 
 function prevSlide() {
-    if (isTransitioning) return;
     goToSlide(currentSlide - 1);
 }
 
@@ -123,14 +125,18 @@ function createIndicators() {
         const dot = document.createElement('div');
         dot.classList.add('indicator-dot');
         if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => goToSlide(i));
+        dot.addEventListener('click', () => {
+            // Navigate via the shortest path
+            const realCurrent = ((currentSlide % totalSlides) + totalSlides) % totalSlides;
+            const diff = i - realCurrent;
+            goToSlide(currentSlide + diff);
+        });
         container.appendChild(dot);
     }
 }
 
 // Auto-scroll
 function autoAdvance() {
-    if (isTransitioning) return;
     goToSlide(currentSlide + 1);
 }
 
@@ -149,24 +155,15 @@ function stopAutoScroll() {
 function addCardClickHandlers() {
     originalCards.forEach((card, index) => {
         card.addEventListener('click', () => {
-            if (index !== currentSlide && !isTransitioning) {
-                goToSlide(index);
+            const realCurrent = ((currentSlide % totalSlides) + totalSlides) % totalSlides;
+            if (index !== realCurrent) {
+                const diff = index - realCurrent;
+                goToSlide(currentSlide + diff);
             }
         });
         card.querySelectorAll('.btn').forEach(btn => {
             btn.addEventListener('click', (e) => e.stopPropagation());
         });
-    });
-
-    // Clone click handlers
-    const allCards = getAllCards();
-    // First element is the last-clone
-    allCards[0].addEventListener('click', () => {
-        if (!isTransitioning) goToSlide(totalSlides - 1);
-    });
-    // Last element is the first-clone
-    allCards[allCards.length - 1].addEventListener('click', () => {
-        if (!isTransitioning) goToSlide(0);
     });
 }
 
@@ -177,14 +174,20 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Initialize
-createInfiniteLoop();
+measureLayout();
 createIndicators();
 addCardClickHandlers();
 
-// Set initial position instantly
+// Set initial position
 updateActiveStates(0);
-setPosition(getOffset(1), true);
+setPosition(getOffset(0), true);
 startAutoScroll();
+
+// Recalculate on resize
+window.addEventListener('resize', () => {
+    measureLayout();
+    setPosition(getOffset(currentSlide), true);
+});
 
 // Pause auto-scroll on hover
 cardsContainer.addEventListener('mouseenter', () => {
@@ -205,48 +208,46 @@ let touchStartY = 0;
 let touchCurrentX = 0;
 let isDragging = false;
 let dragStartOffset = 0;
-let swipeLocked = false; // once we decide horizontal vs vertical, lock it
+let swipeLocked = false;
 
 if (cardsContainer) {
     cardsContainer.addEventListener('touchstart', (e) => {
-        if (isTransitioning) return;
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         touchCurrentX = touchStartX;
         isDragging = true;
         swipeLocked = false;
-        dragStartOffset = getOffset(currentSlide + 1);
+        dragStartOffset = getOffset(currentSlide);
         stopAutoScroll();
         cardsContainer.classList.add('no-transition');
     }, { passive: true });
 
     cardsContainer.addEventListener('touchmove', (e) => {
-        if (!isDragging || isTransitioning) return;
+        if (!isDragging) return;
 
         const dx = e.touches[0].clientX - touchStartX;
         const dy = e.touches[0].clientY - touchStartY;
 
-        // Decide direction on first significant move
         if (!swipeLocked) {
             if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
                 swipeLocked = true;
                 if (Math.abs(dy) > Math.abs(dx)) {
-                    // Vertical scroll — bail out
                     isDragging = false;
                     cardsContainer.classList.remove('no-transition');
                     startAutoScroll();
                     return;
                 }
             } else {
-                return; // not enough movement yet
+                return;
             }
         }
 
-        // Horizontal swipe — prevent page scroll and drag the carousel
         e.preventDefault();
         touchCurrentX = e.touches[0].clientX;
         const dragDelta = touchCurrentX - touchStartX;
-        cardsContainer.style.transform = `translateX(${dragStartOffset + dragDelta}px)`;
+        const currentOffset = dragStartOffset + dragDelta;
+        cardsContainer.style.transform = `translateX(${currentOffset}px)`;
+        repositionCards(currentOffset);
     }, { passive: false });
 
     cardsContainer.addEventListener('touchend', () => {
@@ -259,8 +260,7 @@ if (cardsContainer) {
             if (swipeDistance > 0) nextSlide();
             else prevSlide();
         } else {
-            // Snap back to current slide
-            const offset = getOffset(currentSlide + 1);
+            const offset = getOffset(currentSlide);
             setPosition(offset, false);
             startAutoScroll();
         }
@@ -270,8 +270,7 @@ if (cardsContainer) {
         if (!isDragging) return;
         isDragging = false;
         cardsContainer.classList.remove('no-transition');
-        const offset = getOffset(currentSlide + 1);
-        setPosition(offset, false);
+        setPosition(getOffset(currentSlide), false);
         startAutoScroll();
     }, { passive: true });
 }
