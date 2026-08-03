@@ -271,24 +271,34 @@ const SEED=[
  ['txt','📧','Email','alex.rivera@example.com','Clipboard'],
  ['txt','📱','Phone','+1 (614) 555-0164','Clipboard'],
  ['txt','🏠','Address','482 Maple Grove Ave, Apt 3B, Columbus OH 43210','Clipboard'],
- ['txt','🪪','Full name','Alex Rivera','Snippets'],
+ ['txt','👤','Full name','Alex Rivera','Snippets'],
  ['txt','🎯','Why-us opener','I’ve followed Northbeam’s design work for two years — the way your team ships small and polishes hard is exactly how I want to learn to build. My portfolio has three projects in that spirit.','Snippets'],
  ['txt','📮','Follow-up','Just floating this back to the top of your inbox — any thoughts when you get a sec?','Snippets'],
  ['txt','✍️','Signature','Best,\nAlex Rivera','Snippets'],
  ['txt','👥','References','Dana Okafor — Design Lead, Brightline · dana@brightline.example\nSam Chen — PM, Fielder & Co · sam@fielder.example','Snippets'],
- ['doc','🧾','Resume.pdf','','Docs'],
+ ['doc','📑','Resume.pdf','','Docs'],
  ['doc','📃','Cover-letter.pdf','','Docs'],
  ['doc','🎓','Transcript.pdf','','Docs'],
- ['img','🧑','Headshot','','Images'],
+ ['img','📸','Headshot','','Images'],
  ['img','🖼️','Portfolio cover','','Images'],
  ['url','🌐','Portfolio','https://alexrivera.example.com','Links'],
  ['url','💼','LinkedIn','https://linkedin.example.com/in/alexrivera','Links'],
  ['url','📅','Calendly','https://cal.example.com/alex/15min','Links'],
 ];
-const KEY='reel.vault.v2';
+const KEY='reel.vault.v3';   // v3: v2 stores were poisoned by a mis-encoded build
+/* Double-encoded UTF-8 fingerprints. Every emoji in U+1F300-1F6FF starts with the
+   bytes F0 9F, which mangle to "ðŸ" — so that pair alone catches corrupted emoji,
+   without false-positiving on legitimate accented text a tester might save. */
+const MOJIBAKE=/ðŸ|â€|Ã°|Ã¢/;
 let vault=load();
 function load(){
-  try{const j=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(j)&&j.length)return j;}catch(_){}
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw&&MOJIBAKE.test(raw)){localStorage.removeItem(KEY);}   // corrupt: discard, re-seed below
+    else{const j=JSON.parse(raw);if(Array.isArray(j)&&j.length)return j;}
+  }catch(_){}
+  for(const stale of ['reel.vault.v1','reel.vault.v2'])
+    { try{localStorage.removeItem(stale)}catch(_){} }
   const now=Date.now();
   const v=SEED.map((s,i)=>({id:'s'+i,type:s[0],icon:s[1],label:s[2],content:s[3],col:s[4],
     use_count:0,last_used_at:0,captured_at:now-i*60000,source:'seed'}));
