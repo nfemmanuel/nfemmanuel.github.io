@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Action Button → Dynamic Island — a feel demo</title>
+<style>
+  :root{
+    --paper:#F2F1EC; --panel:#FFFFFF; --ink:#1D2126; --dim:#6B7280; --line:#E2DED4;
+    --accent:#0E8C7F; --accent-soft:#0E8C7F1A; --shadow:0 10px 28px rgba(28,32,38,.12);
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#0F1216; --panel:#171C22; --ink:#E9EDF2; --dim:#8B95A1; --line:#242B33;
+    --accent:#2FB9A9; --accent-soft:#2FB9A924; --shadow:0 10px 28px rgba(0,0,0,.5);
+  }}
+  :root[data-theme="dark"]{
+    --paper:#0F1216; --panel:#171C22; --ink:#E9EDF2; --dim:#8B95A1; --line:#242B33;
+    --accent:#2FB9A9; --accent-soft:#2FB9A924; --shadow:0 10px 28px rgba(0,0,0,.5);
+  }
+  :root[data-theme="light"]{
+    --paper:#F2F1EC; --panel:#FFFFFF; --ink:#1D2126; --dim:#6B7280; --line:#E2DED4;
+    --accent:#0E8C7F; --accent-soft:#0E8C7F1A; --shadow:0 10px 28px rgba(28,32,38,.12);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    max-width:520px;margin-inline:auto;padding:14px 14px calc(20px + env(safe-area-inset-bottom))}
+  h1{font-size:16.5px;margin:0 0 3px;letter-spacing:-.01em}
+  .sub{font-size:12.5px;color:var(--dim);margin:0 0 12px}
+  .row{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+  .chipb{border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;
+    padding:7px 14px;font:inherit;font-size:12.5px;cursor:pointer}
+  .chipb[data-on="1"]{border-color:var(--accent);background:var(--accent-soft)}
+
+  /* ---------- the simulated phone surface ---------- */
+  .sim{position:relative;height:min(66dvh,560px);border-radius:26px;overflow:hidden;
+    background:linear-gradient(160deg,#20303c 0%,#131a22 55%,#0d1116 100%);
+    box-shadow:var(--shadow);border:1px solid var(--line);user-select:none;-webkit-user-select:none}
+  .clock{position:absolute;top:70px;left:0;right:0;text-align:center;color:#E7ECF2;
+    font-size:56px;font-weight:250;letter-spacing:-.03em;opacity:.9;pointer-events:none}
+  .date{position:absolute;top:56px;left:0;right:0;text-align:center;color:#B9C4CF;
+    font-size:13px;pointer-events:none}
+  .grid{position:absolute;left:0;right:0;bottom:16px;display:grid;grid-template-columns:repeat(4,1fr);
+    gap:14px;padding:0 22px;pointer-events:none}
+  .app{aspect-ratio:1;border-radius:14px;background:rgba(255,255,255,.13);display:flex;
+    align-items:center;justify-content:center;font-size:22px;backdrop-filter:blur(4px)}
+
+  /* action button — left edge like the hardware */
+  .ab{position:absolute;left:0;top:112px;width:9px;height:62px;border-radius:0 5px 5px 0;
+    background:linear-gradient(180deg,#FF9F0A,#E8890B);cursor:pointer;z-index:6;
+    box-shadow:2px 0 8px rgba(0,0,0,.4)}
+  .ab::after{content:"";position:absolute;inset:-14px -18px -14px 0}
+  .ab.pressed{transform:translateX(-3px)}
+  .abhint{position:absolute;left:20px;top:118px;color:#FFD79A;font-size:12.5px;z-index:5;
+    display:flex;align-items:center;gap:7px;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+  .abhint .pulse{width:10px;height:10px;border-radius:50%;background:#FF9F0A;
+    animation:pu 1.4s infinite}
+  @keyframes pu{0%{box-shadow:0 0 0 0 rgba(255,159,10,.55)}70%{box-shadow:0 0 0 12px rgba(255,159,10,0)}100%{box-shadow:0 0 0 0 rgba(255,159,10,0)}}
+  @media (prefers-reduced-motion:reduce){.abhint .pulse{animation:none}}
+
+  /* the island */
+  .island{position:absolute;top:12px;left:50%;transform:translateX(-50%);
+    background:#000;border-radius:22px;color:#fff;z-index:8;overflow:hidden;cursor:pointer;
+    width:120px;height:34px;transition:width .32s cubic-bezier(.4,1.3,.5,1),height .32s cubic-bezier(.4,1.3,.5,1);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+  @media (prefers-reduced-motion:reduce){.island{transition:none}}
+  .island .inner{width:100%;height:100%;display:flex;align-items:center;padding:0 14px;gap:9px}
+  .island.pill{width:120px;height:34px}
+  .island.compact{width:190px;height:36px}
+  .island.wide{width:min(340px,88%);height:64px}
+  .island.panel{width:min(352px,92%);height:238px;border-radius:30px;cursor:default}
+  .isl-dot{width:9px;height:9px;border-radius:50%;background:#2C2C2E;margin-left:auto}
+  .isl-ic{font-size:16px;flex:0 0 auto}
+  .isl-tx{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .isl-tx b{font-size:13px}
+  .isl-sub{font-size:10.5px;color:#9BA3AD}
+  .isl-cta{margin-left:auto;background:var(--accent);color:#fff;border-radius:999px;
+    padding:5px 13px;font-size:12px;font-weight:600;flex:0 0 auto}
+  .isl-n{margin-left:auto;font-size:11px;color:#9BA3AD;flex:0 0 auto}
+  .plist{width:100%;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+  .pl-h{display:flex;align-items:center;gap:8px;font-size:12px;color:#9BA3AD;padding:2px 4px 4px}
+  .pl-i{display:flex;align-items:center;gap:10px;background:#161A1F;border-radius:11px;
+    padding:8px 11px;font-size:13px;cursor:pointer}
+  .pl-i .st{margin-left:auto;font-size:11px;color:#9BA3AD}
+  .pl-i[data-done="1"] .st{color:var(--accent)}
+
+  #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(90px);
+    background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;border-radius:11px;
+    padding:9px 15px;font-size:13px;z-index:60;transition:transform .22s;max-width:86vw;text-align:center}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion:reduce){#toast{transition:none}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:15px;margin-top:13px;box-shadow:var(--shadow);font-size:13.5px}
+  .card h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:0 0 8px}
+  .card p{margin:0 0 8px;color:var(--dim)} .card p:last-child{margin-bottom:0}
+  .card b{color:var(--ink)}
+  .step{display:flex;gap:9px;margin-bottom:7px;color:var(--dim)}
+  .step .n{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);
+    color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<h1>Press the orange button</h1>
+<p class="sub">This simulates an iPhone's <b>Action Button</b> starting a fill session in the <b>Dynamic Island</b>. The app never opens. Copies are real — you can actually paste afterwards.</p>
+
+<div class="row">
+  <button class="chipb" id="snd" data-on="1">Sound on</button>
+  <button class="chipb" id="reset">Restart</button>
+</div>
+
+<div class="sim" id="sim">
+  <div class="ab" id="ab" role="button" aria-label="Action Button"></div>
+  <div class="abhint" id="abhint"><span class="pulse"></span> the Action Button</div>
+  <div class="date">Monday, August 3</div>
+  <div class="clock">9:41</div>
+  <div class="island pill" id="island"><div class="inner" id="islinner"></div></div>
+  <div class="grid">
+    ${''}
+  </div>
+</div>
+
+<div class="card">
+  <h2>What just happened, in real API terms</h2>
+  <div class="step"><span class="n">1</span><span><b>Action Button</b> runs our Control (iOS 18 Controls API) — which is just one of our App Intents wearing a button.</span></div>
+  <div class="step"><span class="n">2</span><span>The intent starts a <b>Live Activity</b> — that's the only way into the Dynamic Island, and it fits: a fill session is a real ongoing activity with progress.</span></div>
+  <div class="step"><span class="n">3</span><span>Each tap on the island is a <b>LiveActivityIntent button</b> — it copies the next item without the app opening. Long-press expands the full session list.</span></div>
+</div>
+
+<div class="card">
+  <h2>The honest catches</h2>
+  <p><b>Hardware-gated:</b> Dynamic Island needs iPhone 14 Pro / any 15 or later; the Action Button needs 15 Pro / any 16 or later. The judge's crowd has this hardware; plenty of users don't — so it's a delight layer, never the only path.</p>
+  <p><b>Apple's guidance:</b> the island is a status layer, not a launcher. The session framing (progress through N items) is what makes this legitimate rather than a hack.</p>
+  <p><b>Samsung twin:</b> same idea maps to One UI — side-key double-press via RegiStar, and a Now Bar chip for the session. One shared concept, two native expressions.</p>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+const ITEMS=[
+ ['👤','Full name','Alex Rivera'],
+ ['📧','Email','alex.rivera@example.com'],
+ ['📱','Phone','+1 (614) 555-0164'],
+ ['🌐','Portfolio','https://alexrivera.example.com'],
+ ['✍️','Signature','Best,\nAlex Rivera'],
+];
+const S={mode:'idle',idx:0,done:new Set(),sound:true,holdT:null};
+
+/* sound: detent tick (high, short) + expand thock (lower, softer) */
+let AC=null;
+function beep(freq,gain,dur){
+  if(!S.sound)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+    o.type='square';o.frequency.value=freq;
+    g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g).connect(AC.destination);o.start(t);o.stop(t+dur+.005);}catch(_){}
+}
+const tick=()=>{navigator.vibrate&&navigator.vibrate(4);beep(1900,.05,.018)};
+const thock=()=>{navigator.vibrate&&navigator.vibrate(8);beep(1150,.045,.03)};
+const dbl=()=>{tick();setTimeout(tick,65)};
+
+let toastT;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2100);}
+
+async function realCopy(text){
+  try{await navigator.clipboard.writeText(text);return true}
+  catch(_){return false}
+}
+
+const island=document.getElementById('island');
+const inner=document.getElementById('islinner');
+function setIsland(cls,html){island.className='island '+cls;inner.innerHTML=html;}
+
+function render(){
+  const it=ITEMS[S.idx];
+  if(S.mode==='idle'){
+    setIsland('pill',`<span style="font-size:11px;color:#9BA3AD;margin:0 auto">●</span>`);
+  }else if(S.mode==='announce'){
+    setIsland('wide',`<span class="isl-ic">◎</span>
+      <span class="isl-tx"><b>Fill session</b><br><span class="isl-sub">Northbeam application · 5 items ready</span></span>
+      <span class="isl-cta">Go</span>`);
+  }else if(S.mode==='session'){
+    setIsland('compact',`<span class="isl-ic">${it[0]}</span>
+      <span class="isl-tx">${it[1]}</span><span class="isl-n">${S.idx+1}/5</span>`);
+  }else if(S.mode==='panel'){
+    setIsland('panel',`<div class="plist">
+      <div class="pl-h">◎ Fill session · tap anything to copy it</div>
+      ${ITEMS.map((x,i)=>`<div class="pl-i" data-i="${i}" data-done="${S.done.has(i)?1:0}">
+        <span>${x[0]}</span><span>${x[1]}</span>
+        <span class="st">${S.done.has(i)?'copied ✓':'copy'}</span></div>`).join('')}
+    </div>`);
+    [...inner.querySelectorAll('.pl-i')].forEach(el=>el.onclick=e=>{e.stopPropagation();copyItem(+el.dataset.i,false)});
+  }else if(S.mode==='doneAll'){
+    setIsland('compact',`<span class="isl-ic">✓</span><span class="isl-tx">All 5 copied</span>`);
+  }
+}
+
+async function copyItem(i,advance){
+  S.idx=i;const it=ITEMS[i];
+  const ok=await realCopy(it[2]);
+  S.done.add(i);dbl();
+  toast(ok?`${it[1]} copied — go paste it`:`${it[1]} (clipboard blocked here — imagine it copied)`);
+  if(S.done.size>=ITEMS.length){S.mode='doneAll';render();
+    setTimeout(()=>{S.mode='idle';render();},2200);return;}
+  if(advance){let n=i;do{n=(n+1)%ITEMS.length}while(S.done.has(n));S.idx=n;}
+  S.mode='session';render();
+}
+
+/* action button */
+const ab=document.getElementById('ab');
+ab.addEventListener('pointerdown',()=>{ab.classList.add('pressed')});
+ab.addEventListener('pointerup',()=>{
+  ab.classList.remove('pressed');
+  document.getElementById('abhint').style.display='none';
+  thock();S.mode='announce';S.idx=0;render();
+  setTimeout(()=>{if(S.mode==='announce'){S.mode='session';render();tick();}},1300);
+});
+
+/* island taps + long-press */
+island.addEventListener('pointerdown',()=>{
+  if(S.mode!=='session')return;
+  S.holdT=setTimeout(()=>{S.holdT=null;thock();S.mode='panel';render();},380);
+});
+island.addEventListener('pointerup',()=>{
+  if(S.holdT){clearTimeout(S.holdT);S.holdT=null;
+    if(S.mode==='session'){copyItem(S.idx,true);}
+    else if(S.mode==='announce'){S.mode='session';render();tick();}
+    else if(S.mode==='idle'){toast('Press the orange Action Button first');}
+  }
+});
+document.getElementById('sim').addEventListener('pointerdown',e=>{
+  if(S.mode==='panel'&&!island.contains(e.target)){S.mode='session';render();tick();}
+});
+
+document.getElementById('snd').onclick=e=>{S.sound=!S.sound;
+  e.target.dataset.on=S.sound?1:0;e.target.textContent=S.sound?'Sound on':'Sound off';};
+document.getElementById('reset').onclick=()=>{S.mode='idle';S.idx=0;S.done=new Set();
+  document.getElementById('abhint').style.display='flex';render();};
+
+/* fake app grid */
+document.querySelector('.grid').innerHTML=
+  ['✉️','🗓️','📷','🎵','🗺️','☁️','💬','⚙️'].map(g=>`<div class="app">${g}</div>`).join('');
+
+render();
+</script>
+</body>
+</html>
