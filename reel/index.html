@@ -179,14 +179,15 @@
   <section data-page="dial" hidden>
     <div class="eyebrow">Test 1 · the dial</div>
     <h1>Apply to Northbeam using only the dial →</h1>
+    <p style="margin:-2px 0 10px">The round button on the right edge is the app. It floats over whatever you're doing.</p>
     <div class="card tips">
       <h2>Three moves</h2>
       <table>
-        <tr><td>Tap the handle</td><td>Opens and stays. Spin a ring — the item at the <b style="color:#FF4D4D">red mark</b> is selected. Tap it to insert into the box you last touched.</td></tr>
-        <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the handle, then slide <b>out</b>: a little reaches the <b>inner</b> ring (collections), further reaches the <b>outer</b> ring (items). Arc your finger to spin whichever you're on — the lit ring is the one you're holding. Release on the outer ring to insert and put it away.</td></tr>
+        <tr><td>Tap the round button</td><td>Opens and stays. Spin a ring — it steps one item at a time and settles; the item at the <b style="color:#FF4D4D">red mark</b> is selected. Tap it to insert into the box you last touched.</td></tr>
+        <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button, then slide <b>out</b>: a little reaches the <b>inner</b> ring (collections), further reaches the <b>outer</b> ring (items). Arc your finger to spin whichever you're on — the lit ring is the one you're holding. Release on the outer ring to insert and put it away.</td></tr>
         <tr><td>Double-tap the handle</td><td>Pastes your most recent item instantly. No dial.</td></tr>
       </table>
-      <p class="muted" style="margin:8px 0 0">Inner ring = collections. Outer ring = what's inside. Sound on 🔊 for the clicks.</p>
+      <p class="muted" style="margin:8px 0 0">Inner ring = collections. Outer ring = what's inside. The rings step and settle — no half-turns. Sound on 🔊 for the clicks.</p>
     </div>
 
     <div class="task">
@@ -471,9 +472,23 @@ function refreshKb(){
 /* ================= the dial ================= */
 const svg=document.getElementById('dialsvg');
 const glidechip=document.getElementById('glidechip');
+/* Rotation model: the finger drives `raw` (continuous), `raw` commits to `t` (a whole
+   detent) as soon as it passes the deadband, and `s` (what's drawn) always eases toward
+   `t`. So the ring is never rendered part-way between items — it falls into place and
+   settles before the next step can start. `raw` exists only so a slow drag still has
+   somewhere to accumulate; it is never drawn. */
 const DIAL={enabled:false,mode:'closed',open:0,openT:0,
-  sIn:0,tIn:0,sOut:0,tOut:0,cat:0,grab:null,downBand:null,lastA:0,moved:0,downT:0,
-  tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null};
+  sIn:0,tIn:0,rawIn:0,sOut:0,tOut:0,rawOut:0,cat:0,grab:null,downBand:null,
+  lastA:0,moved:0,downT:0,tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null};
+const DEADBAND=0.55;                                   // >0.5 so it can't flicker on the boundary
+const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
+const BTN_R=27;                                        // round logo button (primary affordance)
+function turn(ring,deltaDeg){
+  const D=DIAL,step=ring==='In'?STEP_IN:STEP_OUT;
+  D['raw'+ring]+=-deltaDeg/step;
+  D['t'+ring]=detent(D['raw'+ring],D['t'+ring]);
+}
+function settle(ring){const D=DIAL;D['raw'+ring]=D['t'+ring];}
 const STEP_IN=42,STEP_OUT=33,WIN_IN=46,WIN_OUT=70;
 let VW=innerWidth,VH=innerHeight,R=0,HUB=0,IN0=0,IN1=0,OUT0=0,OUT1=0,CY=0;
 function sizes(){
@@ -486,6 +501,8 @@ function sizes(){
 sizes();addEventListener('resize',()=>{sizes();drawDial();});
 const rad=d=>(d-90)*Math.PI/180;
 const P=(r,deg)=>({x:VW+r*Math.cos(rad(deg)),y:CY+r*Math.sin(rad(deg))});
+const P2=(cx,cy,r,deg)=>({x:cx+r*Math.cos(rad(deg)),y:cy+r*Math.sin(rad(deg))});
+const onLogoBtn=(x,y)=>Math.hypot(x-(VW-BTN_R),y-CY)<=BTN_R+11;
 const wrapDeg=x=>((x+180)%360+360)%360-180;
 const mod=(a,n)=>((a%n)+n)%n;
 const dist=(x,y)=>Math.hypot(x-VW,y-CY);
@@ -522,8 +539,17 @@ function drawDial(){
     <radialGradient id="hb" cx="50%" cy="42%" r="70%">
     <stop offset="0%" stop-color="#2C3542"/><stop offset="100%" stop-color="#12161C"/></radialGradient></defs>`;
   if(f<.02){
-    h+=`<rect x="${VW-7}" y="${CY-40}" width="6" height="80" rx="3" fill="#3A4655" opacity=".8" style="pointer-events:auto;cursor:pointer"/>`;
-    h+=`<rect x="${VW-30}" y="${CY-70}" width="30" height="140" fill="transparent" style="pointer-events:auto"/>`;
+    const bx=VW-BTN_R,by=CY;
+    // secondary: the docked panel edge, a quiet hint that something lives here
+    h+=`<rect x="${VW-4}" y="${CY-52}" width="3" height="104" rx="1.5" fill="#3A4655" opacity=".45"/>`;
+    // primary: round logo button
+    h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="#151A21" stroke="#39424F" stroke-width="2"/>`;
+    for(let a=-70;a<=70;a+=10){const p1=P2(bx,by,BTN_R-4,a),p2=P2(bx,by,BTN_R-1,a);
+      h+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#39424F" stroke-width="1.3" opacity=".8"/>`;}
+    h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-9}" fill="none" stroke="#4A5563" stroke-width="1.4"/>`;
+    h+=`<circle cx="${bx}" cy="${by}" r="6.5" fill="#2FB9A9"/>`;
+    h+=`<line x1="${bx}" y1="${by-BTN_R+3}" x2="${bx}" y2="${by-BTN_R+10}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round"/>`;
+    h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
     svg.innerHTML=h;return;
   }
   h+=`<circle cx="${VW}" cy="${CY}" r="${o(OUT1)+22}" fill="rgba(5,8,12,${.5*f})"/>`;
@@ -572,15 +598,18 @@ let prevIn=0,prevOut=0;
   const D=DIAL;
   D.open+=(D.openT-D.open)*.18;
   if(Math.abs(D.openT-D.open)<.005)D.open=D.openT;
+  // Always ease toward the committed detent, dragging included — never rest part-way.
+  // Rate .5 + a .004 landing threshold puts a step on screen in ~8 frames (~130ms):
+  // fast enough to read as a mechanical click, slow enough not to look like a teleport.
   for(const r of ['In','Out']){
-    if(D.grab!==r&&D.mode!=='glide'){D['s'+r]+=(D['t'+r]-D['s'+r])*.22;
-      if(Math.abs(D['t'+r]-D['s'+r])<.002)D['s'+r]=D['t'+r];}
+    D['s'+r]+=(D['t'+r]-D['s'+r])*.5;
+    if(Math.abs(D['t'+r]-D['s'+r])<.004)D['s'+r]=D['t'+r];
   }
-  const dIn=Math.round(D.sIn),dOut=Math.round(D.sOut);
-  if(dIn!==prevIn){prevIn=dIn;tick();
-    const c=mod(dIn,COLS.length);
-    if(c!==D.cat){D.cat=c;D.sOut=0;D.tOut=0;prevOut=0;}}
-  if(dOut!==prevOut){prevOut=dOut;tick();}
+  // click at the moment of commitment, not when the animation crosses a midpoint
+  if(D.tIn!==prevIn){prevIn=D.tIn;tick();
+    const c=mod(D.tIn,COLS.length);
+    if(c!==D.cat){D.cat=c;D.sOut=0;D.tOut=0;D.rawOut=0;prevOut=0;}}
+  if(D.tOut!==prevOut){prevOut=D.tOut;tick();}
   document.body.classList.toggle('dialing',D.enabled&&(D.openT>0||D.mode==='glide'));
   if(D.enabled)drawDial();
   requestAnimationFrame(loop);
@@ -591,7 +620,7 @@ let PTR=null;
 addEventListener('pointerdown',e=>{
   const D=DIAL;if(!D.enabled)return;
   const d=dist(e.clientX,e.clientY);
-  const onHandle=D.openT===0&&(VW-e.clientX)<34&&Math.abs(e.clientY-CY)<80;
+  const onHandle=D.openT===0&&onLogoBtn(e.clientX,e.clientY);
   if(D.openT===0&&!onHandle)return;
   PTR=e.pointerId;D.moved=0;D.downT=Date.now();D.lastA=ang(e.clientX,e.clientY);
   D.glideY=e.clientY;D.downBand=band(d);
@@ -621,7 +650,7 @@ addEventListener('pointermove',e=>{
     }
     if(D.glideZone){
       const delta=wrapDeg(a-D.lastA);
-      D['s'+D.glideZone]+=-delta/(D.glideZone==='In'?STEP_IN:STEP_OUT);
+      turn(D.glideZone,delta);
       D.moved+=Math.abs(delta);
     }
     D.lastA=a;
@@ -634,7 +663,7 @@ addEventListener('pointermove',e=>{
   if(!D.grab)return;
   const a=ang(e.clientX,e.clientY),delta=wrapDeg(a-D.lastA);D.lastA=a;
   D.moved+=Math.abs(delta);
-  D['s'+D.grab]+=-delta/(D.grab==='In'?STEP_IN:STEP_OUT);
+  turn(D.grab,delta);
   e.preventDefault();
 },{passive:false});
 
@@ -644,15 +673,14 @@ addEventListener('pointerup',e=>{
   if(D.mode==='glide'){
     const z=D.glideZone;
     D.mode='closed';D.glideZone=null;glidechip.style.display='none';
-    D.tIn=Math.round(D.sIn);D.sIn=D.tIn;
-    D.tOut=Math.round(D.sOut);D.sOut=D.tOut;
+    settle('In');settle('Out');                       // already on whole detents; just resync raw
     if(z==='Out'){useItem(focusedItem());D.openT=0;}  // only the item ring fires on release
     else{D.openT=1;}                                  // neutral or collections: stay open to browse
     return;
   }
   const d=dist(e.clientX,e.clientY),a=ang(e.clientX,e.clientY);
   const wasTap=D.moved<4&&Date.now()-D.downT<400;
-  if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
+  if(D.grab){settle(D.grab);D.grab=null;}
   if(!wasTap){D.downBand=null;return;}
 
   if(D.openT===0){
@@ -672,11 +700,18 @@ addEventListener('pointerup',e=>{
       if(hit==='Out'&&Math.abs(dd)<.45){
         const okd=useItem(focusedItem());
         if(okd)D.openT=0;
-      }else{D['t'+hit]=Math.round(D['s'+hit]+dd);}
+      }else{D['t'+hit]=Math.round(D['t'+hit]+dd);D['raw'+hit]=D['t'+hit];}
     }
   }
   D.downBand=null;
 });
+addEventListener('wheel',e=>{                          // desktop: one notch = one whole detent
+  const D=DIAL;if(!D.enabled||D.openT===0)return;
+  const r=band(dist(e.clientX,e.clientY));if(!r)return;
+  e.preventDefault();
+  D['t'+r]+=Math.sign(e.deltaY);D['raw'+r]=D['t'+r];
+},{passive:false});
+
 addEventListener('pointercancel',e=>{
   const D=DIAL;if(e.pointerId!==PTR)return;
   PTR=null;clearTimeout(D.holdTimer);D.holdTimer=null;
