@@ -127,27 +127,55 @@
     border-radius:10px;padding:6px 11px;font-size:12.5px;pointer-events:none;display:none}
 
   #kb{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#1C1F24;border-top:1px solid #000;
-    padding:8px 8px 10px;transform:translateY(105%);transition:transform .22s;
-    display:flex;flex-direction:column;height:302px}
+    padding:6px 6px 8px;transform:translateY(105%);transition:transform .22s;
+    display:flex;flex-direction:column;height:332px}
   #kb.up{transform:translateY(0)}
   @media (prefers-reduced-motion: reduce){#kb{transition:none}}
-  #kb .bar{display:flex;gap:6px;margin-bottom:7px;flex:0 0 auto}
-  #kb .globe{width:36px;height:30px;border-radius:7px;background:#3A3F47;color:#E9EDF2;display:flex;
-    align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex:0 0 auto;border:none}
-  #kb input{flex:1;height:30px;border-radius:7px;background:#262B32;border:1px solid #333941;
-    color:#E9EDF2;font-size:13px;padding:0 10px}
-  #kb input::placeholder{color:#6D7783}
-  #kb .cats{display:flex;gap:6px;margin-bottom:7px;flex:0 0 auto}
-  #kb .cat{flex:1;height:34px;border-radius:8px;background:#242A31;border:1px solid transparent;
+  .kdots{display:flex;gap:6px;justify-content:center;padding:2px 0 6px;flex:0 0 auto}
+  .kdots span{width:6px;height:6px;border-radius:50%;background:#3A414B;cursor:pointer;transition:.15s}
+  .kdots span.on{background:#2FB9A9;width:16px;border-radius:3px}
+  .kpager{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:0}
+  .kpager::-webkit-scrollbar{display:none}
+  .kpage{flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-height:0;padding:0 2px}
+  .ksearch{height:32px;border-radius:8px;background:#262B32;border:1px solid #333941;
+    display:flex;align-items:center;padding:0 10px;gap:7px;color:#6D7783;font-size:13px;
+    cursor:pointer;flex:0 0 auto;margin-bottom:6px}
+  .ksearch .q{color:#E9EDF2;white-space:pre}
+  .ksearch .caret{width:1.5px;height:16px;background:#2FB9A9;animation:kblink 1s step-end infinite}
+  @keyframes kblink{50%{opacity:0}}
+  .ksearch .x{margin-left:auto;color:#8A94A0;padding:2px 4px}
+  #kb .cats{display:flex;gap:6px;margin-bottom:6px;flex:0 0 auto}
+  #kb .cat{flex:1;height:32px;border-radius:8px;background:#242A31;border:1px solid transparent;
     display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
   #kb .cat.on{background:#2F3A4A;border-color:#5B8CFF}
-  #kb .grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
+  #kb .grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start;min-height:0}
   #kb .it{background:#2A2F36;border:1px solid #333941;border-radius:9px;padding:8px 10px;
     font-size:12.5px;color:#CFD8E3;cursor:pointer;display:flex;align-items:center;gap:7px;
     overflow:hidden;white-space:nowrap;min-height:38px}
   #kb .it:active{background:#333A43}
   #kb .it .tx{overflow:hidden;text-overflow:ellipsis}
   #kb .it .b{margin-left:auto;font-size:9px;color:#7A8492;flex:0 0 auto}
+  .kresults{display:flex;gap:6px;overflow-x:auto;flex:0 0 46px;margin-bottom:6px;scrollbar-width:none}
+  .kresults::-webkit-scrollbar{display:none}
+  .kresults .it{flex:0 0 auto;min-height:40px}
+  .kfoot{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding-top:6px;color:#6D7783;font-size:11px}
+  .kfoot .fbtn{background:#2A2F36;border:1px solid #333941;color:#C9D2DD;border-radius:7px;
+    padding:6px 11px;font:inherit;font-size:12px;cursor:pointer}
+  .kfoot .hint{flex:1;text-align:center}
+  .krows{flex:1;display:flex;flex-direction:column;gap:5px;justify-content:flex-end;min-height:0;padding-bottom:2px}
+  .krow{display:flex;gap:4.5px}
+  .key{flex:1;height:37px;border-radius:6.5px;background:#3A3F47;color:#E9EDF2;display:flex;
+    align-items:center;justify-content:center;font-size:14.5px;cursor:pointer;user-select:none;-webkit-user-select:none}
+  .key:active{background:#4A5160}
+  .key.dim{background:#2A2F36;font-size:12px}
+  .key.act{background:#2FB9A9;color:#fff;font-weight:600}
+  .key.sp{flex:3.2}
+  .fillov{position:absolute;inset:0;background:#1C1F24;z-index:3;display:flex;flex-direction:column;
+    padding:8px 8px 10px}
+  .fprev{flex:0 0 auto;background:#262B32;border:1px solid #333941;border-radius:9px;padding:9px 11px;
+    font-size:12.5px;color:#C9D2DD;margin-bottom:7px;max-height:74px;overflow-y:auto;line-height:1.45}
+  .fprev .blank{background:#2FB9A926;border-bottom:2px solid #2FB9A9;color:#7FE0D2;
+    border-radius:3px;padding:0 3px;white-space:pre}
   #kbfab{position:fixed;right:16px;bottom:18px;z-index:49;width:52px;height:52px;border-radius:50%;
     background:var(--accent);color:#fff;border:none;font-size:21px;cursor:pointer;box-shadow:var(--shadow)}
 
@@ -225,7 +253,7 @@
   <section data-page="keyboard" hidden>
     <div class="eyebrow">Test 2 · the keyboard</div>
     <h1>Second application of the day — keyboard style</h1>
-    <p>Tap into any box and the vault keyboard rises. On a real iPhone it works inside every app. <b>Search actually filters</b> — try typing "res".</p>
+    <p>Tap into any box and the vault keyboard rises — <b>vault first, keys one swipe left</b>. Three things to try: the search field (it uses our own keys — a keyboard can't summon a keyboard), the <b>Interview thanks</b> snippet (it asks you to fill a blank before inserting), and the <b>⇄ done</b> key that hands you straight back to your own keyboard.</p>
 
     <div class="task">
       <div class="co"><div class="logo" style="background:#B0632F">F</div>
@@ -257,9 +285,25 @@
 <div class="glidechip" id="glidechip">release to insert</div>
 <button id="kbfab" hidden aria-label="Open vault keyboard">⌨️</button>
 <div id="kb" aria-label="Vault keyboard">
-  <div class="bar"><button class="globe" id="kbclose" aria-label="Close keyboard">🌐</button><input id="kbsearch" type="text" placeholder="Search your stuff…"></div>
-  <div class="cats" id="kbcats"></div>
-  <div class="grid" id="kbgrid"></div>
+  <div class="kdots" id="kdots"><span class="on"></span><span></span></div>
+  <div class="kpager" id="kpager">
+    <div class="kpage" id="kpageVault">
+      <div class="ksearch" id="ksearch"></div>
+      <div class="cats" id="kbcats"></div>
+      <div class="grid" id="kbgrid"></div>
+      <div class="kresults" id="kresults" style="display:none"></div>
+      <div class="krows" id="ksrows" style="display:none"></div>
+      <div class="kfoot" id="kfootV">
+        <button class="fbtn" data-kx="globe" aria-label="Next keyboard">🌐</button>
+        <span class="hint">swipe left for keys ⌨️ →</span>
+        <button class="fbtn" data-kx="exit">⇄ done</button>
+      </div>
+    </div>
+    <div class="kpage" id="kpageKeys">
+      <div class="krows" id="ktyperows"></div>
+    </div>
+  </div>
+  <div class="fillov" id="fillov" style="display:none"></div>
 </div>
 <div id="savechip"><b>＋</b> Save to Reel</div>
 <div id="toast" role="status"></div>
@@ -277,6 +321,7 @@ const SEED=[
  ['txt','📮','Follow-up','Just floating this back to the top of your inbox — any thoughts when you get a sec?','Snippets'],
  ['txt','✍️','Signature','Best,\nAlex Rivera','Snippets'],
  ['txt','👥','References','Dana Okafor — Design Lead, Brightline · dana@brightline.example\nSam Chen — PM, Fielder & Co · sam@fielder.example','Snippets'],
+ ['txt','📝','Interview thanks','Thanks for the great conversation, ___ — I left even more excited about the role. Anything else you need is one message away.','Snippets'],
  ['doc','📑','Resume.pdf','','Docs'],
  ['doc','📃','Cover-letter.pdf','','Docs'],
  ['doc','🎓','Transcript.pdf','','Docs'],
@@ -286,7 +331,7 @@ const SEED=[
  ['url','💼','LinkedIn','https://linkedin.example.com/in/alexrivera','Links'],
  ['url','📅','Calendly','https://cal.example.com/alex/15min','Links'],
 ];
-const KEY='reel.vault.v3';   // v3: v2 stores were poisoned by a mis-encoded build
+const KEY='reel.vault.v4';   // v4: adds the template snippet; carries user items over from v3
 /* Double-encoded UTF-8 fingerprints. Every emoji in U+1F300-1F6FF starts with the
    bytes F0 9F, which mangle to "ðŸ" — so that pair alone catches corrupted emoji,
    without false-positiving on legitimate accented text a tester might save. */
@@ -298,11 +343,16 @@ function load(){
     if(raw&&MOJIBAKE.test(raw)){localStorage.removeItem(KEY);}   // corrupt: discard, re-seed below
     else{const j=JSON.parse(raw);if(Array.isArray(j)&&j.length)return j;}
   }catch(_){}
-  for(const stale of ['reel.vault.v1','reel.vault.v2'])
+  let carried=[];
+  try{const old=JSON.parse(localStorage.getItem('reel.vault.v3'));
+    if(Array.isArray(old))carried=old.filter(i=>i&&i.source&&i.source!=='seed'&&!MOJIBAKE.test(JSON.stringify(i)));
+  }catch(_){}
+  for(const stale of ['reel.vault.v1','reel.vault.v2','reel.vault.v3'])
     { try{localStorage.removeItem(stale)}catch(_){} }
   const now=Date.now();
   const v=SEED.map((s,i)=>({id:'s'+i,type:s[0],icon:s[1],label:s[2],content:s[3],col:s[4],
     use_count:0,last_used_at:0,captured_at:now-i*60000,source:'seed'}));
+  v.push(...carried);
   save(v);return v;
 }
 function save(v){try{localStorage.setItem(KEY,JSON.stringify(v))}catch(_){}}
@@ -378,6 +428,7 @@ function visibleSection(){return document.querySelector('section:not([hidden])')
 function useItem(it){
   if(!it)return false;
   if(it.type==='txt'||it.type==='url'){
+    if(kb.classList.contains('up')&&(it.content||'').includes('___')){enterFill(it);return true;}
     if(T.field&&visibleSection().contains(T.field)){
       insertAtCursor(T.field,it.content||it.label);touch(it);
       toast(`Inserted · ${it.label}`);tick();setTimeout(tick,70);return true;
@@ -444,29 +495,155 @@ function route(){
 }
 addEventListener('hashchange',route);
 
-/* ================= keyboard (bottom sheet) ================= */
+/* ========== keyboard: vault-first, swipe left for keys ========== */
 const kb=document.getElementById('kb');
-let kbCat=0,kbQ='';
-function kbShow(){kb.classList.add('up')}
-function kbHide(){kb.classList.remove('up')}
-document.getElementById('kbfab').onclick=()=>kb.classList.contains('up')?kbHide():(refreshKb(),kbShow());
-document.getElementById('kbclose').onclick=kbHide;
+const kpager=document.getElementById('kpager');
+const KB={cat:0,q:'',mode:'browse',fillItem:null,fillBuf:''};
+function kbShow(page){kb.classList.add('up');
+  if(page!==undefined)setTimeout(()=>kpager.scrollTo({left:page*kpager.clientWidth}),10);}
+function kbHide(){kb.classList.remove('up');exitSearch();exitFill();}
+function kbExit(){kbHide();toast("Back to your keyboard — on iOS that's this one tap");}
+document.getElementById('kbfab').onclick=()=>kb.classList.contains('up')?kbHide():(refreshKb(),kbShow(0));
 document.addEventListener('focusin',e=>{
   if(!document.querySelector('[data-page=keyboard]').hidden
-     &&e.target.matches('input[type=text],textarea')&&e.target.closest('.task')){refreshKb();kbShow();}
+     &&e.target.matches('input[type=text],textarea')&&e.target.closest('.task')){refreshKb();kbShow(0);}
 });
-document.getElementById('kbsearch').addEventListener('input',e=>{kbQ=e.target.value.trim().toLowerCase();refreshKb();});
+
+/* pager dots */
+const kdots=document.getElementById('kdots');
+kpager.addEventListener('scroll',()=>{
+  const p=kpager.scrollLeft>kpager.clientWidth/2?1:0;
+  [...kdots.children].forEach((d,i)=>d.classList.toggle('on',i===p));
+},{passive:true});
+[...kdots.children].forEach((d,i)=>d.onclick=()=>kpager.scrollTo({left:i*kpager.clientWidth,behavior:'smooth'}));
+
+/* soft key click — quieter than the dial detent */
+function kbeep(){navigator.vibrate&&navigator.vibrate(2);
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+    o.type='square';o.frequency.value=1450;
+    g.gain.setValueAtTime(.03,t);g.gain.exponentialRampToValueAtTime(.0001,t+.014);
+    o.connect(g).connect(AC.destination);o.start(t);o.stop(t+.02);}catch(_){}}
+
+/* one keyset, three contexts: typing into the page, typing a search, filling a blank */
+const KROWS=[['1','2','3','4','5','6','7','8','9','0'],
+  ['q','w','e','r','t','y','u','i','o','p'],
+  ['a','s','d','f','g','h','j','k','l'],
+  ['z','x','c','v','b','n','m','@','.']];
+function rowsHTML(ctx){
+  let h=KROWS.map(r=>`<div class="krow">${r.map(k=>`<div class="key" data-k="${k}">${k}</div>`).join('')}</div>`).join('');
+  h+=`<div class="krow">
+    <div class="key dim" data-kx="globe">🌐</div>
+    <div class="key dim" data-kx="exit">⇄</div>
+    <div class="key sp" data-k=" ">space</div>
+    <div class="key dim" data-kx="bksp">⌫</div>
+    ${ctx==='type'?`<div class="key dim" data-k="&#10;">↩</div>`:''}
+    ${ctx==='search'?`<div class="key act" data-kx="closeSearch">Done</div>`:''}
+    ${ctx==='fill'?`<div class="key dim" data-kx="cancelFill">✕</div><div class="key act" data-kx="commitFill">Insert</div>`:''}
+  </div>`;
+  return h;
+}
+function bindKeys(container){
+  [...container.querySelectorAll('.key')].forEach(el=>{
+    el.addEventListener('pointerdown',e=>e.preventDefault());   // host field keeps focus + caret
+    el.onclick=()=>{const kx=el.dataset.kx;
+      if(kx){handleKx(kx);return;}
+      kbeep();typeChar(el.dataset.k);};
+  });
+}
+function typeChar(ch){
+  if(KB.mode==='search'){KB.q+=ch;renderSearch();}
+  else if(KB.mode==='fill'){KB.fillBuf+=ch;renderFill();}
+  else{ // the no-paste-step path: keys type straight into the page's field
+    if(T.field&&visibleSection().contains(T.field))insertAtCursor(T.field,ch);
+    else{pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');toast('Tap a text box first');}
+  }
+}
+function handleKx(kx){
+  if(kx==='globe'||kx==='exit'){kbExit();return;}
+  if(kx==='bksp'){kbeep();
+    if(KB.mode==='search'){KB.q=KB.q.slice(0,-1);renderSearch();}
+    else if(KB.mode==='fill'){KB.fillBuf=KB.fillBuf.slice(0,-1);renderFill();}
+    else if(T.field&&visibleSection().contains(T.field)){
+      const s=T.field.selectionStart||0;
+      if(s>0){T.field.focus();T.field.setRangeText('',s-1,T.field.selectionEnd||s,'end');
+        T.field.dispatchEvent(new Event('input',{bubbles:true}));}}
+    return;}
+  if(kx==='closeSearch'){exitSearch();refreshKb();return;}
+  if(kx==='cancelFill'){exitFill();refreshKb();return;}
+  if(kx==='commitFill'){commitFill();return;}
+}
+
+/* --- search: our own keys, because a keyboard can't summon a keyboard --- */
+function enterSearch(){KB.mode='search';KB.q='';
+  for(const id of ['kbcats','kbgrid','kfootV'])document.getElementById(id).style.display='none';
+  const r=document.getElementById('kresults'),k=document.getElementById('ksrows');
+  r.style.display='flex';k.style.display='flex';k.innerHTML=rowsHTML('search');bindKeys(k);
+  renderSearch();}
+function exitSearch(){if(KB.mode!=='search')return;KB.mode='browse';KB.q='';
+  document.getElementById('kbcats').style.display='';
+  document.getElementById('kbgrid').style.display='';
+  document.getElementById('kfootV').style.display='';
+  document.getElementById('kresults').style.display='none';
+  document.getElementById('ksrows').style.display='none';
+  renderSearchField();}
+const escq=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function renderSearchField(){
+  const s=document.getElementById('ksearch');
+  if(KB.mode==='search'){
+    s.innerHTML=`🔍 <span class="q">${escq(KB.q)}</span><span class="caret"></span><span class="x">✕</span>`;
+    s.querySelector('.x').onclick=e=>{e.stopPropagation();exitSearch();refreshKb();};
+  }else s.innerHTML=`🔍 <span style="color:#6D7783">Search your stuff…</span>`;
+}
+function renderSearch(){
+  renderSearchField();
+  const items=KB.q?vault.filter(i=>(i.label+' '+i.content).toLowerCase().includes(KB.q.toLowerCase()))
+    :vault.slice().sort((a,b)=>b.last_used_at-a.last_used_at).slice(0,6);
+  const r=document.getElementById('kresults');
+  r.innerHTML=items.length?items.map(i=>`<div class="it">${i.icon} <span class="tx">${i.label}</span></div>`).join('')
+    :`<div style="color:#6d7783;font-size:12px;padding:12px">No match for “${escq(KB.q)}”</div>`;
+  [...r.children].forEach((el,idx)=>{if(items[idx])el.onclick=()=>useItem(items[idx]);});
+}
+document.getElementById('ksearch').onclick=()=>{if(KB.mode!=='search')enterSearch();};
+
+/* --- template fill: complete the blank before inserting --- */
+function enterFill(it){KB.mode='fill';KB.fillItem=it;KB.fillBuf='';
+  document.getElementById('fillov').style.display='flex';renderFill();}
+function renderFill(){
+  const it=KB.fillItem,parts=escq(it.content).split('___');
+  const ov=document.getElementById('fillov');
+  ov.innerHTML=`<div style="font-size:11px;color:#8A94A0;margin-bottom:6px">${it.icon} ${escq(it.label)} — fill the blank, then Insert</div>
+    <div class="fprev">${parts[0]}<span class="blank">${KB.fillBuf?escq(KB.fillBuf):'···'}</span>${parts.slice(1).join('___')}</div>
+    <div class="krows" id="frows"></div>`;
+  const fr=document.getElementById('frows');fr.innerHTML=rowsHTML('fill');bindKeys(fr);
+}
+function exitFill(){if(KB.mode!=='fill')return;KB.mode='browse';KB.fillItem=null;
+  document.getElementById('fillov').style.display='none';}
+function commitFill(){
+  const it=KB.fillItem,text=it.content.replace('___',KB.fillBuf||'___');
+  exitFill();
+  if(T.field&&visibleSection().contains(T.field)){
+    insertAtCursor(T.field,text);touch(it);
+    toast(`Inserted · ${it.label}`);tick();setTimeout(tick,70);
+  }else{pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');toast('Tap a text box first');}
+}
+
+/* --- browse (default) --- */
 function refreshKb(){
+  renderSearchField();
   const cats=document.getElementById('kbcats');
-  cats.innerHTML=COLS.map((c,i)=>`<div class="cat ${i===kbCat?'on':''}" role="button" aria-label="${c[0]}">${c[1]}</div>`).join('');
-  [...cats.children].forEach((el,i)=>el.onclick=()=>{kbCat=i;document.getElementById('kbsearch').value='';kbQ='';refreshKb();});
-  let items=kbQ?vault.filter(i=>(i.label+' '+i.content).toLowerCase().includes(kbQ)):byCol(COLS[kbCat][0]);
+  cats.innerHTML=COLS.map((c,i)=>`<div class="cat ${i===KB.cat?'on':''}" role="button" aria-label="${c[0]}">${c[1]}</div>`).join('');
+  [...cats.children].forEach((el,i)=>el.onclick=()=>{KB.cat=i;refreshKb();});
+  const items=byCol(COLS[KB.cat][0]);
   const grid=document.getElementById('kbgrid');
   grid.innerHTML=items.length?items.map(i=>{
-    const b=i.type==='doc'?'file':i.type==='img'?'image':'';
+    const b=i.type==='doc'?'file':i.type==='img'?'image':(i.content||'').includes('___')?'fill-in':'';
     return `<div class="it" role="button"><span>${i.icon}</span><span class="tx">${i.label}</span>${b?`<span class="b">${b}</span>`:''}</div>`;
-  }).join(''):`<div style="grid-column:1/-1;color:#6d7783;font-size:12.5px;padding:14px;text-align:center">Nothing matches “${kbQ}”</div>`;
+  }).join(''):`<div style="grid-column:1/-1;color:#6d7783;font-size:12.5px;padding:14px;text-align:center">Nothing here yet</div>`;
   [...grid.children].forEach((el,idx)=>{if(items[idx])el.onclick=()=>useItem(items[idx]);});
+  const tr=document.getElementById('ktyperows');
+  if(!tr.dataset.built){tr.innerHTML=rowsHTML('type');bindKeys(tr);tr.dataset.built='1';}
+  [...document.querySelectorAll('#kfootV .fbtn')].forEach(b=>b.onclick=()=>handleKx(b.dataset.kx));
 }
 
 /* ================= the dial ================= */
