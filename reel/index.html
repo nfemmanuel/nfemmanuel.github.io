@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!-- GENERATED from shipaton-project/design/web-prototype.html - edit there, then re-run the deploy copy.
-     Regenerate with .NET File APIs and explicit UTF-8; Get-Content/Set-Content will corrupt the emoji. -->
+<!-- GENERATED from shipaton-project/design/web-prototype.html
+     Edit the source there, then re-run shipaton-project/scripts/deploy-prototype.ps1
+     Do not hand-edit this file. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reel &#8212; the job application, one gesture at a time</title>
@@ -182,7 +183,7 @@
       <h2>Three moves</h2>
       <table>
         <tr><td>Tap the handle</td><td>Opens and stays. Spin a ring — the item at the <b style="color:#FF4D4D">red mark</b> is selected. Tap it to insert into the box you last touched.</td></tr>
-        <tr><td>Hold · swipe · release</td><td>One finger: hold the handle, swipe to spin, release to insert. It puts itself away.</td></tr>
+        <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the handle, then slide <b>out</b>: a little reaches the <b>inner</b> ring (collections), further reaches the <b>outer</b> ring (items). Arc your finger to spin whichever you're on — the lit ring is the one you're holding. Release on the outer ring to insert and put it away.</td></tr>
         <tr><td>Double-tap the handle</td><td>Pastes your most recent item instantly. No dial.</td></tr>
       </table>
       <p class="muted" style="margin:8px 0 0">Inner ring = collections. Outer ring = what's inside. Sound on 🔊 for the clicks.</p>
@@ -462,7 +463,7 @@ const svg=document.getElementById('dialsvg');
 const glidechip=document.getElementById('glidechip');
 const DIAL={enabled:false,mode:'closed',open:0,openT:0,
   sIn:0,tIn:0,sOut:0,tOut:0,cat:0,grab:null,downBand:null,lastA:0,moved:0,downT:0,
-  tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0};
+  tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null};
 const STEP_IN=42,STEP_OUT=33,WIN_IN=46,WIN_OUT=70;
 let VW=innerWidth,VH=innerHeight,R=0,HUB=0,IN0=0,IN1=0,OUT0=0,OUT1=0,CY=0;
 function sizes(){
@@ -480,6 +481,14 @@ const mod=(a,n)=>((a%n)+n)%n;
 const dist=(x,y)=>Math.hypot(x-VW,y-CY);
 const ang=(x,y)=>mod(Math.atan2(y-CY,x-VW)*180/Math.PI+90,360);
 const band=d=>(d>=IN0-8&&d<=IN1+8)?'In':(d>=OUT0-8&&d<=OUT1+14)?'Out':null;
+/* Glide zones: while holding, how far OUT the finger is picks which ring it turns.
+   Hysteresis (H) so a ring you're already turning doesn't flip on small wobble. */
+function zoneFor(r,cur){
+  const NEUT=IN0,MID=(IN1+OUT0)/2,H=14;
+  if(cur===null)  return r>=NEUT+H?(r<MID?'In':'Out'):null;
+  if(cur==='In')  return r<NEUT-H?null:(r>MID+H?'Out':'In');
+  return r<MID-H?(r<NEUT-H?null:'In'):'Out';          // cur==='Out'
+}
 function seg(r0,r1,a0,a1){
   const p1=P(r1,a0),p2=P(r1,a1),p3=P(r0,a1),p4=P(r0,a0),big=(a1-a0)>180?1:0;
   return `M${p1.x} ${p1.y}A${r1} ${r1} 0 ${big} 1 ${p2.x} ${p2.y}L${p3.x} ${p3.y}A${r0} ${r0} 0 ${big} 0 ${p4.x} ${p4.y}Z`;
@@ -516,6 +525,12 @@ function drawDial(){
       k+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#333D4A" stroke-width="1.5" opacity="${.55*f}"/>`;}
     return k;};
   h+=knurl(o(IN1)+1,o(IN1)+6,DIAL.sIn,STEP_IN)+knurl(o(OUT1)+1,o(OUT1)+7,DIAL.sOut,STEP_OUT);
+  if(DIAL.mode==='glide'){                            // which ring the finger currently owns
+    const z=DIAL.glideZone;
+    if(z){const r0=z==='In'?o(IN0):o(OUT0),r1=z==='In'?o(IN1):o(OUT1);
+      h+=`<path d="${seg(r0,r1,A0,A1)}" fill="#2FB9A9" fill-opacity=".10" stroke="#2FB9A9" stroke-width="2"/>`;}
+    else{h+=`<path d="${seg(o(IN0),o(IN1),A0,A1)}" fill="none" stroke="#2FB9A9" stroke-width="1.5" stroke-dasharray="4 5" opacity=".5"/>`;}
+  }
   h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,270-STEP_OUT/2,270+STEP_OUT/2)}" fill="#2FB9A9" opacity="${.14*f}"/>`;
   h+=`<path d="${seg(o(IN0)+2,o(IN1)-2,270-STEP_IN/2,270+STEP_IN/2)}" fill="#2FB9A9" opacity="${.18*f}"/>`;
   slots(COLS,DIAL.sIn,STEP_IN,WIN_IN).forEach(({i,off})=>{
@@ -536,7 +551,7 @@ function drawDial(){
     const cp=P(o(OUT1)+26,270);
     h+=`<g opacity="${f}"><rect x="${cp.x-150}" y="${cp.y-16}" width="150" height="32" rx="9" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
     <text x="${cp.x-75}" y="${cp.y-3}" font-size="11.5" text-anchor="middle" fill="#DFE6EE" font-weight="600">${fi.label.slice(0,20)}</text>
-    <text x="${cp.x-75}" y="${cp.y+10}" font-size="8.5" text-anchor="middle" fill="#7D8794">${DIAL.mode==='glide'?'release to insert':(fi.type==='doc'?'tap = attach to armed spot':fi.type==='img'?'tap = attach / copy':'tap = insert')}</text></g>`;
+    <text x="${cp.x-75}" y="${cp.y+10}" font-size="8.5" text-anchor="middle" fill="#7D8794">${DIAL.mode==='glide'?(DIAL.glideZone==='Out'?'release to insert':DIAL.glideZone==='In'?'turning collections':'move finger out to pick a ring'):(fi.type==='doc'?'tap = attach to armed spot':fi.type==='img'?'tap = attach / copy':'tap = insert')}</text></g>`;
   }
   svg.innerHTML=h;
 }
@@ -575,9 +590,9 @@ addEventListener('pointerdown',e=>{
     D.holdTimer=setTimeout(()=>{
       D.holdTimer=null;
       clearTimeout(D.tapTimer);D.tapTimer=null;
-      D.mode='glide';D.openT=1;tick();
-      glidechip.style.display='block';
-      glidechip.style.right=(R+40)+'px';glidechip.style.top=(CY-10)+'px';
+      D.mode='glide';D.glideZone=null;D.openT=1;tick();
+      glidechip.style.display='block';glidechip.textContent='move out to pick a ring';
+      glidechip.style.right=(R+40)+'px';glidechip.style.top=(CY-34)+'px';
     },350);
     e.preventDefault();return;
   }
@@ -587,8 +602,21 @@ addEventListener('pointerdown',e=>{
 addEventListener('pointermove',e=>{
   const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;
   if(D.mode==='glide'){
-    const dy=e.clientY-D.glideY;D.glideY=e.clientY;
-    D.sOut+=dy/34;D.moved+=Math.abs(dy);e.preventDefault();return;
+    const r=dist(e.clientX,e.clientY),a=ang(e.clientX,e.clientY);
+    const z=zoneFor(r,D.glideZone);
+    if(z!==D.glideZone){
+      D.glideZone=z;D.lastA=a;                        // re-baseline so switching rings doesn't jump
+      if(z)tick();
+      glidechip.textContent=z==='In'?'turning collections':z==='Out'?'release to insert':'move out to pick a ring';
+    }
+    if(D.glideZone){
+      const delta=wrapDeg(a-D.lastA);
+      D['s'+D.glideZone]+=-delta/(D.glideZone==='In'?STEP_IN:STEP_OUT);
+      D.moved+=Math.abs(delta);
+    }
+    D.lastA=a;
+    glidechip.style.top=(Math.max(12,Math.min(VH-40,e.clientY-34)))+'px';
+    e.preventDefault();return;
   }
   if(D.holdTimer&&D.moved+Math.abs(e.movementX||0)+Math.abs(e.movementY||0)>12){
     clearTimeout(D.holdTimer);D.holdTimer=null;
@@ -604,10 +632,13 @@ addEventListener('pointerup',e=>{
   const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;PTR=null;
   clearTimeout(D.holdTimer);D.holdTimer=null;
   if(D.mode==='glide'){
-    D.mode='closed';glidechip.style.display='none';
+    const z=D.glideZone;
+    D.mode='closed';D.glideZone=null;glidechip.style.display='none';
+    D.tIn=Math.round(D.sIn);D.sIn=D.tIn;
     D.tOut=Math.round(D.sOut);D.sOut=D.tOut;
-    useItem(focusedItem());
-    D.openT=0;return;
+    if(z==='Out'){useItem(focusedItem());D.openT=0;}  // only the item ring fires on release
+    else{D.openT=1;}                                  // neutral or collections: stay open to browse
+    return;
   }
   const d=dist(e.clientX,e.clientY),a=ang(e.clientX,e.clientY);
   const wasTap=D.moved<4&&Date.now()-D.downT<400;
@@ -639,7 +670,7 @@ addEventListener('pointerup',e=>{
 addEventListener('pointercancel',e=>{
   const D=DIAL;if(e.pointerId!==PTR)return;
   PTR=null;clearTimeout(D.holdTimer);D.holdTimer=null;
-  if(D.mode==='glide'){D.mode='closed';glidechip.style.display='none';D.openT=0;}
+  if(D.mode==='glide'){D.mode='closed';D.glideZone=null;glidechip.style.display='none';D.openT=0;}
   if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
 });
 
