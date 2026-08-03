@@ -2,69 +2,99 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>iOS UI — what we design vs. what iOS draws</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>iOS screens — a guided tour</title>
 <style>
   :root{
     --paper:#F2F1EC; --panel:#FFFFFF; --ink:#1D2126; --dim:#6B7280; --line:#E2DED4;
     --accent:#0E8C7F; --accent-soft:#0E8C7F1A;
-    /* iOS surface tokens */
     --ios-bg:#F2F2F7; --ios-card:#FFFFFF; --ios-txt:#000000; --ios-dim:#8A8A8E;
-    --ios-sep:#E5E5EA; --ios-blue:#007AFF; --ios-group:#F2F2F7;
-    --shadow:0 12px 34px rgba(28,32,38,.12);
+    --ios-sep:#E5E5EA; --ios-blue:#007AFF;
+    --sys:#8A8A8E;
+    --shadow:0 10px 28px rgba(28,32,38,.12);
   }
   @media (prefers-color-scheme:dark){:root{
     --paper:#0F1216; --panel:#171C22; --ink:#E9EDF2; --dim:#8B95A1; --line:#242B33;
     --accent:#2FB9A9; --accent-soft:#2FB9A924;
     --ios-bg:#000000; --ios-card:#1C1C1E; --ios-txt:#FFFFFF; --ios-dim:#98989F;
-    --ios-sep:#38383A; --ios-blue:#0A84FF; --ios-group:#000000;
-    --shadow:0 12px 34px rgba(0,0,0,.5);
+    --ios-sep:#38383A; --ios-blue:#0A84FF;
+    --shadow:0 10px 28px rgba(0,0,0,.5);
   }}
   :root[data-theme="dark"]{
     --paper:#0F1216; --panel:#171C22; --ink:#E9EDF2; --dim:#8B95A1; --line:#242B33;
     --accent:#2FB9A9; --accent-soft:#2FB9A924;
     --ios-bg:#000000; --ios-card:#1C1C1E; --ios-txt:#FFFFFF; --ios-dim:#98989F;
-    --ios-sep:#38383A; --ios-blue:#0A84FF; --ios-group:#000000;
-    --shadow:0 12px 34px rgba(0,0,0,.5);
+    --ios-sep:#38383A; --ios-blue:#0A84FF;
+    --shadow:0 10px 28px rgba(0,0,0,.5);
   }
   :root[data-theme="light"]{
     --paper:#F2F1EC; --panel:#FFFFFF; --ink:#1D2126; --dim:#6B7280; --line:#E2DED4;
     --accent:#0E8C7F; --accent-soft:#0E8C7F1A;
     --ios-bg:#F2F2F7; --ios-card:#FFFFFF; --ios-txt:#000000; --ios-dim:#8A8A8E;
-    --ios-sep:#E5E5EA; --ios-blue:#007AFF; --ios-group:#F2F2F7;
-    --shadow:0 12px 34px rgba(28,32,38,.12);
+    --ios-sep:#E5E5EA; --ios-blue:#007AFF;
+    --shadow:0 10px 28px rgba(28,32,38,.12);
   }
   *{box-sizing:border-box}
+  html,body{height:100%}
   body{margin:0;background:var(--paper);color:var(--ink);
-    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    display:flex;flex-wrap:wrap;gap:30px;padding:28px;justify-content:center;align-items:flex-start}
-  h1{font-size:19px;margin:0 0 6px;letter-spacing:-.02em}
-  h2{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin:0 0 9px;font-weight:700}
-  p{margin:0 0 10px;color:var(--dim)}
+    font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex;flex-direction:column}
 
-  /* ---------- phone ---------- */
-  .stage{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:12px;position:sticky;top:28px}
-  .phone{position:relative;width:340px;height:718px;background:#000;border:11px solid #101317;
-    border-radius:52px;overflow:hidden;box-shadow:var(--shadow)}
+  /* ---------- top: explainer + chips ---------- */
+  .top{padding:12px 14px 0;flex:0 0 auto}
+  .top h1{font-size:15.5px;margin:0 0 2px;letter-spacing:-.01em}
+  .top p{margin:0;font-size:12.5px;color:var(--dim)}
+  .top b.us{color:var(--accent)} .top b.sys{color:var(--sys)}
+  .chips{display:flex;gap:7px;overflow-x:auto;padding:10px 14px;flex:0 0 auto;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:1.5px solid var(--line);
+    background:var(--panel);color:var(--dim);border-radius:999px;padding:7px 13px;
+    font:inherit;font-size:12.5px;cursor:pointer;white-space:nowrap}
+  .chip .dot{width:8px;height:8px;border-radius:50%}
+  .chip[data-on="1"]{border-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
+  .nav{display:flex;gap:8px;align-items:center;padding:0 14px 8px;flex:0 0 auto}
+  .nav button{border:1.5px solid var(--line);background:var(--panel);color:var(--ink);
+    border-radius:9px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+  .meta{flex:1;font-size:12px;color:var(--dim);line-height:1.35}
+  .tag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;padding:2px 7px;border-radius:5px;color:#fff;margin-right:6px;vertical-align:1px}
+
+  /* ---------- the screen ---------- */
+  .stage{flex:1;min-height:0;padding:0 10px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+  .frame{position:relative;width:100%;max-width:400px;height:100%;
+    border-radius:22px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
   .scr{position:absolute;inset:0;background:var(--ios-bg);display:flex;flex-direction:column;
     font-family:-apple-system,"SF Pro Text",ui-sans-serif,system-ui,sans-serif;color:var(--ios-txt)}
-  .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:112px;height:29px;
-    background:#000;border-radius:16px;z-index:9}
-  .sb{height:50px;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;
-    padding:0 26px 5px;font-size:13px;font-weight:600}
-  .badge{position:absolute;top:11px;left:11px;z-index:12;font-size:9.5px;font-weight:700;letter-spacing:.05em;
-    text-transform:uppercase;padding:3px 8px;border-radius:6px}
-  .badge.ours{background:var(--accent);color:#fff}
-  .badge.sys{background:#8A8A8E;color:#fff}
 
-  .body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-  .lt{font-size:32px;font-weight:700;letter-spacing:-.028em;padding:4px 18px 8px}
-  .srch{margin:0 16px 14px;height:36px;border-radius:10px;background:var(--ios-sep);
+  /* desktop: add bezel + side notes */
+  @media (min-width:860px){
+    body{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:center;
+      gap:26px;padding:26px;height:auto;min-height:100%}
+    .top{flex-basis:100%;max-width:820px;padding:0}
+    .chips{flex-basis:100%;max-width:820px;padding:10px 0}
+    .nav{display:none}
+    .stage{flex:0 0 auto;padding:0;height:auto}
+    .frame{width:352px;height:712px;border:10px solid #101317;border-radius:46px}
+    .desk{display:block;flex:0 0 320px;max-width:360px}
+    .desk .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+      padding:15px;margin-bottom:13px;box-shadow:var(--shadow);font-size:13px;color:var(--dim)}
+    .desk h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:0 0 8px}
+    .desk b{color:var(--ink)}
+  }
+  .desk{display:none}
+
+  /* ---------- iOS bits ---------- */
+  .sb{height:44px;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 22px 5px;font-size:13px;font-weight:600}
+  .body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
+  .lt{font-size:30px;font-weight:700;letter-spacing:-.028em;padding:4px 16px 8px}
+  .srch{margin:0 14px 12px;height:36px;border-radius:10px;background:var(--ios-sep);
     display:flex;align-items:center;padding:0 10px;color:var(--ios-dim);font-size:15px;gap:6px}
   .sec{font-size:12.5px;font-weight:600;color:var(--ios-dim);text-transform:uppercase;
-    letter-spacing:.045em;padding:14px 18px 6px}
-  .grp{background:var(--ios-card);margin:0 14px;border-radius:12px;overflow:hidden}
-  .row{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:.5px solid var(--ios-sep);
+    letter-spacing:.045em;padding:12px 16px 6px}
+  .grp{background:var(--ios-card);margin:0 12px;border-radius:12px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-bottom:.5px solid var(--ios-sep);
     font-size:15.5px;cursor:pointer}
   .row:last-child{border-bottom:none}
   .row:active{background:var(--ios-sep)}
@@ -74,96 +104,69 @@
   .row .sub{font-size:12.5px;color:var(--ios-dim);margin-top:1px}
   .row .cnt{color:var(--ios-dim);font-size:14.5px}
   .row .chev{color:#C4C4C6;font-size:15px}
-  .tabbar{flex:0 0 auto;height:78px;background:var(--ios-card);border-top:.5px solid var(--ios-sep);
-    display:flex;padding-top:9px}
-  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;
-    color:var(--ios-dim);cursor:pointer}
+  .tabbar{flex:0 0 auto;height:64px;background:var(--ios-card);border-top:.5px solid var(--ios-sep);
+    display:flex;padding-top:8px}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--ios-dim)}
   .tab.on{color:var(--accent)}
-  .tab .g{font-size:21px;line-height:1}
-  .fab{position:absolute;right:18px;bottom:96px;width:56px;height:56px;border-radius:50%;
+  .tab .g{font-size:20px;line-height:1}
+  .fab{position:absolute;right:16px;bottom:82px;width:54px;height:54px;border-radius:50%;
     background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;
-    font-size:23px;box-shadow:0 6px 18px rgba(0,0,0,.28);cursor:pointer;z-index:5}
-
-  /* sheet */
+    font-size:22px;box-shadow:0 6px 18px rgba(0,0,0,.28);cursor:pointer;z-index:5}
   .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--ios-card);
-    border-radius:16px 16px 0 0;padding:9px 0 26px;z-index:8;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+    border-radius:16px 16px 0 0;padding:9px 0 20px;z-index:8;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
   .grab{width:36px;height:5px;border-radius:3px;background:#C6C6C8;margin:0 auto 12px}
-
-  /* widget */
-  .wgwrap{padding:30px 18px;display:flex;flex-direction:column;gap:18px;align-items:center}
-  .wg{width:158px;height:158px;border-radius:22px;background:var(--ios-card);padding:13px;
-    box-shadow:0 4px 14px rgba(0,0,0,.16);display:flex;flex-direction:column;gap:7px}
-  .wg.med{width:100%;height:158px}
-  .wgh{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ios-dim);font-weight:600}
+  .wgwrap{padding:26px 16px;display:flex;flex-direction:column;gap:16px;align-items:center}
+  .wg{width:152px;height:152px;border-radius:22px;background:var(--ios-card);padding:12px;
+    box-shadow:0 4px 14px rgba(0,0,0,.16);display:flex;flex-direction:column;gap:6px}
+  .wg.med{width:100%;height:152px}
+  .wgh{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ios-dim);font-weight:600}
   .wgi{display:flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 7px;border-radius:8px;
     background:var(--ios-sep);overflow:hidden;white-space:nowrap}
   .wgg{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1}
-
-  /* spotlight */
-  .spot{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(18px);
-    display:flex;flex-direction:column;padding-top:64px;z-index:7}
+  .spot{position:absolute;inset:0;background:rgba(10,14,18,.66);backdrop-filter:blur(16px);
+    display:flex;flex-direction:column;padding-top:52px;z-index:7}
   .spotf{margin:0 14px 14px;height:40px;border-radius:11px;background:rgba(255,255,255,.22);
     display:flex;align-items:center;padding:0 12px;color:#fff;font-size:16px;gap:8px}
   .spotg{background:rgba(255,255,255,.14);margin:0 14px;border-radius:13px;overflow:hidden}
   .spotr{display:flex;align-items:center;gap:11px;padding:11px 13px;color:#fff;font-size:15px;
     border-bottom:.5px solid rgba(255,255,255,.12)}
   .spotr:last-child{border-bottom:none}
-  .spotl{color:rgba(255,255,255,.6);font-size:11.5px;padding:14px 16px 6px;font-weight:600;
+  .spotl{color:rgba(255,255,255,.65);font-size:11.5px;padding:13px 16px 6px;font-weight:600;
     text-transform:uppercase;letter-spacing:.05em}
-
-  /* files picker */
   .navbar{height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
-    padding:0 15px;font-size:16px;border-bottom:.5px solid var(--ios-sep);background:var(--ios-card)}
+    padding:0 14px;font-size:16px;border-bottom:.5px solid var(--ios-sep);background:var(--ios-card)}
   .navbar .t{font-weight:600;font-size:16.5px}
-  .navbar .b{color:var(--ios-blue);font-size:16px}
+  .navbar .b{color:var(--ios-blue)}
+  #dialsvg{width:100%;flex:1;display:block;min-height:0}
 
-  /* dial */
-  #dialsvg{width:100%;flex:1;display:block}
-
-  /* ---------- side ---------- */
-  .side{flex:1 1 350px;max-width:430px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px;margin-bottom:14px;box-shadow:var(--shadow)}
-  .picker{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-  .pk{border:1px solid var(--line);background:transparent;color:var(--dim);border-radius:10px;
-    padding:9px 10px;cursor:pointer;font:inherit;font-size:12.5px;text-align:left;transition:.13s}
-  .pk:hover{border-color:var(--accent);color:var(--ink)}
-  .pk[data-on="1"]{background:var(--accent);border-color:var(--accent);color:#fff}
-  .pk small{display:block;font-size:10.5px;opacity:.78;margin-top:2px}
-  .legend{display:flex;gap:14px;font-size:12px;color:var(--dim);margin-bottom:12px;flex-wrap:wrap}
-  .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-  ul{margin:7px 0 0;padding-left:18px;color:var(--dim)}
-  li{margin-bottom:7px}
-  b.k{color:var(--ink)}
+  #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(90px);
+    background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;border-radius:11px;
+    padding:9px 15px;font-size:13px;z-index:60;transition:transform .22s;max-width:86vw;text-align:center}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion:reduce){#toast{transition:none}}
   button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 </head>
 <body>
 
-<div class="stage">
-  <div class="phone">
-    <div class="notch"></div>
-    <div class="badge ours" id="badge">we design this</div>
-    <div class="scr" id="scr"></div>
-  </div>
-  <div style="font-size:12px;color:var(--dim);max-width:340px;text-align:center" id="caption"></div>
+<div class="top">
+  <h1>The iOS app — 8 mock screens</h1>
+  <p>Nothing here is a real app — it's a picture tour. Pick a screen below. <b class="us">Teal</b> = screens we design. <b class="sys">Grey</b> = iOS draws them, our stuff just appears in them.</p>
 </div>
 
-<div class="side">
-  <h1>iOS: what we design vs. what iOS draws for us</h1>
-  <p>On Android the dial <em>is</em> the product's face. On iOS most of our reach is through system surfaces we don't get to style — so our identity lives in fewer places, and they have to be good.</p>
+<div class="chips" id="chips"></div>
 
-  <div class="legend">
-    <span><span class="sw" style="background:var(--accent)"></span>ours to design</span>
-    <span><span class="sw" style="background:#8A8A8E"></span>iOS draws it, we supply content</span>
-  </div>
-
-  <div class="card">
-    <h2>Screens</h2>
-    <div class="picker" id="picker"></div>
-  </div>
-
-  <div class="card" id="notes"></div>
+<div class="nav">
+  <button id="prev">‹ Prev</button>
+  <div class="meta" id="meta"></div>
+  <button id="next">Next ›</button>
 </div>
+
+<div class="stage"><div class="frame"><div class="scr" id="scr"></div></div></div>
+
+<aside class="desk" id="desk"></aside>
+
+<div id="toast" role="status"></div>
 
 <script>
 'use strict';
@@ -176,15 +179,12 @@ const ITEMS={
 };
 const COLS=Object.keys(ITEMS);
 const ICON={Clipboard:'📋',Snippets:'✂️',Docs:'📄',Images:'🖼️',Links:'🔗'};
-
-const sb=`<div class="sb"><span>9:41</span><span>􀙇 􀛨 􀛧</span></div>`;
-const tabs=on=>`<div class="tabbar">
-  ${[['Library','􀈕'],['Search','􀊫'],['Settings','􀍟']].map((t,i)=>
-    `<div class="tab ${i===on?'on':''}"><span class="g">${['📚','🔍','⚙️'][i]}</span>${t[0]}</div>`).join('')}
-</div>`;
+const sb=`<div class="sb"><span>9:41</span><span>5G ▮▮▮</span></div>`;
+const tabs=on=>`<div class="tabbar">${[['Library','📚'],['Search','🔍'],['Settings','⚙️']].map((t,i)=>
+  `<div class="tab ${i===on?'on':''}"><span class="g">${t[1]}</span>${t[0]}</div>`).join('')}</div>`;
 
 const SCREENS={
-  library:{own:1,cap:'The app itself. Standard iOS grouped lists, large title, search — deliberately unremarkable chrome so the content reads fast.',
+  library:{own:1,name:'Library',cap:'The app. Plain iOS lists on purpose — content reads fast, chrome disappears.',
     html:()=>`${sb}<div class="body">
       <div class="lt">Library</div>
       <div class="srch">🔍 Search everything</div>
@@ -195,19 +195,19 @@ const SCREENS={
       </div>
       <div class="sec">Collections</div>
       <div class="grp">
-        ${COLS.map(c=>`<div class="row" onclick="go('collection')"><div class="ic">${ICON[c]}</div>
+        ${COLS.map(c=>`<div class="row" data-live="1" onclick="go('collection')"><div class="ic">${ICON[c]}</div>
           <div class="tx">${c}</div><span class="cnt">${ITEMS[c].length}</span><span class="chev">›</span></div>`).join('')}
       </div>
-      <div style="height:26px"></div>
-    </div><div class="fab" onclick="go('retrieve')">◎</div>${tabs(0)}`},
+      <div style="height:24px"></div>
+    </div><div class="fab" data-live="1" onclick="go('retrieve')">◎</div>${tabs(0)}`},
 
-  collection:{own:1,cap:'Inside a collection. Every item type sits in the same list with the same affordances — a PDF is not a special case the user has to learn.',
+  collection:{own:1,name:'Collection',cap:'Inside Docs. PDFs and images sit in one list with the same look — no special cases to learn.',
     html:()=>`${sb}<div class="body">
-      <div style="padding:6px 16px 0;font-size:16px;color:var(--ios-blue);cursor:pointer" onclick="go('library')">‹ Library</div>
+      <div style="padding:6px 14px 0;font-size:16px;color:var(--ios-blue);cursor:pointer" data-live="1" onclick="go('library')">‹ Library</div>
       <div class="lt">Docs</div>
       <div class="srch">🔍 Search Docs</div>
       <div class="grp">
-        ${ITEMS.Docs.map(i=>`<div class="row" onclick="go('item')"><div class="ic">${i[0]}</div>
+        ${ITEMS.Docs.map(i=>`<div class="row" data-live="1" onclick="go('item')"><div class="ic">${i[0]}</div>
           <div class="tx">${i[1]}<div class="sub">${i[2]}</div></div><span class="chev">›</span></div>`).join('')}
       </div>
       <div class="sec">Also here</div>
@@ -217,22 +217,22 @@ const SCREENS={
       </div>
     </div>${tabs(0)}`},
 
-  item:{own:1,cap:'Item detail as a sheet. One primary action, sized for a thumb; the rest is quiet. No mechanism language anywhere.',
+  item:{own:1,name:'Item sheet',cap:'Tap an item, get a sheet. One big obvious action; the rest stays quiet.',
     html:()=>`${sb}<div class="body" style="filter:brightness(.62)">
       <div class="lt">Docs</div>
       <div class="grp">${ITEMS.Docs.map(i=>`<div class="row"><div class="ic">${i[0]}</div><div class="tx">${i[1]}<div class="sub">${i[2]}</div></div></div>`).join('')}</div>
     </div>
     <div class="sheet">
       <div class="grab"></div>
-      <div style="padding:0 18px">
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:15px">
-          <div style="width:52px;height:52px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:25px">📑</div>
-          <div><div style="font-size:19px;font-weight:650;letter-spacing:-.015em">Resume.pdf</div>
+      <div style="padding:0 16px">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+          <div style="width:50px;height:50px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:24px">📑</div>
+          <div><div style="font-size:18px;font-weight:650">Resume.pdf</div>
           <div style="font-size:13px;color:var(--ios-dim)">248 KB · added 3 days ago · used 6×</div></div>
         </div>
-        <div style="background:var(--accent);color:#fff;border-radius:12px;padding:13px;text-align:center;font-size:16.5px;font-weight:600;margin-bottom:9px">Copy</div>
+        <div style="background:var(--accent);color:#fff;border-radius:12px;padding:12px;text-align:center;font-size:16px;font-weight:600;margin-bottom:9px">Copy</div>
         <div class="grp" style="margin:0">
-          <div class="row"><div class="ic">􀈂</div><div class="tx">Share…</div></div>
+          <div class="row"><div class="ic">📤</div><div class="tx">Share…</div></div>
           <div class="row"><div class="ic">👁️</div><div class="tx">Preview</div></div>
           <div class="row"><div class="ic">📌</div><div class="tx">Pin to top</div></div>
           <div class="row"><div class="ic">🏷️</div><div class="tx">Collections &amp; tags</div></div>
@@ -240,24 +240,24 @@ const SCREENS={
       </div>
     </div>${tabs(0)}`},
 
-  retrieve:{own:1,cap:'Quick retrieve inside the app — the dial, same object as Android. A custom control inside your own app is fine; it is the chrome around it that must feel native.',
+  retrieve:{own:1,name:'Quick retrieve',cap:'The dial, living inside the app — same object as Android, pivoted to the thumb.',
     html:()=>`${sb}<div class="body" style="display:flex;flex-direction:column">
-      <div style="display:flex;justify-content:space-between;padding:6px 17px 2px;font-size:16px;color:var(--ios-blue)">
-        <span onclick="go('library')">Cancel</span><span style="opacity:.45">Edit</span></div>
-      <div style="text-align:center;font-size:13px;color:var(--ios-dim);padding:6px 0 0">Turn to choose · tap to copy</div>
-      <svg id="dialsvg" viewBox="0 0 340 400"></svg>
-      <div style="text-align:center;padding:0 24px 16px">
-        <div style="font-size:20px;font-weight:650;letter-spacing:-.02em" id="dlab">Signature</div>
-        <div style="font-size:13.5px;color:var(--ios-dim);margin-top:2px">Snippets · used 24×</div>
+      <div style="display:flex;justify-content:space-between;padding:6px 16px 2px;font-size:16px;color:var(--ios-blue)">
+        <span data-live="1" onclick="go('library')" style="cursor:pointer">Cancel</span><span style="opacity:.4">Edit</span></div>
+      <div style="text-align:center;font-size:13px;color:var(--ios-dim);padding:4px 0 0">Turn to choose · tap to copy</div>
+      <svg id="dialsvg" viewBox="0 0 340 380"></svg>
+      <div style="text-align:center;padding:0 22px 12px">
+        <div style="font-size:19px;font-weight:650">Signature</div>
+        <div style="font-size:13px;color:var(--ios-dim);margin-top:2px">Snippets · used 24×</div>
       </div>
     </div>${tabs(0)}`},
 
-  widget:{own:1,cap:'Widgets are ours to design and are pure reach — a tap runs an App Intent and the item is on the clipboard without the app ever opening.',
+  widget:{own:1,name:'Widgets',cap:'Home-screen widgets. Tap one and the item is copied — the app never opens.',
     html:()=>`${sb}<div class="body" style="background:linear-gradient(165deg,#2b3a44,#151b21)">
       <div class="wgwrap">
         <div style="align-self:stretch;color:#fff;opacity:.55;font-size:12px;text-align:center">Home Screen</div>
         <div class="wg">
-          <div class="wgh">◎ REEL · PINNED</div>
+          <div class="wgh">◎ PINNED</div>
           <div class="wgg">
             ${[['✍️','Signature'],['📧','Email'],['📱','Phone'],['🌐','Portfolio']].map(i=>
               `<div class="wgi" style="justify-content:center;flex-direction:column;gap:2px">
@@ -265,27 +265,27 @@ const SCREENS={
           </div>
         </div>
         <div class="wg med">
-          <div class="wgh">◎ REEL · RECENT</div>
+          <div class="wgh">◎ RECENT</div>
           ${[['📑','Resume.pdf'],['🎯','Why-us opener'],['💼','LinkedIn']].map(i=>
             `<div class="wgi"><span>${i[0]}</span><span>${i[1]}</span></div>`).join('')}
         </div>
       </div>
     </div>`},
 
-  spotlight:{own:0,cap:'Spotlight. iOS draws every pixel — we only supply indexed items and actions. Zero setup for the user, and it is where Apple power users already live.',
+  spotlight:{own:0,name:'Spotlight',cap:'Swipe down, type two letters, your snippet is right there. iOS draws all of this — we just supply the items. Zero setup.',
     html:()=>`${sb}<div class="body" style="background:linear-gradient(165deg,#2b3a44,#151b21)"></div>
       <div class="spot">
-        <div class="spotf">🔍 signat</div>
-        <div class="spotl">Reel</div>
+        <div class="spotf">🔍 signat…</div>
+        <div class="spotl">From our app</div>
         <div class="spotg">
           <div class="spotr"><span>✍️</span><div style="flex:1">Signature<div style="font-size:12px;opacity:.6">Best, Alex Rivera</div></div></div>
           <div class="spotr"><span>◎</span><div style="flex:1">Copy Signature<div style="font-size:12px;opacity:.6">Shortcut action</div></div></div>
         </div>
         <div class="spotl">Applications</div>
-        <div class="spotg"><div class="spotr"><span>◎</span><div style="flex:1">Reel</div></div></div>
+        <div class="spotg"><div class="spotr"><span>◎</span><div style="flex:1">Open the app</div></div></div>
       </div>`},
 
-  files:{own:0,cap:'The Files picker, from inside Mail. iOS draws it; we appear as a location. This is how a saved PDF gets attached without leaving the mail app.',
+  files:{own:0,name:'Files picker',cap:'You are in Mail, attaching a file. We show up as a place, next to iCloud. Tap the resume, it attaches. You never left Mail.',
     html:()=>`${sb}
       <div class="navbar"><span class="b">Cancel</span><span class="t">Browse</span><span class="b">Select</span></div>
       <div class="body">
@@ -293,101 +293,117 @@ const SCREENS={
         <div class="sec">Locations</div>
         <div class="grp">
           <div class="row"><div class="ic" style="background:#E8F0FE">☁️</div><div class="tx">iCloud Drive</div><span class="chev">›</span></div>
-          <div class="row" style="background:var(--accent-soft)"><div class="ic">◎</div><div class="tx"><b>Reel</b><div class="sub">Docs · Images</div></div><span class="chev">›</span></div>
+          <div class="row" style="background:var(--accent-soft)"><div class="ic">◎</div><div class="tx"><b>Our app</b><div class="sub">Docs · Images</div></div><span class="chev">›</span></div>
           <div class="row"><div class="ic" style="background:#EDEDF0">📁</div><div class="tx">On My iPhone</div><span class="chev">›</span></div>
         </div>
-        <div class="sec">Reel · Docs</div>
+        <div class="sec">Our app · Docs</div>
         <div class="grp">
           ${ITEMS.Docs.map(i=>`<div class="row"><div class="ic">${i[0]}</div><div class="tx">${i[1]}<div class="sub">${i[2]}</div></div></div>`).join('')}
         </div>
       </div>`},
 
-  share:{own:0,cap:'The share sheet — capture. iOS owns the sheet; our extension is the small panel inside it. One tap, no app switch.',
+  share:{own:0,name:'Share sheet',cap:'Saving something in. You are in Safari, hit share, tap us, done. iOS owns the sheet; the small panel is ours.',
     html:()=>`${sb}<div class="body" style="filter:brightness(.5)">
-        <div class="lt">Safari</div><div style="padding:0 18px;color:var(--ios-dim);font-size:14px">alexrivera.example.com</div>
+        <div class="lt">Safari</div><div style="padding:0 16px;color:var(--ios-dim);font-size:14px">alexrivera.example.com</div>
       </div>
-      <div class="sheet" style="padding-bottom:20px">
+      <div class="sheet" style="padding-bottom:18px">
         <div class="grab"></div>
-        <div style="padding:0 16px">
-          <div style="display:flex;gap:11px;align-items:center;margin-bottom:14px">
+        <div style="padding:0 15px">
+          <div style="display:flex;gap:11px;align-items:center;margin-bottom:13px">
             <div style="width:42px;height:42px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px">◎</div>
-            <div style="flex:1"><div style="font-weight:650;font-size:16px">Save to Reel</div>
+            <div style="flex:1"><div style="font-weight:650;font-size:16px">Save</div>
             <div style="font-size:12.5px;color:var(--ios-dim)">Portfolio — alexrivera.example.com</div></div>
           </div>
           <div class="grp" style="margin:0 0 10px">
             <div class="row"><div class="ic">🔗</div><div class="tx">Collection</div><span class="cnt">Links</span><span class="chev">›</span></div>
             <div class="row"><div class="ic">🏷️</div><div class="tx">Tags</div><span class="cnt">none</span><span class="chev">›</span></div>
           </div>
-          <div style="background:var(--accent);color:#fff;border-radius:12px;padding:12px;text-align:center;font-size:16.5px;font-weight:600">Save</div>
+          <div style="background:var(--accent);color:#fff;border-radius:12px;padding:12px;text-align:center;font-size:16px;font-weight:600">Save</div>
         </div>
       </div>`}
 };
 
-const ORDER=[['library','Library','the app'],['collection','Collection','one list, all types'],
-  ['item','Item sheet','one primary action'],['retrieve','Quick retrieve','the dial, on iOS'],
-  ['widget','Widgets','reach, no app open'],['spotlight','Spotlight','iOS draws it'],
-  ['files','Files picker','iOS draws it'],['share','Share sheet','iOS draws it']];
-
+const ORDER=['library','collection','item','retrieve','widget','spotlight','files','share'];
 let cur='library';
+
 function go(k){cur=k;render();}
 window.go=go;
 
 function render(){
   const s=SCREENS[cur];
   document.getElementById('scr').innerHTML=s.html();
-  const b=document.getElementById('badge');
-  b.textContent=s.own?'we design this':'iOS draws this';
-  b.className='badge '+(s.own?'ours':'sys');
-  document.getElementById('caption').textContent=s.cap;
-  [...document.getElementById('picker').children].forEach(el=>el.dataset.on=el.dataset.k===cur?'1':'0');
+  const own=s.own;
+  document.getElementById('meta').innerHTML=
+    `<span class="tag" style="background:${own?'var(--accent)':'var(--sys)'}">${own?'we design this':'iOS draws this'}</span>${s.cap}`;
+  [...document.getElementById('chips').children].forEach(el=>el.dataset.on=el.dataset.k===cur?'1':'0');
+  document.querySelector(`.chip[data-k="${cur}"]`)?.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
   if(cur==='retrieve')drawDial();
-  document.getElementById('notes').innerHTML=NOTES;
+  document.getElementById('desk').innerHTML=`<div class="card"><h2>Reading this</h2>
+    On Android the dial is the product's face. On iOS, three of our best surfaces are drawn by
+    Apple (<b>Spotlight, Files, share sheet</b>) — zero setup, our content inside their pixels.
+    Our own design shows up in four places: <b>the app, the item sheet, the dial, widgets</b>.</div>
+    <div class="card"><h2>Current screen</h2><span class="tag" style="background:${own?'var(--accent)':'var(--sys)'}">${own?'ours':'iOS'}</span>${s.cap}</div>`;
 }
 
-const NOTES=`<h2>What this settles</h2>
-<ul>
-<li><b class="k">Our identity lives in four places</b> — the app, the item sheet, the dial, and widgets. Everything else is Apple's canvas with our content on it.</li>
-<li><b class="k">The dial survives on iOS</b>, but as a mode inside our app rather than a floating overlay. A custom control inside your own app is normal; it is the surrounding chrome that must feel native, and it does.</li>
-<li><b class="k">Native chrome is a feature, not a compromise.</b> Grouped lists, large titles, sheets and system search are what this audience trusts — and the judge's own app is built on exactly that.</li>
-<li><b class="k">Every type behaves the same.</b> A PDF sits in the same list, opens the same sheet, and has one obvious primary action. No special cases to learn.</li>
-<li><b class="k">Three of our best surfaces need zero setup</b> — Spotlight, the Files picker, the share sheet. The user never enables anything to get value from them.</li>
-</ul>`;
+/* dead taps say so instead of doing nothing */
+let toastT;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800);}
+document.getElementById('scr').addEventListener('click',e=>{
+  if(e.target.closest('[data-live]'))return;
+  if(e.target.closest('.row,.fab,.wgi,.spotr'))toast('Just a picture — use the chips up top to move around');
+});
 
-/* --- dial, iOS variant: bottom-pivot half lens --- */
+/* chips + prev/next */
+const chips=document.getElementById('chips');
+chips.innerHTML=ORDER.map(k=>`<button class="chip" data-k="${k}">
+  <span class="dot" style="background:${SCREENS[k].own?'var(--accent)':'var(--sys)'}"></span>${SCREENS[k].name}</button>`).join('');
+[...chips.children].forEach(el=>el.onclick=()=>go(el.dataset.k));
+document.getElementById('prev').onclick=()=>go(ORDER[(ORDER.indexOf(cur)+ORDER.length-1)%ORDER.length]);
+document.getElementById('next').onclick=()=>go(ORDER[(ORDER.indexOf(cur)+1)%ORDER.length]);
+
+/* swipe left/right on the screen switches screens (mobile) */
+let sx=null,sy=null;
+const scr=document.getElementById('scr');
+scr.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+scr.addEventListener('touchend',e=>{
+  if(sx===null)return;
+  const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;sx=null;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.6)
+    document.getElementById(dx<0?'next':'prev').click();
+},{passive:true});
+
+/* --- dial (bottom-pivot half lens) --- */
 function drawDial(){
   const svg=document.getElementById('dialsvg');if(!svg)return;
-  const cx=170,cy=372,R1i=60,R1o=104,R2i=112,R2o=158;
+  const cx=170,cy=352,R1i=56,R1o=98,R2i=106,R2o=150;
   const rad=d=>(d-90)*Math.PI/180;
   const P=(r,d)=>({x:cx+r*Math.cos(rad(d)),y:cy+r*Math.sin(rad(d))});
   const seg=(r0,r1,a0,a1)=>{const p1=P(r1,a0),p2=P(r1,a1),p3=P(r0,a1),p4=P(r0,a0);
     return `M${p1.x} ${p1.y}A${r1} ${r1} 0 0 1 ${p2.x} ${p2.y}L${p3.x} ${p3.y}A${r0} ${r0} 0 0 0 ${p4.x} ${p4.y}Z`;};
-  const dk=getComputedStyle(document.documentElement).getPropertyValue('--ios-card').trim()==='#1C1C1E';
-  const barrel=dk?'#22272E':'#EDEDF0', edge=dk?'#333B45':'#D7D7DC', knurl=dk?'#3B4550':'#C6C6CC';
+  const dark=matchMedia('(prefers-color-scheme:dark)').matches
+    ||document.documentElement.dataset.theme==='dark';
+  const barrel=dark?'#22272E':'#EDEDF0', edge=dark?'#333B45':'#D7D7DC', knurl=dark?'#3B4550':'#C6C6CC';
+  const acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
   const A0=282,A1=438;
   let h=`<path d="${seg(R1i,R1o,A0,A1)}" fill="${barrel}" stroke="${edge}"/>`;
   h+=`<path d="${seg(R2i,R2o,A0,A1)}" fill="${barrel}" stroke="${edge}"/>`;
   for(let a=A0;a<=A1;a+=6){const p1=P(R2o,a),p2=P(R2o+6,a);
     h+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${knurl}" stroke-width="1.5"/>`;}
-  const acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-  h+=`<path d="${seg(R1i+2,R1o-2,360-21,360+21)}" fill="${acc}" opacity=".16"/>`;
-  h+=`<path d="${seg(R2i+2,R2o-2,360-16,360+16)}" fill="${acc}" opacity=".13"/>`;
+  h+=`<path d="${seg(R1i+2,R1o-2,339,381)}" fill="${acc}" opacity=".16"/>`;
+  h+=`<path d="${seg(R2i+2,R2o-2,344,376)}" fill="${acc}" opacity=".13"/>`;
   [[-42,'📋'],[0,'✂️'],[42,'📄']].forEach(([o,ic])=>{
     const p=P((R1i+R1o)/2,360+o);
-    h+=`<text x="${p.x}" y="${p.y}" font-size="${o?17:21}" text-anchor="middle" dominant-baseline="central" opacity="${o?.5:1}">${ic}</text>`;});
+    h+=`<text x="${p.x}" y="${p.y}" font-size="${o?16:20}" text-anchor="middle" dominant-baseline="central" opacity="${o?.5:1}">${ic}</text>`;});
   [[-62,'👤'],[-31,'🎯'],[0,'✍️'],[31,'📮'],[62,'👥']].forEach(([o,ic])=>{
     const p=P((R2i+R2o)/2,360+o);
-    h+=`<text x="${p.x}" y="${p.y}" font-size="${o?16:19}" text-anchor="middle" dominant-baseline="central" opacity="${o?.45:1}">${ic}</text>`;});
-  const m1=P(R2o+9,360),m2=P(R2o+18,360);
+    h+=`<text x="${p.x}" y="${p.y}" font-size="${o?15:18}" text-anchor="middle" dominant-baseline="central" opacity="${o?.45:1}">${ic}</text>`;});
+  const m1=P(R2o+8,360),m2=P(R2o+16,360);
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="#FF3B30" stroke-width="3.5" stroke-linecap="round"/>`;
   h+=`<circle cx="${cx}" cy="${cy}" r="${R1i-8}" fill="${barrel}" stroke="${edge}"/>`;
   h+=`<circle cx="${cx}" cy="${cy}" r="9" fill="${acc}"/>`;
   svg.innerHTML=h;
 }
-
-const pk=document.getElementById('picker');
-pk.innerHTML=ORDER.map(([k,t,s])=>`<button class="pk" data-k="${k}"><b>${t}</b><small>${s}</small></button>`).join('');
-[...pk.children].forEach(el=>el.onclick=()=>go(el.dataset.k));
-matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(cur==='retrieve')drawDial()});
 render();
 </script>
 </body>
