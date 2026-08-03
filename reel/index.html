@@ -1,0 +1,661 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<!-- GENERATED from shipaton-project/design/web-prototype.html - edit there, then re-run the deploy copy -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reel — the job application, one gesture at a time</title>
+<meta name="description" content="An interactive prototype: fill a fake job application using only saved snippets, links, and files — summoned from an edge dial or a vault keyboard. Everything stays in your browser.">
+<meta property="og:title" content="Reel — try a faster way to fill forms">
+<meta property="og:description" content="A 3-minute interactive prototype. Nothing uploads; everything stays in your browser.">
+<meta name="theme-color" content="#0E8C7F">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎛️</text></svg>">
+</head>
+<body>
+<style>
+  :root{
+    --paper:#F6F4EF; --card:#FFFFFF; --ink:#23282E; --dim:#6E7681; --line:#E4E0D6;
+    --accent:#0E8C7F; --accent-soft:#0E8C7F22; --ok:#2E9E5B; --warn:#B27818;
+    --field:#FBFAF7; --field-line:#D8D3C8;
+    --shadow:0 10px 30px rgba(30,35,40,.10);
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --paper:#101317; --card:#181D23; --ink:#E7EBEF; --dim:#8D97A1; --line:#262D35;
+    --accent:#2FB9A9; --accent-soft:#2FB9A926;
+    --field:#131820; --field-line:#2C343E;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }}
+  :root[data-theme="dark"]{
+    --paper:#101317; --card:#181D23; --ink:#E7EBEF; --dim:#8D97A1; --line:#262D35;
+    --accent:#2FB9A9; --accent-soft:#2FB9A926;
+    --field:#131820; --field-line:#2C343E;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  :root[data-theme="light"]{
+    --paper:#F6F4EF; --card:#FFFFFF; --ink:#23282E; --dim:#6E7681; --line:#E4E0D6;
+    --accent:#0E8C7F; --accent-soft:#0E8C7F22;
+    --field:#FBFAF7; --field-line:#D8D3C8;
+    --shadow:0 10px 30px rgba(30,35,40,.10);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-tap-highlight-color:transparent}
+  main{max-width:580px;margin:0 auto;padding:22px 18px 340px}
+  h1{font-size:25px;letter-spacing:-.02em;margin:0 0 8px;text-wrap:balance}
+  h2{font-size:16px;letter-spacing:-.01em;margin:0 0 4px}
+  p{margin:0 0 10px;color:var(--dim)}
+  a{color:var(--accent)}
+  .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin-bottom:4px}
+  .wordmark{display:flex;align-items:center;gap:9px;margin-bottom:22px;user-select:none}
+  .wordmark .knob{width:26px;height:26px;border-radius:50%;
+    background:conic-gradient(from 40deg,#1A1F26 0 70%,#333B45 0 78%,#1A1F26 0);
+    border:2px solid #333B45;position:relative;flex:0 0 auto}
+  .wordmark .knob::after{content:"";position:absolute;top:1px;left:50%;width:2px;height:6px;background:#FF4D4D;transform:translateX(-50%);border-radius:2px}
+  .wordmark b{font-size:17px;letter-spacing:-.01em}
+  .wordmark span{font-size:12px;color:var(--dim)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .navcards{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  @media (max-width:520px){.navcards{grid-template-columns:1fr}}
+  .navcard{display:block;text-decoration:none;color:var(--ink);background:var(--card);
+    border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);transition:.15s}
+  .navcard:hover{border-color:var(--accent)}
+  .navcard .big{font-size:28px;margin-bottom:6px;display:block}
+  .navcard b{display:block;margin-bottom:3px}
+  .navcard small{color:var(--dim);line-height:1.45;display:block}
+
+  .task{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .task .co{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .task .co .logo{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+    justify-content:center;font-size:15px;color:#fff;flex:0 0 auto}
+  .task .co small{color:var(--dim);display:block;font-size:11.5px}
+  .task label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--dim);font-weight:700;margin:10px 0 4px}
+  .task label:first-of-type{margin-top:0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:460px){.two{grid-template-columns:1fr}}
+  input[type=text],textarea{width:100%;background:var(--field);border:1.5px solid var(--field-line);
+    border-radius:9px;padding:9px 11px;font:inherit;color:var(--ink);resize:vertical}
+  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  .flash{animation:flash .8s}
+  @keyframes flash{0%{box-shadow:0 0 0 3px var(--accent-soft);border-color:var(--accent)}100%{box-shadow:none}}
+  .pulse{animation:pulse 1s 2}
+  @keyframes pulse{50%{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}}
+  @media (prefers-reduced-motion: reduce){.flash,.pulse{animation:none}}
+
+  .drop{border:1.5px dashed var(--field-line);border-radius:10px;background:var(--field);
+    min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px;
+    color:var(--dim);font-size:13px;cursor:pointer;padding:9px;transition:.15s;text-align:center}
+  .drop.armed{border-color:var(--accent);border-style:solid;background:var(--accent-soft);color:var(--ink)}
+  .drop .chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+    border-radius:8px;padding:6px 10px;color:var(--ink);font-size:13px}
+  .drop .chip .x{color:var(--dim);cursor:pointer;padding:0 2px;font-size:15px}
+
+  .chatlog{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+  .bub{max-width:82%;padding:8px 12px;border-radius:14px;font-size:13.5px;
+    background:var(--field);border:1px solid var(--line);color:var(--ink)}
+  .tips{font-size:13px}
+  .tips table{width:100%;border-collapse:collapse}
+  .tips td{padding:5px 6px;border-top:1px solid var(--line);vertical-align:top}
+  .tips td:first-child{white-space:nowrap;font-weight:600;width:42%}
+  .muted{font-size:12px;color:var(--dim)}
+  .linkbtn{background:none;border:none;color:var(--accent);cursor:pointer;font:inherit;padding:0;text-decoration:underline}
+  .filebtn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;
+    border:none;border-radius:9px;padding:9px 14px;font:inherit;font-size:13.5px;cursor:pointer}
+  .filebtn:hover{filter:brightness(1.06)}
+
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(80px);
+    background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;border-radius:12px;
+    padding:10px 16px;font-size:13.5px;z-index:60;transition:transform .25s;max-width:88vw;text-align:center}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion: reduce){#toast{transition:none}}
+
+  #savechip{position:absolute;z-index:55;background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;
+    border-radius:10px;padding:7px 12px;font-size:13px;cursor:pointer;display:none;user-select:none;
+    box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  #savechip b{color:#7FE0D2}
+
+  #dialsvg{position:fixed;inset:0;width:100%;height:100%;z-index:50;pointer-events:none;touch-action:none}
+  body.dialing #dialsvg{pointer-events:auto}
+  .glidechip{position:fixed;z-index:51;background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;
+    border-radius:10px;padding:6px 11px;font-size:12.5px;pointer-events:none;display:none}
+
+  #kb{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#1C1F24;border-top:1px solid #000;
+    padding:8px 8px 10px;transform:translateY(105%);transition:transform .22s;
+    display:flex;flex-direction:column;height:302px}
+  #kb.up{transform:translateY(0)}
+  @media (prefers-reduced-motion: reduce){#kb{transition:none}}
+  #kb .bar{display:flex;gap:6px;margin-bottom:7px;flex:0 0 auto}
+  #kb .globe{width:36px;height:30px;border-radius:7px;background:#3A3F47;color:#E9EDF2;display:flex;
+    align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex:0 0 auto;border:none}
+  #kb input{flex:1;height:30px;border-radius:7px;background:#262B32;border:1px solid #333941;
+    color:#E9EDF2;font-size:13px;padding:0 10px}
+  #kb input::placeholder{color:#6D7783}
+  #kb .cats{display:flex;gap:6px;margin-bottom:7px;flex:0 0 auto}
+  #kb .cat{flex:1;height:34px;border-radius:8px;background:#242A31;border:1px solid transparent;
+    display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
+  #kb .cat.on{background:#2F3A4A;border-color:#5B8CFF}
+  #kb .grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
+  #kb .it{background:#2A2F36;border:1px solid #333941;border-radius:9px;padding:8px 10px;
+    font-size:12.5px;color:#CFD8E3;cursor:pointer;display:flex;align-items:center;gap:7px;
+    overflow:hidden;white-space:nowrap;min-height:38px}
+  #kb .it:active{background:#333A43}
+  #kb .it .tx{overflow:hidden;text-overflow:ellipsis}
+  #kb .it .b{margin-left:auto;font-size:9px;color:#7A8492;flex:0 0 auto}
+  #kbfab{position:fixed;right:16px;bottom:18px;z-index:49;width:52px;height:52px;border-radius:50%;
+    background:var(--accent);color:#fff;border:none;font-size:21px;cursor:pointer;box-shadow:var(--shadow)}
+
+  [hidden]{display:none !important}
+  footer{margin-top:26px;font-size:12px;color:var(--dim);text-align:center;line-height:1.7}
+  button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<main>
+  <div class="wordmark"><div class="knob"></div><div><b>reel</b> <span>Â· prototype</span></div></div>
+
+  <!-- ============ HOME ============ -->
+  <section data-page="home">
+    <div class="eyebrow">A 3-minute test</div>
+    <h1>Job applications ask for the same seven things. Every. Single. Time.</h1>
+    <p>Name, email, portfolio link, "why us?", resume, headshot, phone. Reel is a phone app that keeps everything you reuse one gesture away â€” inside whatever app you're filling. This page fakes two job applications so you can feel it.</p>
+    <div class="navcards">
+      <a class="navcard" href="#dial"><span class="big">ðŸŽ›ï¸</span><b>The dial</b><small>A control docked to the screen edge â€” the Android experience. One-finger gestures, clicks you can feel.</small></a>
+      <a class="navcard" href="#keyboard"><span class="big">âŒ¨ï¸</span><b>The keyboard</b><small>Your stuff inside the keyboard â€” the iPhone experience. Search and tap.</small></a>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2>Before you start</h2>
+      <p style="margin-bottom:6px">The vault comes preloaded as <b>Alex Rivera</b>, a demo applicant. Anything you add stays in <b>this browser only</b> â€” nothing uploads, nothing leaves your device.</p>
+      <p style="margin-bottom:0">The real product inserts into <i>other apps</i> â€” Safari forms, Gmail, LinkedIn. A webpage can't reach outside itself, so judge the speed and the feel here, not the reach. <button class="linkbtn" id="resetbtn">Reset demo data</button></p>
+    </div>
+  </section>
+
+  <!-- ============ DIAL PAGE ============ -->
+  <section data-page="dial" hidden>
+    <div class="eyebrow">Test 1 Â· the dial</div>
+    <h1>Apply to Northbeam using only the dial â†’</h1>
+    <div class="card tips">
+      <h2>Three moves</h2>
+      <table>
+        <tr><td>Tap the handle</td><td>Opens and stays. Spin a ring â€” the item at the <b style="color:#FF4D4D">red mark</b> is selected. Tap it to insert into the box you last touched.</td></tr>
+        <tr><td>Hold Â· swipe Â· release</td><td>One finger: hold the handle, swipe to spin, release to insert. It puts itself away.</td></tr>
+        <tr><td>Double-tap the handle</td><td>Pastes your most recent item instantly. No dial.</td></tr>
+      </table>
+      <p class="muted" style="margin:8px 0 0">Inner ring = collections. Outer ring = what's inside. Sound on ðŸ”Š for the clicks.</p>
+    </div>
+
+    <div class="task">
+      <div class="co"><div class="logo" style="background:#31589E">N</div>
+        <div><b>Northbeam Careers</b><small>Product Design Intern Â· Application form</small></div></div>
+      <div class="two">
+        <div><label>Full name</label><input type="text" placeholder="Snippets â†’ Full name"></div>
+        <div><label>Phone</label><input type="text" placeholder="Clipboard â†’ Phone"></div>
+      </div>
+      <label>Email</label><input type="text" placeholder="Clipboard â†’ Email">
+      <label>Portfolio URL</label><input type="text" placeholder="Links â†’ Portfolio">
+      <label>Why Northbeam?</label><textarea rows="3" placeholder="There's an opener for this in Snippetsâ€¦"></textarea>
+      <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0">ðŸ“Ž Tap to choose upload spot</div>
+      <label>Headshot â€” optional (image)</label><div class="drop" data-accept="img" tabindex="0">ðŸ–¼ï¸ Tap to choose upload spot</div>
+    </div>
+
+    <div class="task">
+      <div class="co"><div class="logo" style="background:#7A4BC9">R</div>
+        <div><b>Riya Â· Northbeam recruiting</b><small>replied 2m ago</small></div></div>
+      <div class="chatlog">
+        <div class="bub">Strong application, Alex! Can you send your LinkedIn and a couple of times to talk this week?</div>
+      </div>
+      <label>Reply</label><input type="text" placeholder="Links has both of thoseâ€¦">
+    </div>
+
+    <div class="task">
+      <h2>ï¼‹ Make it yours</h2>
+      <p class="muted" style="margin-bottom:10px">Add your <b>own</b> resume or a photo â€” it appears in the dial's Docs/Images and you can attach it above. The file never uploads; only its name is remembered, in your browser.</p>
+      <button class="filebtn" id="addfile1">ðŸ“Ž Add a file to the vault</button>
+      <p class="muted" style="margin:10px 0 0">Also: select any text on this page and a <b>Save to Reel</b> chip appears â€” write one line of your own cover letter, select it, save it, reuse it on the keyboard page.</p>
+    </div>
+  </section>
+
+  <!-- ============ KEYBOARD PAGE ============ -->
+  <section data-page="keyboard" hidden>
+    <div class="eyebrow">Test 2 Â· the keyboard</div>
+    <h1>Second application of the day â€” keyboard style</h1>
+    <p>Tap into any box and the vault keyboard rises. On a real iPhone it works inside every app. <b>Search actually filters</b> â€” try typing "res".</p>
+
+    <div class="task">
+      <div class="co"><div class="logo" style="background:#B0632F">F</div>
+        <div><b>Fielder &amp; Co</b><small>Junior Product Designer Â· Quick apply</small></div></div>
+      <div class="two">
+        <div><label>Full name</label><input type="text" placeholder="Same name, againâ€¦"></div>
+        <div><label>Email</label><input type="text" placeholder="Same email, againâ€¦"></div>
+      </div>
+      <label>Tell us about something you shipped</label><textarea rows="3" placeholder="Saved a line on the dial page? It's in Clipboard."></textarea>
+      <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0">ðŸ“Ž Tap to choose upload spot</div>
+    </div>
+
+    <div class="task">
+      <div class="co"><div class="logo" style="background:#2E7D6B">M</div>
+        <div><b>Marcus Â· Fielder talent</b><small>via DM</small></div></div>
+      <div class="chatlog">
+        <div class="bub">hey! before the call â€” portfolio link + best phone number?</div>
+      </div>
+      <label>Reply</label><input type="text" placeholder="Two items, one keyboardâ€¦">
+      <p class="muted" style="margin:10px 0 0"><button class="filebtn" id="addfile2" style="background:var(--card);color:var(--accent);border:1.5px solid var(--accent)">ðŸ“Ž Add your own file</button></p>
+    </div>
+  </section>
+
+  <footer>reel Â· prototype v0.4 Â· everything stays in this browser<br>a Shipaton 2026 project, built in public Â· <a href="#home">start over</a></footer>
+</main>
+
+<input type="file" id="filepick" multiple hidden>
+<svg id="dialsvg" aria-hidden="true"></svg>
+<div class="glidechip" id="glidechip">release to insert</div>
+<button id="kbfab" hidden aria-label="Open vault keyboard">âŒ¨ï¸</button>
+<div id="kb" aria-label="Vault keyboard">
+  <div class="bar"><button class="globe" id="kbclose" aria-label="Close keyboard">ðŸŒ</button><input id="kbsearch" type="text" placeholder="Search your stuffâ€¦"></div>
+  <div class="cats" id="kbcats"></div>
+  <div class="grid" id="kbgrid"></div>
+</div>
+<div id="savechip"><b>ï¼‹</b> Save to Reel</div>
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+/* ================= vault ================= */
+const COLS=[['Clipboard','ðŸ“‹'],['Snippets','âœ‚ï¸'],['Docs','ðŸ“„'],['Images','ðŸ–¼ï¸'],['Links','ðŸ”—']];
+const SEED=[
+ ['txt','ðŸ“§','Email','alex.rivera@example.com','Clipboard'],
+ ['txt','ðŸ“±','Phone','+1 (614) 555-0164','Clipboard'],
+ ['txt','ðŸ ','Address','482 Maple Grove Ave, Apt 3B, Columbus OH 43210','Clipboard'],
+ ['txt','ðŸªª','Full name','Alex Rivera','Snippets'],
+ ['txt','ðŸŽ¯','Why-us opener','Iâ€™ve followed Northbeamâ€™s design work for two years â€” the way your team ships small and polishes hard is exactly how I want to learn to build. My portfolio has three projects in that spirit.','Snippets'],
+ ['txt','ðŸ“®','Follow-up','Just floating this back to the top of your inbox â€” any thoughts when you get a sec?','Snippets'],
+ ['txt','âœï¸','Signature','Best,\nAlex Rivera','Snippets'],
+ ['txt','ðŸ‘¥','References','Dana Okafor â€” Design Lead, Brightline Â· dana@brightline.example\nSam Chen â€” PM, Fielder & Co Â· sam@fielder.example','Snippets'],
+ ['doc','ðŸ§¾','Resume.pdf','','Docs'],
+ ['doc','ðŸ“ƒ','Cover-letter.pdf','','Docs'],
+ ['doc','ðŸŽ“','Transcript.pdf','','Docs'],
+ ['img','ðŸ§‘','Headshot','','Images'],
+ ['img','ðŸ–¼ï¸','Portfolio cover','','Images'],
+ ['url','ðŸŒ','Portfolio','https://alexrivera.example.com','Links'],
+ ['url','ðŸ’¼','LinkedIn','https://linkedin.example.com/in/alexrivera','Links'],
+ ['url','ðŸ“…','Calendly','https://cal.example.com/alex/15min','Links'],
+];
+const KEY='reel.vault.v2';
+let vault=load();
+function load(){
+  try{const j=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(j)&&j.length)return j;}catch(_){}
+  const now=Date.now();
+  const v=SEED.map((s,i)=>({id:'s'+i,type:s[0],icon:s[1],label:s[2],content:s[3],col:s[4],
+    use_count:0,last_used_at:0,captured_at:now-i*60000,source:'seed'}));
+  save(v);return v;
+}
+function save(v){try{localStorage.setItem(KEY,JSON.stringify(v))}catch(_){}}
+function byCol(c){return vault.filter(i=>i.col===c).sort((a,b)=>b.captured_at-a.captured_at)}
+function touch(it){it.use_count++;it.last_used_at=Date.now();save(vault)}
+function lastUsed(){
+  const used=vault.filter(i=>i.last_used_at).sort((a,b)=>b.last_used_at-a.last_used_at);
+  return used[0]||byCol('Clipboard')[0]||vault[0];
+}
+document.getElementById('resetbtn').onclick=()=>{localStorage.removeItem(KEY);vault=load();toast('Demo data reset');refreshKb();};
+
+/* add-your-own-file: name only, nothing is read or uploaded */
+const filepick=document.getElementById('filepick');
+document.getElementById('addfile1').onclick=()=>filepick.click();
+document.getElementById('addfile2').onclick=()=>filepick.click();
+filepick.addEventListener('change',()=>{
+  const now=Date.now();let n=0;
+  for(const f of filepick.files){
+    const isImg=/^image\//.test(f.type);
+    vault.push({id:'f'+now+'-'+n,type:isImg?'img':'doc',icon:isImg?'ðŸ–¼ï¸':'ðŸ“Ž',
+      label:f.name.slice(0,28),content:'',col:isImg?'Images':'Docs',
+      use_count:0,last_used_at:now,captured_at:now+n,source:'user-file'});
+    n++;
+  }
+  if(n){save(vault);refreshKb();toast(n===1?`Added Â· ${filepick.files[0].name.slice(0,24)} â€” it's in the vault now`:`Added ${n} files to the vault`);}
+  filepick.value='';
+});
+
+/* ================= toast / sound ================= */
+const toastEl=document.getElementById('toast');let toastT;
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),2600);}
+let AC=null;
+function tick(){
+  if(navigator.vibrate)navigator.vibrate(4);
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+    o.type='square';o.frequency.value=1900;
+    g.gain.setValueAtTime(.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+.018);
+    o.connect(g).connect(AC.destination);o.start(t);o.stop(t+.02);}catch(_){}
+}
+
+/* ================= targets + insert engine ================= */
+const T={field:null,drop:null};
+document.addEventListener('focusin',e=>{
+  const el=e.target;
+  if(el.closest('#kb'))return;
+  if((el.matches('input[type=text],textarea'))&&el.closest('.task')){T.field=el;}
+});
+document.addEventListener('click',e=>{
+  const d=e.target.closest('.drop');
+  if(d&&!e.target.classList.contains('x')){
+    document.querySelectorAll('.drop.armed').forEach(x=>x!==d&&x.classList.remove('armed'));
+    d.classList.toggle('armed');T.drop=d.classList.contains('armed')?d:null;
+    if(T.drop)toast('Upload spot armed â€” now pick a doc or image');
+  }
+  if(e.target.classList.contains('x')){
+    const drop=e.target.closest('.drop');
+    drop.innerHTML=drop.dataset.accept==='doc'?'ðŸ“Ž Tap to choose upload spot':'ðŸ–¼ï¸ Tap to choose upload spot';
+    drop.classList.remove('armed');e.stopPropagation();
+  }
+});
+function insertAtCursor(el,text){
+  el.focus();
+  const s=el.selectionStart??el.value.length,e=el.selectionEnd??el.value.length;
+  if(el.setRangeText){el.setRangeText(text,s,e,'end');}
+  else{el.value=el.value.slice(0,s)+text+el.value.slice(e);}
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+}
+function pulse(sel){document.querySelectorAll(sel).forEach(el=>{el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');})}
+function visibleSection(){return document.querySelector('section:not([hidden])')}
+function useItem(it){
+  if(!it)return false;
+  if(it.type==='txt'||it.type==='url'){
+    if(T.field&&visibleSection().contains(T.field)){
+      insertAtCursor(T.field,it.content||it.label);touch(it);
+      toast(`Inserted Â· ${it.label}`);tick();setTimeout(tick,70);return true;
+    }
+    pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');
+    toast('Tap a text box first, then summon');return false;
+  }
+  if(T.drop&&visibleSection().contains(T.drop)){
+    const ok=T.drop.dataset.accept===it.type;
+    if(!ok){toast(it.type==='doc'?'That spot wants an image':'That spot wants a PDF');return false;}
+    T.drop.innerHTML=`<span class="chip">${it.icon} ${it.label}<span class="x" role="button" aria-label="remove">âœ•</span></span>`;
+    T.drop.classList.remove('armed');const d=T.drop;T.drop=null;
+    d.classList.add('flash');touch(it);
+    toast(`Attached Â· ${it.label}`);tick();setTimeout(tick,70);return true;
+  }
+  pulse('section:not([hidden]) .drop');
+  toast('Files land in upload spots â€” tap one first');return false;
+}
+function pasteLast(){
+  const it=lastUsed();
+  if(it&&(it.type==='txt'||it.type==='url')){const r=useItem(it);if(r)toast(`Pasted last Â· ${it.label}`);}
+  else useItem(it);
+}
+
+/* ================= selection capture ================= */
+const chip=document.getElementById('savechip');let selText='';
+document.addEventListener('selectionchange',()=>{
+  clearTimeout(chip._t);chip._t=setTimeout(()=>{
+    const sel=document.getSelection();
+    if(!sel||sel.isCollapsed){chip.style.display='none';return;}
+    const txt=sel.toString().trim();
+    if(txt.length<3||txt.length>400){chip.style.display='none';return;}
+    const n=sel.anchorNode&&sel.anchorNode.parentElement;
+    if(!n||!n.closest('main')||n.closest('#kb')){chip.style.display='none';return;}
+    const r=sel.getRangeAt(0).getBoundingClientRect();
+    selText=txt;
+    chip.style.display='block';
+    chip.style.left=Math.max(8,Math.min(innerWidth-150,r.left+scrollX))+'px';
+    chip.style.top=(r.top+scrollY-42)+'px';
+  },220);
+});
+chip.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  const now=Date.now();
+  vault.push({id:'u'+now,type:'txt',icon:'âœ‚ï¸',label:selText.slice(0,26)+(selText.length>26?'â€¦':''),
+    content:selText,col:'Clipboard',use_count:0,last_used_at:now,captured_at:now,source:'selection'});
+  save(vault);chip.style.display='none';
+  toast('Saved to Clipboard âœ“ â€” now double-tap the dial handle');
+  refreshKb();
+});
+
+/* ================= router ================= */
+const PAGES=['home','dial','keyboard'];
+function route(){
+  const h=(location.hash||'#home').slice(1);
+  const page=PAGES.includes(h)?h:'home';
+  document.querySelectorAll('[data-page]').forEach(s=>s.hidden=s.dataset.page!==page);
+  document.getElementById('kbfab').hidden=page!=='keyboard';
+  if(page!=='keyboard')kbHide();
+  DIAL.enabled=page==='dial';
+  if(!DIAL.enabled){DIAL.mode='closed';DIAL.open=0;DIAL.openT=0;document.body.classList.remove('dialing');}
+  T.field=null;T.drop=null;
+  scrollTo(0,0);drawDial();
+}
+addEventListener('hashchange',route);
+
+/* ================= keyboard (bottom sheet) ================= */
+const kb=document.getElementById('kb');
+let kbCat=0,kbQ='';
+function kbShow(){kb.classList.add('up')}
+function kbHide(){kb.classList.remove('up')}
+document.getElementById('kbfab').onclick=()=>kb.classList.contains('up')?kbHide():(refreshKb(),kbShow());
+document.getElementById('kbclose').onclick=kbHide;
+document.addEventListener('focusin',e=>{
+  if(!document.querySelector('[data-page=keyboard]').hidden
+     &&e.target.matches('input[type=text],textarea')&&e.target.closest('.task')){refreshKb();kbShow();}
+});
+document.getElementById('kbsearch').addEventListener('input',e=>{kbQ=e.target.value.trim().toLowerCase();refreshKb();});
+function refreshKb(){
+  const cats=document.getElementById('kbcats');
+  cats.innerHTML=COLS.map((c,i)=>`<div class="cat ${i===kbCat?'on':''}" role="button" aria-label="${c[0]}">${c[1]}</div>`).join('');
+  [...cats.children].forEach((el,i)=>el.onclick=()=>{kbCat=i;document.getElementById('kbsearch').value='';kbQ='';refreshKb();});
+  let items=kbQ?vault.filter(i=>(i.label+' '+i.content).toLowerCase().includes(kbQ)):byCol(COLS[kbCat][0]);
+  const grid=document.getElementById('kbgrid');
+  grid.innerHTML=items.length?items.map(i=>{
+    const b=i.type==='doc'?'file':i.type==='img'?'image':'';
+    return `<div class="it" role="button"><span>${i.icon}</span><span class="tx">${i.label}</span>${b?`<span class="b">${b}</span>`:''}</div>`;
+  }).join(''):`<div style="grid-column:1/-1;color:#6d7783;font-size:12.5px;padding:14px;text-align:center">Nothing matches â€œ${kbQ}â€</div>`;
+  [...grid.children].forEach((el,idx)=>{if(items[idx])el.onclick=()=>useItem(items[idx]);});
+}
+
+/* ================= the dial ================= */
+const svg=document.getElementById('dialsvg');
+const glidechip=document.getElementById('glidechip');
+const DIAL={enabled:false,mode:'closed',open:0,openT:0,
+  sIn:0,tIn:0,sOut:0,tOut:0,cat:0,grab:null,downBand:null,lastA:0,moved:0,downT:0,
+  tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0};
+const STEP_IN=42,STEP_OUT=33,WIN_IN=46,WIN_OUT=70;
+let VW=innerWidth,VH=innerHeight,R=0,HUB=0,IN0=0,IN1=0,OUT0=0,OUT1=0,CY=0;
+function sizes(){
+  VW=innerWidth;VH=innerHeight;
+  R=Math.min(VW*0.46,205);
+  HUB=R*.17;IN0=R*.25;IN1=R*.52;OUT0=R*.58;OUT1=R*.88;CY=VH*.56;
+  svg.setAttribute('width',VW);svg.setAttribute('height',VH);
+  svg.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
+}
+sizes();addEventListener('resize',()=>{sizes();drawDial();});
+const rad=d=>(d-90)*Math.PI/180;
+const P=(r,deg)=>({x:VW+r*Math.cos(rad(deg)),y:CY+r*Math.sin(rad(deg))});
+const wrapDeg=x=>((x+180)%360+360)%360-180;
+const mod=(a,n)=>((a%n)+n)%n;
+const dist=(x,y)=>Math.hypot(x-VW,y-CY);
+const ang=(x,y)=>mod(Math.atan2(y-CY,x-VW)*180/Math.PI+90,360);
+const band=d=>(d>=IN0-8&&d<=IN1+8)?'In':(d>=OUT0-8&&d<=OUT1+14)?'Out':null;
+function seg(r0,r1,a0,a1){
+  const p1=P(r1,a0),p2=P(r1,a1),p3=P(r0,a1),p4=P(r0,a0),big=(a1-a0)>180?1:0;
+  return `M${p1.x} ${p1.y}A${r1} ${r1} 0 ${big} 1 ${p2.x} ${p2.y}L${p3.x} ${p3.y}A${r0} ${r0} 0 ${big} 0 ${p4.x} ${p4.y}Z`;
+}
+function slots(list,s,step,win){
+  const n=list.length,out=[];
+  if(!n)return out;
+  for(let i=0;i<n;i++){let d=mod(i-s,n);if(d>n/2)d-=n;const off=d*step;
+    if(Math.abs(off)<=win+step*.7)out.push({i,off});}
+  return out.sort((a,b)=>a.off-b.off);
+}
+function dialItems(){return byCol(COLS[DIAL.cat][0])}
+function focusedItem(){const its=dialItems();return its.length?its[mod(Math.round(DIAL.sOut),its.length)]:null}
+
+function drawDial(){
+  if(!DIAL.enabled){svg.innerHTML='';return;}
+  const f=DIAL.open,o=x=>x*(0.55+0.45*f);
+  let h=`<defs><radialGradient id="brl" cx="100%" cy="56%" r="75%">
+    <stop offset="55%" stop-color="#161B22"/><stop offset="82%" stop-color="#1D242E"/>
+    <stop offset="100%" stop-color="#12161C"/></radialGradient>
+    <radialGradient id="hb" cx="50%" cy="42%" r="70%">
+    <stop offset="0%" stop-color="#2C3542"/><stop offset="100%" stop-color="#12161C"/></radialGradient></defs>`;
+  if(f<.02){
+    h+=`<rect x="${VW-7}" y="${CY-40}" width="6" height="80" rx="3" fill="#3A4655" opacity=".8" style="pointer-events:auto;cursor:pointer"/>`;
+    h+=`<rect x="${VW-30}" y="${CY-70}" width="30" height="140" fill="transparent" style="pointer-events:auto"/>`;
+    svg.innerHTML=h;return;
+  }
+  h+=`<circle cx="${VW}" cy="${CY}" r="${o(OUT1)+22}" fill="rgba(5,8,12,${.5*f})"/>`;
+  const A0=270-WIN_OUT-16,A1=270+WIN_OUT+16;
+  h+=`<path d="${seg(o(IN0),o(IN1),A0,A1)}" fill="url(#brl)" stroke="#2A323D"/>`;
+  h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="url(#brl)" stroke="#2A323D"/>`;
+  const knurl=(r0,r1,s,st)=>{let k='';const sh=-(s*st)%7;
+    for(let a=A0;a<=A1;a+=7){const p1=P(r0,a+sh),p2=P(r1,a+sh);
+      k+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#333D4A" stroke-width="1.5" opacity="${.55*f}"/>`;}
+    return k;};
+  h+=knurl(o(IN1)+1,o(IN1)+6,DIAL.sIn,STEP_IN)+knurl(o(OUT1)+1,o(OUT1)+7,DIAL.sOut,STEP_OUT);
+  h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,270-STEP_OUT/2,270+STEP_OUT/2)}" fill="#2FB9A9" opacity="${.14*f}"/>`;
+  h+=`<path d="${seg(o(IN0)+2,o(IN1)-2,270-STEP_IN/2,270+STEP_IN/2)}" fill="#2FB9A9" opacity="${.18*f}"/>`;
+  slots(COLS,DIAL.sIn,STEP_IN,WIN_IN).forEach(({i,off})=>{
+    const p=P(o((IN0+IN1)/2),270+off),foc=Math.abs(off)<STEP_IN*.45;
+    const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_IN+10)/18))*f;
+    h+=`<text x="${p.x}" y="${p.y}" font-size="${foc?22:17}" text-anchor="middle" dominant-baseline="central" opacity="${op}">${COLS[i][1]}</text>`;});
+  const its=dialItems();
+  slots(its,DIAL.sOut,STEP_OUT,WIN_OUT).forEach(({i,off})=>{
+    const p=P(o((OUT0+OUT1)/2),270+off),foc=Math.abs(off)<STEP_OUT*.45;
+    const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_OUT+10)/16))*f;
+    h+=`<text x="${p.x}" y="${p.y}" font-size="${foc?19:15}" text-anchor="middle" dominant-baseline="central" opacity="${op}">${its[i].icon}</text>`;});
+  const m1=P(o(OUT1)+9,270),m2=P(o(OUT1)+17,270);
+  h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round" opacity="${f}"/>`;
+  h+=`<circle cx="${VW}" cy="${CY}" r="${HUB}" fill="url(#hb)" stroke="#39424F" stroke-width="1.5" opacity="${f}"/>`;
+  h+=`<text x="${VW-HUB*.45}" y="${CY}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#C9D3DF" opacity="${f}">âœ•</text>`;
+  const fi=focusedItem();
+  if(fi){
+    const cp=P(o(OUT1)+26,270);
+    h+=`<g opacity="${f}"><rect x="${cp.x-150}" y="${cp.y-16}" width="150" height="32" rx="9" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
+    <text x="${cp.x-75}" y="${cp.y-3}" font-size="11.5" text-anchor="middle" fill="#DFE6EE" font-weight="600">${fi.label.slice(0,20)}</text>
+    <text x="${cp.x-75}" y="${cp.y+10}" font-size="8.5" text-anchor="middle" fill="#7D8794">${DIAL.mode==='glide'?'release to insert':(fi.type==='doc'?'tap = attach to armed spot':fi.type==='img'?'tap = attach / copy':'tap = insert')}</text></g>`;
+  }
+  svg.innerHTML=h;
+}
+
+/* physics loop */
+let prevIn=0,prevOut=0;
+(function loop(){
+  const D=DIAL;
+  D.open+=(D.openT-D.open)*.18;
+  if(Math.abs(D.openT-D.open)<.005)D.open=D.openT;
+  for(const r of ['In','Out']){
+    if(D.grab!==r&&D.mode!=='glide'){D['s'+r]+=(D['t'+r]-D['s'+r])*.22;
+      if(Math.abs(D['t'+r]-D['s'+r])<.002)D['s'+r]=D['t'+r];}
+  }
+  const dIn=Math.round(D.sIn),dOut=Math.round(D.sOut);
+  if(dIn!==prevIn){prevIn=dIn;tick();
+    const c=mod(dIn,COLS.length);
+    if(c!==D.cat){D.cat=c;D.sOut=0;D.tOut=0;prevOut=0;}}
+  if(dOut!==prevOut){prevOut=dOut;tick();}
+  document.body.classList.toggle('dialing',D.enabled&&(D.openT>0||D.mode==='glide'));
+  if(D.enabled)drawDial();
+  requestAnimationFrame(loop);
+})();
+
+/* gestures â€” window-level, coordinate hit-testing, no pointer capture */
+let PTR=null;
+addEventListener('pointerdown',e=>{
+  const D=DIAL;if(!D.enabled)return;
+  const d=dist(e.clientX,e.clientY);
+  const onHandle=D.openT===0&&(VW-e.clientX)<34&&Math.abs(e.clientY-CY)<80;
+  if(D.openT===0&&!onHandle)return;
+  PTR=e.pointerId;D.moved=0;D.downT=Date.now();D.lastA=ang(e.clientX,e.clientY);
+  D.glideY=e.clientY;D.downBand=band(d);
+  if(onHandle){
+    clearTimeout(D.holdTimer);
+    D.holdTimer=setTimeout(()=>{
+      D.holdTimer=null;
+      clearTimeout(D.tapTimer);D.tapTimer=null;
+      D.mode='glide';D.openT=1;tick();
+      glidechip.style.display='block';
+      glidechip.style.right=(R+40)+'px';glidechip.style.top=(CY-10)+'px';
+    },350);
+    e.preventDefault();return;
+  }
+  if(D.openT>0){D.grab=D.downBand;if(D.grab)e.preventDefault();}
+},{passive:false});
+
+addEventListener('pointermove',e=>{
+  const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;
+  if(D.mode==='glide'){
+    const dy=e.clientY-D.glideY;D.glideY=e.clientY;
+    D.sOut+=dy/34;D.moved+=Math.abs(dy);e.preventDefault();return;
+  }
+  if(D.holdTimer&&D.moved+Math.abs(e.movementX||0)+Math.abs(e.movementY||0)>12){
+    clearTimeout(D.holdTimer);D.holdTimer=null;
+  }
+  if(!D.grab)return;
+  const a=ang(e.clientX,e.clientY),delta=wrapDeg(a-D.lastA);D.lastA=a;
+  D.moved+=Math.abs(delta);
+  D['s'+D.grab]+=-delta/(D.grab==='In'?STEP_IN:STEP_OUT);
+  e.preventDefault();
+},{passive:false});
+
+addEventListener('pointerup',e=>{
+  const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;PTR=null;
+  clearTimeout(D.holdTimer);D.holdTimer=null;
+  if(D.mode==='glide'){
+    D.mode='closed';glidechip.style.display='none';
+    D.tOut=Math.round(D.sOut);D.sOut=D.tOut;
+    useItem(focusedItem());
+    D.openT=0;return;
+  }
+  const d=dist(e.clientX,e.clientY),a=ang(e.clientX,e.clientY);
+  const wasTap=D.moved<4&&Date.now()-D.downT<400;
+  if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
+  if(!wasTap){D.downBand=null;return;}
+
+  if(D.openT===0){
+    const now=Date.now();
+    if(now-D.lastTapAt<300){clearTimeout(D.tapTimer);D.tapTimer=null;D.lastTapAt=0;pasteLast();return;}
+    D.lastTapAt=now;
+    D.tapTimer=setTimeout(()=>{D.openT=1;tick();D.tapTimer=null;},290);
+    return;
+  }
+  if(d<=HUB+8){D.openT=0;return;}
+  if(d>OUT1+24){D.openT=0;return;}
+  const rel=wrapDeg(a-270),hit=band(d);
+  if(hit&&hit===D.downBand){
+    const step=hit==='In'?STEP_IN:STEP_OUT,win=hit==='In'?WIN_IN:WIN_OUT;
+    const dd=rel/step;
+    if(Math.abs(rel)<=win+step*.6){
+      if(hit==='Out'&&Math.abs(dd)<.45){
+        const okd=useItem(focusedItem());
+        if(okd)D.openT=0;
+      }else{D['t'+hit]=Math.round(D['s'+hit]+dd);}
+    }
+  }
+  D.downBand=null;
+});
+addEventListener('pointercancel',e=>{
+  const D=DIAL;if(e.pointerId!==PTR)return;
+  PTR=null;clearTimeout(D.holdTimer);D.holdTimer=null;
+  if(D.mode==='glide'){D.mode='closed';glidechip.style.display='none';D.openT=0;}
+  if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
+});
+
+/* first-visit coach */
+addEventListener('hashchange',()=>{
+  if(location.hash==='#dial'&&!localStorage.getItem('reel.coach.dial')){
+    setTimeout(()=>toast('Tap the handle on the right edge â†’'),500);
+    localStorage.setItem('reel.coach.dial','1');
+  }
+});
+if(location.hash==='#dial'&&!localStorage.getItem('reel.coach.dial')){
+  setTimeout(()=>toast('Tap the handle on the right edge â†’'),600);
+  localStorage.setItem('reel.coach.dial','1');
+}
+
+refreshKb();route();
+</script>
+
+</body>
+</html>
