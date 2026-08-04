@@ -151,6 +151,23 @@ input.hunt{font-family:inherit;outline:none;border:none;color:var(--ink);width:c
 .gauge .num i{font-style:normal;color:var(--ink-3);font-size:15px;font-weight:500}
 .gauge .track{height:6px;border-radius:99px;background:var(--hair);margin-top:11px;overflow:hidden}
 .gauge .track i{display:block;height:100%;border-radius:99px}
+/* just-arrived items get a brief ring so you can see what landed */
+.card.fresh{box-shadow:0 0 0 2px var(--c-doc),var(--shadow-s)}
+/* the clipboard catcher */
+.catch{margin:14px 16px 4px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:13px;
+  border:1.5px dashed var(--hair);background:transparent;transition:.2s var(--glide)}
+.md .catch{border-radius:24px} .ios .catch{border-radius:16px}
+.catch:active{transform:scale(.985)}
+.catch .g{width:38px;height:38px;border-radius:13px;background:var(--t-doc);color:var(--c-doc);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.catch b{display:block;font-size:14.5px;font-weight:600}
+.catch span.s{font-size:12.5px;color:var(--ink-3)}
+textarea.ed{width:calc(100% - 32px);margin:0 16px;min-height:180px;padding:16px;font:inherit;
+  font-size:16px;line-height:1.5;color:var(--ink);background:var(--surf);border:1px solid var(--hair);
+  outline:none;resize:none;box-shadow:var(--shadow-s)}
+.md textarea.ed{border-radius:22px} .ios textarea.ed{border-radius:16px}
+textarea.ed:focus{border-color:var(--c-doc)}
+textarea.ed.code{font-family:var(--mono);font-size:15px}
 .empty{padding:56px 34px;text-align:center;color:var(--ink-3)}
 .empty .e1{font-family:var(--display);font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-.03em}
 .empty .e2{font-size:14px;margin-top:7px;line-height:1.5}
@@ -183,7 +200,7 @@ svg{display:block}
     <h1 class="pt">Reel</h1>
     <div class="ctrls"><div class="seg" id="platSeg"></div><div class="seg" id="themeSeg"></div></div>
   </div>
-  <p class="lede"><b>It works now</b> — tap tiles, cards, nav, back arrows. Search filters live. Pinning actually pins. Nine screens across three tabs.</p>
+  <p class="lede"><b>Copy anything, anywhere on your phone, then come back to this tab</b> — it lands in the vault by itself. (Same rule as the real app: an OS only lets you read the clipboard when you become active, which is why iOS asks.) Text and links are editable; the plus button writes straight in.</p>
 </header>
 
 <div class="stage"><div class="phone"><div class="scr" id="scr"></div></div></div>
@@ -209,6 +226,7 @@ const I={
   back:'<path d="M14.4 5.6 8 12l6.4 6.4"/>',
   time:'<circle cx="12" cy="12.6" r="8.2"/><path d="M12 8.4v4.4l2.6 1.9M9.6 2.6h4.8"/>',
   trash:'<path d="M4.6 6.6h14.8M9.4 6.6V4.4h5.2v2.2M6.6 6.6l1 13.2h8.8l1-13.2"/>',
+  pencil:'<path d="M16.4 3.6a2.3 2.3 0 0 1 3.3 3.3L8.2 18.4l-4.3 1 1-4.3z"/><path d="m14.6 5.4 4 4"/>',
 };
 const ic=(n,s,w)=>`<svg viewBox="0 0 24 24" width="${s||20}" height="${s||20}" fill="none" stroke="currentColor" stroke-width="${w||1.7}" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
 const TYPE={txt:'Text',img:'Images',doc:'Docs',lnk:'Links'};
@@ -234,6 +252,11 @@ let ITEMS=[
   {id:14,t:'lnk',v:'linkedin.example.com/in/alexrivera'},
   {id:15,t:'lnk',v:'cal.example.com/alex/15min'},
 ];
+/* ── inference: the app works out the type, it never asks ── */
+const isUrl=v=>/^(https?:\/\/|www\.)/i.test(v.trim())||/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v.trim());
+const isCode=v=>{const s=v.trim();
+  return s.length<64 && !/\s{2,}/.test(s) && (/\d{4,}/.test(s)||/^[A-Z0-9 -]{8,}$/.test(s)||/[/@:]/.test(s)&&!isUrl(s));};
+const nextId=()=>Math.max(0,...ITEMS.map(i=>i.id))+1;
 const byType=t=>ITEMS.filter(i=>i.t===t);
 const pinned=()=>ITEMS.filter(i=>i.pin).sort((a,b)=>a.pin-b.pin);
 const find=id=>ITEMS.find(i=>i.id===id);
@@ -256,6 +279,49 @@ function copy(id){const it=find(id);st.sheet=null;
   toast(it.sens?'Copied — clears in 60s':'Copied');}
 function del(id){ITEMS=ITEMS.filter(i=>i.id!==id);st.sheet=null;toast('Deleted');}
 
+/* ── writing: add and edit ── */
+function saveNew(){
+  const el=document.getElementById('ed'); const v=(el?el.value:'').trim();
+  if(!v){toast('Nothing to save');return;}
+  const t=isUrl(v)?'lnk':'txt';
+  ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1});
+  clearFresh(); toast('Saved to '+TYPE[t]); go('type',t);
+}
+function saveEdit(){
+  const el=document.getElementById('ed'); const it=find(st.arg);
+  const v=(el?el.value:'').trim();
+  if(!it)return; if(!v){toast('Cannot be empty');return;}
+  it.v=v; it.code=isCode(v);
+  const t=isUrl(v)?'lnk':it.t;
+  if((it.t==='txt'||it.t==='lnk')&&t!==it.t){it.t=t;toast('Moved to '+TYPE[t]);}
+  else toast('Saved');
+  go('type',it.t);
+}
+function edit(id){st.sheet=null;go('edit',id);}
+
+/* ── clipboard: the same constraint the real app has ──
+   No OS lets a background app watch the clipboard. It can only look when it
+   becomes active — which is exactly why iOS shows "Allow Paste". So: we try on
+   focus, and offer a tap when the browser withholds permission. */
+let lastClip='';
+function clearFresh(){setTimeout(()=>{ITEMS.forEach(i=>i.fresh=0);render()},2600);}
+async function grabClip(manual){
+  try{
+    const txt=await navigator.clipboard.readText();
+    if(!txt||!txt.trim()){ if(manual)toast('Your clipboard is empty'); return; }
+    if(txt===lastClip){ if(manual)toast('Already saved that one'); return; }
+    lastClip=txt;
+    const v=txt.trim(), t=isUrl(v)?'lnk':'txt';
+    ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1});
+    st.tab='vault';st.view='vault';st.sheet=null;
+    render(); toast('Just copied — saved to '+TYPE[t]); clearFresh();
+  }catch(e){
+    if(manual)toast('Your browser blocked the clipboard');
+  }
+}
+addEventListener('focus',()=>grabClip(false));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)grabClip(false)});
+
 /* ── chrome ── */
 const sbar=()=>`<div class="sbar"><span>9:41</span><span>5G</span></div>`;
 const nav=()=>`<div class="nav">${[['txt','Vault','vault'],['find','Find','find'],['cog','You','you']]
@@ -265,7 +331,7 @@ const tbar=(back,title,right)=>`<div class="tbar">
   ${back?`<span class="tbtn" onclick="${back}">${ic('back',17)}</span>`:'<span style="width:36px"></span>'}
   ${title?`<span style="font-weight:600;font-size:15px">${title}</span>`:'<span></span>'}
   ${right||'<span style="width:36px"></span>'}</div>`;
-const card=it=>`<div class="card" onclick="openSheet(${it.id})">
+const card=it=>`<div class="card${it.fresh?' fresh':''}" onclick="openSheet(${it.id})">
   ${it.pin?`<span class="pin">${ic('pin',14,1.9)}</span>`:''}
   ${it.g?`<div class="thumb" style="background:${it.g}"></div>`
         :`<div class="in"><div class="val${it.code?' code':''}">${it.v.replace(/\n/g,'<br>')}</div></div>`}
@@ -278,7 +344,15 @@ vault:()=>`${sbar()}${tbar('',null,`<span class="tbtn" onclick="go('add')">${ic(
     <div><h1 class="big" style="font-size:34px">Everything<br>you reuse</h1>
       <div class="sub">${ITEMS.length} things · ${pinned().length} pinned</div></div>
     <div class="hunt" onclick="tab('find')">${ic('find',20)} Search everything</div>
+    <div class="catch" onclick="grabClip(true)">
+      <span class="g">${ic('copy',19)}</span>
+      <span style="flex:1"><b>Copied something?</b>
+      <span class="s">Tap to bring it in — or just switch back to this tab</span></span>
+      ${ic('next',17)}</div>
     ${pinned().length?`<div class="sect">Pinned</div>${pinned().map(card).join('')}`:''}
+    ${(()=>{const recent=ITEMS.filter(i=>!i.pin).slice(0,3);
+      return recent.length?`<div class="sect">${ITEMS.some(i=>i.fresh)?'Just arrived':'Recent'}</div>
+        ${recent.map(card).join('')}`:''})()}
     <div class="sect">By type</div>
     <div class="tiles">
       ${Object.keys(TYPE).map(t=>`<div class="tile" style="background:var(--t-${t});color:var(--c-${t})"
@@ -316,20 +390,33 @@ find:()=>{const q=st.q.trim().toLowerCase();
 
 item:()=>'',
 
-add:()=>`${sbar()}${tbar("go('"+(st.tab==='vault'?'vault':'you')+"')",'New',
+add:()=>`${sbar()}${tbar("go('vault')",'New',
     `<span class="tbtn wide" style="background:var(--c-txt);color:#fff;border:none"
-      onclick="toast('Saved to Text');go('vault')">Save</span>`)}
-  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
-    <div class="card" style="margin:8px 16px 11px"><div class="in" style="min-height:150px">
-      <div class="val" style="-webkit-line-clamp:unset;color:var(--ink-3)">Type or paste anything…</div></div></div>
-    <div class="sect">Reel will work out</div>
-    <div class="card"><div class="in" style="display:flex;align-items:center;gap:13px">
+      onclick="saveNew()">Save</span>`)}
+  <div class="roll" style="padding-top:52px">
+    <textarea class="ed" id="ed" placeholder="Type or paste anything…" autocomplete="off"></textarea>
+    <div class="sect">Reel works the rest out</div>
+    <div class="card" style="cursor:default"><div class="in" style="display:flex;align-items:center;gap:13px">
+      <span style="width:38px;height:38px;border-radius:13px;background:var(--t-lnk);color:var(--c-lnk);
+        display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic('lnk',19)}</span>
+      <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">Paste a web address</b>
+      <span style="font-size:13px;color:var(--ink-3)">and it files itself under Links</span></span></div></div>
+    <div class="card" style="cursor:default"><div class="in" style="display:flex;align-items:center;gap:13px">
       <span style="width:38px;height:38px;border-radius:13px;background:var(--t-txt);color:var(--c-txt);
-        display:flex;align-items:center;justify-content:center">${ic('txt',19)}</span>
-      <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">What kind of thing it is</b>
-      <span style="font-size:13px;color:var(--ink-3)">and which type it belongs to</span></span></div></div>
-    <div class="empty" style="padding:22px 34px"><div class="e2">Most things arrive from the share sheet or the dial. This is here for the rare time you want to type one in.</div></div>
+        display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic('txt',19)}</span>
+      <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">Anything else</b>
+      <span style="font-size:13px;color:var(--ink-3)">goes to Text, in mono if it looks like a code</span></span></div></div>
   </div>`,
+
+edit:()=>{const it=find(st.arg); if(!it)return V.vault();
+  return `${sbar()}${tbar("go('type','"+it.t+"')",'Edit',
+    `<span class="tbtn wide" style="background:var(--c-${it.t});color:#fff;border:none"
+      onclick="saveEdit()">Save</span>`)}
+  <div class="roll" style="padding-top:52px">
+    <textarea class="ed${it.code?' code':''}" id="ed" autocomplete="off">${it.v.replace(/</g,'&lt;')}</textarea>
+    <div class="empty" style="padding:20px 34px;text-align:left">
+      <div class="e2">Change a web address to something that isn't one and it moves itself to Text. The other way round too.</div></div>
+  </div>`},
 
 you:()=>`${sbar()}${tbar('','You','')}
   <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
@@ -439,6 +526,8 @@ function sheet(){
     <div class="act" style="background:var(--c-${c})" onclick="copy(${it.id})">${ic('copy',19)} Copy</div>
     ${it.sens?`<div style="display:flex;align-items:center;gap:9px;padding:14px 20px 2px;font-size:13px;color:var(--ink-3)">
       ${ic('time',16)} Leaves your clipboard after 60 seconds</div>`:''}
+    ${it.t==='txt'||it.t==='lnk'?`<div class="opt" onclick="edit(${it.id})">
+      <span style="color:var(--ink-2)">${ic('pencil',19)}</span><span class="t">Edit</span>${ic('next',16)}</div>`:''}
     <div class="opt" onclick="togglePin(${it.id})"><span style="color:var(--ink-2)">${ic('pin',19)}</span>
       <span class="t">${it.pin?'Unpin':'Pin it'}</span><span class="v">${it.pin?'slot '+it.pin:pinned().length+'/'+st.pinCap+' used'}</span></div>
     <div class="opt" onclick="toast('Share sheet would open');closeSheet()">
@@ -476,7 +565,8 @@ function renderKeepFocus(){
   const n=document.getElementById('q');
   if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
 }
-Object.assign(window,{go,tab,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st});
+Object.assign(window,{go,tab,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
+  saveNew,saveEdit,edit,grabClip});
 render();
 /* let the bounce finish, then never again this session */
 setTimeout(()=>{firstOpen=false},600);
