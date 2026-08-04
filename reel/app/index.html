@@ -281,7 +281,7 @@ function togglePin(id){
   else {it.pin=nextPin();it.auto=0;toast('Pinned — this one stays');}
   render();
 }
-function copy(id){const it=find(id);st.sheet=null;
+function copy(id){const it=find(id);touchItem(it);st.sheet=null;
   toast(it.sens?'Copied — clears in 60s':'Copied');}
 function del(id){ITEMS=ITEMS.filter(i=>i.id!==id);st.sheet=null;toast('Deleted');}
 
@@ -323,14 +323,22 @@ function clearFresh(){setTimeout(()=>{ITEMS.forEach(i=>i.fresh=0);render()},2600
    against. So auto-captured things live in a capped buffer and the oldest fall
    off the end. Pinning or editing something marks it deliberate and it stops
    ageing out. Curation is a consequence of what you do, not a bucket to learn. */
-const AUTO_CAP=20;
+const AUTO_CAP=20, USE_BONUS=8;
+let seq=0;
 const autoItems=()=>ITEMS.filter(i=>i.auto&&!i.pin);
+/* Heat: what falls off is the coldest thing, not the oldest. Every use makes an
+   item effectively younger, so something you reach for often survives a long
+   time even if you saved it ages ago — and a URL you pasted once and never
+   touched again leaves quickly. Frequency-aged LRU, the same idea a cache uses. */
+const heat=i=>(i.touch||0)+(i.uses||0)*USE_BONUS;
+function touchItem(it){it.uses=(it.uses||0)+1;it.touch=++seq;}
 function pruneAuto(){
-  const over=autoItems().slice(AUTO_CAP);
-  if(!over.length)return 0;
-  const gone=new Set(over.map(o=>o.id));
+  const pool=autoItems();
+  if(pool.length<=AUTO_CAP)return 0;
+  const cold=[...pool].sort((a,b)=>heat(a)-heat(b)).slice(0,pool.length-AUTO_CAP);
+  const gone=new Set(cold.map(c=>c.id));
   ITEMS=ITEMS.filter(i=>!gone.has(i.id));
-  return over.length;
+  return cold.length;
 }
 
 async function grabClip(manual){
@@ -341,7 +349,7 @@ async function grabClip(manual){
     if(txt===lastClip){ if(manual)toast('Already saved that one'); return false; }
     lastClip=txt;
     const v=txt.trim(), t=isUrl(v)?'lnk':'txt';
-    ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1,auto:1});
+    ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1,auto:1,uses:0,touch:++seq});
     const dropped=pruneAuto();
     if(st.view!=='edit'&&st.view!=='add'){st.tab='vault';st.view='vault';st.sheet=null;}
     render();
@@ -400,7 +408,7 @@ vault:()=>`${sbar()}${tbar('',null,`<span class="tbtn" onclick="go('add')">${ic(
     <div class="catch${st.watch?' on':''}" onclick="toggleWatch()">
       <span class="g">${st.watch?ic('bolt',19):ic('copy',19)}</span>
       <span style="flex:1"><b>${st.watch?'Watching your clipboard':st.perm==='blocked'?'Clipboard is blocked':'Watch my clipboard'}</b>
-      <span class="s">${st.watch?`Keeping the last ${AUTO_CAP} · pin anything to keep it for good`
+      <span class="s">${st.watch?`Holds ${AUTO_CAP} · the ones you use stay longest`
         :st.perm==='blocked'?'Your browser said no. Tap to try again.'
         :'Turn on and anything you copy saves itself'}</span></span>
       ${st.watch?`<span style="display:flex;align-items:center;gap:9px;flex:0 0 auto">
@@ -586,7 +594,7 @@ function sheet(){
     ${it.auto?`<div class="opt" onclick="keep(${it.id})">
       <span style="color:var(--c-doc)">${ic('ok',19)}</span>
       <span class="t" style="color:var(--c-doc)">Keep this</span>
-      <span class="v">stop it ageing out</span></div>`:''}
+      <span class="v">${it.uses?`used ${it.uses}× · safe for now`:'stop it ageing out'}</span></div>`:''}
     ${it.t==='txt'||it.t==='lnk'?`<div class="opt" onclick="edit(${it.id})">
       <span style="color:var(--ink-2)">${ic('pencil',19)}</span><span class="t">Edit</span>${ic('next',16)}</div>`:''}
     <div class="opt" onclick="togglePin(${it.id})"><span style="color:var(--ink-2)">${ic('pin',19)}</span>
