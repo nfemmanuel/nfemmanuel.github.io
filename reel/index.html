@@ -150,11 +150,17 @@
   #kb .cat.on{background:#2F3A4A;border-color:#5B8CFF}
   #kb .grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start;min-height:0}
   #kb .it{background:#2A2F36;border:1px solid #333941;border-radius:9px;padding:8px 10px;
-    font-size:12.5px;color:#CFD8E3;cursor:pointer;display:flex;align-items:center;gap:7px;
-    overflow:hidden;white-space:nowrap;min-height:38px}
+    font-size:11.5px;color:#CFD8E3;cursor:pointer;display:flex;align-items:flex-start;gap:6px;
+    overflow:hidden;min-height:52px}
   #kb .it:active{background:#333A43}
-  #kb .it .tx{overflow:hidden;text-overflow:ellipsis}
-  #kb .it .b{margin-left:auto;font-size:9px;color:#7A8492;flex:0 0 auto}
+  #kb .it .pv{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    line-height:1.4;word-break:break-word;flex:1}
+  #kb .it .pin{flex:0 0 auto;font-size:10px;line-height:1.4}
+  #kb .it .thumb{flex:1;height:36px;border-radius:6px;align-self:center}
+  #kb .it .b{margin-left:auto;font-size:9px;color:#7A8492;flex:0 0 auto;line-height:1.4}
+  #kb .it[data-t=txt]{background:#2B2A21}
+  #kb .it[data-t=url]{background:#222A3A}
+  #kb .it[data-t=doc]{background:#2A2430}
   .kresults{display:flex;gap:6px;overflow-x:auto;flex:0 0 46px;margin-bottom:6px;scrollbar-width:none}
   .kresults::-webkit-scrollbar{display:none}
   .kresults .it{flex:0 0 auto;min-height:40px}
@@ -632,7 +638,7 @@ function renderSearch(){
   const items=KB.q?vault.filter(i=>(i.label+' '+i.content).toLowerCase().includes(KB.q.toLowerCase()))
     :vault.slice().sort((a,b)=>b.last_used_at-a.last_used_at).slice(0,6);
   const r=document.getElementById('kresults');
-  r.innerHTML=items.length?items.map(i=>`<div class="it">${i.icon} <span class="tx">${i.label}</span></div>`).join('')
+  r.innerHTML=items.length?items.map(i=>`<div class="it" data-t="${i.type}" style="min-height:40px;max-width:150px">${i.pin_order!=null?'<span class="pin">📌</span>':''}<span class="pv" style="-webkit-line-clamp:1">${escq(i.type==='doc'?i.label:(i.content||i.label))}</span></div>`).join('')
     :`<div style="color:#6d7783;font-size:12px;padding:12px">No match for “${escq(KB.q)}”</div>`;
   [...r.children].forEach((el,idx)=>{if(items[idx])el.onclick=()=>useItem(items[idx]);});
 }
@@ -669,9 +675,15 @@ function refreshKb(){
   const items=byCol(COLS[KB.cat][0])
     .sort((a,b)=>((b.pin_order!=null)-(a.pin_order!=null)));   // pins first, recency preserved after
   const grid=document.getElementById('kbgrid');
+  const KGRAD=['linear-gradient(135deg,#3E5A72,#22303E)','linear-gradient(135deg,#5C4A6E,#2C2438)'];
+  const kgrad=id=>KGRAD[Math.abs([...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0))%2];
   grid.innerHTML=items.length?items.map(i=>{
-    const b=i.type==='doc'?'file':i.type==='img'?'image':(i.content||'').includes('___')?'fill-in':'';
-    return `<div class="it" role="button"><span>${i.pin_order!=null?'📌':i.icon}</span><span class="tx">${i.label}</span>${b?`<span class="b">${b}</span>`:''}</div>`;
+    const b=i.type==='doc'?'file':(i.content||'').includes('___')?'fill-in':'';
+    const pin=i.pin_order!=null?`<span class="pin">📌</span>`:'';
+    const body=i.type==='img'
+      ?`<span class="thumb" style="background:${kgrad(i.id)}"></span>`
+      :`<span class="pv">${escq((i.type==='doc'?i.label:(i.content||i.label)))}</span>`;
+    return `<div class="it" role="button" data-t="${i.type}">${pin}${body}${b?`<span class="b">${b}</span>`:''}</div>`;
   }).join(''):`<div style="grid-column:1/-1;color:#6d7783;font-size:12.5px;padding:14px;text-align:center">Nothing here yet</div>`;
   [...grid.children].forEach((el,idx)=>{if(items[idx])el.onclick=()=>useItem(items[idx]);});
   const tr=document.getElementById('ktyperows');
@@ -752,7 +764,11 @@ function drawDial(){
     <stop offset="55%" stop-color="#161B22"/><stop offset="82%" stop-color="#1D242E"/>
     <stop offset="100%" stop-color="#12161C"/></radialGradient>
     <radialGradient id="hb" cx="50%" cy="42%" r="70%">
-    <stop offset="0%" stop-color="#2C3542"/><stop offset="100%" stop-color="#12161C"/></radialGradient></defs>`;
+    <stop offset="0%" stop-color="#2C3542"/><stop offset="100%" stop-color="#12161C"/></radialGradient>
+    <linearGradient id="g0" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3E5A72"/><stop offset="1" stop-color="#22303E"/></linearGradient>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#5C4A6E"/><stop offset="1" stop-color="#2C2438"/></linearGradient></defs>`;
   if(f<.02){
     const bx=VW-BTN_R,by=CY;
     // secondary: the docked panel edge, a quiet hint that something lives here
@@ -788,27 +804,42 @@ function drawDial(){
     const p=P(o((IN0+IN1)/2),270+off),foc=Math.abs(off)<STEP_IN*.45;
     const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_IN+10)/18))*f;
     h+=`<text x="${p.x}" y="${p.y}" font-size="${foc?22:17}" text-anchor="middle" dominant-baseline="central" opacity="${op}">${COLS[i][1]}</text>`;});
+  /* outer ring = Samsung-clipboard content cards: raw text, image thumbs, filenames.
+     No identity icons out here — the inner ring owns icons; only 📌 marks pins. */
+  const midO=o((OUT0+OUT1)/2);
+  const TINT={txt:'#2B2A21',url:'#222A3A',doc:'#2A2430'};
+  const gpick=id=>'g'+(Math.abs([...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0))%2);
+  const card=(it,ang,scale,op,pinned)=>{
+    const c=P(midO,ang),w=58*scale,hh=40*scale;
+    const isImg=it.type==='img';
+    const fill=isImg?`url(#${gpick(it.id)})`:(TINT[it.type]||'#2A2F36');
+    let s=`<g opacity="${op}">`;
+    s+=`<rect x="${c.x-w/2}" y="${c.y-hh/2}" width="${w}" height="${hh}" rx="7" fill="${fill}"
+        stroke="${pinned?'#2FB9A9':'#3A424D'}" stroke-width="${pinned?1.4:1}"/>`;
+    if(!isImg){
+      const raw=(it.type==='doc'?it.label:(it.content||it.label)).replace(/\s+/g,' ');
+      const l1=raw.slice(0,12),l2=raw.slice(12,23)+(raw.length>23?'…':'');
+      s+=`<text x="${c.x}" y="${c.y-(l2?5:0)}" font-size="${8.5*scale}" text-anchor="middle" dominant-baseline="central" fill="#D6DEE8">${escq(l1)}</text>`;
+      if(l2)s+=`<text x="${c.x}" y="${c.y+6.5*scale}" font-size="${8.5*scale}" text-anchor="middle" dominant-baseline="central" fill="#98A3B0">${escq(l2)}</text>`;
+    }
+    if(pinned)s+=`<text x="${c.x+w/2-7}" y="${c.y-hh/2+7}" font-size="7">📌</text>`;
+    return s+`</g>`;
+  };
   const its=dialItems();
   slots(its,DIAL.sOut,STEP_OUT,WIN_ROT).forEach(({i,off})=>{
-    const p=P(o((OUT0+OUT1)/2),270+off),foc=Math.abs(off)<STEP_OUT*.45;
+    const foc=Math.abs(off)<STEP_OUT*.45;
     const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_ROT+8)/14))*f;
-    h+=`<text x="${p.x}" y="${p.y}" font-size="${foc?19:15}" text-anchor="middle" dominant-baseline="central" opacity="${op}">${its[i].icon}</text>`;});
-  pinnedItems().forEach((pn,k)=>{                       // fixed slots at ±PIN_OFF — never rotate
-    const a=270+(k===0?-PIN_OFF:PIN_OFF);
-    h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,a-13,a+13)}" fill="#2FB9A9" opacity="${.09*f}" stroke="#2FB9A9" stroke-opacity="${.5*f}" stroke-width="1"/>`;
-    const p=P(o((OUT0+OUT1)/2),a);
-    h+=`<text x="${p.x}" y="${p.y-5}" font-size="16" text-anchor="middle" dominant-baseline="central" opacity="${f}">${pn.icon}</text>`;
-    h+=`<text x="${p.x}" y="${p.y+11}" font-size="8" text-anchor="middle" dominant-baseline="central" opacity="${.85*f}">📌</text>`;});
+    h+=card(its[i],270+off,foc?1.14:1,op,false);
+  });
+  pinnedItems().forEach((pn,k)=>{h+=card(pn,270+(k===0?-PIN_OFF:PIN_OFF),1,f,true);});
   const m1=P(o(OUT1)+9,270),m2=P(o(OUT1)+17,270);
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round" opacity="${f}"/>`;
   h+=`<circle cx="${VW}" cy="${CY}" r="${HUB}" fill="url(#hb)" stroke="#39424F" stroke-width="1.5" opacity="${f}"/>`;
   h+=`<text x="${VW-HUB*.45}" y="${CY}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#C9D3DF" opacity="${f}">✕</text>`;
-  const fi=focusedItem();
-  if(fi){
-    const cp=P(o(OUT1)+26,270);
-    h+=`<g opacity="${f}"><rect x="${cp.x-150}" y="${cp.y-16}" width="150" height="32" rx="9" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
-    <text x="${cp.x-75}" y="${cp.y-3}" font-size="11.5" text-anchor="middle" fill="#DFE6EE" font-weight="600">${fi.label.slice(0,20)}</text>
-    <text x="${cp.x-75}" y="${cp.y+10}" font-size="8.5" text-anchor="middle" fill="#7D8794">${DIAL.mode==='glide'?(DIAL.glideZone==='Out'?'release to insert':DIAL.glideZone==='In'?'turning collections':'move finger out to pick a ring'):(fi.type==='doc'?'tap = attach to armed spot':fi.type==='img'?'tap = attach / copy':'tap = insert')}</text></g>`;
+  if(DIAL.mode==='glide'){                 // glide keeps its one-line mode hint; browse needs none —
+    const cp=P(o(OUT1)+24,270);            // the cards show their own content now
+    h+=`<g opacity="${f}"><rect x="${cp.x-128}" y="${cp.y-12}" width="128" height="24" rx="8" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
+    <text x="${cp.x-64}" y="${cp.y+1}" font-size="9.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">${DIAL.glideZone==='Out'?'release to insert':DIAL.glideZone==='In'?'turning collections':'slide out to pick a ring'}</text></g>`;
   }
   svg.innerHTML=h;
 }
