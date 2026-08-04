@@ -278,7 +278,7 @@ function togglePin(id){
   const it=find(id);
   if(it.pin){it.pin=0;toast('Unpinned');}
   else if(pinned().length>=st.pinCap){st.sheet=null;go('plan');toast('That is your third pin');return;}
-  else {it.pin=nextPin();toast('Pinned');}
+  else {it.pin=nextPin();it.auto=0;toast('Pinned — this one stays');}
   render();
 }
 function copy(id){const it=find(id);st.sheet=null;
@@ -297,13 +297,17 @@ function saveEdit(){
   const el=document.getElementById('ed'); const it=find(st.arg);
   const v=(el?el.value:'').trim();
   if(!it)return; if(!v){toast('Cannot be empty');return;}
-  it.v=v; it.code=isCode(v);
+  it.v=v; it.code=isCode(v); it.auto=0;   /* you touched it, so it stops ageing out */
   const t=isUrl(v)?'lnk':it.t;
   if((it.t==='txt'||it.t==='lnk')&&t!==it.t){it.t=t;toast('Moved to '+TYPE[t]);}
   else toast('Saved');
   go('type',it.t);
 }
 function edit(id){st.sheet=null;go('edit',id);}
+/* Keep and Pin are different jobs, and conflating them would have meant a free
+   user could permanently hold exactly two things. Keep = stop ageing out, free
+   and unlimited. Pin = occupy a dial slot, which is the scarce thing. */
+function keep(id){const it=find(id); if(!it)return; it.auto=0; render(); toast('Kept — it stays now');}
 
 /* ── clipboard: the same constraint the real app has ──
    No OS lets a background app watch the clipboard. It can only look when it
@@ -313,6 +317,22 @@ let lastClip='', watchTimer=null;
 st.watch=false; st.perm='unknown';
 function clearFresh(){setTimeout(()=>{ITEMS.forEach(i=>i.fresh=0);render()},2600);}
 
+/* ── the buffer ──
+   Automatic capture would otherwise fill the vault with every URL and stray
+   phrase you ever copied — Paste's passive river, the thing we positioned
+   against. So auto-captured things live in a capped buffer and the oldest fall
+   off the end. Pinning or editing something marks it deliberate and it stops
+   ageing out. Curation is a consequence of what you do, not a bucket to learn. */
+const AUTO_CAP=20;
+const autoItems=()=>ITEMS.filter(i=>i.auto&&!i.pin);
+function pruneAuto(){
+  const over=autoItems().slice(AUTO_CAP);
+  if(!over.length)return 0;
+  const gone=new Set(over.map(o=>o.id));
+  ITEMS=ITEMS.filter(i=>!gone.has(i.id));
+  return over.length;
+}
+
 async function grabClip(manual){
   try{
     const txt=await navigator.clipboard.readText();
@@ -321,9 +341,12 @@ async function grabClip(manual){
     if(txt===lastClip){ if(manual)toast('Already saved that one'); return false; }
     lastClip=txt;
     const v=txt.trim(), t=isUrl(v)?'lnk':'txt';
-    ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1});
+    ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1,auto:1});
+    const dropped=pruneAuto();
     if(st.view!=='edit'&&st.view!=='add'){st.tab='vault';st.view='vault';st.sheet=null;}
-    render(); toast('Copied — saved to '+TYPE[t]); clearFresh(); return true;
+    render();
+    toast(dropped?`Saved — oldest ${dropped===1?'one':dropped} dropped off`:'Copied — saved to '+TYPE[t]);
+    clearFresh(); return true;
   }catch(e){
     st.perm='blocked';
     if(manual)toast('Your browser blocked the clipboard');
@@ -377,10 +400,12 @@ vault:()=>`${sbar()}${tbar('',null,`<span class="tbtn" onclick="go('add')">${ic(
     <div class="catch${st.watch?' on':''}" onclick="toggleWatch()">
       <span class="g">${st.watch?ic('bolt',19):ic('copy',19)}</span>
       <span style="flex:1"><b>${st.watch?'Watching your clipboard':st.perm==='blocked'?'Clipboard is blocked':'Watch my clipboard'}</b>
-      <span class="s">${st.watch?'Copy anything — it appears here on its own'
+      <span class="s">${st.watch?`Keeping the last ${AUTO_CAP} · pin anything to keep it for good`
         :st.perm==='blocked'?'Your browser said no. Tap to try again.'
         :'Turn on and anything you copy saves itself'}</span></span>
-      ${st.watch?`<span class="live"></span>`:ic('next',17)}</div>
+      ${st.watch?`<span style="display:flex;align-items:center;gap:9px;flex:0 0 auto">
+        <span style="font-family:var(--mono);font-size:12px;color:var(--c-doc)">${autoItems().length}/${AUTO_CAP}</span>
+        <span class="live"></span></span>`:ic('next',17)}</div>
     ${pinned().length?`<div class="sect">Pinned</div>${pinned().map(card).join('')}`:''}
     ${(()=>{const recent=ITEMS.filter(i=>!i.pin).slice(0,3);
       return recent.length?`<div class="sect">${ITEMS.some(i=>i.fresh)?'Just arrived':'Recent'}</div>
@@ -558,6 +583,10 @@ function sheet(){
     <div class="act" style="background:var(--c-${c})" onclick="copy(${it.id})">${ic('copy',19)} Copy</div>
     ${it.sens?`<div style="display:flex;align-items:center;gap:9px;padding:14px 20px 2px;font-size:13px;color:var(--ink-3)">
       ${ic('time',16)} Leaves your clipboard after 60 seconds</div>`:''}
+    ${it.auto?`<div class="opt" onclick="keep(${it.id})">
+      <span style="color:var(--c-doc)">${ic('ok',19)}</span>
+      <span class="t" style="color:var(--c-doc)">Keep this</span>
+      <span class="v">stop it ageing out</span></div>`:''}
     ${it.t==='txt'||it.t==='lnk'?`<div class="opt" onclick="edit(${it.id})">
       <span style="color:var(--ink-2)">${ic('pencil',19)}</span><span class="t">Edit</span>${ic('next',16)}</div>`:''}
     <div class="opt" onclick="togglePin(${it.id})"><span style="color:var(--ink-2)">${ic('pin',19)}</span>
@@ -598,7 +627,7 @@ function renderKeepFocus(){
   if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
 }
 Object.assign(window,{go,tab,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
-  saveNew,saveEdit,edit,grabClip,toggleWatch,startWatch,stopWatch});
+  saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch});
 render();
 /* let the bounce finish, then never again this session */
 setTimeout(()=>{firstOpen=false},600);
