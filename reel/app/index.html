@@ -158,8 +158,14 @@ input.hunt{font-family:inherit;outline:none;border:none;color:var(--ink);width:c
   border:1.5px dashed var(--hair);background:transparent;transition:.2s var(--glide)}
 .md .catch{border-radius:24px} .ios .catch{border-radius:16px}
 .catch:active{transform:scale(.985)}
+.catch.on{border-style:solid;border-color:var(--c-doc);background:var(--t-doc)}
 .catch .g{width:38px;height:38px;border-radius:13px;background:var(--t-doc);color:var(--c-doc);
   display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.catch.on .g{background:var(--c-doc);color:var(--surf)}
+.catch.on b,.catch.on span.s{color:var(--c-doc)}
+.live{width:9px;height:9px;border-radius:50%;background:var(--c-doc);flex:0 0 auto;
+  animation:beat 1.6s ease-in-out infinite}
+@keyframes beat{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.82)}}
 .catch b{display:block;font-size:14.5px;font-weight:600}
 .catch span.s{font-size:12.5px;color:var(--ink-3)}
 textarea.ed{width:calc(100% - 32px);margin:0 16px;min-height:180px;padding:16px;font:inherit;
@@ -200,7 +206,7 @@ svg{display:block}
     <h1 class="pt">Reel</h1>
     <div class="ctrls"><div class="seg" id="platSeg"></div><div class="seg" id="themeSeg"></div></div>
   </div>
-  <p class="lede"><b>Copy anything, anywhere on your phone, then come back to this tab</b> — it lands in the vault by itself. (Same rule as the real app: an OS only lets you read the clipboard when you become active, which is why iOS asks.) Text and links are editable; the plus button writes straight in.</p>
+  <p class="lede">Tap <b>Watch my clipboard</b>, allow it once, then copy anything — it saves itself while this tab is open. It stops when you leave the tab, and that is not a shortcut: <b>no browser, and neither Android nor iOS, lets a background app read your clipboard.</b> Automatic capture on a real phone means being your keyboard.</p>
 </header>
 
 <div class="stage"><div class="phone"><div class="scr" id="scr"></div></div></div>
@@ -303,24 +309,48 @@ function edit(id){st.sheet=null;go('edit',id);}
    No OS lets a background app watch the clipboard. It can only look when it
    becomes active — which is exactly why iOS shows "Allow Paste". So: we try on
    focus, and offer a tap when the browser withholds permission. */
-let lastClip='';
+let lastClip='', watchTimer=null;
+st.watch=false; st.perm='unknown';
 function clearFresh(){setTimeout(()=>{ITEMS.forEach(i=>i.fresh=0);render()},2600);}
+
 async function grabClip(manual){
   try{
     const txt=await navigator.clipboard.readText();
-    if(!txt||!txt.trim()){ if(manual)toast('Your clipboard is empty'); return; }
-    if(txt===lastClip){ if(manual)toast('Already saved that one'); return; }
+    st.perm='granted';
+    if(!txt||!txt.trim()){ if(manual)toast('Your clipboard is empty'); return false; }
+    if(txt===lastClip){ if(manual)toast('Already saved that one'); return false; }
     lastClip=txt;
     const v=txt.trim(), t=isUrl(v)?'lnk':'txt';
     ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1});
-    st.tab='vault';st.view='vault';st.sheet=null;
-    render(); toast('Just copied — saved to '+TYPE[t]); clearFresh();
+    if(st.view!=='edit'&&st.view!=='add'){st.tab='vault';st.view='vault';st.sheet=null;}
+    render(); toast('Copied — saved to '+TYPE[t]); clearFresh(); return true;
   }catch(e){
+    st.perm='blocked';
     if(manual)toast('Your browser blocked the clipboard');
+    return false;
   }
 }
-addEventListener('focus',()=>grabClip(false));
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)grabClip(false)});
+
+/* Automatic watching. On the web this is the closest thing available: once the
+   browser grants clipboard-read, we can poll while the tab is open and focused.
+   It stops the moment you leave the tab — the browser will not let a background
+   page read your clipboard, and neither will Android or iOS. */
+async function startWatch(){
+  const ok=await grabClip(true);
+  if(st.perm==='blocked'){render();return;}
+  st.watch=true;
+  clearInterval(watchTimer);
+  watchTimer=setInterval(()=>{if(!document.hidden&&document.hasFocus())grabClip(false)},1200);
+  render(); if(!ok)toast('Watching — copy something and it appears here');
+}
+function stopWatch(){st.watch=false;clearInterval(watchTimer);watchTimer=null;render();toast('Stopped watching');}
+function toggleWatch(){st.watch?stopWatch():startWatch();}
+
+addEventListener('focus',()=>{if(st.watch)grabClip(false)});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&st.watch)grabClip(false)});
+navigator.permissions?.query({name:'clipboard-read'}).then(p=>{
+  st.perm=p.state; if(p.state==='granted'&&!st.watch)startWatch(); else render();
+}).catch(()=>{});
 
 /* ── chrome ── */
 const sbar=()=>`<div class="sbar"><span>9:41</span><span>5G</span></div>`;
@@ -344,11 +374,13 @@ vault:()=>`${sbar()}${tbar('',null,`<span class="tbtn" onclick="go('add')">${ic(
     <div><h1 class="big" style="font-size:34px">Everything<br>you reuse</h1>
       <div class="sub">${ITEMS.length} things · ${pinned().length} pinned</div></div>
     <div class="hunt" onclick="tab('find')">${ic('find',20)} Search everything</div>
-    <div class="catch" onclick="grabClip(true)">
-      <span class="g">${ic('copy',19)}</span>
-      <span style="flex:1"><b>Copied something?</b>
-      <span class="s">Tap to bring it in — or just switch back to this tab</span></span>
-      ${ic('next',17)}</div>
+    <div class="catch${st.watch?' on':''}" onclick="toggleWatch()">
+      <span class="g">${st.watch?ic('bolt',19):ic('copy',19)}</span>
+      <span style="flex:1"><b>${st.watch?'Watching your clipboard':st.perm==='blocked'?'Clipboard is blocked':'Watch my clipboard'}</b>
+      <span class="s">${st.watch?'Copy anything — it appears here on its own'
+        :st.perm==='blocked'?'Your browser said no. Tap to try again.'
+        :'Turn on and anything you copy saves itself'}</span></span>
+      ${st.watch?`<span class="live"></span>`:ic('next',17)}</div>
     ${pinned().length?`<div class="sect">Pinned</div>${pinned().map(card).join('')}`:''}
     ${(()=>{const recent=ITEMS.filter(i=>!i.pin).slice(0,3);
       return recent.length?`<div class="sect">${ITEMS.some(i=>i.fresh)?'Just arrived':'Recent'}</div>
@@ -566,7 +598,7 @@ function renderKeepFocus(){
   if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
 }
 Object.assign(window,{go,tab,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
-  saveNew,saveEdit,edit,grabClip});
+  saveNew,saveEdit,edit,grabClip,toggleWatch,startWatch,stopWatch});
 render();
 /* let the bounce finish, then never again this session */
 setTimeout(()=>{firstOpen=false},600);
