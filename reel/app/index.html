@@ -28,14 +28,14 @@
   --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
   --spring:cubic-bezier(.34,1.56,.5,1); --glide:cubic-bezier(.2,.85,.3,1);
 }
-/* ── dark: OLED ground, emissive hue ── */
+/* ── dark: same structure as light, tinted surfaces. Palette tuned, not rebuilt. ── */
 .dark{
-  --ground:#000; --surf:#101114; --ink:#F2F3F5; --ink-2:#9AA1AB; --ink-3:#6B727C; --hair:#22242A;
-  --c-txt:#FFC14D; --t-txt:#000;
-  --c-img:#C79BFF; --t-img:#000;
-  --c-doc:#6FB4FF; --t-doc:#000;
-  --c-lnk:#FF8A66; --t-lnk:#000;
-  --shadow-s:none; --shadow-m:0 16px 40px rgba(0,0,0,.7);
+  --ground:#0E1013; --surf:#181B20; --ink:#F0F1F3; --ink-2:#A2A9B3; --ink-3:#767D87; --hair:#272B31;
+  --c-txt:#EDBA63; --t-txt:#322611;   /* warmer gold */
+  --c-img:#AE90E8; --t-img:#261D3E;   /* cooler violet */
+  --c-doc:#6FB0E8; --t-doc:#10263D;   /* deeper blue */
+  --c-lnk:#E68A6E; --t-lnk:#38201A;   /* softer coral */
+  --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
@@ -109,13 +109,6 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .card .meta{display:flex;align-items:center;gap:8px;margin-top:11px;font-size:11.5px}
 .card .tagl{padding:3px 9px;border-radius:99px;font-size:10.5px;font-weight:600}
 .card .when{color:var(--ink-3)}
-/* emissive edge — dark only */
-.dark .card[data-c]::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px}
-.dark .card[data-c=txt]::before{background:var(--c-txt);box-shadow:0 0 14px 1px var(--c-txt)}
-.dark .card[data-c=img]::before{background:var(--c-img);box-shadow:0 0 14px 1px var(--c-img)}
-.dark .card[data-c=doc]::before{background:var(--c-doc);box-shadow:0 0 14px 1px var(--c-doc)}
-.dark .card[data-c=lnk]::before{background:var(--c-lnk);box-shadow:0 0 14px 1px var(--c-lnk)}
-.dark .card .tagl{background:transparent;border:1px solid currentColor;opacity:.85}
 .pin{position:absolute;top:11px;right:11px;width:22px;height:22px;border-radius:50%;
   display:flex;align-items:center;justify-content:center}
 
@@ -128,10 +121,6 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .tile .glyph{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:11px}
 .tile .n{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.03em;margin-top:auto}
 .tile .c{font-size:12px;font-weight:500;opacity:.72;margin-top:2px}
-.dark .tile{background:var(--surf)!important;border:1px solid var(--hair)}
-.dark .tile .glyph{background:transparent!important;border:1px solid currentColor}
-.dark .tile::after{content:"";position:absolute;inset:auto 0 0 0;height:2px;background:currentColor;
-  opacity:.9;filter:blur(.3px);box-shadow:0 0 16px 1px currentColor}
 
 /* ── nav ── */
 .md .nav{position:absolute;left:12px;right:12px;bottom:14px;height:66px;background:var(--surf);
@@ -200,7 +189,7 @@ svg{display:block}
     <h1 class="pt">Reel</h1>
     <div class="ctrls"><div class="seg" id="platSeg"></div><div class="seg" id="themeSeg"></div></div>
   </div>
-  <p class="lede">Three fixes: the <b>plus button is gone</b> — manual typing is the rarest way things get in here, so it no longer owns the loudest spot. <b>"Snippets" is gone</b> — collections are now just the four types. And <b>dark mode has its own physics</b>: colour stops being paint and starts being light.</p>
+  <p class="lede">The <b>plus button is gone</b> — manual typing is the rarest way things get in here, so it no longer owns the loudest spot on screen. <b>"Snippets" is gone</b> — collections are just the four types now, and keeping something means pinning it. Dark keeps the tinted surfaces, with the palette retuned.</p>
 </header>
 
 <nav class="rail" id="rail"></nav>
@@ -245,9 +234,9 @@ const dark=()=>THEME==='dark';
 
 function card(it){
   const [val,c,tag,when,pin,code]=it;
-  const tagStyle=dark()?`color:var(--c-${c})`:`background:var(--t-${c});color:var(--c-${c})`;
+  const tagStyle=`background:var(--t-${c});color:var(--c-${c})`;
   return `<div class="card" data-c="${c}">
-    ${pin?`<span class="pin" style="${dark()?`color:var(--c-${c})`:`background:var(--t-${c});color:var(--c-${c})`}">${ic('pin',13,2)}</span>`:''}
+    ${pin?`<span class="pin" style="${tagStyle}">${ic('pin',13,2)}</span>`:''}
     <div class="in"><div class="val${code?' code':''}">${val.replace(/\n/g,'<br>')}</div>
       <div class="meta"><span class="tagl" style="${tagStyle}">${tag}</span>
       <span class="when">${when}</span></div></div></div>`;
@@ -271,8 +260,8 @@ vault:{n:'Vault',c:'No floating plus. Search is the biggest thing on screen, bec
    ${ITEMS.filter(i=>i[4]).map(card).join('')}
    <div class="sect">By type</div>
    <div class="tiles">
-     ${TYPES.map(t=>`<div class="tile" style="${dark()?`color:var(--c-${t[0]})`:`background:var(--t-${t[0]});color:var(--c-${t[0]})`}">
-       <span class="glyph" style="${dark()?'':`background:color-mix(in srgb,var(--c-${t[0]}) 16%,transparent)`}">${ic(t[0],19)}</span>
+     ${TYPES.map(t=>`<div class="tile" style="background:var(--t-${t[0]});color:var(--c-${t[0]})">
+       <span class="glyph" style="background:color-mix(in srgb,var(--c-${t[0]}) 18%,transparent)">${ic(t[0],19)}</span>
        <span class="n">${t[1]}</span><span class="c">${t[2]}</span></div>`).join('')}
    </div>
  </div>${nav(0)}`},
@@ -295,11 +284,11 @@ item:{n:'Item',c:'One weighted action in the type colour. Sensitive things state
   <div class="sheet"><div class="grip"></div>
    <div style="padding:2px 20px 16px">
      <div style="display:flex;gap:8px;align-items:center;margin-bottom:13px">
-       <span class="tagl" style="${dark()?'color:var(--c-txt);border:1px solid currentColor':'background:var(--t-txt);color:var(--c-txt)'};padding:4px 11px;border-radius:99px;font-size:11.5px;font-weight:600">Text</span>
+       <span class="tagl" style="background:var(--t-txt);color:var(--c-txt);padding:4px 11px;border-radius:99px;font-size:11.5px;font-weight:600">Text</span>
        <span style="font-size:12.5px;color:var(--ink-3)">used 4 times</span></div>
      <div style="font-family:var(--mono);font-size:19px;line-height:1.5;letter-spacing:-.02em">DE89 3704 0044<br>0532 0130 00</div>
    </div>
-   <div class="act" style="background:var(--c-txt);color:${dark()?'#1A1206':'#fff'}">${ic('copy',19)} Copy</div>
+   <div class="act" style="background:var(--c-txt);color:#1A1206">${ic('copy',19)} Copy</div>
    <div style="display:flex;align-items:center;gap:9px;padding:14px 20px 4px;font-size:13px;color:var(--ink-3)">
      ${ic('time',16)} Leaves your clipboard after 60 seconds</div>
    <div class="opt"><span style="color:var(--ink-2)">${ic('pin',19)}</span><span class="t">Pin it</span><span class="v">slot 3</span></div>
@@ -316,17 +305,17 @@ reach:{n:'Reach',c:'How things get in and out without opening this. Capture live
       ['doc','Files','attach without leaving mail','img']]
      .map(r=>`<div class="card" data-c="${r[3]}"><div class="in" style="display:flex;align-items:center;gap:13px;padding:13px 15px">
        <span style="width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;
-         ${dark()?`color:var(--c-${r[3]});border:1px solid currentColor`:`background:var(--t-${r[3]});color:var(--c-${r[3]})`}">${ic(r[0],19)}</span>
+         background:var(--t-${r[3]});color:var(--c-${r[3]})">${ic(r[0],19)}</span>
        <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">${r[1]}</b>
        <span style="font-size:12.5px;color:var(--ink-3)">${r[2]}</span></span>
        <span style="color:var(--c-doc)">${ic('ok',19,2.2)}</span></div></div>`).join('')}
    <div class="sect">Set up one thing</div>
-   <div class="card" data-c="lnk" style="${dark()?'':'background:var(--t-lnk)'}">
+   <div class="card" data-c="lnk" style="background:var(--t-lnk)">
      <div class="in" style="padding:17px">
        <div style="font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.03em;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Edge dial'}</div>
-       <div style="font-size:14px;line-height:1.5;margin-top:6px;color:${dark()?'var(--ink-2)':'var(--c-lnk)'}">
+       <div style="font-size:14px;line-height:1.5;margin-top:6px;color:var(--c-lnk);opacity:.85">
          ${PLAT==='ios'?'Double-tap the back of your phone. Your last thing lands on the clipboard.':'Swipe in from the edge, turn, let go. It inserts where you were typing.'}</div>
-       <div style="margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:var(--c-lnk);color:${dark()?'#1A0B06':'#fff'};padding:10px 18px;border-radius:99px;font-size:14px;font-weight:600">
+       <div style="margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:var(--c-lnk);color:#1A0B06;padding:10px 18px;border-radius:99px;font-size:14px;font-weight:600">
          Set it up ${ic('next',15,2.2)}</div></div></div>
  </div>${nav(2)}`},
 
@@ -337,10 +326,10 @@ you:{n:'You',c:'Room shown as gauges, never hidden. In dark the bars are the onl
    <div class="sect">Room left</div>
    <div class="gauge"><div class="row"><span style="font-size:13.5px;font-weight:500;color:var(--ink-2)">Pinned things</span>
      <span class="num" style="color:var(--c-lnk)">2<i>/2</i></span></div>
-     <div class="track"><i style="width:100%;background:var(--c-lnk);${dark()?'box-shadow:0 0 12px var(--c-lnk)':''}"></i></div></div>
+     <div class="track"><i style="width:100%;background:var(--c-lnk)"></i></div></div>
    <div class="gauge"><div class="row"><span style="font-size:13.5px;font-weight:500;color:var(--ink-2)">Files and images</span>
      <span class="num" style="color:var(--c-doc)">5<i>/20</i></span></div>
-     <div class="track"><i style="width:25%;background:var(--c-doc);${dark()?'box-shadow:0 0 12px var(--c-doc)':''}"></i></div></div>
+     <div class="track"><i style="width:25%;background:var(--c-doc)"></i></div></div>
    <div class="act" style="background:var(--ink);color:var(--ground);margin-top:4px">Remove the limits</div>
    <div style="text-align:center;font-size:12.5px;color:var(--ink-3);padding:11px 20px 0">one payment, no subscription</div>
  </div>${nav(2)}`},
@@ -364,8 +353,8 @@ function render(){
     <p>It did the rarest thing in the product — typing something in by hand — from the most prominent spot on screen. Capture happens in the <b>share sheet</b>, the <b>clipboard</b>, the <b>dial</b>. Manual entry is now a quiet toolbar button, and <b>search</b> got the weight instead.</p>
     <h3>Why "Snippets" went</h3>
     <p>Two buckets both holding text, with an invisible difference. Collections are now the four types the database already has: <b>Text, Images, Docs, Links</b>. Keeping something means <b>pinning</b> it — no jargon, no second bucket.</p>
-    <h3>Dark isn't inverted</h3>
-    <p>Tinted fills that read as soft paint in light turn to mud on black. So in dark the hue stops being <b>paint</b> and becomes <b>light</b>: near-black cards, a luminous edge, and the colour carried by glowing text. Same system, different physics.</p>`;
+    <h3>Dark, retuned</h3>
+    <p>Same structure as light — tinted surfaces, ink on tint — with the palette shifted: <b>warmer gold</b>, a <b>cooler violet</b>, a <b>deeper blue</b> and a <b>softer coral</b>, on a slightly warmer ground.</p>`;
 }
 const rail=document.getElementById('rail');
 rail.innerHTML=ORDER.map(k=>`<button data-k="${k}">${S[k].n}</button>`).join('');
