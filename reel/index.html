@@ -213,7 +213,8 @@
       <table>
         <tr><td>Tap the round button</td><td>Opens and stays. Spin a ring — it steps one item at a time and settles; the item at the <b style="color:#FF4D4D">red mark</b> is selected. Tap it to insert into the box you last touched.</td></tr>
         <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button, then slide <b>out</b>: a little reaches the <b>inner</b> ring (collections), further reaches the <b>outer</b> ring (items). Arc your finger to spin whichever you're on — the lit ring is the one you're holding. Release on the outer ring to insert and put it away.</td></tr>
-        <tr><td>Double-tap the handle</td><td>Pastes your most recent item instantly. No dial.</td></tr>
+        <tr><td>Double-tap the button</td><td>Pastes your most recent item instantly. No dial.</td></tr>
+        <tr><td>Pins &amp; slow-cycle</td><td>The two <b>edge slots are pinned</b> 📌 — same place forever, tap to use. Hold a finger on any off-center item and the ring <b>cycles slowly</b> on its own until you let go.</td></tr>
       </table>
       <p class="muted" style="margin:8px 0 0">Inner ring = collections. Outer ring = what's inside. The rings step and settle — no half-turns. Sound on 🔊 for the clicks.</p>
     </div>
@@ -239,6 +240,20 @@
         <div class="bub">Strong application, Alex! Can you send your LinkedIn and a couple of times to talk this week?</div>
       </div>
       <label>Reply</label><input type="text" placeholder="Links has both of those…">
+    </div>
+
+    <div class="task">
+      <div class="co"><div class="logo" style="background:#3E7C4F">W</div>
+        <div><b>Guests at the door</b><small>via text</small></div></div>
+      <div class="chatlog"><div class="bub">we're outside!! what's the wifi 😅</div></div>
+      <label>Reply</label><input type="text" placeholder="Clipboard → Wifi password">
+    </div>
+
+    <div class="task">
+      <div class="co"><div class="logo" style="background:#8A5A2B">B</div>
+        <div><b>Split the deposit</b><small>bank transfer form</small></div></div>
+      <label>Recipient IBAN</label><input type="text" placeholder="Clipboard → IBAN (watch the toast)">
+      <label>Reference</label><input type="text" placeholder="e.g. Maple Grove deposit">
     </div>
 
     <div class="task">
@@ -274,6 +289,13 @@
       </div>
       <label>Reply</label><input type="text" placeholder="Two items, one keyboard…">
       <p class="muted" style="margin:10px 0 0"><button class="filebtn" id="addfile2" style="background:var(--card);color:var(--accent);border:1.5px solid var(--accent)">📎 Add your own file</button></p>
+    </div>
+
+    <div class="task">
+      <div class="co"><div class="logo" style="background:#5A4FB3">S</div>
+        <div><b>Set up the call</b><small>Riya · scheduling</small></div></div>
+      <div class="chatlog"><div class="bub">what times work for you this week?</div></div>
+      <label>Reply</label><input type="text" placeholder="Snippets → Availability (or search 'ava')">
     </div>
   </section>
 
@@ -313,15 +335,18 @@
 /* ================= vault ================= */
 const COLS=[['Clipboard','📋'],['Snippets','✂️'],['Docs','📄'],['Images','🖼️'],['Links','🔗']];
 const SEED=[
+ ['txt','🔑','Wifi password','PineTree-Guest / autumn2026!','Clipboard'],
  ['txt','📧','Email','alex.rivera@example.com','Clipboard'],
  ['txt','📱','Phone','+1 (614) 555-0164','Clipboard'],
  ['txt','🏠','Address','482 Maple Grove Ave, Apt 3B, Columbus OH 43210','Clipboard'],
+ ['txt','💳','IBAN','DE89 3704 0044 0532 0130 00','Clipboard'],
  ['txt','👤','Full name','Alex Rivera','Snippets'],
  ['txt','🎯','Why-us opener','I’ve followed Northbeam’s design work for two years — the way your team ships small and polishes hard is exactly how I want to learn to build. My portfolio has three projects in that spirit.','Snippets'],
  ['txt','📮','Follow-up','Just floating this back to the top of your inbox — any thoughts when you get a sec?','Snippets'],
  ['txt','✍️','Signature','Best,\nAlex Rivera','Snippets'],
  ['txt','👥','References','Dana Okafor — Design Lead, Brightline · dana@brightline.example\nSam Chen — PM, Fielder & Co · sam@fielder.example','Snippets'],
  ['txt','📝','Interview thanks','Thanks for the great conversation, ___ — I left even more excited about the role. Anything else you need is one message away.','Snippets'],
+ ['txt','🗓️','Availability','Tue 2–4pm or Thu morning works for me — or grab any slot: https://cal.example.com/alex/15min','Snippets'],
  ['doc','📑','Resume.pdf','','Docs'],
  ['doc','📃','Cover-letter.pdf','','Docs'],
  ['doc','🎓','Transcript.pdf','','Docs'],
@@ -331,7 +356,7 @@ const SEED=[
  ['url','💼','LinkedIn','https://linkedin.example.com/in/alexrivera','Links'],
  ['url','📅','Calendly','https://cal.example.com/alex/15min','Links'],
 ];
-const KEY='reel.vault.v4';   // v4: adds the template snippet; carries user items over from v3
+const KEY='reel.vault.v5';   // v5: pins (Signature, Email), sensitive IBAN, wifi + availability seeds
 /* Double-encoded UTF-8 fingerprints. Every emoji in U+1F300-1F6FF starts with the
    bytes F0 9F, which mangle to "ðŸ" — so that pair alone catches corrupted emoji,
    without false-positiving on legitimate accented text a tester might save. */
@@ -344,14 +369,20 @@ function load(){
     else{const j=JSON.parse(raw);if(Array.isArray(j)&&j.length)return j;}
   }catch(_){}
   let carried=[];
-  try{const old=JSON.parse(localStorage.getItem('reel.vault.v3'));
-    if(Array.isArray(old))carried=old.filter(i=>i&&i.source&&i.source!=='seed'&&!MOJIBAKE.test(JSON.stringify(i)));
-  }catch(_){}
-  for(const stale of ['reel.vault.v1','reel.vault.v2','reel.vault.v3'])
+  for(const oldKey of ['reel.vault.v4','reel.vault.v3']){
+    try{const old=JSON.parse(localStorage.getItem(oldKey));
+      if(Array.isArray(old)&&!carried.length)
+        carried=old.filter(i=>i&&i.source&&i.source!=='seed'&&!MOJIBAKE.test(JSON.stringify(i)));
+    }catch(_){}
+  }
+  for(const stale of ['reel.vault.v1','reel.vault.v2','reel.vault.v3','reel.vault.v4'])
     { try{localStorage.removeItem(stale)}catch(_){} }
   const now=Date.now();
   const v=SEED.map((s,i)=>({id:'s'+i,type:s[0],icon:s[1],label:s[2],content:s[3],col:s[4],
-    use_count:0,last_used_at:0,captured_at:now-i*60000,source:'seed'}));
+    use_count:0,last_used_at:0,captured_at:now-i*60000,source:'seed',pin_order:null,is_sensitive:0}));
+  (v.find(i=>i.label==='Signature')||{}).pin_order=1;
+  (v.find(i=>i.label==='Email')||{}).pin_order=2;
+  (v.find(i=>i.label==='IBAN')||{}).is_sensitive=1;
   v.push(...carried);
   save(v);return v;
 }
@@ -431,7 +462,8 @@ function useItem(it){
     if(kb.classList.contains('up')&&(it.content||'').includes('___')){enterFill(it);return true;}
     if(T.field&&visibleSection().contains(T.field)){
       insertAtCursor(T.field,it.content||it.label);touch(it);
-      toast(`Inserted · ${it.label}`);tick();setTimeout(tick,70);return true;
+      toast(it.is_sensitive?`${it.label} inserted — auto-clears from clipboard in 60s`:`Inserted · ${it.label}`);
+      tick();setTimeout(tick,70);return true;
     }
     pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');
     toast('Tap a text box first, then summon');return false;
@@ -634,11 +666,12 @@ function refreshKb(){
   const cats=document.getElementById('kbcats');
   cats.innerHTML=COLS.map((c,i)=>`<div class="cat ${i===KB.cat?'on':''}" role="button" aria-label="${c[0]}">${c[1]}</div>`).join('');
   [...cats.children].forEach((el,i)=>el.onclick=()=>{KB.cat=i;refreshKb();});
-  const items=byCol(COLS[KB.cat][0]);
+  const items=byCol(COLS[KB.cat][0])
+    .sort((a,b)=>((b.pin_order!=null)-(a.pin_order!=null)));   // pins first, recency preserved after
   const grid=document.getElementById('kbgrid');
   grid.innerHTML=items.length?items.map(i=>{
     const b=i.type==='doc'?'file':i.type==='img'?'image':(i.content||'').includes('___')?'fill-in':'';
-    return `<div class="it" role="button"><span>${i.icon}</span><span class="tx">${i.label}</span>${b?`<span class="b">${b}</span>`:''}</div>`;
+    return `<div class="it" role="button"><span>${i.pin_order!=null?'📌':i.icon}</span><span class="tx">${i.label}</span>${b?`<span class="b">${b}</span>`:''}</div>`;
   }).join(''):`<div style="grid-column:1/-1;color:#6d7783;font-size:12.5px;padding:14px;text-align:center">Nothing here yet</div>`;
   [...grid.children].forEach((el,idx)=>{if(items[idx])el.onclick=()=>useItem(items[idx]);});
   const tr=document.getElementById('ktyperows');
@@ -704,7 +737,12 @@ function slots(list,s,step,win){
     if(Math.abs(off)<=win+step*.7)out.push({i,off});}
   return out.sort((a,b)=>a.off-b.off);
 }
-function dialItems(){return byCol(COLS[DIAL.cat][0])}
+/* pins live at the arc's edge extremes — fixed positions, global across collections */
+const PIN_OFF=64, WIN_ROT=38;
+function pinnedItems(){return vault.filter(i=>i.pin_order!=null&&!i.deleted_at)
+  .sort((a,b)=>a.pin_order-b.pin_order).slice(0,2)}
+function dialItems(){const pins=new Set(pinnedItems().map(p=>p.id));
+  return byCol(COLS[DIAL.cat][0]).filter(i=>!pins.has(i.id))}
 function focusedItem(){const its=dialItems();return its.length?its[mod(Math.round(DIAL.sOut),its.length)]:null}
 
 function drawDial(){
@@ -751,10 +789,16 @@ function drawDial(){
     const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_IN+10)/18))*f;
     h+=`<text x="${p.x}" y="${p.y}" font-size="${foc?22:17}" text-anchor="middle" dominant-baseline="central" opacity="${op}">${COLS[i][1]}</text>`;});
   const its=dialItems();
-  slots(its,DIAL.sOut,STEP_OUT,WIN_OUT).forEach(({i,off})=>{
+  slots(its,DIAL.sOut,STEP_OUT,WIN_ROT).forEach(({i,off})=>{
     const p=P(o((OUT0+OUT1)/2),270+off),foc=Math.abs(off)<STEP_OUT*.45;
-    const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_OUT+10)/16))*f;
+    const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_ROT+8)/14))*f;
     h+=`<text x="${p.x}" y="${p.y}" font-size="${foc?19:15}" text-anchor="middle" dominant-baseline="central" opacity="${op}">${its[i].icon}</text>`;});
+  pinnedItems().forEach((pn,k)=>{                       // fixed slots at ±PIN_OFF — never rotate
+    const a=270+(k===0?-PIN_OFF:PIN_OFF);
+    h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,a-13,a+13)}" fill="#2FB9A9" opacity="${.09*f}" stroke="#2FB9A9" stroke-opacity="${.5*f}" stroke-width="1"/>`;
+    const p=P(o((OUT0+OUT1)/2),a);
+    h+=`<text x="${p.x}" y="${p.y-5}" font-size="16" text-anchor="middle" dominant-baseline="central" opacity="${f}">${pn.icon}</text>`;
+    h+=`<text x="${p.x}" y="${p.y+11}" font-size="8" text-anchor="middle" dominant-baseline="central" opacity="${.85*f}">📌</text>`;});
   const m1=P(o(OUT1)+9,270),m2=P(o(OUT1)+17,270);
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round" opacity="${f}"/>`;
   h+=`<circle cx="${VW}" cy="${CY}" r="${HUB}" fill="url(#hb)" stroke="#39424F" stroke-width="1.5" opacity="${f}"/>`;
@@ -801,6 +845,18 @@ addEventListener('pointerdown',e=>{
   if(D.openT===0&&!onHandle)return;
   PTR=e.pointerId;D.moved=0;D.downT=Date.now();D.lastA=ang(e.clientX,e.clientY);
   D.glideY=e.clientY;D.downBand=band(d);
+  /* hold on an off-center rotating slot ⇒ slow auto-cycle toward that side */
+  if(D.openT>0&&D.downBand){
+    const rel=wrapDeg(ang(e.clientX,e.clientY)-270),ar=Math.abs(rel);
+    const zone=(D.downBand==='Out'&&ar>=12&&ar<=48)||(D.downBand==='In'&&ar>=15&&ar<=58);
+    if(zone){
+      D.cycT=setTimeout(()=>{D.cycOn=true;
+        const ring=D.downBand,dir=Math.sign(rel);
+        const step=()=>{D['t'+ring]+=dir;D['raw'+ring]=D['t'+ring];};
+        step();D.cycInt=setInterval(step,480);
+      },350);
+    }
+  }
   if(onHandle){
     clearTimeout(D.holdTimer);
     D.holdTimer=setTimeout(()=>{
@@ -837,6 +893,8 @@ addEventListener('pointermove',e=>{
   if(D.holdTimer&&D.moved+Math.abs(e.movementX||0)+Math.abs(e.movementY||0)>12){
     clearTimeout(D.holdTimer);D.holdTimer=null;
   }
+  if(D.moved>6){clearTimeout(D.cycT);D.cycT=null;
+    if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}}
   if(!D.grab)return;
   const a=ang(e.clientX,e.clientY),delta=wrapDeg(a-D.lastA);D.lastA=a;
   D.moved+=Math.abs(delta);
@@ -847,6 +905,11 @@ addEventListener('pointermove',e=>{
 addEventListener('pointerup',e=>{
   const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;PTR=null;
   clearTimeout(D.holdTimer);D.holdTimer=null;
+  clearTimeout(D.cycT);D.cycT=null;
+  if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}
+  if(D.cycOn){D.cycOn=false;                     // a cycle-hold is not a tap
+    if(D.grab){settle(D.grab);D.grab=null;}
+    D.downBand=null;return;}
   if(D.mode==='glide'){
     const z=D.glideZone;
     D.mode='closed';D.glideZone=null;glidechip.style.display='none';
@@ -870,8 +933,13 @@ addEventListener('pointerup',e=>{
   if(d<=HUB+8){D.openT=0;return;}
   if(d>OUT1+24){D.openT=0;return;}
   const rel=wrapDeg(a-270),hit=band(d);
+  if(hit==='Out'&&Math.abs(Math.abs(rel)-PIN_OFF)<13){   // pinned slot: use immediately
+    const pn=pinnedItems()[rel>0?1:0];
+    if(pn){const okd=useItem(pn);if(okd)D.openT=0;}
+    D.downBand=null;return;
+  }
   if(hit&&hit===D.downBand){
-    const step=hit==='In'?STEP_IN:STEP_OUT,win=hit==='In'?WIN_IN:WIN_OUT;
+    const step=hit==='In'?STEP_IN:STEP_OUT,win=hit==='In'?WIN_IN:WIN_ROT;
     const dd=rel/step;
     if(Math.abs(rel)<=win+step*.6){
       if(hit==='Out'&&Math.abs(dd)<.45){
@@ -892,6 +960,8 @@ addEventListener('wheel',e=>{                          // desktop: one notch = o
 addEventListener('pointercancel',e=>{
   const D=DIAL;if(e.pointerId!==PTR)return;
   PTR=null;clearTimeout(D.holdTimer);D.holdTimer=null;
+  clearTimeout(D.cycT);D.cycT=null;D.cycOn=false;
+  if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}
   if(D.mode==='glide'){D.mode='closed';D.glideZone=null;glidechip.style.display='none';D.openT=0;}
   if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
 });
