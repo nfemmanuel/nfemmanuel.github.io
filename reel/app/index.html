@@ -3,45 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Reel — four types, no jargon</title>
+<title>Reel — working prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════════════════════════════════════════════════
-   LIGHT: colour is PAINT — soft tinted fills, ink on tint.
-   DARK : colour is LIGHT — near-black cards, hue emitted as
-          glowing text and a luminous edge. Not an inversion;
-          a different physics for a different ground.
-   Android → Material 3 Expressive · iOS → Liquid Glass
-   ══════════════════════════════════════════════════════════════ */
 :root{
   --ground:#F6F6F7; --surf:#FFF; --ink:#14161A; --ink-2:#5C636D; --ink-3:#8B929C; --hair:#E7E8EB;
-  --c-txt:#B4761C;  --t-txt:#FBF2E2;   /* Text   */
-  --c-img:#7B55B4;  --t-img:#F0EAF9;   /* Images */
-  --c-doc:#356BA6;  --t-doc:#E6EFF8;   /* Docs   */
-  --c-lnk:#BA5138;  --t-lnk:#FAEAE5;   /* Links  */
-  --edge:0 0 0 0 transparent;
+  --c-txt:#B4761C;  --t-txt:#FBF2E2;
+  --c-img:#7B55B4;  --t-img:#F0EAF9;
+  --c-doc:#356BA6;  --t-doc:#E6EFF8;
+  --c-lnk:#BA5138;  --t-lnk:#FAEAE5;
   --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
   --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
   --display:"Bricolage Grotesque",system-ui,sans-serif;
   --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
   --spring:cubic-bezier(.34,1.56,.5,1); --glide:cubic-bezier(.2,.85,.3,1);
 }
-/* ── dark: same structure as light, tinted surfaces. Palette tuned, not rebuilt. ── */
 .dark{
   --ground:#0E1013; --surf:#181B20; --ink:#F0F1F3; --ink-2:#A2A9B3; --ink-3:#767D87; --hair:#272B31;
-  --c-txt:#EDBA63; --t-txt:#322611;   /* warmer gold */
-  --c-img:#AE90E8; --t-img:#261D3E;   /* cooler violet */
-  --c-doc:#6FB0E8; --t-doc:#10263D;   /* deeper blue */
-  --c-lnk:#E68A6E; --t-lnk:#38201A;   /* softer coral */
+  --c-txt:#EDBA63; --t-txt:#322611;
+  --c-img:#AE90E8; --t-img:#261D3E;
+  --c-doc:#6FB0E8; --t-doc:#10263D;
+  --c-lnk:#E68A6E; --t-lnk:#38201A;
   --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--ui);
   display:flex;flex-direction:column;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-
 header{padding:14px 16px 0;flex:0 0 auto}
 .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-.035em;margin:0}
@@ -52,26 +42,21 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:500;
   color:var(--ink-3);padding:6px 13px;border-radius:99px;cursor:pointer;transition:.2s var(--glide)}
 .seg button[data-on="1"]{background:var(--ink);color:var(--ground)}
-.rail{display:flex;gap:6px;overflow-x:auto;padding:12px 16px;scrollbar-width:none;flex:0 0 auto}
-.rail::-webkit-scrollbar{display:none}
-.rail button{appearance:none;border:1px solid var(--hair);background:var(--surf);font:inherit;font-size:12.5px;
-  font-weight:500;color:var(--ink-2);padding:7px 14px;border-radius:99px;cursor:pointer;white-space:nowrap;
-  flex:0 0 auto;transition:.22s var(--spring)}
-.rail button[data-on="1"]{background:var(--ink);color:var(--ground);border-color:var(--ink);transform:scale(1.04)}
-.cap{font-size:12.5px;color:var(--ink-2);padding:0 16px 10px;line-height:1.5;flex:0 0 auto}
-.stage{flex:1 1 auto;min-height:0;display:flex;justify-content:center;padding:0 12px 14px}
-.phone{position:relative;width:100%;max-width:392px;height:min(70vh,100%);border-radius:30px;overflow:hidden;
+.stage{flex:1 1 auto;min-height:0;display:flex;justify-content:center;padding:12px 12px 14px}
+.phone{position:relative;width:100%;max-width:392px;height:min(74vh,100%);border-radius:30px;overflow:hidden;
   background:var(--ground);box-shadow:var(--shadow-m);border:1px solid var(--hair)}
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--ground)}
 @media (min-width:900px){
   body{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:0 32px;padding:28px}
-  header,.rail{flex-basis:100%;max-width:860px;padding-inline:0}
-  .cap{display:none}
+  header{flex-basis:100%;max-width:860px;padding-inline:0}
   .stage{flex:0 0 auto;height:auto;padding:18px 0 0}
-  .phone{width:376px;height:752px;border-radius:42px;border:9px solid #0B0C0E}
-  .notes{display:block;flex:0 0 296px;max-width:330px;padding-top:18px;font-size:12.5px;color:var(--ink-2);line-height:1.65}
-  .notes h3{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink);margin:0 0 6px;letter-spacing:-.02em}
-  .notes p{margin:0 0 15px} .notes b{color:var(--ink);font-weight:600}
+  .phone{width:376px;height:768px;border-radius:42px;border:9px solid #0B0C0E}
+  .notes{display:block;flex:0 0 300px;max-width:340px;padding-top:18px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+  .notes h3{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink);margin:16px 0 6px;letter-spacing:-.02em}
+  .notes h3:first-child{margin-top:0}
+  .notes p{margin:0 0 10px} .notes b{color:var(--ink);font-weight:600}
+  .notes code{font-family:var(--mono);font-size:11.5px;background:var(--surf);padding:1px 5px;border-radius:4px;
+    border:1px solid var(--hair)}
 }
 .notes{display:none}
 
@@ -80,39 +65,32 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
   padding:0 20px;font-size:12px;font-weight:600}
 .roll{flex:1;overflow-y:auto;min-height:0;scrollbar-width:none;padding-bottom:96px}
 .roll::-webkit-scrollbar{display:none}
-.big{font-family:var(--display);letter-spacing:-.04em;line-height:.95;margin:0}
+.big{font-family:var(--display);letter-spacing:-.04em;line-height:.95;margin:0;padding:6px 20px 0}
 .sub{color:var(--ink-3);font-size:13px;margin-top:6px;padding:0 20px}
 .sect{font-size:12px;font-weight:600;color:var(--ink-3);padding:20px 20px 10px}
-
-/* ── the search field is now the hero: no FAB competes with it ── */
 .hunt{margin:14px 16px 4px;display:flex;align-items:center;gap:12px;cursor:pointer;
   transition:transform .3s var(--spring)}
 .hunt:active{transform:scale(.985)}
 .md .hunt{height:58px;border-radius:29px;background:var(--surf);padding:0 20px;box-shadow:var(--shadow-s);
   font-size:16px;color:var(--ink-3)}
 .ios .hunt{height:44px;border-radius:13px;padding:0 14px;font-size:16px;color:var(--ink-3);
-  background:color-mix(in srgb,var(--surf) 74%,transparent);
-  backdrop-filter:blur(24px) saturate(1.7);-webkit-backdrop-filter:blur(24px) saturate(1.7);
-  border:.5px solid var(--hair)}
+  background:color-mix(in srgb,var(--surf) 74%,transparent);backdrop-filter:blur(24px) saturate(1.7);
+  -webkit-backdrop-filter:blur(24px) saturate(1.7);border:.5px solid var(--hair)}
 .dark .md .hunt{border:1px solid var(--hair)}
+input.hunt{font-family:inherit;outline:none;border:none;color:var(--ink);width:calc(100% - 32px)}
+.dark input.hunt{border:1px solid var(--hair)}
 
-/* ── cards: paint in light, light in dark ── */
 .card{background:var(--surf);box-shadow:var(--shadow-s);cursor:pointer;overflow:hidden;position:relative;
   margin:0 16px 11px;transition:transform .3s var(--spring)}
 .card:active{transform:scale(.975)}
 .md .card{border-radius:22px} .ios .card{border-radius:16px}
 .dark .card{border:1px solid var(--hair)}
-/* the content is the whole card. no type label, no timestamp — the value says what it is. */
 .card .in{padding:15px 16px}
-.card .val{font-size:16px;line-height:1.45;font-weight:450;padding-right:20px;
+.card .val{font-size:16px;line-height:1.45;font-weight:450;padding-right:22px;
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
 .card .val.code{font-family:var(--mono);font-size:14.5px;letter-spacing:-.01em}
-.card .tagl{padding:3px 9px;border-radius:99px;font-size:10.5px;font-weight:600}
-/* pin: a quiet mark, not a badge */
-.pin{position:absolute;top:13px;right:13px;color:var(--ink-3);opacity:.55;
-  display:flex;align-items:center;justify-content:center}
-
-/* ── type tiles ── */
+.pin{position:absolute;top:13px;right:13px;color:var(--ink-3);opacity:.55;display:flex}
+.thumb{height:78px;border-radius:12px;margin:15px 16px}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:0 16px}
 .tile{padding:15px 14px 13px;cursor:pointer;position:relative;overflow:hidden;display:flex;
   flex-direction:column;min-height:126px;transition:transform .34s var(--spring)}
@@ -122,43 +100,42 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .tile .n{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.03em;margin-top:auto}
 .tile .c{font-size:12px;font-weight:500;opacity:.72;margin-top:2px}
 
-/* ── nav ── */
 .md .nav{position:absolute;left:12px;right:12px;bottom:14px;height:66px;background:var(--surf);
-  border-radius:33px;display:flex;align-items:center;box-shadow:var(--shadow-m);padding:0 6px}
+  border-radius:33px;display:flex;align-items:center;box-shadow:var(--shadow-m);padding:0 6px;z-index:6}
 .dark .md .nav{border:1px solid var(--hair)}
 .md .nav .n{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;
   font-weight:500;color:var(--ink-3);cursor:pointer}
 .md .nav .n .pill{padding:5px 20px;border-radius:99px;transition:.34s var(--spring)}
-.md .nav .n[data-on="1"]{color:var(--ink)}
-.md .nav .n[data-on="1"] .pill{background:var(--hair)}
+.md .nav .n[data-on="1"]{color:var(--ink)} .md .nav .n[data-on="1"] .pill{background:var(--hair)}
 .ios .nav{position:absolute;left:16px;right:16px;bottom:16px;height:58px;border-radius:26px;display:flex;
   align-items:center;padding:0 4px;background:color-mix(in srgb,var(--surf) 66%,transparent);
   backdrop-filter:blur(30px) saturate(1.9);-webkit-backdrop-filter:blur(30px) saturate(1.9);
-  border:.5px solid color-mix(in srgb,#fff 20%,transparent);box-shadow:0 8px 30px rgba(0,0,0,.18)}
+  border:.5px solid color-mix(in srgb,#fff 20%,transparent);box-shadow:0 8px 30px rgba(0,0,0,.18);z-index:6}
 .ios .nav .n{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;
   font-weight:500;color:var(--ink-3);cursor:pointer}
 .ios .nav .n[data-on="1"]{color:var(--ink)}
-/* toolbar: where manual add now lives — secondary, where it belongs */
 .tbar{position:absolute;top:36px;left:0;right:0;height:46px;display:flex;align-items:center;
   justify-content:space-between;padding:0 14px;z-index:4}
-/* Android has no Liquid Glass, so it needs a real surface or content collides with it */
 .md .tbar{background:linear-gradient(var(--ground) 62%,transparent)}
 .ios .tbar{background:color-mix(in srgb,var(--ground) 60%,transparent);
   backdrop-filter:blur(22px) saturate(1.8);-webkit-backdrop-filter:blur(22px) saturate(1.8)}
 .tbtn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:var(--surf);border:1px solid var(--hair);cursor:pointer;color:var(--ink-2)}
+  background:var(--surf);border:1px solid var(--hair);cursor:pointer;color:var(--ink-2);flex:0 0 auto}
 .ios .tbtn{background:color-mix(in srgb,var(--surf) 70%,transparent);backdrop-filter:blur(18px);
   -webkit-backdrop-filter:blur(18px);border:.5px solid var(--hair)}
+.tbtn.wide{width:auto;padding:0 15px;border-radius:99px;font-size:14.5px;font-weight:600;gap:6px;height:36px}
 
+.scrim{position:absolute;inset:0;background:rgba(8,10,14,.45);z-index:7;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
 .sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;background:var(--surf);animation:rise .38s var(--spring)}
 .md .sheet{border-radius:30px 30px 0 0;padding:10px 0 22px}
 .ios .sheet{border-radius:14px 14px 0 0;padding:8px 0 20px;
-  background:color-mix(in srgb,var(--surf) 92%,transparent);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
+  background:color-mix(in srgb,var(--surf) 94%,transparent);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
 .dark .sheet{border-top:1px solid var(--hair)}
 @keyframes rise{from{transform:translateY(26px);opacity:0}to{transform:none;opacity:1}}
 .grip{width:36px;height:4px;border-radius:2px;background:var(--hair);margin:0 auto 14px}
 .act{margin:0 16px;height:52px;display:flex;align-items:center;justify-content:center;gap:9px;
-  font-weight:600;font-size:16px;cursor:pointer;transition:transform .3s var(--spring)}
+  font-weight:600;font-size:16px;cursor:pointer;transition:transform .3s var(--spring);color:#fff}
 .act:active{transform:scale(.97)}
 .md .act{border-radius:26px} .ios .act{border-radius:14px}
 .opt{display:flex;align-items:center;gap:13px;padding:14px 20px;font-size:15px;cursor:pointer}
@@ -171,8 +148,17 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .gauge .num{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.04em}
 .gauge .num i{font-style:normal;color:var(--ink-3);font-size:15px;font-weight:500}
 .gauge .track{height:6px;border-radius:99px;background:var(--hair);margin-top:11px;overflow:hidden}
-.gauge .track i{display:block;height:100%;border-radius:99px;animation:grow .7s var(--spring)}
-@keyframes grow{from{width:0!important}}
+.gauge .track i{display:block;height:100%;border-radius:99px}
+.empty{padding:56px 34px;text-align:center;color:var(--ink-3)}
+.empty .e1{font-family:var(--display);font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-.03em}
+.empty .e2{font-size:14px;margin-top:7px;line-height:1.5}
+.step{display:flex;gap:13px;padding:14px 20px;align-items:flex-start}
+.step .num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex:0 0 auto;margin-top:1px}
+.step .b{font-size:15px;font-weight:600} .step .s{font-size:13.5px;color:var(--ink-3);margin-top:3px;line-height:1.5}
+.toast{position:absolute;left:16px;right:16px;bottom:92px;z-index:9;padding:13px 16px;border-radius:16px;
+  background:var(--ink);color:var(--ground);font-size:14px;font-weight:500;text-align:center;
+  animation:rise .3s var(--spring)}
 .stag>*{animation:pop .42s both var(--spring)}
 .stag>*:nth-child(1){animation-delay:.01s}.stag>*:nth-child(2){animation-delay:.04s}
 .stag>*:nth-child(3){animation-delay:.07s}.stag>*:nth-child(4){animation-delay:.1s}
@@ -189,11 +175,9 @@ svg{display:block}
     <h1 class="pt">Reel</h1>
     <div class="ctrls"><div class="seg" id="platSeg"></div><div class="seg" id="themeSeg"></div></div>
   </div>
-  <p class="lede">The <b>plus button is gone</b> — manual typing is the rarest way things get in here, so it no longer owns the loudest spot on screen. <b>"Snippets" is gone</b> — collections are just the four types now, and keeping something means pinning it. Dark keeps the tinted surfaces, with the palette retuned.</p>
+  <p class="lede"><b>It works now</b> — tap tiles, cards, nav, back arrows. Search filters live. Pinning actually pins. Nine screens across three tabs.</p>
 </header>
 
-<nav class="rail" id="rail"></nav>
-<div class="cap" id="cap"></div>
 <div class="stage"><div class="phone"><div class="scr" id="scr"></div></div></div>
 <aside class="notes" id="notes"></aside>
 
@@ -216,150 +200,274 @@ const I={
   next:'<path d="m9.6 5.6 6.4 6.4-6.4 6.4"/>',
   back:'<path d="M14.4 5.6 8 12l6.4 6.4"/>',
   time:'<circle cx="12" cy="12.6" r="8.2"/><path d="M12 8.4v4.4l2.6 1.9M9.6 2.6h4.8"/>',
+  trash:'<path d="M4.6 6.6h14.8M9.4 6.6V4.4h5.2v2.2M6.6 6.6l1 13.2h8.8l1-13.2"/>',
 };
 const ic=(n,s,w)=>`<svg viewBox="0 0 24 24" width="${s||20}" height="${s||20}" fill="none" stroke="currentColor" stroke-width="${w||1.7}" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
+const TYPE={txt:'Text',img:'Images',doc:'Docs',lnk:'Links'};
 
-/* four types. that's it. no jargon buckets. */
-const TYPES=[['txt','Text','14 saved'],['img','Images','2 saved'],['doc','Docs','3 saved'],['lnk','Links','3 saved']];
-const ITEMS=[
-  ['alex.rivera@example.com','txt','Email','yesterday',1,0],
-  ['Best,\nAlex Rivera','txt','Signature','3d ago',1,0],
-  ['PineTree-Guest / autumn2026!','txt','Wifi','2h ago',0,1],
-  ['+1 (614) 555-0164','txt','Phone','last week',0,1],
-  ['DE89 3704 0044 0532 0130 00','txt','IBAN','last week',0,1],
-  ['482 Maple Grove Ave, Apt 3B, Columbus OH 43210','txt','Address','2w ago',0,0],
-];
+/* ── mutable state ── */
 let PLAT='md',THEME='light';
-const dark=()=>THEME==='dark';
+const st={tab:'vault',view:'vault',arg:null,sheet:null,q:'',toast:null,pinCap:2};
+let ITEMS=[
+  {id:1,t:'txt',v:'alex.rivera@example.com',pin:1},
+  {id:2,t:'txt',v:'Best,\nAlex Rivera',pin:2},
+  {id:3,t:'txt',v:'PineTree-Guest / autumn2026!',code:1},
+  {id:4,t:'txt',v:'+1 (614) 555-0164',code:1},
+  {id:5,t:'txt',v:'DE89 3704 0044 0532 0130 00',code:1,sens:1},
+  {id:6,t:'txt',v:'482 Maple Grove Ave, Apt 3B, Columbus OH 43210'},
+  {id:7,t:'txt',v:'Thanks for the great conversation — I left even more excited about the role.'},
+  {id:8,t:'img',v:'Headshot',g:'linear-gradient(135deg,#7B55B4,#3E2C5E)'},
+  {id:9,t:'img',v:'Portfolio cover',g:'linear-gradient(135deg,#356BA6,#1D3A5C)'},
+  {id:10,t:'doc',v:'Resume.pdf'},
+  {id:11,t:'doc',v:'Cover-letter.pdf'},
+  {id:12,t:'doc',v:'Transcript.pdf'},
+  {id:13,t:'lnk',v:'alexrivera.example.com'},
+  {id:14,t:'lnk',v:'linkedin.example.com/in/alexrivera'},
+  {id:15,t:'lnk',v:'cal.example.com/alex/15min'},
+];
+const byType=t=>ITEMS.filter(i=>i.t===t);
+const pinned=()=>ITEMS.filter(i=>i.pin).sort((a,b)=>a.pin-b.pin);
+const find=id=>ITEMS.find(i=>i.id===id);
+const nextPin=()=>{const u=pinned().map(p=>p.pin);for(let n=1;n<=99;n++)if(!u.includes(n))return n;};
 
-function card(it){
-  const [val,c,,,pin,code]=it;
-  return `<div class="card" data-c="${c}">
-    ${pin?`<span class="pin">${ic('pin',14,1.9)}</span>`:''}
-    <div class="in"><div class="val${code?' code':''}">${val.replace(/\n/g,'<br>')}</div></div></div>`;
+/* ── actions ── */
+function go(view,arg){st.view=view;st.arg=arg??null;st.sheet=null;render();}
+function tab(t){st.tab=t;st.view=t==='vault'?'vault':t==='find'?'find':'you';st.arg=null;st.sheet=null;st.q='';render();}
+function openSheet(id){st.sheet=id;render();}
+function closeSheet(){st.sheet=null;render();}
+function toast(m){st.toast=m;render();clearTimeout(toast._t);toast._t=setTimeout(()=>{st.toast=null;render()},1900);}
+function togglePin(id){
+  const it=find(id);
+  if(it.pin){it.pin=0;toast('Unpinned');}
+  else if(pinned().length>=st.pinCap){st.sheet=null;go('plan');toast('That is your third pin');return;}
+  else {it.pin=nextPin();toast('Pinned');}
+  render();
 }
-const nav=on=>`<div class="nav">${[['txt','Vault'],['find','Find'],['cog','You']]
-  .map((n,i)=>`<div class="n" data-on="${i===on?1:0}"><span class="pill">${ic(n[0],21)}</span>${n[1]}</div>`).join('')}</div>`;
+function copy(id){const it=find(id);st.sheet=null;
+  toast(it.sens?'Copied — clears in 60s':'Copied');}
+function del(id){ITEMS=ITEMS.filter(i=>i.id!==id);st.sheet=null;toast('Deleted');}
+
+/* ── chrome ── */
 const sbar=()=>`<div class="sbar"><span>9:41</span><span>5G</span></div>`;
-/* manual add now lives here — a quiet toolbar button, not a floating billboard */
-const tbar=(left,title)=>`<div class="tbar">
-  <span class="tbtn">${ic(left,17)}</span>
+const nav=()=>`<div class="nav">${[['txt','Vault','vault'],['find','Find','find'],['cog','You','you']]
+  .map(n=>`<div class="n" data-on="${st.tab===n[2]?1:0}" onclick="tab('${n[2]}')">
+    <span class="pill">${ic(n[0],21)}</span>${n[1]}</div>`).join('')}</div>`;
+const tbar=(back,title,right)=>`<div class="tbar">
+  ${back?`<span class="tbtn" onclick="${back}">${ic('back',17)}</span>`:'<span style="width:36px"></span>'}
   ${title?`<span style="font-weight:600;font-size:15px">${title}</span>`:'<span></span>'}
-  <span class="tbtn">${ic('add',17)}</span></div>`;
+  ${right||'<span style="width:36px"></span>'}</div>`;
+const card=it=>`<div class="card" onclick="openSheet(${it.id})">
+  ${it.pin?`<span class="pin">${ic('pin',14,1.9)}</span>`:''}
+  ${it.g?`<div class="thumb" style="background:${it.g}"></div>`
+        :`<div class="in"><div class="val${it.code?' code':''}">${it.v.replace(/\n/g,'<br>')}</div></div>`}
+  ${it.g?`<div class="in" style="padding-top:0"><div class="val">${it.v}</div></div>`:''}</div>`;
 
-const S={
-vault:{n:'Vault',c:'No floating plus. Search is the biggest thing on screen, because finding is what you actually came to do.',
- h:()=>`${sbar()}${tbar('cog','')}<div class="roll stag" style="padding-top:46px">
-   <div><h1 class="big" style="font-size:${PLAT==='ios'?33:34}px;padding:6px 20px 0">Everything<br>you reuse</h1>
-     <div class="sub">22 things · 2 pinned</div></div>
-   <div class="hunt">${ic('find',20)} Search everything</div>
-   <div class="sect">Pinned</div>
-   ${ITEMS.filter(i=>i[4]).map(card).join('')}
-   <div class="sect">By type</div>
-   <div class="tiles">
-     ${TYPES.map(t=>`<div class="tile" style="background:var(--t-${t[0]});color:var(--c-${t[0]})">
-       <span class="glyph" style="background:color-mix(in srgb,var(--c-${t[0]}) 18%,transparent)">${ic(t[0],19)}</span>
-       <span class="n">${t[1]}</span><span class="c">${t[2]}</span></div>`).join('')}
-   </div>
- </div>${nav(0)}`},
+/* ── screens ── */
+const V={
+vault:()=>`${sbar()}${tbar('',null,`<span class="tbtn" onclick="go('add')">${ic('add',17)}</span>`)}
+  <div class="roll stag" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:34px">Everything<br>you reuse</h1>
+      <div class="sub">${ITEMS.length} things · ${pinned().length} pinned</div></div>
+    <div class="hunt" onclick="tab('find')">${ic('find',20)} Search everything</div>
+    ${pinned().length?`<div class="sect">Pinned</div>${pinned().map(card).join('')}`:''}
+    <div class="sect">By type</div>
+    <div class="tiles">
+      ${Object.keys(TYPE).map(t=>`<div class="tile" style="background:var(--t-${t});color:var(--c-${t})"
+        onclick="go('type','${t}')">
+        <span class="glyph" style="background:color-mix(in srgb,var(--c-${t}) 18%,transparent)">${ic(t,19)}</span>
+        <span class="n">${TYPE[t]}</span><span class="c">${byType(t).length} saved</span></div>`).join('')}
+    </div></div>${nav()}`,
 
-type:{n:'Text',c:'One type, one list, newest first. Pinned things float to the top — that is what "keeping" something means. No second bucket to learn.',
- h:()=>`${sbar()}${tbar('back','Text')}<div class="roll stag" style="padding-top:46px">
-   <div><h1 class="big" style="font-size:33px;padding:6px 20px 0;color:var(--c-txt)">Text</h1>
-     <div class="sub">14 things · 2 pinned</div></div>
-   <div class="hunt">${ic('find',20)} Search text</div>
-   <div class="sect">Pinned</div>
-   ${ITEMS.filter(i=>i[4]).map(card).join('')}
-   <div class="sect">Everything else</div>
-   ${ITEMS.filter(i=>!i[4]).map(card).join('')}
- </div>${nav(0)}`},
+type:()=>{const t=st.arg,list=byType(t);
+  return `${sbar()}${tbar("go('vault')",TYPE[t],`<span class="tbtn" onclick="go('add')">${ic('add',17)}</span>`)}
+  <div class="roll stag" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:33px;color:var(--c-${t})">${TYPE[t]}</h1>
+      <div class="sub">${list.length} saved</div></div>
+    ${list.length?'':`<div class="empty"><div class="e1">Nothing here yet</div>
+      <div class="e2">Things land here when you share or copy them from another app.</div></div>`}
+    ${list.filter(i=>i.pin).length?`<div class="sect">Pinned</div>${list.filter(i=>i.pin).map(card).join('')}`:''}
+    ${list.filter(i=>!i.pin).length?`<div class="sect">${list.some(i=>i.pin)?'Everything else':'All'}</div>
+      ${list.filter(i=>!i.pin).map(card).join('')}`:''}
+  </div>${nav()}`},
 
-item:{n:'Item',c:'One weighted action in the type colour. Sensitive things state the consequence in words, not a lock icon.',
- h:()=>`${sbar()}<div class="roll" style="opacity:.35">
-   <div><h1 class="big" style="font-size:33px;padding:6px 20px 0;color:var(--c-txt)">Text</h1></div>
-   ${ITEMS.slice(0,3).map(card).join('')}</div>
-  <div class="sheet"><div class="grip"></div>
-   <div style="padding:2px 20px 16px">
-     <div style="display:flex;gap:8px;align-items:center;margin-bottom:13px">
-       <span class="tagl" style="background:var(--t-txt);color:var(--c-txt);padding:4px 11px;border-radius:99px;font-size:11.5px;font-weight:600">Text</span>
-       <span style="font-size:12.5px;color:var(--ink-3)">used 4 times</span></div>
-     <div style="font-family:var(--mono);font-size:19px;line-height:1.5;letter-spacing:-.02em">DE89 3704 0044<br>0532 0130 00</div>
-   </div>
-   <div class="act" style="background:var(--c-txt);color:#1A1206">${ic('copy',19)} Copy</div>
-   <div style="display:flex;align-items:center;gap:9px;padding:14px 20px 4px;font-size:13px;color:var(--ink-3)">
-     ${ic('time',16)} Leaves your clipboard after 60 seconds</div>
-   <div class="opt"><span style="color:var(--ink-2)">${ic('pin',19)}</span><span class="t">Pin it</span><span class="v">slot 3</span></div>
-   <div class="opt"><span style="color:var(--ink-2)">${ic('send',19)}</span><span class="t">Send somewhere</span>${ic('next',16)}</div>
-  </div>`},
+find:()=>{const q=st.q.trim().toLowerCase();
+  const res=q?ITEMS.filter(i=>i.v.toLowerCase().includes(q)):[];
+  return `${sbar()}<div class="roll" style="padding-top:8px">
+    <div><h1 class="big" style="font-size:31px">Find</h1></div>
+    <input class="hunt" id="q" placeholder="Type to search" value="${st.q.replace(/"/g,'&quot;')}"
+      oninput="st.q=this.value;renderKeepFocus()" autocomplete="off">
+    ${!q?`<div class="sect">Jump to</div>
+      <div class="tiles">${Object.keys(TYPE).map(t=>`<div class="tile" style="background:var(--t-${t});color:var(--c-${t});min-height:96px"
+        onclick="go('type','${t}')"><span class="glyph" style="background:color-mix(in srgb,var(--c-${t}) 18%,transparent)">${ic(t,18)}</span>
+        <span class="n" style="font-size:15px">${TYPE[t]}</span></div>`).join('')}</div>`
+     :res.length?`<div class="sect">${res.length} result${res.length>1?'s':''}</div>${res.map(card).join('')}`
+     :`<div class="empty"><div class="e1">No match</div>
+       <div class="e2">Nothing here contains “${st.q}”.</div></div>`}
+  </div>${nav()}`},
 
-reach:{n:'Reach',c:'How things get in and out without opening this. Capture lives here — which is exactly why no plus button was needed.',
- h:()=>`${sbar()}${tbar('cog','')}<div class="roll stag" style="padding-top:46px">
-   <div><h1 class="big" style="font-size:33px;padding:6px 20px 0">Reach it<br>anywhere</h1>
-     <div class="sub">without opening this app</div></div>
-   <div class="sect">Already working</div>
-   ${[['send','Share sheet','this is how things get in','txt'],
-      [PLAT==='ios'?'find':'bolt',PLAT==='ios'?'Spotlight':'Quick tile',PLAT==='ios'?'search from your home screen':'one swipe, any screen','doc'],
-      ['doc','Files','attach without leaving mail','img']]
-     .map(r=>`<div class="card" data-c="${r[3]}"><div class="in" style="display:flex;align-items:center;gap:13px;padding:13px 15px">
-       <span style="width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;
-         background:var(--t-${r[3]});color:var(--c-${r[3]})">${ic(r[0],19)}</span>
-       <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">${r[1]}</b>
-       <span style="font-size:12.5px;color:var(--ink-3)">${r[2]}</span></span>
-       <span style="color:var(--c-doc)">${ic('ok',19,2.2)}</span></div></div>`).join('')}
-   <div class="sect">Set up one thing</div>
-   <div class="card" data-c="lnk" style="background:var(--t-lnk)">
-     <div class="in" style="padding:17px">
-       <div style="font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.03em;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Edge dial'}</div>
-       <div style="font-size:14px;line-height:1.5;margin-top:6px;color:var(--c-lnk);opacity:.85">
-         ${PLAT==='ios'?'Double-tap the back of your phone. Your last thing lands on the clipboard.':'Swipe in from the edge, turn, let go. It inserts where you were typing.'}</div>
-       <div style="margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:var(--c-lnk);color:#1A0B06;padding:10px 18px;border-radius:99px;font-size:14px;font-weight:600">
-         Set it up ${ic('next',15,2.2)}</div></div></div>
- </div>${nav(2)}`},
+item:()=>'',
 
-you:{n:'You',c:'Room shown as gauges, never hidden. In dark the bars are the only saturated thing — light where it means something.',
- h:()=>`${sbar()}${tbar('back','')}<div class="roll stag" style="padding-top:46px">
-   <div><h1 class="big" style="font-size:33px;padding:6px 20px 0">You</h1>
-     <div class="sub">free · everything stays on this phone</div></div>
-   <div class="sect">Room left</div>
-   <div class="gauge"><div class="row"><span style="font-size:13.5px;font-weight:500;color:var(--ink-2)">Pinned things</span>
-     <span class="num" style="color:var(--c-lnk)">2<i>/2</i></span></div>
-     <div class="track"><i style="width:100%;background:var(--c-lnk)"></i></div></div>
-   <div class="gauge"><div class="row"><span style="font-size:13.5px;font-weight:500;color:var(--ink-2)">Files and images</span>
-     <span class="num" style="color:var(--c-doc)">5<i>/20</i></span></div>
-     <div class="track"><i style="width:25%;background:var(--c-doc)"></i></div></div>
-   <div class="act" style="background:var(--ink);color:var(--ground);margin-top:4px">Remove the limits</div>
-   <div style="text-align:center;font-size:12.5px;color:var(--ink-3);padding:11px 20px 0">one payment, no subscription</div>
- </div>${nav(2)}`},
+add:()=>`${sbar()}${tbar("go('"+(st.tab==='vault'?'vault':'you')+"')",'New',
+    `<span class="tbtn wide" style="background:var(--c-txt);color:#fff;border:none"
+      onclick="toast('Saved to Text');go('vault')">Save</span>`)}
+  <div class="roll stag" style="padding-top:46px">
+    <div class="card" style="margin:8px 16px 11px"><div class="in" style="min-height:150px">
+      <div class="val" style="-webkit-line-clamp:unset;color:var(--ink-3)">Type or paste anything…</div></div></div>
+    <div class="sect">Reel will work out</div>
+    <div class="card"><div class="in" style="display:flex;align-items:center;gap:13px">
+      <span style="width:38px;height:38px;border-radius:13px;background:var(--t-txt);color:var(--c-txt);
+        display:flex;align-items:center;justify-content:center">${ic('txt',19)}</span>
+      <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">What kind of thing it is</b>
+      <span style="font-size:13px;color:var(--ink-3)">and which type it belongs to</span></span></div></div>
+    <div class="empty" style="padding:22px 34px"><div class="e2">Most things arrive from the share sheet or the dial. This is here for the rare time you want to type one in.</div></div>
+  </div>`,
+
+you:()=>`${sbar()}${tbar('','You','')}
+  <div class="roll stag" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:33px">You</h1>
+      <div class="sub">free · everything stays on this phone</div></div>
+    <div class="sect">Room left</div>
+    <div class="gauge" onclick="go('plan')"><div class="row">
+      <span style="font-size:13.5px;font-weight:500;color:var(--ink-2)">Pinned things</span>
+      <span class="num" style="color:var(--c-lnk)">${pinned().length}<i>/${st.pinCap}</i></span></div>
+      <div class="track"><i style="width:${Math.min(100,pinned().length/st.pinCap*100)}%;background:var(--c-lnk)"></i></div></div>
+    <div class="gauge" onclick="go('plan')"><div class="row">
+      <span style="font-size:13.5px;font-weight:500;color:var(--ink-2)">Files and images</span>
+      <span class="num" style="color:var(--c-doc)">${byType('img').length+byType('doc').length}<i>/20</i></span></div>
+      <div class="track"><i style="width:${(byType('img').length+byType('doc').length)/20*100}%;background:var(--c-doc)"></i></div></div>
+    <div class="sect">Set up</div>
+    <div class="card" onclick="go('reach')"><div class="in" style="display:flex;align-items:center;gap:13px">
+      <span style="width:38px;height:38px;border-radius:13px;background:var(--t-lnk);color:var(--c-lnk);
+        display:flex;align-items:center;justify-content:center">${ic('bolt',19)}</span>
+      <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">Reach</b>
+      <span style="font-size:13px;color:var(--ink-3)">ways in without opening this</span></span>${ic('next',17)}</div></div>
+    <div class="card" onclick="toast('Not in this prototype')"><div class="in" style="display:flex;align-items:center;gap:13px">
+      <span style="width:38px;height:38px;border-radius:13px;background:var(--t-img);color:var(--c-img);
+        display:flex;align-items:center;justify-content:center">${ic('cog',19)}</span>
+      <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">Appearance</b>
+      <span style="font-size:13px;color:var(--ink-3)">match phone</span></span>${ic('next',17)}</div></div>
+  </div>${nav()}`,
+
+reach:()=>`${sbar()}${tbar("go('you')",'Reach','')}
+  <div class="roll stag" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:33px">Reach it<br>anywhere</h1>
+      <div class="sub">without opening this app</div></div>
+    <div class="sect">Already working</div>
+    ${[['send','Share sheet','this is how things get in','txt'],
+       [PLAT==='ios'?'find':'bolt',PLAT==='ios'?'Spotlight':'Quick tile',PLAT==='ios'?'search from your home screen':'one swipe, any screen','doc'],
+       ['doc','Files','attach without leaving mail','img']]
+      .map(r=>`<div class="card" onclick="toast('Already on')"><div class="in" style="display:flex;align-items:center;gap:13px">
+        <span style="width:38px;height:38px;border-radius:13px;background:var(--t-${r[3]});color:var(--c-${r[3]});
+          display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic(r[0],19)}</span>
+        <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">${r[1]}</b>
+        <span style="font-size:13px;color:var(--ink-3)">${r[2]}</span></span>
+        <span style="color:var(--c-doc)">${ic('ok',19,2.2)}</span></div></div>`).join('')}
+    <div class="sect">Set up one thing</div>
+    <div class="card" style="background:var(--t-lnk)" onclick="go('setup')">
+      <div class="in" style="padding:17px">
+        <div style="font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.03em;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Edge dial'}</div>
+        <div style="font-size:14px;line-height:1.5;margin-top:6px;color:var(--c-lnk);opacity:.85">
+          ${PLAT==='ios'?'Double-tap the back of your phone. Your last thing lands on the clipboard.':'Swipe in from the edge, turn, let go. It inserts where you were typing.'}</div>
+        <div style="margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:var(--c-lnk);
+          color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;font-weight:600">
+          Set it up ${ic('next',15,2.2)}</div></div></div>
+    <div class="sect">Whenever you want</div>
+    ${[['key','Vault keyboard','type without leaving the app','img'],
+       ['pin',PLAT==='ios'?'Widgets and Action Button':'Widgets and shortcuts','pinned things, one press','lnk']]
+      .map(r=>`<div class="card" onclick="toast('Not in this prototype')"><div class="in" style="display:flex;align-items:center;gap:13px">
+        <span style="width:38px;height:38px;border-radius:13px;background:var(--t-${r[3]});color:var(--c-${r[3]});
+          display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic(r[0],19)}</span>
+        <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">${r[1]}</b>
+        <span style="font-size:13px;color:var(--ink-3)">${r[2]}</span></span>${ic('next',17)}</div></div>`).join('')}
+  </div>${nav()}`,
+
+setup:()=>`${sbar()}${tbar("go('reach')",PLAT==='ios'?'Back Tap':'Edge dial','')}
+  <div class="roll stag" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:31px;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Edge dial'}</h1>
+      <div class="sub">about 40 seconds, once</div></div>
+    ${(PLAT==='ios'
+      ?[['Open Settings','Accessibility, then Touch, then Back Tap'],
+        ['Choose Double Tap','pick Reel from the list'],
+        ['Try it','double-tap the back of your phone']]
+      :[['Allow it to float','one permission, so the dial can sit over other apps'],
+        ['Pick an edge','left or right, wherever your thumb rests'],
+        ['Try it','swipe in, turn, let go']])
+      .map((s,i)=>`<div class="step"><span class="num" style="background:var(--t-lnk);color:var(--c-lnk)">${i+1}</span>
+        <span><span class="b">${s[0]}</span><span class="s">${s[1]}</span></span></div>`).join('')}
+    <div style="padding:14px 0 0"><div class="act" style="background:var(--c-lnk)"
+      onclick="toast('That would open Settings');go('reach')">Open Settings</div></div>
+    <div class="empty" style="padding:20px 34px"><div class="e2">You can change or turn this off at any time.</div></div>
+  </div>`,
+
+plan:()=>`${sbar()}${tbar("go('you')",'','')}
+  <div class="roll stag" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:33px">Remove<br>the limits</h1>
+      <div class="sub">one payment, no subscription</div></div>
+    <div class="sect">What changes</div>
+    ${[['pin','Pin as many as you like',`you are using ${pinned().length} of ${st.pinCap}`,'lnk'],
+       ['img','Unlimited files and images','20 today','doc'],
+       ['find','Search inside images','find text in a screenshot','img']]
+      .map(r=>`<div class="card"><div class="in" style="display:flex;align-items:center;gap:13px">
+        <span style="width:38px;height:38px;border-radius:13px;background:var(--t-${r[3]});color:var(--c-${r[3]});
+          display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic(r[0],19)}</span>
+        <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">${r[1]}</b>
+        <span style="font-size:13px;color:var(--ink-3)">${r[2]}</span></span></div></div>`).join('')}
+    <div style="padding:10px 0 0"><div class="act" style="background:var(--ink);color:var(--ground)"
+      onclick="st.pinCap=99;toast('Unlocked in the prototype');go('you')">Unlock · one payment</div></div>
+    <div class="empty" style="padding:18px 34px"><div class="e2">Everything you already saved stays exactly where it is.</div></div>
+  </div>`,
 };
 
-const ORDER=['vault','type','item','reach','you'];
-let cur='vault';
+function sheet(){
+  const it=find(st.sheet); if(!it)return'';
+  const c=it.t;
+  return `<div class="scrim" onclick="closeSheet()"></div>
+  <div class="sheet"><div class="grip"></div>
+    <div style="padding:2px 20px 16px">
+      <div style="font-size:${it.code?18:17}px;line-height:1.5;${it.code?'font-family:var(--mono);letter-spacing:-.02em':''}">
+        ${it.g?`<div class="thumb" style="background:${it.g};margin:0 0 12px;height:104px"></div>`:''}${it.v.replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="act" style="background:var(--c-${c})" onclick="copy(${it.id})">${ic('copy',19)} Copy</div>
+    ${it.sens?`<div style="display:flex;align-items:center;gap:9px;padding:14px 20px 2px;font-size:13px;color:var(--ink-3)">
+      ${ic('time',16)} Leaves your clipboard after 60 seconds</div>`:''}
+    <div class="opt" onclick="togglePin(${it.id})"><span style="color:var(--ink-2)">${ic('pin',19)}</span>
+      <span class="t">${it.pin?'Unpin':'Pin it'}</span><span class="v">${it.pin?'slot '+it.pin:pinned().length+'/'+st.pinCap+' used'}</span></div>
+    <div class="opt" onclick="toast('Share sheet would open');closeSheet()">
+      <span style="color:var(--ink-2)">${ic('send',19)}</span><span class="t">Send somewhere</span>${ic('next',16)}</div>
+    <div class="opt" onclick="del(${it.id})"><span style="color:var(--c-lnk)">${ic('trash',19)}</span>
+      <span class="t" style="color:var(--c-lnk)">Delete</span></div>
+  </div>`;
+}
+
 function render(){
-  document.body.className=(PLAT==='ios'?'ios':'md')+(dark()?' dark':'');
-  document.getElementById('scr').innerHTML=S[cur].h();
-  document.getElementById('cap').textContent=S[cur].c;
+  document.body.className=(PLAT==='ios'?'ios':'md')+(THEME==='dark'?' dark':'');
+  document.getElementById('scr').innerHTML=(V[st.view]||V.vault)()
+    +(st.sheet?sheet():'')+(st.toast?`<div class="toast">${st.toast}</div>`:'');
   document.getElementById('platSeg').innerHTML=[['md','Android'],['ios','iOS']]
     .map(p=>`<button data-p="${p[0]}" data-on="${PLAT===p[0]?1:0}">${p[1]}</button>`).join('');
   document.getElementById('themeSeg').innerHTML=[['light','Light'],['dark','Dark']]
     .map(t=>`<button data-t="${t[0]}" data-on="${THEME===t[0]?1:0}">${t[1]}</button>`).join('');
   [...document.getElementById('platSeg').children].forEach(b=>b.onclick=()=>{PLAT=b.dataset.p;render()});
   [...document.getElementById('themeSeg').children].forEach(b=>b.onclick=()=>{THEME=b.dataset.t;render()});
-  [...document.getElementById('rail').children].forEach(b=>b.dataset.on=b.dataset.k===cur?'1':'0');
   document.getElementById('notes').innerHTML=`
-    <h3>Why the plus went</h3>
-    <p>It did the rarest thing in the product — typing something in by hand — from the most prominent spot on screen. Capture happens in the <b>share sheet</b>, the <b>clipboard</b>, the <b>dial</b>. Manual entry is now a quiet toolbar button, and <b>search</b> got the weight instead.</p>
-    <h3>Why "Snippets" went</h3>
-    <p>Two buckets both holding text, with an invisible difference. Collections are now the four types the database already has: <b>Text, Images, Docs, Links</b>. Keeping something means <b>pinning</b> it — no jargon, no second bucket.</p>
-    <h3>Dark, retuned</h3>
-    <p>Same structure as light — tinted surfaces, ink on tint — with the palette shifted: <b>warmer gold</b>, a <b>cooler violet</b>, a <b>deeper blue</b> and a <b>softer coral</b>, on a slightly warmer ground.</p>`;
+    <h3>Try these</h3>
+    <p>Tap a <b>type tile</b> to open it · tap any <b>card</b> for its sheet · <b>Pin</b> and watch the Vault reorder · try pinning a <b>third</b> thing · <b>Find</b> and type "cal" or "pdf" · <b>You → Reach → Set it up</b>.</p>
+    <h3>Nine screens, three tabs</h3>
+    <p><b>Vault:</b> home, a type collection, the item sheet, manual add.<br>
+       <b>Find:</b> live search, with a real empty state.<br>
+       <b>You:</b> settings, Reach, a setup walkthrough, the upgrade page.</p>
+    <h3>What the paywall does</h3>
+    <p>Pinning a third thing doesn't error — it takes you to the upgrade page, in the moment the limit actually matters. Gate on scale, never on access.</p>
+    <h3>Still to design</h3>
+    <p>Onboarding · the dial and keyboard themselves (separate prototype) · multi-select · Recently deleted · widget gallery.</p>`;
 }
-const rail=document.getElementById('rail');
-rail.innerHTML=ORDER.map(k=>`<button data-k="${k}">${S[k].n}</button>`).join('');
-[...rail.children].forEach(b=>b.onclick=()=>{cur=b.dataset.k;render()});
-let sx=null;
-addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
-addEventListener('touchend',e=>{if(sx===null)return;const d=e.changedTouches[0].clientX-sx;sx=null;
-  if(Math.abs(d)>70){const i=ORDER.indexOf(cur);cur=ORDER[(i+(d<0?1:ORDER.length-1))%ORDER.length];render()}},{passive:true});
+function renderKeepFocus(){
+  const el=document.getElementById('q'); const pos=el?el.selectionStart:0;
+  render();
+  const n=document.getElementById('q');
+  if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
+}
+Object.assign(window,{go,tab,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st});
 render();
 </script>
 </body>
