@@ -3,400 +3,441 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>The main app — Android and iOS</title>
+<title>Instrument — the app, two native bodies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --page:#F3F1EC; --card:#FFF; --ink:#1C2025; --dim:#68707A; --line:#E3DFD5;
-    --brand:#0E8C7F; --brand-soft:#0E8C7F1A;
-    --shadow:0 8px 24px rgba(24,28,34,.10);
-  }
-  @media (prefers-color-scheme:dark){:root{
-    --page:#0E1115; --card:#161B21; --ink:#E8ECF1; --dim:#8B95A1; --line:#232A32;
-    --brand:#2FB9A9; --brand-soft:#2FB9A924; --shadow:0 8px 24px rgba(0,0,0,.5);
-  }}
-  :root[data-theme=dark]{--page:#0E1115;--card:#161B21;--ink:#E8ECF1;--dim:#8B95A1;--line:#232A32;
-    --brand:#2FB9A9;--brand-soft:#2FB9A924;--shadow:0 8px 24px rgba(0,0,0,.5);}
-  :root[data-theme=light]{--page:#F3F1EC;--card:#FFF;--ink:#1C2025;--dim:#68707A;--line:#E3DFD5;
-    --brand:#0E8C7F;--brand-soft:#0E8C7F1A;--shadow:0 8px 24px rgba(24,28,34,.10);}
+/* ============================================================
+   INSTRUMENT — a precision tool for reusable data.
+   Machined anodised body · engraved index ticks · vermillion
+   focus mark · everything you stored rendered as data, in mono.
+   The dial's lens barrel, extended to a whole app.
+   ============================================================ */
+:root{
+  --void:#08090B;          /* outside the body */
+  --body:#101317;          /* anodised housing */
+  --plate:#171B20;         /* raised plate */
+  --plate-hi:#1E242B;      /* machined highlight */
+  --etch:#2A323B;          /* engraved line */
+  --etch-lo:#1C2228;
+  --ink:#E9E5DE;           /* engraved fill, warm */
+  --ink-dim:#8C949E;
+  --ink-faint:#5A626C;
+  --mark:#FF4A2B;          /* THE index mark. one colour, used sparingly. */
+  --mark-glow:#FF4A2B22;
+  --brass:#C9A227;         /* secondary engraving, used almost never */
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --sans:"Archivo",system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  margin:0;background:var(--void);color:var(--ink);font-family:var(--sans);
+  display:flex;flex-direction:column;overflow-x:hidden;
+  background-image:
+    radial-gradient(120% 80% at 50% -10%, #161B21 0%, transparent 60%),
+    repeating-linear-gradient(90deg, transparent 0 3px, rgba(255,255,255,.012) 3px 4px);
+}
 
-  /* platform surface tokens — swapped wholesale by the toggle */
-  .plat-android{
-    --s-bg:#F7F2FA; --s-card:#FFF; --s-txt:#1C1B1F; --s-dim:#49454F; --s-line:#E7E0EC;
-    --s-accent:#4F6354; --s-accent-c:#FFF; --s-tonal:#DCE5DC; --s-r-card:20px; --s-r-btn:100px;
-    --s-font:"Roboto",system-ui,sans-serif;
-  }
-  .plat-ios{
-    --s-bg:#F2F2F7; --s-card:#FFF; --s-txt:#000; --s-dim:#8A8A8E; --s-line:#E5E5EA;
-    --s-accent:#007AFF; --s-accent-c:#FFF; --s-tonal:#EAF3FF; --s-r-card:12px; --s-r-btn:12px;
-    --s-font:-apple-system,"SF Pro Text",system-ui,sans-serif;
-  }
-  @media (prefers-color-scheme:dark){
-    .plat-android{--s-bg:#141218;--s-card:#211F26;--s-txt:#E6E0E9;--s-dim:#CAC4D0;--s-line:#49454F;
-      --s-accent:#B5CCBA;--s-accent-c:#21372B;--s-tonal:#37493C;}
-    .plat-ios{--s-bg:#000;--s-card:#1C1C1E;--s-txt:#FFF;--s-dim:#98989F;--s-line:#38383A;
-      --s-accent:#0A84FF;--s-tonal:#0A2540;}
-  }
-  :root[data-theme=dark] .plat-android{--s-bg:#141218;--s-card:#211F26;--s-txt:#E6E0E9;--s-dim:#CAC4D0;
-    --s-line:#49454F;--s-accent:#B5CCBA;--s-accent-c:#21372B;--s-tonal:#37493C;}
-  :root[data-theme=dark] .plat-ios{--s-bg:#000;--s-card:#1C1C1E;--s-txt:#FFF;--s-dim:#98989F;
-    --s-line:#38383A;--s-accent:#0A84FF;--s-tonal:#0A2540;}
+/* ---------- the knurl: our signature rule ---------- */
+.knurl{height:9px;flex:0 0 auto;
+  background:repeating-linear-gradient(90deg,var(--etch) 0 1px,transparent 1px 5px);
+  opacity:.65;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.knurl.tight{background:repeating-linear-gradient(90deg,var(--etch) 0 1px,transparent 1px 3px);height:7px}
 
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:var(--page);color:var(--ink);display:flex;flex-direction:column;
-    font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+/* ---------- masthead ---------- */
+header{padding:14px 16px 0;flex:0 0 auto}
+.brandrow{display:flex;align-items:baseline;gap:10px}
+.brand{font-size:19px;font-weight:800;letter-spacing:-.03em;text-transform:uppercase}
+.brand em{font-style:normal;color:var(--mark)}
+.spec{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--ink-faint);
+  text-transform:uppercase;margin-left:auto}
+.tagline{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin:6px 0 0;line-height:1.5;
+  max-width:52ch}
 
-  .top{padding:10px 14px 0;flex:0 0 auto}
-  .top h1{font-size:15px;margin:0 0 2px;letter-spacing:-.01em}
-  .top p{margin:0;font-size:12px;color:var(--dim);
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  @media (min-width:880px){.top p{-webkit-line-clamp:unset;display:block}}
-  .toggle{display:flex;gap:0;margin:10px 0 0;background:var(--card);border:1px solid var(--line);
-    border-radius:99px;padding:3px;width:max-content}
-  .toggle button{border:none;background:none;color:var(--dim);font:inherit;font-size:12.5px;
-    padding:6px 16px;border-radius:99px;cursor:pointer;display:flex;align-items:center;gap:6px}
-  .toggle button[data-on="1"]{background:var(--brand);color:#fff}
-  .chips{display:flex;gap:7px;overflow-x:auto;padding:10px 14px;flex:0 0 auto;scrollbar-width:none}
-  .chips::-webkit-scrollbar{display:none}
-  .chip{flex:0 0 auto;border:1.5px solid var(--line);background:var(--card);color:var(--dim);
-    border-radius:99px;padding:7px 13px;font:inherit;font-size:12.5px;cursor:pointer;white-space:nowrap}
-  .chip[data-on="1"]{border-color:var(--brand);background:var(--brand-soft);color:var(--ink)}
-  .nav{display:flex;gap:8px;align-items:center;padding:0 14px 8px;flex:0 0 auto}
-  .nav button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;
-    padding:6px 13px;font:inherit;font-size:13px;cursor:pointer}
-  .meta{flex:1;font-size:12px;color:var(--dim);line-height:1.35}
+/* ---------- selector: reads like a machined switch ---------- */
+.switch{display:flex;margin:12px 0 0;border:1px solid var(--etch);border-radius:2px;
+  width:max-content;background:var(--plate);overflow:hidden}
+.switch button{appearance:none;border:0;background:transparent;color:var(--ink-faint);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  padding:8px 15px;cursor:pointer;position:relative;transition:color .18s}
+.switch button+button{border-left:1px solid var(--etch)}
+.switch button[data-on="1"]{color:var(--ink);background:var(--plate-hi)}
+.switch button[data-on="1"]::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--mark)}
 
-  .stage{flex:1 1 auto;min-height:0;padding:0 10px calc(10px + env(safe-area-inset-bottom));
-    display:flex;justify-content:center}
-  /* min(...,100%) so the frame can never exceed the stage and push its own nav bar
-     below the fold — measured, not guessed: frame was 585px inside a 565px stage. */
-  .frame{position:relative;width:100%;max-width:400px;height:min(72vh,100%);min-height:0;
-    border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
-  .scr{position:absolute;inset:0;background:var(--s-bg);color:var(--s-txt);font-family:var(--s-font);
-    display:flex;flex-direction:column}
+.rail{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;flex:0 0 auto;
+  border-top:1px solid var(--etch-lo);border-bottom:1px solid var(--etch-lo);margin-top:12px}
+.rail::-webkit-scrollbar{display:none}
+.rail button{appearance:none;border:0;background:transparent;color:var(--ink-faint);
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  padding:11px 14px;cursor:pointer;white-space:nowrap;position:relative;flex:0 0 auto;transition:color .16s}
+.rail button+button{border-left:1px solid var(--etch-lo)}
+.rail button[data-on="1"]{color:var(--ink)}
+.rail button[data-on="1"]::before{content:"";position:absolute;left:14px;right:14px;bottom:0;height:2px;
+  background:var(--mark);animation:slidein .28s cubic-bezier(.2,.9,.3,1)}
+@keyframes slidein{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
 
-  @media (min-width:880px){
-    body{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:24px;
-      padding:24px;height:auto;min-height:100%}
-    .top,.chips{flex-basis:100%;max-width:840px;padding-inline:0}
-    .nav{display:none}
-    .stage{flex:0 0 auto;padding:0;height:auto}
-    .frame{width:360px;height:720px;border:10px solid #101317;border-radius:44px}
-    .side{display:block;flex:0 0 300px;max-width:340px}
-    .side .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;
-      margin-bottom:12px;font-size:13px;color:var(--dim);box-shadow:var(--shadow)}
-    .side b{color:var(--ink)}
-    .side h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:0 0 8px}
-  }
-  .side{display:none}
+.caption{font-family:var(--mono);font-size:10.5px;line-height:1.65;color:var(--ink-dim);
+  padding:10px 16px;flex:0 0 auto;display:flex;gap:9px;align-items:flex-start}
+.caption .idx{width:3px;flex:0 0 auto;align-self:stretch;background:var(--mark);margin-top:2px;margin-bottom:2px}
 
-  /* ---- shared screen furniture, themed by platform vars ---- */
-  .sb{height:42px;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;
-    padding:0 20px 4px;font-size:12.5px;font-weight:600;opacity:.85}
-  .body{flex:1;overflow-y:auto;min-height:0}
-  .ttl{padding:6px 16px 10px;font-weight:700;letter-spacing:-.02em}
-  .plat-android .ttl{font-size:26px}
-  .plat-ios .ttl{font-size:31px;letter-spacing:-.028em}
-  .search{margin:0 14px 12px;height:38px;border-radius:99px;background:var(--s-line);display:flex;
-    align-items:center;gap:8px;padding:0 13px;color:var(--s-dim);font-size:14.5px}
-  .plat-ios .search{border-radius:10px;height:36px}
-  .sec{font-size:11.5px;font-weight:600;color:var(--s-dim);letter-spacing:.05em;text-transform:uppercase;
-    padding:12px 18px 6px}
-  .grp{background:var(--s-card);margin:0 12px;border-radius:var(--s-r-card);overflow:hidden}
-  .plat-android .grp{background:transparent;display:flex;flex-direction:column;gap:8px;margin:0 12px}
-  .row{display:flex;align-items:center;gap:12px;padding:12px 14px;font-size:15px;cursor:pointer}
-  .plat-ios .row{border-bottom:.5px solid var(--s-line)}
-  .plat-ios .row:last-child{border-bottom:none}
-  .plat-android .row{background:var(--s-card);border-radius:16px}
-  .row .ic{width:38px;height:38px;border-radius:11px;background:var(--s-tonal);display:flex;
-    align-items:center;justify-content:center;flex:0 0 auto}
-  .plat-ios .row .ic{width:29px;height:29px;border-radius:7px;background:transparent}
-  .row .tx{flex:1;min-width:0}
-  .row .tx .sub{font-size:12.5px;color:var(--s-dim);margin-top:1px;overflow:hidden;
-    text-overflow:ellipsis;white-space:nowrap}
-  .row .cnt{color:var(--s-dim);font-size:14px}
-  .cards{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 12px}
-  .cd{background:var(--s-card);border-radius:var(--s-r-card);padding:11px 12px;min-height:74px;
-    display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.4;cursor:pointer;
-    border:1px solid transparent;overflow:hidden}
-  .plat-ios .cd{border-color:var(--s-line)}
-  .cd .pv{color:var(--s-txt);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
-    overflow:hidden;word-break:break-word}
-  .cd .ft{display:flex;align-items:center;gap:5px;color:var(--s-dim);font-size:10.5px;margin-top:auto}
-  .cd .thumb{flex:1;min-height:44px;border-radius:8px}
-  .bar{flex:0 0 auto;background:var(--s-card);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
-  .plat-ios .bar{border-top:.5px solid var(--s-line)}
-  .plat-android .bar{background:var(--s-card);border-top:1px solid var(--s-line)}
-  .bar .t{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--s-dim)}
-  .bar .t[data-on="1"]{color:var(--s-accent)}
-  .plat-android .bar .t[data-on="1"] .pill{background:var(--s-tonal)}
-  .bar .t .pill{padding:3px 18px;border-radius:99px;display:flex;align-items:center;justify-content:center}
-  .fab{position:absolute;right:16px;bottom:88px;background:var(--s-accent);color:var(--s-accent-c);
-    display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,.28);cursor:pointer}
-  .plat-android .fab{width:60px;height:60px;border-radius:19px}
-  .plat-ios .fab{width:52px;height:52px;border-radius:50%}
-  .btn{background:var(--s-accent);color:var(--s-accent-c);border-radius:var(--s-r-btn);padding:13px;
-    text-align:center;font-weight:600;font-size:15.5px;margin:0 12px;cursor:pointer}
-  .btn.ghost{background:transparent;color:var(--s-accent);border:1.5px solid var(--s-accent)}
-  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--s-card);z-index:5;
-    border-radius:22px 22px 0 0;padding:10px 0 22px;box-shadow:0 -8px 28px rgba(0,0,0,.28)}
-  .plat-ios .sheet{border-radius:14px 14px 0 0}
-  .grab{width:34px;height:5px;border-radius:3px;background:var(--s-line);margin:0 auto 12px}
-  .badge{font-size:10.5px;padding:2px 8px;border-radius:99px;background:var(--s-tonal);color:var(--s-txt)}
-  .stepn{width:24px;height:24px;border-radius:50%;background:var(--s-accent);color:var(--s-accent-c);
-    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 auto}
-  .done{width:24px;height:24px;border-radius:50%;background:var(--s-tonal);display:flex;
-    align-items:center;justify-content:center;flex:0 0 auto}
-  svg{display:block}
-  button:focus-visible,.chip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+/* ---------- the device ---------- */
+.stage{flex:1 1 auto;min-height:0;display:flex;justify-content:center;padding:0 12px 14px}
+.device{position:relative;width:100%;max-width:392px;height:min(70vh,100%);min-height:0;
+  border-radius:14px;overflow:hidden;background:var(--body);
+  border:1px solid var(--etch);
+  box-shadow:0 0 0 1px #000 inset, 0 22px 50px rgba(0,0,0,.6);}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--body)}
+
+@media (min-width:900px){
+  body{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:0 34px;
+    padding:30px;height:auto;min-height:100%}
+  header,.rail{flex-basis:100%;max-width:880px;padding-inline:0}
+  .caption{display:none}
+  .stage{flex:0 0 auto;height:auto;padding:22px 0 0}
+  .device{width:378px;height:756px;border-radius:34px;border-width:8px;border-color:#0A0C0E}
+  .notes{display:block;flex:0 0 300px;max-width:330px;padding-top:22px}
+}
+.notes{display:none;font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--ink-dim)}
+.notes h3{font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);margin:0 0 8px;font-weight:700}
+.notes p{margin:0 0 14px}
+.notes b{color:var(--ink);font-weight:500}
+.notes .sep{height:1px;background:repeating-linear-gradient(90deg,var(--etch) 0 1px,transparent 1px 5px);margin:16px 0}
+
+/* ============ screen internals ============ */
+.status{height:34px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:.08em}
+.scroll{flex:1;overflow-y:auto;min-height:0;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+
+.head{padding:14px 18px 10px}
+.head h1{margin:0;font-size:27px;font-weight:800;letter-spacing:-.035em;line-height:1}
+.head .sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);margin-top:7px}
+
+/* engraved section label with tick */
+.lbl{display:flex;align-items:center;gap:9px;padding:16px 18px 8px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint)}
+.lbl::after{content:"";flex:1;height:1px;
+  background:repeating-linear-gradient(90deg,var(--etch) 0 1px,transparent 1px 4px)}
+
+/* the slot: where a stored thing lives */
+.slot{display:flex;gap:0;margin:0 14px 7px;background:var(--plate);border:1px solid var(--etch-lo);
+  border-radius:3px;overflow:hidden;cursor:pointer;position:relative;
+  transition:border-color .16s,transform .16s}
+.slot:active{transform:scale(.994)}
+.slot .mark{width:3px;flex:0 0 auto;background:transparent}
+.slot[data-pin="1"] .mark{background:var(--mark)}
+.slot[data-pin="1"]{border-color:#3A2A26}
+.slot .in{flex:1;min-width:0;padding:11px 13px}
+.slot .val{font-family:var(--mono);font-size:12.5px;line-height:1.5;color:var(--ink);
+  word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.slot .foot{display:flex;align-items:center;gap:7px;margin-top:8px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+.slot .foot .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-faint)}
+.slot .side{flex:0 0 auto;display:flex;align-items:center;padding:0 12px;color:var(--ink-faint)}
+.slot .thumb{height:52px;border-radius:2px;margin:11px 13px;flex:1}
+
+/* directory rows (collections) */
+.dir{display:flex;align-items:center;gap:13px;padding:12px 18px;cursor:pointer;
+  border-bottom:1px solid var(--etch-lo)}
+.dir:active{background:var(--plate)}
+.dir .g{width:30px;height:30px;border:1px solid var(--etch);border-radius:2px;display:flex;
+  align-items:center;justify-content:center;color:var(--ink-dim);flex:0 0 auto;background:var(--plate)}
+.dir .n{flex:1;min-width:0}
+.dir .n b{display:block;font-size:14.5px;font-weight:600;letter-spacing:-.01em}
+.dir .n span{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);display:block;margin-top:3px}
+.dir .ct{font-family:var(--mono);font-size:12px;color:var(--ink-faint)}
+
+/* seek bar */
+.seek{margin:0 14px 4px;display:flex;align-items:center;gap:10px;padding:10px 13px;
+  background:var(--plate);border:1px solid var(--etch-lo);border-radius:3px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+
+/* bottom control deck */
+.deck{flex:0 0 auto;border-top:1px solid var(--etch);background:var(--plate);
+  display:flex;padding:9px 0 calc(11px + env(safe-area-inset-bottom))}
+.deck .k{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--ink-faint);
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;
+  position:relative}
+.deck .k[data-on="1"]{color:var(--ink)}
+.deck .k[data-on="1"]::before{content:"";position:absolute;top:-9px;width:26px;height:2px;background:var(--mark)}
+/* iOS body swaps the deck to a lighter, tighter rhythm */
+.ios .deck{padding:7px 0 calc(9px + env(safe-area-inset-bottom))}
+.ios .deck .k[data-on="1"]::before{width:100%;left:0;right:0;height:1px;background:var(--etch);top:-7px}
+.ios .deck .k[data-on="1"]{color:var(--mark)}
+
+/* capture button — machined shutter */
+.shutter{position:absolute;right:16px;bottom:82px;width:54px;height:54px;cursor:pointer;
+  background:radial-gradient(circle at 38% 32%,var(--plate-hi),var(--body));
+  border:1px solid var(--etch);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 18px rgba(0,0,0,.55), 0 0 0 4px #0C0E11}
+.android .shutter{border-radius:16px}
+.ios .shutter{border-radius:50%}
+.shutter::after{content:"";position:absolute;inset:5px;border:1px solid var(--etch-lo);border-radius:inherit}
+
+/* sheet */
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--plate);z-index:6;
+  border-top:1px solid var(--etch);padding:0 0 20px;
+  box-shadow:0 -18px 40px rgba(0,0,0,.6);animation:rise .3s cubic-bezier(.2,.9,.3,1)}
+@keyframes rise{from{transform:translateY(22px);opacity:0}to{transform:none;opacity:1}}
+.android .sheet{border-radius:16px 16px 0 0}
+.ios .sheet{border-radius:10px 10px 0 0}
+.sheet .pull{width:30px;height:3px;background:var(--etch);border-radius:2px;margin:9px auto 0}
+
+.act{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 14px;padding:13px;
+  background:var(--mark);color:#120603;border-radius:3px;font-weight:700;font-size:14px;
+  letter-spacing:.02em;cursor:pointer;font-family:var(--sans)}
+.act.sec{background:transparent;color:var(--ink);border:1px solid var(--etch)}
+.opt{display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--etch-lo);
+  font-size:13.5px;cursor:pointer}
+.opt .g{color:var(--ink-dim);flex:0 0 auto;display:flex}
+.opt .t{flex:1}
+.opt .v{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+
+.tag{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;
+  padding:3px 7px;border:1px solid var(--etch);color:var(--ink-dim);border-radius:2px}
+.tag.hot{border-color:var(--mark);color:var(--mark)}
+
+.gauge{margin:0 14px 8px;padding:12px 13px;background:var(--plate);border:1px solid var(--etch-lo);border-radius:3px}
+.gauge .top{display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+.gauge .num{font-family:var(--mono);font-size:19px;color:var(--ink);letter-spacing:-.02em}
+.gauge .num i{font-style:normal;color:var(--ink-faint);font-size:12px}
+.gauge .bar{height:3px;background:var(--etch-lo);margin-top:9px;position:relative;overflow:hidden}
+.gauge .bar i{position:absolute;inset:0 auto 0 0;background:var(--mark);animation:fill .6s cubic-bezier(.2,.9,.3,1)}
+@keyframes fill{from{width:0!important}}
+
+.stagger>*{animation:up .34s both cubic-bezier(.2,.9,.3,1)}
+.stagger>*:nth-child(1){animation-delay:.02s}.stagger>*:nth-child(2){animation-delay:.05s}
+.stagger>*:nth-child(3){animation-delay:.08s}.stagger>*:nth-child(4){animation-delay:.11s}
+.stagger>*:nth-child(5){animation-delay:.14s}.stagger>*:nth-child(6){animation-delay:.17s}
+.stagger>*:nth-child(7){animation-delay:.2s}.stagger>*:nth-child(8){animation-delay:.23s}
+.stagger>*:nth-child(n+9){animation-delay:.26s}
+@keyframes up{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+svg{display:block}
+button:focus-visible{outline:1px solid var(--mark);outline-offset:2px}
 </style>
 </head>
-<body class="plat-android">
+<body class="android">
 
-<div class="top">
-  <h1>The main app — the thing the extensions hang off</h1>
-  <p>Same data, same structure, two native skins. Toggle to see how each platform renders it. Every icon here is a real vector — Material Symbols shapes on Android, SF Symbols shapes on iOS.</p>
-  <div class="toggle" id="toggle"></div>
-</div>
+<header>
+  <div class="brandrow">
+    <div class="brand">Reel<em>.</em></div>
+    <div class="spec" id="spec">Android · One UI</div>
+  </div>
+  <p class="tagline">A precision instrument for the things you retype. Machined body, engraved labels, everything you stored shown as what it is — data.</p>
+  <div class="switch" id="switch"></div>
+</header>
 
-<div class="chips" id="chips"></div>
+<nav class="rail" id="rail"></nav>
+<div class="caption" id="caption"></div>
 
-<div class="nav">
-  <button id="prev">Prev</button>
-  <div class="meta" id="meta"></div>
-  <button id="next">Next</button>
-</div>
+<div class="stage"><div class="device"><div class="scr" id="scr"></div></div></div>
 
-<div class="stage"><div class="frame"><div class="scr" id="scr"></div></div></div>
-
-<aside class="side" id="side"></aside>
+<aside class="notes" id="notes"></aside>
 
 <script>
 'use strict';
-
-/* ---------------- icon sets: no emoji anywhere ---------------- */
-/* Material Symbols Rounded — geometric, filled, 24dp grid */
-const MAT = {
-  clipboard:'<path d="M19 3h-4.2A3 3 0 0 0 12 1a3 3 0 0 0-2.8 2H5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/>',
-  snippet:'<path d="M14.7 12 21 5.7a1 1 0 0 0-1.4-1.4L13.3 10.6 11 8.3A4 4 0 1 0 8.3 11l2.3 2.3-2.3 2.3A4 4 0 1 0 11 18.3l2.3-2.3 6.3 6.3A1 1 0 0 0 21 21ZM6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm0 10a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z"/>',
-  doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Zm-1 7V3.5L18.5 9ZM8 13h8v2H8Zm0 4h8v2H8Z"/>',
-  image:'<path d="M5 21a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2Zm2.5-4h9a.5.5 0 0 0 .4-.8l-2.5-3.3a.5.5 0 0 0-.8 0L11.5 16 10 14.1a.5.5 0 0 0-.8 0l-2.1 2.7a.5.5 0 0 0 .4.8Z"/>',
-  link:'<path d="M3.9 12A3.1 3.1 0 0 1 7 8.9h4V7H7a5 5 0 0 0 0 10h4v-1.9H7A3.1 3.1 0 0 1 3.9 12ZM8 13h8v-2H8Zm9-6h-4v1.9h4a3.1 3.1 0 1 1 0 6.2h-4V17h4a5 5 0 0 0 0-10Z"/>',
-  pin:'<path d="M16 9V4h1a1 1 0 0 0 0-2H7a1 1 0 0 0 0 2h1v5c0 1.7-1.3 3-3 3v2h5.9v6l1 1 1-1v-6H19v-2c-1.7 0-3-1.3-3-3Z"/>',
-  search:'<path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5 1.5-1.5Zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Z"/>',
-  add:'<path d="M11 13H6a1 1 0 0 1 0-2h5V6a1 1 0 0 1 2 0v5h5a1 1 0 0 1 0 2h-5v5a1 1 0 0 1-2 0Z"/>',
-  settings:'<path d="m19.1 12.9.1-.9-.1-.9 1.9-1.5a.5.5 0 0 0 .1-.6l-1.8-3.1a.5.5 0 0 0-.6-.2l-2.2.9a7 7 0 0 0-1.6-.9l-.3-2.4a.5.5 0 0 0-.5-.4h-3.6a.5.5 0 0 0-.5.4l-.3 2.4c-.6.2-1.1.5-1.6.9l-2.2-.9a.5.5 0 0 0-.6.2L3.5 9a.5.5 0 0 0 .1.6l1.9 1.5-.1.9.1.9-1.9 1.5a.5.5 0 0 0-.1.6l1.8 3.1c.1.2.4.3.6.2l2.2-.9c.5.4 1 .7 1.6.9l.3 2.4c0 .3.2.4.5.4h3.6c.3 0 .5-.1.5-.4l.3-2.4c.6-.2 1.1-.5 1.6-.9l2.2.9c.2.1.5 0 .6-.2l1.8-3.1a.5.5 0 0 0-.1-.6ZM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/>',
-  keyboard:'<path d="M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM9 8h2v2H9Zm0 3h2v2H9ZM6 8h2v2H6Zm0 3h2v2H6Zm2.5 6h7v-2h-7ZM12 8h2v2h-2Zm0 3h2v2h-2Zm3-3h2v2h-2Zm0 3h2v2h-2Zm3-3h2v2h-2Zm0 3h2v2h-2Z"/>',
-  overlay:'<path d="M12 3 2 9l10 6 10-6Zm0 8.5L5.2 7.4 12 5l6.8 2.4ZM2 13.5 12 19.5l10-6-1.9-1.1L12 17.2 3.9 12.4Z"/>',
-  chevron:'<path d="M9.3 6.7 14.6 12l-5.3 5.3a1 1 0 0 0 1.4 1.4l6-6a1 1 0 0 0 0-1.4l-6-6a1 1 0 1 0-1.4 1.4Z"/>',
-  back:'<path d="M20 11H7.8l4.9-4.9a1 1 0 0 0-1.4-1.4l-6.6 6.6a1 1 0 0 0 0 1.4l6.6 6.6a1 1 0 0 0 1.4-1.4L7.8 13H20a1 1 0 0 0 0-2Z"/>',
-  check:'<path d="M9 16.2 5.5 12.7a1 1 0 0 0-1.4 1.4l4.2 4.2a1 1 0 0 0 1.4 0L20.3 7.7a1 1 0 0 0-1.4-1.4Z"/>',
-  copy:'<path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11Z"/>',
-  share:'<path d="M18 16.1c-.8 0-1.4.3-2 .8l-7.1-4.2c0-.2.1-.4.1-.7s0-.5-.1-.7l7-4.1c.5.5 1.2.8 2 .8a3 3 0 1 0-3-3l.1.7-7 4.1c-.6-.5-1.3-.8-2.1-.8a3 3 0 0 0 0 6c.8 0 1.5-.3 2.1-.8l7.1 4.2-.1.6a2.9 2.9 0 1 0 2.9-2.9Z"/>',
-  timer:'<path d="M15 1H9v2h6Zm-4 12h2V8h-2Zm8.1-5.6 1.4-1.4-1.4-1.4-1.5 1.4A9 9 0 1 0 21 13a8.9 8.9 0 0 0-1.9-5.6ZM12 20a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/>',
-  shield:'<path d="M12 1 3 5v6c0 5.6 3.8 10.7 9 12 5.2-1.3 9-6.4 9-12V5Zm-1 15-4-4 1.4-1.4L11 13.2l5.6-5.6L18 9Z"/>',
-};
-/* SF Symbols — lighter stroke weight, rounded caps, optically airier */
-const SF = {
-  clipboard:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3.5" width="11" height="14" rx="2.5"/><path d="M8.5 3.5V3a1.5 1.5 0 0 1 3 0v.5"/><path d="M8.5 6.5h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V6.5" transform="translate(-1.5 -.5)"/></g>',
-  snippet:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="17.5" r="2.5"/><path d="M8.6 8.1 20 19.5M20 4.5 8.6 15.9"/></g>',
-  doc:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.8h7l5 5v13.4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3.8a1 1 0 0 1 1-1Z"/><path d="M13 2.8v5h5M8 13h8M8 16.5h8"/></g>',
-  image:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 16.5 4.2-4.2a1.5 1.5 0 0 1 2.1 0l2.4 2.4M12 16.5l2.6-2.6a1.5 1.5 0 0 1 2.1 0L20 17"/></g>',
-  link:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10 13.5a4 4 0 0 0 5.7 0l2.8-2.8a4 4 0 0 0-5.7-5.7l-1.4 1.4"/><path d="M14 10.5a4 4 0 0 0-5.7 0l-2.8 2.8a4 4 0 1 0 5.7 5.7l1.4-1.4"/></g>',
-  pin:'<path d="M14.6 2.9a1.4 1.4 0 0 0-2 0l-.5.5a1.4 1.4 0 0 0 0 2l.2.2-3.4 3.1-2.3-.5a1.2 1.2 0 0 0-1.1 2l3 3-4.1 5.3a.6.6 0 0 0 .9.8l5.2-4.2 3 3a1.2 1.2 0 0 0 2-1.1l-.5-2.3 3.1-3.4.2.2a1.4 1.4 0 0 0 2 0l.5-.5a1.4 1.4 0 0 0 0-2Z"/>',
-  search:'<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.3"/><path d="m15.2 15.2 4.6 4.6"/></g>',
-  add:'<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></g>',
-  settings:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 2.6a2 2 0 0 1 1.6.8l.7 1 1.2-.2a2 2 0 0 1 2.2 1.3l.4 1.1 1.1.4a2 2 0 0 1 1.3 2.2l-.2 1.2 1 .7a2 2 0 0 1 0 3.2l-1 .7.2 1.2a2 2 0 0 1-1.3 2.2l-1.1.4-.4 1.1a2 2 0 0 1-2.2 1.3l-1.2-.2-.7 1a2 2 0 0 1-3.2 0l-.7-1-1.2.2a2 2 0 0 1-2.2-1.3l-.4-1.1-1.1-.4a2 2 0 0 1-1.3-2.2l.2-1.2-1-.7a2 2 0 0 1 0-3.2l1-.7-.2-1.2a2 2 0 0 1 1.3-2.2l1.1-.4.4-1.1a2 2 0 0 1 2.2-1.3l1.2.2.7-1A2 2 0 0 1 12 2.6Z"/><circle cx="12" cy="12" r="3.2"/></g>',
-  keyboard:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M6 9.2h.01M9.5 9.2h.01M13 9.2h.01M16.5 9.2h.01M6 12.6h.01M9.5 12.6h.01M13 12.6h.01M16.5 12.6h.01M8 15.8h8"/></g>',
-  overlay:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3.2 8.5 4.6L12 12.4 3.5 7.8Z"/><path d="m4.5 11.4-1 .6 8.5 4.6 8.5-4.6-1-.6"/><path d="m4.5 15.4-1 .6 8.5 4.6 8.5-4.6-1-.6"/></g>',
-  chevron:'<g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 5.5 6.5 6.5-6.5 6.5"/></g>',
-  back:'<g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5 8 12l6.5 6.5"/></g>',
-  check:'<g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></g>',
-  copy:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="13" rx="2.5"/><path d="M16 5.5a2.5 2.5 0 0 0-2.5-2.5h-8A2.5 2.5 0 0 0 3 5.5v10A2.5 2.5 0 0 0 5.5 18"/></g>',
-  share:'<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15.5V3.2"/><path d="m8.4 6.6 3.6-3.4 3.6 3.4"/><path d="M6.5 11H5.2a2 2 0 0 0-2 2v6.6a2 2 0 0 0 2 2h13.6a2 2 0 0 0 2-2V13a2 2 0 0 0-2-2h-1.3"/></g>',
-  timer:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="13.5" r="8"/><path d="M12 9.5v4l2.5 1.8M9.5 2.5h5M19 6.5l1.6-1.6"/></g>',
-  shield:'<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 2.7 4.5 5.5v6c0 4.8 3.1 9.1 7.5 10.3 4.4-1.2 7.5-5.5 7.5-10.3v-6Z"/><path d="m8.8 11.8 2.4 2.4 4.2-4.6"/></g>',
+/* ---- icons: geometric line work, drawn to match the engraving ---- */
+const I={
+  clip:'<rect x="5.5" y="3.5" width="13" height="17" rx="1.5"/><path d="M9 3.5V2.8h6v.7M9 9h6M9 12.5h6M9 16h3.5"/>',
+  snip:'<circle cx="6" cy="6.5" r="2.4"/><circle cx="6" cy="17.5" r="2.4"/><path d="M8.1 8.1 19 19M19 5 8.1 15.9"/>',
+  doc:'<path d="M6 2.8h7.5L18 7.3v13.9H6z"/><path d="M13.3 2.8v4.6H18M9 12h6M9 15.5h6"/>',
+  img:'<rect x="3.5" y="5" width="17" height="14" rx="1.5"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m4 17 4.6-4.6 3 3 3.4-3.4L20 17"/>',
+  link:'<path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.3-2.3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.3 2.3a4 4 0 0 0 5.7 5.7l1.2-1.2"/>',
+  pin:'<path d="M9 3h6v5.5l2.5 3.5v2H6.5v-2L9 8.5z"/><path d="M12 14v7"/>',
+  seek:'<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4.5 4.5"/>',
+  add:'<path d="M12 5.5v13M5.5 12h13"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/>',
+  key:'<rect x="2.5" y="6" width="19" height="12" rx="1.5"/><path d="M6 10h.01M9.5 10h.01M13 10h.01M16.5 10h.01M6 13.5h.01M9.5 13.5h.01M13 13.5h.01M16.5 13.5h.01M8.5 16.5h7"/>',
+  layer:'<path d="m12 3 8.5 4.5L12 12 3.5 7.5z"/><path d="m4.5 11 -1 .5L12 16l8.5-4.5-1-.5"/><path d="m4.5 15 -1 .5L12 20l8.5-4.5-1-.5"/>',
+  share:'<path d="M12 15.5V3.5"/><path d="m8.5 6.8 3.5-3.3 3.5 3.3"/><path d="M7 10.5H5v10h14v-10h-2"/>',
+  copy:'<rect x="8.5" y="8.5" width="12" height="12.5" rx="1.5"/><path d="M15.5 5.5V3.5h-12v12h2"/>',
+  ok:'<path d="m4.5 12.5 5 5 10-11"/>',
+  next:'<path d="m9.5 5.5 6.5 6.5-6.5 6.5"/>',
+  back:'<path d="M14.5 5.5 8 12l6.5 6.5"/>',
+  time:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.8M9.5 2.5h5"/>',
+  lock:'<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8.5 10.5V7a3.5 3.5 0 0 1 7 0v3.5"/>',
 };
 let PLAT='android';
-const ic=(n,sz)=>`<svg viewBox="0 0 24 24" width="${sz||22}" height="${sz||22}" fill="${PLAT==='android'?'currentColor':'currentColor'}" aria-hidden="true">${(PLAT==='android'?MAT:SF)[n]||''}</svg>`;
+const ic=(n,s)=>`<svg viewBox="0 0 24 24" width="${s||18}" height="${s||18}" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
 
-/* ---------------- content ---------------- */
-const COLS=[
-  ['clipboard','Clipboard','6 items','the inbox — raw captures land here'],
-  ['snippet','Snippets','7 items','curated, reused text'],
-  ['doc','Docs','3 items','resume, cover letter, transcript'],
-  ['image','Images','2 items','headshot, portfolio cover'],
-  ['link','Links','3 items','portfolio, LinkedIn, scheduling'],
+const DIRS=[
+  ['clip','Clipboard','inbox · raw capture','6'],
+  ['snip','Snippets','curated · reused','7'],
+  ['doc','Docs','pdf · attachments','3'],
+  ['img','Images','photo · screenshot','2'],
+  ['link','Links','url · scheduling','3'],
 ];
-const CLIP=[
-  ['PineTree-Guest / autumn2026!','Wifi'],
-  ['alex.rivera@example.com','Email'],
-  ['+1 (614) 555-0164','Phone'],
-  ['482 Maple Grove Ave, Apt 3B, Columbus OH 43210','Address'],
-  ['DE89 3704 0044 0532 0130 00','IBAN'],
+const SLOTS=[
+  ['PineTree-Guest / autumn2026!','WIFI','copy',0],
+  ['alex.rivera@example.com','EMAIL','copy',1],
+  ['+1 (614) 555-0164','PHONE','copy',0],
+  ['482 Maple Grove Ave, Apt 3B\nColumbus OH 43210','ADDRESS','copy',0],
+  ['DE89 3704 0044 0532 0130 00','IBAN · SENSITIVE','lock',0],
 ];
-const sb=()=>`<div class="sb"><span>9:41</span><span>5G</span></div>`;
-const bar=on=>`<div class="bar">${[['clipboard','Library'],['search','Search'],['settings','Settings']]
-  .map((t,i)=>`<div class="t" data-on="${i===on?1:0}"><span class="pill">${ic(t[0],22)}</span>${t[1]}</div>`).join('')}</div>`;
+const st=()=>`<div class="status"><span>09:41</span><span>${PLAT==='ios'?'5G':'5G ▮▮'}</span></div>`;
+const deck=on=>`<div class="deck">${[['clip','Vault'],['seek','Seek'],['gear','Setup']]
+  .map((k,i)=>`<div class="k" data-on="${i===on?1:0}">${ic(k[0],19)}${k[1]}</div>`).join('')}</div>`;
 
-const SCREENS={
-  library:{name:'Library',cap:'Home. Pinned things first, then your collections. Icons here are wayfinding only — item cards show content, never icons.',
-    html:()=>`${sb()}<div class="body">
-      <div class="ttl">Library</div>
-      <div class="search">${ic('search',18)}<span>Search everything</span></div>
-      <div class="sec">Pinned</div>
-      <div class="cards">
-        <div class="cd"><span class="pv">Best,<br>Alex Rivera</span><span class="ft">${ic('pin',12)} Signature</span></div>
-        <div class="cd"><span class="pv">alex.rivera@example.com</span><span class="ft">${ic('pin',12)} Email</span></div>
-      </div>
-      <div class="sec">Collections</div>
-      <div class="grp">
-        ${COLS.map(c=>`<div class="row"><span class="ic">${ic(c[0],20)}</span>
-          <span class="tx">${c[1]}<div class="sub">${c[3]}</div></span>
-          <span class="cnt">${c[2].split(' ')[0]}</span>${ic('chevron',16)}</div>`).join('')}
-      </div>
-      <div style="height:96px"></div>
-    </div>
-    <div class="fab">${ic('add',26)}</div>${bar(0)}`},
+const S={
+vault:{n:'Vault',c:'Home. Pinned slots carry the index mark. Everything stored is shown as data — mono, unstyled, exactly as you saved it.',
+ h:()=>`${st()}<div class="scroll stagger">
+  <div class="head"><h1>Vault</h1><div class="sub">21 items · 2 pinned</div></div>
+  <div class="seek">${ic('seek',15)} SEEK ANYTHING</div>
+  <div class="lbl">Pinned</div>
+  ${SLOTS.filter(s=>s[3]).map(s=>slot(s)).join('')}
+  ${slot(['Best,\nAlex Rivera','SIGNATURE','copy',1])}
+  <div class="lbl">Directory</div>
+  ${DIRS.map(d=>`<div class="dir"><span class="g">${ic(d[0],16)}</span>
+    <span class="n"><b>${d[1]}</b><span>${d[2]}</span></span>
+    <span class="ct">${d[3]}</span>${ic('next',15)}</div>`).join('')}
+  <div style="height:92px"></div></div>
+  <div class="shutter">${ic('add',22)}</div>${deck(0)}`},
 
-  collection:{name:'Collection',cap:'Inside Clipboard. Content cards, Samsung-style — the text is the interface. Every type sits in one list with the same affordances.',
-    html:()=>`${sb()}<div class="body">
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 14px 0;color:var(--s-accent)">
-        ${ic('back',20)}<span style="font-size:15px">Library</span></div>
-      <div class="ttl">Clipboard</div>
-      <div class="search">${ic('search',18)}<span>Search Clipboard</span></div>
-      <div class="cards">
-        ${CLIP.map((c,i)=>`<div class="cd">
-          <span class="pv">${c[0]}</span>
-          <span class="ft">${i===1?ic('pin',12):ic('copy',12)} ${c[1]}</span></div>`).join('')}
-        <div class="cd"><span class="thumb" style="background:linear-gradient(135deg,#3E5A72,#22303E)"></span>
-          <span class="ft">${ic('image',12)} Screenshot</span></div>
-      </div>
-      <div style="height:96px"></div>
-    </div><div class="fab">${ic('add',26)}</div>${bar(0)}`},
+dir:{n:'Directory',c:'Inside a collection. No icons on items — the content is the identity. Type lives in the engraved footer line, not a badge.',
+ h:()=>`${st()}<div class="scroll stagger">
+  <div class="head" style="padding-top:8px">
+    <div style="display:flex;align-items:center;gap:8px;color:var(--ink-faint);font-family:var(--mono);
+      font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px">${ic('back',14)} VAULT</div>
+    <h1>Clipboard</h1><div class="sub">inbox · 6 items · promote to keep</div></div>
+  <div class="seek">${ic('seek',15)} SEEK IN CLIPBOARD</div>
+  <div class="lbl">Most recent</div>
+  ${SLOTS.map(s=>slot(s)).join('')}
+  <div class="slot"><span class="mark"></span>
+    <span class="thumb" style="background:linear-gradient(118deg,#2A3A47,#151C22)"></span></div>
+  <div style="height:92px"></div></div>
+  <div class="shutter">${ic('add',22)}</div>${deck(0)}`},
 
-  item:{name:'Item',cap:'One primary action, sized for a thumb. Everything else is quiet. Sensitive items say what will happen to the clipboard.',
-    html:()=>`${sb()}<div class="body" style="filter:brightness(.55)">
-      <div class="ttl">Clipboard</div>
-      <div class="cards">${CLIP.slice(0,4).map(c=>`<div class="cd"><span class="pv">${c[0]}</span></div>`).join('')}</div>
-    </div>
-    <div class="sheet">
-      <div class="grab"></div>
-      <div style="padding:0 16px">
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
-          <span style="width:46px;height:46px;border-radius:13px;background:var(--s-tonal);display:flex;align-items:center;justify-content:center">${ic('shield',24)}</span>
-          <span><div style="font-size:17px;font-weight:650">IBAN</div>
-          <div style="font-size:12.5px;color:var(--s-dim)">Clipboard · used 4 times · added Tuesday</div></span>
-        </div>
-        <div style="background:var(--s-bg);border-radius:12px;padding:11px 13px;font-size:13.5px;margin-bottom:12px">DE89 3704 0044 0532 0130 00</div>
-        <div class="btn" style="margin:0 0 8px;display:flex;align-items:center;justify-content:center;gap:8px">${ic('copy',20)} Copy</div>
-        <div style="display:flex;gap:7px;align-items:center;color:var(--s-dim);font-size:12px;margin-bottom:12px">
-          ${ic('timer',15)} Clears from your clipboard after 60 seconds</div>
-        <div class="grp" style="margin:0">
-          <div class="row"><span class="ic">${ic('share',18)}</span><span class="tx">Share…</span></div>
-          <div class="row"><span class="ic">${ic('pin',18)}</span><span class="tx">Pin</span><span class="badge">slot 3</span></div>
-          <div class="row"><span class="ic">${ic('snippet',18)}</span><span class="tx">Move to Snippets</span></div>
-        </div>
-      </div>
-    </div>`},
+item:{n:'Item',c:'One action, weighted. Sensitive items state the clipboard consequence in plain language — no lock icon theatre.',
+ h:()=>`${st()}<div class="scroll" style="filter:brightness(.45)">
+  <div class="head"><h1>Clipboard</h1></div>${SLOTS.slice(0,3).map(s=>slot(s)).join('')}</div>
+  <div class="sheet"><div class="pull"></div>
+   <div style="padding:14px 18px 12px">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px">
+      <span class="tag hot">Sensitive</span><span class="tag">Clipboard</span>
+      <span style="margin-left:auto;font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+        color:var(--ink-faint)">USED 4×</span></div>
+    <div style="font-family:var(--mono);font-size:15px;line-height:1.6;letter-spacing:.02em;
+      padding:13px;background:var(--body);border:1px solid var(--etch-lo);border-radius:2px">DE89 3704 0044<br>0532 0130 00</div>
+   </div>
+   <div style="padding:0 0 4px"><div class="act">${ic('copy',18)} COPY</div></div>
+   <div style="display:flex;gap:8px;align-items:center;padding:11px 18px;font-family:var(--mono);
+     font-size:10px;color:var(--ink-faint);letter-spacing:.06em">${ic('time',14)} CLEARS FROM CLIPBOARD IN 60S</div>
+   <div class="opt"><span class="g">${ic('pin',17)}</span><span class="t">Pin to a slot</span><span class="v">Slot 3</span></div>
+   <div class="opt"><span class="g">${ic('share',17)}</span><span class="t">Send elsewhere</span>${ic('next',14)}</div>
+   <div class="opt"><span class="g">${ic('snip',17)}</span><span class="t">Promote to Snippets</span>${ic('next',14)}</div>
+  </div>`},
 
-  surfaces:{name:'Surfaces',cap:'THE distinctive screen. Where the app teaches its extensions — one gesture asked for, everything else optional and self-selected.',
-    html:()=>`${sb()}<div class="body">
-      <div class="ttl">Surfaces</div>
-      <div style="padding:0 16px 12px;color:var(--s-dim);font-size:13.5px">Ways to reach your stuff without opening this app.</div>
-      <div class="sec">Working now</div>
-      <div class="grp">
-        <div class="row"><span class="ic">${ic('share',18)}</span><span class="tx">Share sheet<div class="sub">Save from any app</div></span><span class="done">${ic('check',15)}</span></div>
-        <div class="row"><span class="ic">${ic('search',18)}</span><span class="tx">${PLAT==='ios'?'Spotlight':'Quick Settings tile'}<div class="sub">${PLAT==='ios'?'Search your items from the Home Screen':'One swipe from anywhere'}</div></span><span class="done">${ic('check',15)}</span></div>
-        <div class="row"><span class="ic">${ic('doc',18)}</span><span class="tx">Files<div class="sub">Attach a saved document from inside any app</div></span><span class="done">${ic('check',15)}</span></div>
-      </div>
-      <div class="sec">Pick one to set up</div>
-      <div class="grp">
-        <div class="row"><span class="ic">${ic('overlay',18)}</span><span class="tx">${PLAT==='ios'?'Back Tap':'Floating dial'}<div class="sub">${PLAT==='ios'?'Double-tap the back of your phone':'Reach the dial over any app'}</div></span><span class="stepn">1</span></div>
-      </div>
-      <div class="sec">Optional</div>
-      <div class="grp">
-        <div class="row"><span class="ic">${ic('keyboard',18)}</span><span class="tx">Vault keyboard<div class="sub">Insert without leaving the app you're typing in</div></span>${ic('chevron',16)}</div>
-        <div class="row"><span class="ic">${ic('pin',18)}</span><span class="tx">Widgets &amp; ${PLAT==='ios'?'Action Button':'shortcuts'}<div class="sub">Your pinned items, one press away</div></span>${ic('chevron',16)}</div>
-      </div>
-      <div style="height:96px"></div>
-    </div>${bar(2)}`},
+reach:{n:'Reach',c:'The distinctive screen: how you get at your stuff without opening this. Three already live, exactly one asked of you, the rest optional.',
+ h:()=>`${st()}<div class="scroll stagger">
+  <div class="head"><h1>Reach</h1><div class="sub">ways in, without opening this</div></div>
+  <div class="lbl">Live</div>
+  ${[['share','Share sheet','save from anywhere'],
+     [PLAT==='ios'?'seek':'layer',PLAT==='ios'?'Spotlight':'Quick tile',PLAT==='ios'?'search from home':'one swipe, any screen'],
+     ['doc','Files','attach without leaving mail']]
+    .map(r=>`<div class="dir"><span class="g">${ic(r[0],16)}</span>
+      <span class="n"><b>${r[1]}</b><span>${r[2]}</span></span>
+      <span style="color:var(--mark)">${ic('ok',16)}</span></div>`).join('')}
+  <div class="lbl">Set one up</div>
+  <div class="slot" data-pin="1"><span class="mark"></span><div class="in">
+    <div style="font-size:15px;font-weight:600;margin-bottom:5px">${PLAT==='ios'?'Back Tap':'Edge dial'}</div>
+    <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);line-height:1.6">
+      ${PLAT==='ios'?'Double-tap the back of the phone.<br>Two taps, item on the clipboard.':'Swipe in from the edge.<br>Turn, release, inserted.'}</div>
+    <div class="foot"><span>~40 SEC SETUP</span><span class="dot"></span><span>ONE TIME</span></div>
+  </div><span class="side">${ic('next',16)}</span></div>
+  <div class="lbl">Optional</div>
+  ${[['key','Vault keyboard','type without switching apps'],
+     ['pin',PLAT==='ios'?'Widgets · Action Button':'Widgets · shortcuts','pinned slots, one press']]
+    .map(r=>`<div class="dir"><span class="g">${ic(r[0],16)}</span>
+      <span class="n"><b>${r[1]}</b><span>${r[2]}</span></span>${ic('next',15)}</div>`).join('')}
+  <div style="height:92px"></div></div>${deck(2)}`},
 
-  capture:{name:'Capture',cap:'Adding something by hand. Type is inferred, not asked — you write, it routes. The collection line is the only choice offered.',
-    html:()=>`${sb()}<div class="body">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;color:var(--s-accent);font-size:15.5px">
-        <span>Cancel</span><span style="font-weight:650;color:var(--s-txt)">New item</span><span style="font-weight:650">Save</span></div>
-      <div style="padding:6px 14px">
-        <div style="background:var(--s-card);border-radius:var(--s-r-card);padding:14px;min-height:150px;
-          font-size:15px;line-height:1.5">Thanks for the great conversation, <span style="background:var(--s-tonal);border-radius:4px;padding:1px 5px">___</span> — I left even more excited about the role.</div>
-      </div>
-      <div class="sec">Detected</div>
-      <div class="grp">
-        <div class="row"><span class="ic">${ic('snippet',18)}</span><span class="tx">Text with a blank<div class="sub">You'll fill it in each time you use it</div></span><span class="done">${ic('check',15)}</span></div>
-      </div>
-      <div class="sec">Goes into</div>
-      <div class="grp">
-        <div class="row"><span class="ic">${ic('snippet',18)}</span><span class="tx">Snippets</span>${ic('chevron',16)}</div>
-        <div class="row"><span class="ic">${ic('shield',18)}</span><span class="tx">Sensitive<div class="sub">Hide preview, clear clipboard after use</div></span>
-          <span style="width:44px;height:26px;border-radius:99px;background:var(--s-line);position:relative">
-          <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff"></span></span></div>
-      </div>
-    </div>`},
+take:{n:'Take',c:'Capture. Type is read from what you wrote, never asked. The blank is detected and marked in the index colour.',
+ h:()=>`${st()}<div class="scroll stagger">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 18px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase">
+    <span style="color:var(--ink-faint)">Discard</span><span style="color:var(--ink)">New</span>
+    <span style="color:var(--mark)">Keep</span></div>
+  <div style="margin:4px 14px 0;padding:15px;background:var(--plate);border:1px solid var(--etch-lo);
+    border-radius:3px;min-height:132px;font-family:var(--mono);font-size:13px;line-height:1.7">Thanks for the great conversation, <span style="color:var(--mark);border-bottom:1.5px solid var(--mark);padding-bottom:1px">____</span> — I left even more excited about the role.</div>
+  <div class="lbl">Read from what you wrote</div>
+  <div class="dir"><span class="g">${ic('snip',16)}</span>
+    <span class="n"><b>Text with a blank</b><span>you fill it each time</span></span>
+    <span style="color:var(--mark)">${ic('ok',16)}</span></div>
+  <div class="dir"><span class="g">${ic('doc',16)}</span>
+    <span class="n"><b>Filed to Snippets</b><span>change if you like</span></span>${ic('next',15)}</div>
+  <div class="lbl">Handling</div>
+  <div class="dir"><span class="g">${ic('lock',16)}</span>
+    <span class="n"><b>Sensitive</b><span>hide preview · clear after use</span></span>
+    <span style="width:38px;height:21px;border:1px solid var(--etch);border-radius:2px;position:relative;background:var(--body)">
+    <span style="position:absolute;top:2px;left:2px;width:15px;height:15px;background:var(--etch)"></span></span></div>
+ </div>`},
 
-  settings:{name:'Settings',cap:'Plain and system-shaped. The free-tier limits are visible rather than hidden, so the paywall never ambushes.',
-    html:()=>`${sb()}<div class="body">
-      <div class="ttl">Settings</div>
-      <div class="sec">Your plan</div>
-      <div class="grp">
-        <div class="row"><span class="ic">${ic('pin',18)}</span><span class="tx">Pinned items<div class="sub">2 of 2 used</div></span><span class="badge">Free</span></div>
-        <div class="row"><span class="ic">${ic('image',18)}</span><span class="tx">Files &amp; images<div class="sub">5 of 20 used</div></span><span class="badge">Free</span></div>
-      </div>
-      <div style="padding:12px 12px 0"><div class="btn">Unlock unlimited</div></div>
-      <div class="sec">Appearance</div>
-      <div class="grp">
-        <div class="row"><span class="ic">${ic('overlay',18)}</span><span class="tx">Dial position<div class="sub">Right edge</div></span>${ic('chevron',16)}</div>
-        <div class="row"><span class="ic">${ic('settings',18)}</span><span class="tx">Theme<div class="sub">Match system</div></span>${ic('chevron',16)}</div>
-      </div>
-      <div class="sec">Privacy</div>
-      <div class="grp">
-        <div class="row"><span class="ic">${ic('shield',18)}</span><span class="tx">Everything stays on this ${PLAT==='ios'?'iPhone':'phone'}<div class="sub">No account, no server, no analytics</div></span></div>
-      </div>
-      <div style="height:96px"></div>
-    </div>${bar(2)}`},
+setup:{n:'Setup',c:'Limits shown as gauges, never hidden. You always know how much room is left before anything asks for money.',
+ h:()=>`${st()}<div class="scroll stagger">
+  <div class="head"><h1>Setup</h1><div class="sub">free tier · everything on device</div></div>
+  <div class="lbl">Capacity</div>
+  <div class="gauge"><div class="top"><span>Pinned slots</span><span>${ic('pin',13)}</span></div>
+    <div class="num">2<i>/2</i></div><div class="bar"><i style="width:100%"></i></div></div>
+  <div class="gauge"><div class="top"><span>Files &amp; images</span><span>${ic('img',13)}</span></div>
+    <div class="num">5<i>/20</i></div><div class="bar"><i style="width:25%"></i></div></div>
+  <div style="padding:6px 0 2px"><div class="act">REMOVE THE LIMITS</div></div>
+  <div style="font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);text-align:center;
+    padding:9px 18px 0;letter-spacing:.1em">ONE PAYMENT · NO SUBSCRIPTION</div>
+  <div class="lbl">Body</div>
+  <div class="dir"><span class="g">${ic('layer',16)}</span>
+    <span class="n"><b>Dial position</b><span>right edge · locked</span></span>${ic('next',15)}</div>
+  <div class="dir"><span class="g">${ic('gear',16)}</span>
+    <span class="n"><b>Finish</b><span>graphite</span></span>${ic('next',15)}</div>
+  <div class="lbl">Privacy</div>
+  <div style="margin:0 14px;padding:13px;background:var(--plate);border:1px solid var(--etch-lo);
+    border-radius:3px;font-family:var(--mono);font-size:10.5px;line-height:1.7;color:var(--ink-dim)">
+    NO ACCOUNT. NO SERVER. NO ANALYTICS.<br>
+    <span style="color:var(--ink)">Everything lives on this ${PLAT==='ios'?'iPhone':'phone'}.</span></div>
+  <div style="height:92px"></div></div>${deck(2)}`},
 };
-
-const ORDER=['library','collection','item','surfaces','capture','settings'];
-let cur='library';
-
-function render(){
-  document.body.className='plat-'+PLAT;
-  const s=SCREENS[cur];
-  document.getElementById('scr').innerHTML=s.html();
-  document.getElementById('meta').textContent=s.cap;
-  document.getElementById('toggle').innerHTML=
-    [['android','Android'],['ios','iOS']].map(p=>
-      `<button data-p="${p[0]}" data-on="${PLAT===p[0]?1:0}">${p[1]}</button>`).join('');
-  [...document.getElementById('toggle').children].forEach(b=>b.onclick=()=>{PLAT=b.dataset.p;render();});
-  [...document.getElementById('chips').children].forEach(c=>c.dataset.on=c.dataset.k===cur?'1':'0');
-  document.querySelector(`.chip[data-k="${cur}"]`)?.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
-  document.getElementById('side').innerHTML=`<div class="card"><h2>What differs</h2>
-    <b>Android</b> uses Material 3: rounded 20px cards on a tonal surface, a squircle FAB, pill-shaped
-    nav indicators, and Material Symbols — geometric, filled, on a 24dp grid.<br><br>
-    <b>iOS</b> uses inset grouped lists on systemGroupedBackground, a circular FAB, and SF Symbols —
-    lighter strokes, rounded caps, optically airier.<br><br>
-    Same rows, same data, same structure. Nothing here is a compromise skin.</div>
-    <div class="card"><h2>Current screen</h2>${s.cap}</div>`;
+function slot(s){
+  return `<div class="slot" data-pin="${s[3]}"><span class="mark"></span>
+    <div class="in"><div class="val">${s[0].replace(/\n/g,'<br>')}</div>
+      <div class="foot"><span>${s[1]}</span><span class="dot"></span><span>${s[3]?'PINNED':'RECENT'}</span></div></div>
+    <span class="side">${ic(s[2],16)}</span></div>`;
 }
-const chips=document.getElementById('chips');
-chips.innerHTML=ORDER.map(k=>`<button class="chip" data-k="${k}">${SCREENS[k].name}</button>`).join('');
-[...chips.children].forEach(el=>el.onclick=()=>{cur=el.dataset.k;render();});
-document.getElementById('prev').onclick=()=>{cur=ORDER[(ORDER.indexOf(cur)+ORDER.length-1)%ORDER.length];render();};
-document.getElementById('next').onclick=()=>{cur=ORDER[(ORDER.indexOf(cur)+1)%ORDER.length];render();};
+
+const ORDER=['vault','dir','item','reach','take','setup'];
+let cur='vault';
+function render(){
+  document.body.className=PLAT;
+  document.getElementById('spec').textContent=PLAT==='ios'?'iOS · Apple HIG':'Android · One UI';
+  document.getElementById('scr').innerHTML=S[cur].h();
+  document.getElementById('caption').innerHTML=`<span class="idx"></span><span>${S[cur].c}</span>`;
+  document.getElementById('switch').innerHTML=[['android','Android'],['ios','iOS']]
+    .map(p=>`<button data-p="${p[0]}" data-on="${PLAT===p[0]?1:0}">${p[1]}</button>`).join('');
+  [...document.getElementById('switch').children].forEach(b=>b.onclick=()=>{PLAT=b.dataset.p;render()});
+  [...document.getElementById('rail').children].forEach(b=>b.dataset.on=b.dataset.k===cur?'1':'0');
+  document.querySelector(`#rail [data-k="${cur}"]`)?.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+  document.getElementById('notes').innerHTML=`
+    <h3>The idea</h3>
+    <p>What people store here is <b>data</b> — an IBAN, a wifi key, an order number. So it is set in mono and shown raw. No card decoration competing with the thing you came for.</p>
+    <div class="sep"></div>
+    <h3>Where it comes from</h3>
+    <p>The dial is a machined lens barrel. This is the rest of that instrument: <b>knurled rules</b>, engraved uppercase labels, hairline plate edges, and exactly one colour — the <b style="color:var(--mark)">focus index</b>, spent only on pinned slots and the single action that matters.</p>
+    <div class="sep"></div>
+    <h3>Two bodies</h3>
+    <p><b>Android</b> squares its shutter, keeps a hard indicator bar, denser deck. <b>iOS</b> rounds the shutter, uses a hairline rule and tints the active key. Same instrument, different housing — the identity does not soften on either.</p>`;
+}
+const rail=document.getElementById('rail');
+rail.innerHTML=ORDER.map(k=>`<button data-k="${k}">${S[k].n}</button>`).join('');
+[...rail.children].forEach(b=>b.onclick=()=>{cur=b.dataset.k;render()});
 let sx=null;
-const scr=document.getElementById('scr');
 addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
-addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;
-  if(Math.abs(dx)>70)document.getElementById(dx<0?'next':'prev').click();},{passive:true});
+addEventListener('touchend',e=>{if(sx===null)return;const d=e.changedTouches[0].clientX-sx;sx=null;
+  if(Math.abs(d)>70){const i=ORDER.indexOf(cur);cur=ORDER[(i+(d<0?1:ORDER.length-1))%ORDER.length];render()}},{passive:true});
 render();
 </script>
 </body>
