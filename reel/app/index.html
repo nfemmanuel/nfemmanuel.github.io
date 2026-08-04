@@ -161,11 +161,17 @@ input.hunt{font-family:inherit;outline:none;border:none;color:var(--ink);width:c
 .toast{position:absolute;left:16px;right:16px;bottom:92px;z-index:9;padding:13px 16px;border-radius:16px;
   background:var(--ink);color:var(--ground);font-size:14px;font-weight:500;text-align:center;
   animation:rise .3s var(--spring)}
-.stag>*{animation:pop .42s both var(--spring)}
-.stag>*:nth-child(1){animation-delay:.01s}.stag>*:nth-child(2){animation-delay:.04s}
-.stag>*:nth-child(3){animation-delay:.07s}.stag>*:nth-child(4){animation-delay:.1s}
-.stag>*:nth-child(5){animation-delay:.13s}.stag>*:nth-child(n+6){animation-delay:.16s}
-@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+/* Content appears at full opacity, then settles once — a damped bounce, whole
+   screen together. No staggered fade-ups: they read as generated, and they make
+   the app feel slower than it is. First open only. */
+.settle{animation:settle .52s cubic-bezier(.3,1,.5,1) 1}
+@keyframes settle{
+  0%{transform:translateY(0)}
+  26%{transform:translateY(-7px)}
+  54%{transform:translateY(3.5px)}
+  78%{transform:translateY(-1.5px)}
+  100%{transform:translateY(0)}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 svg{display:block}
 </style>
@@ -209,6 +215,7 @@ const TYPE={txt:'Text',img:'Images',doc:'Docs',lnk:'Links'};
 
 /* ── mutable state ── */
 let PLAT='md',THEME='light';
+let firstOpen=true;   /* the settle bounce plays once, on launch — not on every navigation */
 const st={tab:'vault',view:'vault',arg:null,sheet:null,q:'',toast:null,pinCap:2};
 let ITEMS=[
   {id:1,t:'txt',v:'alex.rivera@example.com',pin:1},
@@ -267,7 +274,7 @@ const card=it=>`<div class="card" onclick="openSheet(${it.id})">
 /* ── screens ── */
 const V={
 vault:()=>`${sbar()}${tbar('',null,`<span class="tbtn" onclick="go('add')">${ic('add',17)}</span>`)}
-  <div class="roll stag" style="padding-top:46px">
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:34px">Everything<br>you reuse</h1>
       <div class="sub">${ITEMS.length} things · ${pinned().length} pinned</div></div>
     <div class="hunt" onclick="tab('find')">${ic('find',20)} Search everything</div>
@@ -282,7 +289,7 @@ vault:()=>`${sbar()}${tbar('',null,`<span class="tbtn" onclick="go('add')">${ic(
 
 type:()=>{const t=st.arg,list=byType(t);
   return `${sbar()}${tbar("go('vault')",TYPE[t],`<span class="tbtn" onclick="go('add')">${ic('add',17)}</span>`)}
-  <div class="roll stag" style="padding-top:46px">
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:33px;color:var(--c-${t})">${TYPE[t]}</h1>
       <div class="sub">${list.length} saved</div></div>
     ${list.length?'':`<div class="empty"><div class="e1">Nothing here yet</div>
@@ -312,7 +319,7 @@ item:()=>'',
 add:()=>`${sbar()}${tbar("go('"+(st.tab==='vault'?'vault':'you')+"')",'New',
     `<span class="tbtn wide" style="background:var(--c-txt);color:#fff;border:none"
       onclick="toast('Saved to Text');go('vault')">Save</span>`)}
-  <div class="roll stag" style="padding-top:46px">
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div class="card" style="margin:8px 16px 11px"><div class="in" style="min-height:150px">
       <div class="val" style="-webkit-line-clamp:unset;color:var(--ink-3)">Type or paste anything…</div></div></div>
     <div class="sect">Reel will work out</div>
@@ -325,7 +332,7 @@ add:()=>`${sbar()}${tbar("go('"+(st.tab==='vault'?'vault':'you')+"')",'New',
   </div>`,
 
 you:()=>`${sbar()}${tbar('','You','')}
-  <div class="roll stag" style="padding-top:46px">
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:33px">You</h1>
       <div class="sub">free · everything stays on this phone</div></div>
     <div class="sect">Room left</div>
@@ -351,7 +358,7 @@ you:()=>`${sbar()}${tbar('','You','')}
   </div>${nav()}`,
 
 reach:()=>`${sbar()}${tbar("go('you')",'Reach','')}
-  <div class="roll stag" style="padding-top:46px">
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:33px">Reach it<br>anywhere</h1>
       <div class="sub">without opening this app</div></div>
     <div class="sect">Already working</div>
@@ -384,7 +391,7 @@ reach:()=>`${sbar()}${tbar("go('you')",'Reach','')}
   </div>${nav()}`,
 
 setup:()=>`${sbar()}${tbar("go('reach')",PLAT==='ios'?'Back Tap':'Edge dial','')}
-  <div class="roll stag" style="padding-top:46px">
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:31px;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Edge dial'}</h1>
       <div class="sub">about 40 seconds, once</div></div>
     ${(PLAT==='ios'
@@ -402,7 +409,7 @@ setup:()=>`${sbar()}${tbar("go('reach')",PLAT==='ios'?'Back Tap':'Edge dial','')
   </div>`,
 
 plan:()=>`${sbar()}${tbar("go('you')",'','')}
-  <div class="roll stag" style="padding-top:46px">
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:33px">Remove<br>the limits</h1>
       <div class="sub">one payment, no subscription</div></div>
     <div class="sect">What changes</div>
@@ -449,8 +456,8 @@ function render(){
     .map(p=>`<button data-p="${p[0]}" data-on="${PLAT===p[0]?1:0}">${p[1]}</button>`).join('');
   document.getElementById('themeSeg').innerHTML=[['light','Light'],['dark','Dark']]
     .map(t=>`<button data-t="${t[0]}" data-on="${THEME===t[0]?1:0}">${t[1]}</button>`).join('');
-  [...document.getElementById('platSeg').children].forEach(b=>b.onclick=()=>{PLAT=b.dataset.p;render()});
-  [...document.getElementById('themeSeg').children].forEach(b=>b.onclick=()=>{THEME=b.dataset.t;render()});
+  [...document.getElementById('platSeg').children].forEach(b=>b.onclick=()=>{PLAT=b.dataset.p;relaunch()});
+  [...document.getElementById('themeSeg').children].forEach(b=>b.onclick=()=>{THEME=b.dataset.t;relaunch()});
   document.getElementById('notes').innerHTML=`
     <h3>Try these</h3>
     <p>Tap a <b>type tile</b> to open it · tap any <b>card</b> for its sheet · <b>Pin</b> and watch the Vault reorder · try pinning a <b>third</b> thing · <b>Find</b> and type "cal" or "pdf" · <b>You → Reach → Set it up</b>.</p>
@@ -471,6 +478,11 @@ function renderKeepFocus(){
 }
 Object.assign(window,{go,tab,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st});
 render();
+/* let the bounce finish, then never again this session */
+setTimeout(()=>{firstOpen=false},600);
+/* the platform/theme switches re-launch the app, so the settle is worth seeing again */
+function relaunch(){firstOpen=true;render();setTimeout(()=>{firstOpen=false},600);}
+window.relaunch=relaunch;
 </script>
 </body>
 </html>
