@@ -88,11 +88,53 @@ input.hunt{font-family:inherit;outline:none;border:none;color:var(--ink);width:c
 .md .card{border-radius:22px} .ios .card{border-radius:16px}
 .dark .card{border:1px solid var(--hair)}
 .card .in{padding:15px 16px}
-.card .val{font-size:16px;line-height:1.45;font-weight:450;padding-right:22px;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-.card .val.code{font-family:var(--mono);font-size:14.5px;letter-spacing:-.01em}
 .pin{position:absolute;top:13px;right:13px;color:var(--ink-3);opacity:.55;display:flex}
-.thumb{height:78px;border-radius:12px;margin:15px 16px}
+
+/* ═══ item tiles ═══
+   Saved things are squares, not rows. The point is that you recognise one by its
+   shape and colour before you read a word of it, so you can skip most of the grid
+   instead of reading all of it. Costs density — affordable only because the
+   auto-capture buffer is capped, so this list is short by design. */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:0 16px}
+.gc{position:relative;aspect-ratio:1;background:var(--surf);box-shadow:var(--shadow-s);
+  cursor:pointer;overflow:hidden;transition:transform .3s var(--spring)}
+.gc:active{transform:scale(.965)}
+.md .gc{border-radius:24px} .ios .gc{border-radius:18px}
+.dark .gc{border:1px solid var(--hair)}
+.gc .face{position:absolute;inset:0;padding:14px}
+/* a short value centred in a square looks composed; the same value pinned to the top
+   looks abandoned. Long values still start at the top so the fade reads as "more". */
+.gc .face.sh{display:flex;align-items:center}
+/* Type scales to content length. A phone number is the entire point of its tile, so it
+   gets to be big; a paragraph has to be small to show enough of itself to be
+   recognised. A uniform 13px made every tile look like an empty box. */
+.gc .tx{font-size:13px;line-height:1.44;font-weight:450;word-break:break-word}
+.gc .tx.s1{font-size:17.5px;line-height:1.3;letter-spacing:-.015em}
+.gc .tx.s2{font-size:15px;line-height:1.38;letter-spacing:-.01em}
+.gc .tx.ind{padding-right:17px}
+.gc .tx.code{font-family:var(--mono);font-size:12px;letter-spacing:-.01em}
+.gc .tx.code.s1{font-size:15px} .gc .tx.code.s2{font-size:13.5px}
+.gc .tx .dom{font-weight:650;color:var(--c-lnk)}
+/* long values fade out rather than ending in an ellipsis — gentler in a small square,
+   and it reads as "there is more" instead of "this was cut off" */
+.gc.txt::after,.gc.lnk::after{content:"";position:absolute;left:0;right:0;bottom:0;height:32px;
+  background:linear-gradient(transparent,var(--surf));pointer-events:none}
+/* images: the picture is the whole tile */
+.gc .shot{position:absolute;inset:0}
+.gc .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 13px 11px;color:#fff;
+  font-size:12.5px;font-weight:600;letter-spacing:-.01em;
+  background:linear-gradient(transparent,rgba(0,0,0,.66))}
+/* files: the file type is the cover art */
+.gc.doc{background:var(--t-doc)}
+.gc.doc .face{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+  padding-bottom:36px;color:var(--c-doc)}
+.gc .ext{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  padding:2.5px 8px;border-radius:7px;background:color-mix(in srgb,var(--c-doc) 18%,transparent)}
+.gc .fname{position:absolute;left:0;right:0;bottom:0;padding:0 12px 13px;text-align:center;
+  font-size:12px;font-weight:600;color:var(--ink-2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gc .pin{top:11px;right:11px;opacity:.5}
+.gc.img .pin{color:#fff;opacity:.92}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:0 16px}
 .tile{padding:15px 14px 13px;cursor:pointer;position:relative;overflow:hidden;display:flex;
   flex-direction:column;min-height:126px;transition:transform .34s var(--spring)}
@@ -152,7 +194,7 @@ input.hunt{font-family:inherit;outline:none;border:none;color:var(--ink);width:c
 .gauge .track{height:6px;border-radius:99px;background:var(--hair);margin-top:11px;overflow:hidden}
 .gauge .track i{display:block;height:100%;border-radius:99px}
 /* just-arrived items get a brief ring so you can see what landed */
-.card.fresh{box-shadow:0 0 0 2px var(--c-doc),var(--shadow-s)}
+.gc.fresh{box-shadow:0 0 0 2px var(--c-doc),var(--shadow-s)}
 /* the clipboard catcher */
 .catch{margin:14px 16px 4px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:13px;
   border:1.5px dashed var(--hair);background:transparent;transition:.2s var(--glide)}
@@ -392,11 +434,32 @@ const tbar=(back,title,right)=>`<div class="tbar">
   ${back?`<span class="tbtn" onclick="${back}">${ic('back',17)}</span>`:'<span style="width:36px"></span>'}
   ${title?`<span style="font-weight:600;font-size:15px">${title}</span>`:'<span></span>'}
   ${right||'<span style="width:36px"></span>'}</div>`;
-const card=it=>`<div class="card${it.fresh?' fresh':''}" onclick="openSheet(${it.id})">
-  ${it.pin?`<span class="pin">${ic('pin',14,1.9)}</span>`:''}
-  ${it.g?`<div class="thumb" style="background:${it.g}"></div>`
-        :`<div class="in"><div class="val${it.code?' code':''}">${it.v.replace(/\n/g,'<br>')}</div></div>`}
-  ${it.g?`<div class="in" style="padding-top:0"><div class="val">${it.v}</div></div>`:''}</div>`;
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const extOf=v=>{const m=v.match(/\.(\w{1,5})$/);return m?m[1].toUpperCase():'FILE'};
+/* Offer the wrapper somewhere sensible to break. Without this an email splits as
+   "alex.rivera@e / xample.com", which is harder to read than the whole string. */
+const wbr=s=>s.replace(/([@./_-])/g,'$1<wbr>');
+/* a link is easier to place when the domain is the loud part and the path is not */
+const domify=v=>{const m=v.match(/^([^/]+)(\/.*)?$/);
+  return m?`<span class="dom">${m[1]}</span>${m[2]||''}`:v};
+
+const card=it=>{
+  const pin=it.pin?`<span class="pin">${ic('pin',13,1.9)}</span>`:'';
+  const open=`onclick="openSheet(${it.id})"`;
+  const fresh=it.fresh?' fresh':'';
+  if(it.t==='img')return `<div class="gc img${fresh}" ${open}>
+    <div class="shot" style="background:${it.g}"></div>
+    <div class="cap">${esc(it.v)}</div>${pin}</div>`;
+  if(it.t==='doc')return `<div class="gc doc${fresh}" ${open}>
+    <div class="face">${ic('doc',34,1.5)}<span class="ext">${extOf(it.v)}</span></div>
+    <div class="fname">${esc(it.v.replace(/\.\w{1,5}$/,''))}</div>${pin}</div>`;
+  const body=it.t==='lnk'?domify(wbr(esc(it.v)))
+                         :wbr(esc(it.v)).replace(/\n/g,'<br>');
+  const n=it.v.length, size=n<=26?' s1':n<=58?' s2':'', sh=n<58?' sh':'';
+  return `<div class="gc ${it.t}${fresh}" ${open}>
+    <div class="face${sh}"><div class="tx${it.code?' code':''}${size}${it.pin?' ind':''}">${body}</div></div>${pin}</div>`;
+};
+const grid=list=>`<div class="grid">${list.map(card).join('')}</div>`;
 
 /* ── screens ── */
 const V={
@@ -414,10 +477,10 @@ vault:()=>`${sbar()}${tbar('',null,`<span class="tbtn" onclick="go('add')">${ic(
       ${st.watch?`<span style="display:flex;align-items:center;gap:9px;flex:0 0 auto">
         <span style="font-family:var(--mono);font-size:12px;color:var(--c-doc)">${autoItems().length}/${AUTO_CAP}</span>
         <span class="live"></span></span>`:ic('next',17)}</div>
-    ${pinned().length?`<div class="sect">Pinned</div>${pinned().map(card).join('')}`:''}
-    ${(()=>{const recent=ITEMS.filter(i=>!i.pin).slice(0,3);
+    ${pinned().length?`<div class="sect">Pinned</div>${grid(pinned())}`:''}
+    ${(()=>{const recent=ITEMS.filter(i=>!i.pin).slice(0,4);
       return recent.length?`<div class="sect">${ITEMS.some(i=>i.fresh)?'Just arrived':'Recent'}</div>
-        ${recent.map(card).join('')}`:''})()}
+        ${grid(recent)}`:''})()}
     <div class="sect">By type</div>
     <div class="tiles">
       ${Object.keys(TYPE).map(t=>`<div class="tile" style="background:var(--t-${t});color:var(--c-${t})"
@@ -433,9 +496,9 @@ type:()=>{const t=st.arg,list=byType(t);
       <div class="sub">${list.length} saved</div></div>
     ${list.length?'':`<div class="empty"><div class="e1">Nothing here yet</div>
       <div class="e2">Things land here when you share or copy them from another app.</div></div>`}
-    ${list.filter(i=>i.pin).length?`<div class="sect">Pinned</div>${list.filter(i=>i.pin).map(card).join('')}`:''}
+    ${list.filter(i=>i.pin).length?`<div class="sect">Pinned</div>${grid(list.filter(i=>i.pin))}`:''}
     ${list.filter(i=>!i.pin).length?`<div class="sect">${list.some(i=>i.pin)?'Everything else':'All'}</div>
-      ${list.filter(i=>!i.pin).map(card).join('')}`:''}
+      ${grid(list.filter(i=>!i.pin))}`:''}
   </div>${nav()}`},
 
 find:()=>{const q=st.q.trim().toLowerCase();
@@ -448,7 +511,7 @@ find:()=>{const q=st.q.trim().toLowerCase();
       <div class="tiles">${Object.keys(TYPE).map(t=>`<div class="tile" style="background:var(--t-${t});color:var(--c-${t});min-height:96px"
         onclick="go('type','${t}')"><span class="glyph" style="background:color-mix(in srgb,var(--c-${t}) 18%,transparent)">${ic(t,18)}</span>
         <span class="n" style="font-size:15px">${TYPE[t]}</span></div>`).join('')}</div>`
-     :res.length?`<div class="sect">${res.length} result${res.length>1?'s':''}</div>${res.map(card).join('')}`
+     :res.length?`<div class="sect">${res.length} result${res.length>1?'s':''}</div>${grid(res)}`
      :`<div class="empty"><div class="e1">No match</div>
        <div class="e2">Nothing here contains “${st.q}”.</div></div>`}
   </div>${nav()}`},
