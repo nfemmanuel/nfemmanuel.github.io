@@ -19,6 +19,13 @@
   --display:"Bricolage Grotesque",system-ui,sans-serif;
   --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
   --spring:cubic-bezier(.34,1.56,.5,1); --glide:cubic-bezier(.2,.85,.3,1);
+  /* File families borrow the colours people already carry in their heads — red is a
+     PDF, green is a spreadsheet, orange is a deck. Leaning on that is the cheapest
+     recognition we will ever get. Only the glyph and badge are saturated; the tile
+     itself takes a wash of the same hue, so a shelf of files reads as one family. */
+  --f-pdf:#C0413B; --f-doc:#2F6DB5; --f-txt:#5D6773; --f-sheet:#2C8A56;
+  --f-deck:#C07524; --f-code:#6B58A4; --f-zip:#96793D; --f-vid:#A8348B; --f-aud:#37878A;
+  --fmix:10%;
 }
 /* dark: tints carry real chroma instead of washing toward the ground —
    roughly double the saturation, lifted a stop, so they read as colour. */
@@ -29,6 +36,9 @@
   --c-doc:#8FC6FF; --t-doc:#0F4275;
   --c-lnk:#FFA184; --t-lnk:#66301F;
   --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
+  --f-pdf:#FF8A80; --f-doc:#8CB9FF; --f-txt:#A7B1BD; --f-sheet:#6FD79B;
+  --f-deck:#FFB265; --f-code:#BBA8F5; --f-zip:#E3C57E; --f-vid:#FF9FE0; --f-aud:#6FD4D6;
+  --fmix:17%;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
@@ -125,11 +135,12 @@ input.hunt{font-family:inherit;outline:none;border:none;color:var(--ink);width:c
   font-size:12.5px;font-weight:600;letter-spacing:-.01em;
   background:linear-gradient(transparent,rgba(0,0,0,.66))}
 /* files: the file type is the cover art */
-.gc.doc{background:var(--t-doc)}
+.gc.doc{background:color-mix(in srgb,var(--fc) var(--fmix),var(--surf))}
 .gc.doc .face{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
-  padding-bottom:36px;color:var(--c-doc)}
+  padding-bottom:36px;color:var(--fc)}
 .gc .ext{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
-  padding:2.5px 8px;border-radius:7px;background:color-mix(in srgb,var(--c-doc) 18%,transparent)}
+  padding:2.5px 8px;border-radius:7px;color:var(--fc);
+  background:color-mix(in srgb,var(--fc) 20%,transparent)}
 .gc .fname{position:absolute;left:0;right:0;bottom:0;padding:0 12px 13px;text-align:center;
   font-size:12px;font-weight:600;color:var(--ink-2);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -275,6 +286,17 @@ const I={
   time:'<circle cx="12" cy="12.6" r="8.2"/><path d="M12 8.4v4.4l2.6 1.9M9.6 2.6h4.8"/>',
   trash:'<path d="M4.6 6.6h14.8M9.4 6.6V4.4h5.2v2.2M6.6 6.6l1 13.2h8.8l1-13.2"/>',
   pencil:'<path d="M16.4 3.6a2.3 2.3 0 0 1 3.3 3.3L8.2 18.4l-4.3 1 1-4.3z"/><path d="m14.6 5.4 4 4"/>',
+  /* File families. Documents keep one silhouette and differ inside, so a shelf of them
+     still reads as a shelf; archives and media get their own outline because they are
+     not documents and pretending otherwise helps nobody. */
+  fAny:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/>',
+  fDoc:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="M9.2 12.6h5.6M9.2 15.4h5.6M9.2 18.2h3.4"/>',
+  fSheet:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><rect x="9" y="12" width="6.2" height="6.6" rx="1"/><path d="M9 15.3h6.2M12.1 12v6.6"/>',
+  fDeck:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="M9.6 18.6v-2.9M12.1 18.6v-5.6M14.6 18.6v-3.8"/>',
+  fCode:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="m11.3 12.9-2.1 2.6 2.1 2.6M13.1 12.9l2.1 2.6-2.1 2.6"/>',
+  fZip:'<rect x="4.2" y="5.4" width="15.6" height="4.2" rx="1.4"/><path d="M5.8 9.6v9a1.6 1.6 0 0 0 1.6 1.6h9.2a1.6 1.6 0 0 0 1.6-1.6v-9"/><path d="M10.3 13.6h3.4"/>',
+  fVid:'<rect x="3.2" y="5.4" width="17.6" height="13.2" rx="2.8"/><path d="m10.3 9.3 5.2 2.7-5.2 2.7z"/>',
+  fAud:'<path d="M3.6 11.1v1.8M7.2 8.6v6.8M10.8 5.8v12.4M14.4 9.2v5.6M18 10.6v3.2M21.2 11.4v1.6"/>',
 };
 const ic=(n,s,w)=>`<svg viewBox="0 0 24 24" width="${s||20}" height="${s||20}" fill="none" stroke="currentColor" stroke-width="${w||1.7}" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
 const TYPE={txt:'Text',img:'Images',doc:'Docs',lnk:'Links'};
@@ -294,11 +316,19 @@ let ITEMS=[
   {id:8,t:'img',v:'Headshot',g:'linear-gradient(135deg,#7B55B4,#3E2C5E)'},
   {id:9,t:'img',v:'Portfolio cover',g:'linear-gradient(135deg,#356BA6,#1D3A5C)'},
   {id:10,t:'doc',v:'Resume.pdf'},
-  {id:11,t:'doc',v:'Cover-letter.pdf'},
+  {id:11,t:'doc',v:'Cover-letter.docx'},
   {id:12,t:'doc',v:'Transcript.pdf'},
   {id:13,t:'lnk',v:'alexrivera.example.com'},
   {id:14,t:'lnk',v:'linkedin.example.com/in/alexrivera'},
   {id:15,t:'lnk',v:'cal.example.com/alex/15min'},
+  {id:16,t:'doc',v:'Portfolio.zip'},
+  {id:17,t:'doc',v:'Rate-card.xlsx'},
+  {id:18,t:'doc',v:'Case-study.pptx'},
+  {id:19,t:'doc',v:'References.txt'},
+  {id:20,t:'doc',v:'Contract-signed.pdf'},
+  {id:21,t:'doc',v:'site-config.xml'},
+  {id:22,t:'doc',v:'Showreel.mp4'},
+  {id:23,t:'doc',v:'Voice-memo.m4a'},
 ];
 /* ── inference: the app works out the type, it never asks ── */
 const isUrl=v=>/^(https?:\/\/|www\.)/i.test(v.trim())||/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v.trim());
@@ -436,6 +466,21 @@ const tbar=(back,title,right)=>`<div class="tbar">
   ${right||'<span style="width:36px"></span>'}</div>`;
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const extOf=v=>{const m=v.match(/\.(\w{1,5})$/);return m?m[1].toUpperCase():'FILE'};
+/* Extensions are grouped into families because a tile has room for a kind, not a
+   format — nobody needs .xls told apart from .xlsx at a glance. */
+const FILE=[
+  [/^pdf$/,                                  'fDoc',  'pdf'],
+  [/^(docx?|rtf|pages|odt)$/,                'fDoc',  'doc'],
+  [/^(txt|md|log)$/,                         'fDoc',  'txt'],
+  [/^(xlsx?|csv|numbers|ods)$/,              'fSheet','sheet'],
+  [/^(pptx?|key|odp)$/,                      'fDeck', 'deck'],
+  [/^(json|xml|ya?ml|html?|css|js|ts|svg)$/, 'fCode', 'code'],
+  [/^(zip|rar|7z|tar|gz)$/,                  'fZip',  'zip'],
+  [/^(mp4|mov|avi|mkv|webm)$/,               'fVid',  'vid'],
+  [/^(mp3|wav|m4a|aac|flac)$/,               'fAud',  'aud'],
+];
+const kindOf=v=>{const e=extOf(v).toLowerCase(),h=FILE.find(f=>f[0].test(e));
+  return h?{g:h[1],c:`var(--f-${h[2]})`}:{g:'fAny',c:'var(--c-doc)'}};
 /* Offer the wrapper somewhere sensible to break. Without this an email splits as
    "alex.rivera@e / xample.com", which is harder to read than the whole string. */
 const wbr=s=>s.replace(/([@./_-])/g,'$1<wbr>');
@@ -450,9 +495,10 @@ const card=it=>{
   if(it.t==='img')return `<div class="gc img${fresh}" ${open}>
     <div class="shot" style="background:${it.g}"></div>
     <div class="cap">${esc(it.v)}</div>${pin}</div>`;
-  if(it.t==='doc')return `<div class="gc doc${fresh}" ${open}>
-    <div class="face">${ic('doc',34,1.5)}<span class="ext">${extOf(it.v)}</span></div>
-    <div class="fname">${esc(it.v.replace(/\.\w{1,5}$/,''))}</div>${pin}</div>`;
+  if(it.t==='doc'){const k=kindOf(it.v);
+    return `<div class="gc doc${fresh}" style="--fc:${k.c}" ${open}>
+    <div class="face">${ic(k.g,34,1.5)}<span class="ext">${extOf(it.v)}</span></div>
+    <div class="fname">${esc(it.v.replace(/\.\w{1,5}$/,''))}</div>${pin}</div>`;}
   const body=it.t==='lnk'?domify(wbr(esc(it.v)))
                          :wbr(esc(it.v)).replace(/\n/g,'<br>');
   const n=it.v.length, size=n<=26?' s1':n<=58?' s2':'', sh=n<58?' sh':'';
