@@ -49,7 +49,8 @@ header{padding:14px 16px 0;flex:0 0 auto}
 h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-.035em;margin:0}
 .lede{font-size:12.5px;color:var(--ink-2);margin:5px 0 0;line-height:1.5;max-width:62ch}
 .lede b{color:var(--ink);font-weight:600}
-.ctrls{display:flex;gap:7px;margin-left:auto}
+.ctrls{display:flex;flex-direction:column;gap:7px;margin-left:auto;align-items:flex-start}
+.crow{display:flex;gap:7px}
 .seg{display:flex;background:var(--surf);border:1px solid var(--hair);border-radius:99px;padding:3px}
 .seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:500;
   color:var(--ink-3);padding:6px 13px;border-radius:99px;cursor:pointer;transition:.2s var(--glide)}
@@ -273,6 +274,10 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
 .tagform input:focus{border-color:var(--c-doc)}
 .thint{padding:10px 20px 0;font-size:12.5px;color:var(--ink-3)}
 /* ideas: yes / no / later */
+/* the owner's recorded verdict — muted, no color drama, just a fact under the title */
+.ideatag{display:inline-block;margin-top:5px;padding:3px 9px;border-radius:99px;
+  background:var(--ground);border:1px solid var(--hair);font-size:11px;font-weight:500;
+  color:var(--ink-3)}
 .vote{display:flex;gap:8px;margin-top:12px}
 .vote span{padding:7px 16px;border-radius:99px;border:1px solid var(--hair);font-size:13px;
   font-weight:600;color:var(--ink-2);cursor:pointer;transition:.15s var(--glide)}
@@ -288,6 +293,97 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
   78%{transform:translateY(-1.5px)}
   100%{transform:translateY(0)}
 }
+/* ═══ device form factors ═══
+   The header's third seg sets one body class (device-phone/flip/fold/tablet).
+   CSS carries frame size and grid columns; render() branches only for the two
+   structurally different views — the Flip cover and the tablet detail dock. */
+#devSeg button{padding:6px 11px}
+.devcap{display:none;margin-top:11px;font-size:12.5px;color:var(--ink-3);text-align:center;
+  max-width:300px;line-height:1.5}
+
+/* Fold inner screen — MEDIUM (~673dp), not a tablet. Wider squarer frame, a
+   barely-there hinge hairline down the centre, grids 4-across so tiles clear
+   the fold through the middle gap, search pinned at the top. */
+.device-fold .phone{max-width:566px;height:auto;align-self:center;aspect-ratio:673/841;border-radius:20px}
+.device-fold .phone::after{content:"";position:absolute;top:0;bottom:0;left:calc(50% - .5px);width:1px;
+  z-index:30;pointer-events:none;
+  background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--ink) 13%,transparent) 9%,
+    color-mix(in srgb,var(--ink) 13%,transparent) 91%,transparent)}
+.device-fold .grid,.device-fold .grid.g3,.device-fold .tiles{grid-template-columns:repeat(4,1fr);padding:0 26px}
+.device-fold .sect{padding-left:26px;padding-right:26px}
+.device-fold .big,.device-fold .sub{padding-left:30px;padding-right:30px}
+.device-fold .card,.device-fold .hunt,.device-fold .catch,.device-fold .gauge,.device-fold .set,
+.device-fold .note,.device-fold .ideasrow{margin-left:26px;margin-right:26px}
+.device-fold textarea.ed{width:calc(100% - 52px);margin-left:26px;margin-right:26px}
+.device-fold .hunt{position:sticky;top:50px;z-index:5}
+/* 4-across (fold) and in-pane 3-across (tablet) tiles sit at phone g3 width,
+   so they wear the existing g3 type tiers — same tier system, not a new one */
+.device-fold .gc .tx,.device-tablet .gc .tx{font-size:11.5px}
+.device-fold .gc .tx.s1,.device-tablet .gc .tx.s1{font-size:15px}
+.device-fold .gc .tx.s2,.device-tablet .gc .tx.s2{font-size:13px}
+.device-fold .gc .tx.code,.device-tablet .gc .tx.code{font-size:10.5px}
+.device-fold .gc .tx.code.s1,.device-tablet .gc .tx.code.s1{font-size:14px}
+.device-fold .gc .tx.code.s2,.device-tablet .gc .tx.code.s2{font-size:12px}
+
+/* Tablet / iPad — EXPANDED: landscape frame, the vault on the left, a docked
+   detail panel on the right that replaces the bottom sheet for item actions. */
+.device-tablet .phone{max-width:960px;height:auto;align-self:center;aspect-ratio:4/3;border-radius:22px}
+.panes{flex:1;min-height:0;display:flex}
+.pane-l{position:relative;flex:0 0 42%;min-width:0;display:flex;flex-direction:column;
+  border-right:1px solid var(--hair)}
+.pane-r{flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:none}
+.pane-r::-webkit-scrollbar{display:none}
+.device-tablet .pane-l .sbar{display:none}
+.device-tablet .pane-l .tbar{top:0}
+.device-tablet .grid,.device-tablet .grid.g3{grid-template-columns:repeat(3,1fr)}
+.dockempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;color:var(--ink-3);font-size:14px}
+.dock{margin:16px 22px 22px;background:var(--surf);box-shadow:var(--shadow-s);padding:8px 0 14px}
+.md .dock{border-radius:26px}.ios .dock{border-radius:16px}
+.dark .dock{border:1px solid var(--hair)}
+.dockhead{display:flex;align-items:center;gap:10px;padding:8px 20px 2px}
+.dockhead .dtitle{flex:1;font-size:13px;font-weight:600;color:var(--ink-3)}
+.device-tablet .sheet{right:58%}
+.device-tablet .toast{right:60%}
+
+/* Flip cover screen — CONCEPT (BACKLOG: in discussion). The phone is shut:
+   wordmark, the top four pins in a 2x2 of large tap-targets, tap flashes
+   Copied. No nav, no search, no add — glance-and-copy only. */
+.device-flip .stage{flex-direction:column;align-items:center}
+.device-flip .devcap{display:block}
+.device-flip .phone{width:288px;max-width:288px;height:300px;border-radius:28px}
+.fbar{flex:0 0 auto;height:38px;display:flex;align-items:center;gap:8px;padding:0 15px}
+.fmark{font-family:var(--display);font-size:14px;font-weight:800;letter-spacing:-.03em}
+.ftag{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  border:1px solid var(--hair);border-radius:99px;padding:2px 7px}
+.ftime{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink-2)}
+.fgrid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  gap:9px;padding:2px 11px 11px}
+.fcell{position:relative;background:var(--surf);box-shadow:var(--shadow-s);cursor:pointer;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;
+  transition:transform .3s var(--spring)}
+.md .fcell{border-radius:20px}.ios .fcell{border-radius:16px}
+.dark .fcell{border:1px solid var(--hair)}
+.fcell:active{transform:scale(.94)}
+.fcell .ftx{font-size:11px;line-height:1.35;font-weight:500;word-break:break-word;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.fcell .ftx.code{font-family:var(--mono);font-size:10.5px}
+.fcell.slot{background:transparent;box-shadow:none;border:1.5px dashed var(--hair);cursor:default;
+  color:var(--ink-3);font-size:10.5px;line-height:1.4}
+.fchip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb,var(--ink) 88%,transparent);color:var(--ground);
+  font-size:12.5px;font-weight:600;animation:fade .18s}
+
+/* the desktop arrangement fixes the phone at 376x768; devices override it */
+@media (min-width:900px){
+  .device-fold .phone{width:560px;height:700px}
+  .device-tablet .phone{width:960px;height:720px}
+  .device-flip .phone{width:288px;height:300px;border-radius:32px}
+  /* the cover frame is small enough to ride up beside the header text — keep it
+     on its own row so the caption reads as part of the stage */
+  .device-flip .stage{flex-basis:100%}
+}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 svg{display:block}
 </style>
@@ -297,12 +393,16 @@ svg{display:block}
 <header>
   <div class="hrow">
     <h1 class="pt">Reel</h1>
-    <div class="ctrls"><div class="seg" id="platSeg"></div><div class="seg" id="themeSeg"></div></div>
+    <div class="ctrls">
+      <div class="crow"><div class="seg" id="platSeg"></div><div class="seg" id="themeSeg"></div></div>
+      <div class="crow"><div class="seg" id="devSeg"></div></div>
+    </div>
   </div>
   <p class="lede">Watching is <b>on by default</b> — copy anything and it saves itself while this tab is open. If the browser has not asked for clipboard access yet, flip <b>Watch my clipboard</b> in Settings (gear, top right) to make it ask. It stops when you leave the tab, and that is not a shortcut: <b>no browser, and neither Android nor iOS, lets a background app read your clipboard.</b> Automatic capture on a real phone means being your keyboard.</p>
 </header>
 
-<div class="stage"><div class="phone"><div class="scr" id="scr"></div></div></div>
+<div class="stage"><div class="phone"><div class="scr" id="scr"></div></div>
+  <div class="devcap">Cover screen concept - still in discussion on the ideas page.</div></div>
 <aside class="notes" id="notes"></aside>
 
 <script>
@@ -345,9 +445,15 @@ const TYPE={txt:'Text',img:'Images',doc:'Docs',lnk:'Links'};
 
 /* ── mutable state ── */
 let PLAT='md',THEME='light';
+/* the fake glass this runs on. Flip and Fold are Samsung hardware, so switching
+   the platform seg to iOS while on either falls back to Phone. */
+let DEVICE='phone';
+const DEVICES_MD=[['phone','Phone'],['flip','Flip'],['fold','Fold'],['tablet','Tablet']];
+const DEVICES_IOS=[['phone','Phone'],['tablet','iPad']];
 let firstOpen=true;   /* the settle bounce plays once, on launch — not on every navigation */
 const st={view:'vault',arg:null,sheet:null,q:'',searching:false,toast:null,pinCap:2,
-  noteDismissed:false,tagEdit:false,watch:true,theme:'system',perm:'unknown'};
+  noteDismissed:false,tagEdit:false,watch:true,theme:'system',themePicker:false,perm:'unknown',
+  flipFlash:null};
 const SEED=[
   {id:1,t:'txt',v:'alex.rivera@example.com',pin:1},
   {id:2,t:'txt',v:'Best,\nAlex Rivera',pin:2},
@@ -391,13 +497,14 @@ try{
       ITEMS=j.items;VOTES=j.votes||{};
       st.watch=j.watch!==false;
       if(j.theme==='light'||j.theme==='dark')st.theme=j.theme;
+      if(['phone','flip','fold','tablet'].includes(j.device))DEVICE=j.device;
       st.noteDismissed=j.noteDismissed===true;
     }}
 }catch(_){}
 if(!ITEMS)ITEMS=SEED.map(i=>({...i,src:'seed'}));
 ITEMS.forEach(i=>i.fresh=0);
 function saveStore(){try{localStorage.setItem(KEY,
-  JSON.stringify({v:1,items:ITEMS,watch:st.watch,theme:st.theme,votes:VOTES,
+  JSON.stringify({v:1,items:ITEMS,watch:st.watch,theme:st.theme,device:DEVICE,votes:VOTES,
     noteDismissed:st.noteDismissed}))}catch(_){}}
 /* ── inference: the app works out the type, it never asks ── */
 const isUrl=v=>/^(https?:\/\/|www\.)/i.test(v.trim())||/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v.trim());
@@ -410,7 +517,7 @@ const find=id=>ITEMS.find(i=>i.id===id);
 const nextPin=()=>{const u=pinned().map(p=>p.pin);for(let n=1;n<=99;n++)if(!u.includes(n))return n;};
 
 /* ── actions ── */
-function go(view,arg){st.view=view;st.arg=arg??null;st.sheet=null;render();}
+function go(view,arg){st.view=view;st.arg=arg??null;st.sheet=null;st.themePicker=false;render();}
 function openSearch(){st.searching=true;render();const el=document.getElementById('q');if(el)el.focus();}
 function closeSearch(){st.searching=false;st.q='';render();}
 function openSheet(id){st.sheet=id;st.tagEdit=false;render();}
@@ -423,7 +530,8 @@ function togglePin(id){
   else {it.pin=nextPin();it.auto=0;toast('Pinned — this one stays');}
   render();
 }
-function copy(id){const it=find(id);touchItem(it);st.sheet=null;
+function copy(id){const it=find(id);touchItem(it);
+  if(DEVICE!=='tablet')st.sheet=null;   /* the dock keeps its selection after a copy */
   toast(it.sens?'Copied — clears in 60s':'Copied');}
 function del(id){ITEMS=ITEMS.filter(i=>i.id!==id);st.sheet=null;toast('Deleted');}
 
@@ -464,7 +572,7 @@ function clearFresh(){setTimeout(()=>{ITEMS.forEach(i=>i.fresh=0);render()},2600
    against. So auto-captured things live in a capped buffer and the oldest fall
    off the end. Pinning or editing something marks it deliberate and it stops
    ageing out. Curation is a consequence of what you do, not a bucket to learn. */
-const AUTO_CAP=20, USE_BONUS=8;
+const AUTO_CAP=40, USE_BONUS=8;
 let seq=Math.max(0,...ITEMS.map(i=>i.touch||0));   /* heat survives a reload */
 const autoItems=()=>ITEMS.filter(i=>i.auto&&!i.pin);
 /* Heat: what falls off is the coldest thing, not the oldest. Every use makes an
@@ -588,17 +696,19 @@ function noteCard(){
 function dismissNote(){st.noteDismissed=true;render();}
 
 /* ── ideas: proposals awaiting a verdict — the chips are votes, kept locally ── */
+/* Third field is the owner's recorded verdict (2026-08-05) — a status tag under
+   the title, not a vote: the chips below stay the reader's own opinion. */
 const IDEAS=[
- ['Read text inside images','Screenshots become searchable. The reading happens on your phone; nothing is sent anywhere.'],
- ['Fill-in blanks','Save a template with a gap in it. Pasting asks for the blank, then pastes it complete.'],
- ['Quick tile in the notification shade','Copy your top pin without opening anything. One swipe down, one tap.'],
- ['Cover-screen pins on Flip phones','A 2x2 grid on the closed screen. Tap to copy; the phone stays shut.'],
- ['Paste stack','Copy several things in a row, then insert them in order, one per tap.'],
- ['Link cards remember the page title','Not just the address — a card that says what the page is, so it is easier to place later.'],
- ['Duplicate catcher','Copying the same thing twice just bumps the original. No twins in the grid.'],
- ['Export everything','All of it goes to one file you own, and comes back with import. Your things stay yours.'],
- ['Auto-collections','Things you tag the same way quietly gather themselves into a group.'],
- ['A share target that queues many files','Send a whole handful into Docs at once, straight from another app\'s share sheet.'],
+ ['Read text inside images','Screenshots become searchable. The reading happens on your phone; nothing is sent anywhere.','approved'],
+ ['Fill-in blanks','Save a template with a gap in it. Pasting asks for the blank, then pastes it complete.','parked - wait for the need'],
+ ['Quick tile in the notification shade','Copy your top pin without opening anything. One swipe down, one tap.','in discussion'],
+ ['Cover-screen pins on Flip phones','A 2x2 grid on the closed screen. Tap to copy; the phone stays shut.','in discussion'],
+ ['Paste stack','Copy several things in a row, then insert them in order, one per tap.','parked - design with the extensions'],
+ ['Link cards remember the page title','Not just the address — a card that says what the page is, so it is easier to place later.','approved - title must never eclipse the link'],
+ ['Duplicate catcher','Copying the same thing twice just bumps the original. No twins in the grid.','approved'],
+ ['Export everything','All of it goes to one file you own, and comes back with import. Your things stay yours.','leaning yes - needs import'],
+ ['Auto-collections','Things you tag the same way quietly gather themselves into a group.','no vote yet'],
+ ['A share target that queues many files','Send a whole handful into Docs at once, straight from another app\'s share sheet.','approved'],
 ];
 function vote(i,o){if(VOTES[i]===o)delete VOTES[i];else VOTES[i]=o;render();}
 
@@ -691,26 +801,24 @@ you:()=>`${sbar()}${tbar("go('vault')",'','')}
     <div><h1 class="big" style="font-size:33px">Settings</h1>
       <div class="sub">free · nothing to sign into</div></div>
 
-    <div class="sect">Capture</div>
+    <div class="sect">The everyday</div>
     <div class="set">
+      <div class="row" onclick="openThemePicker()">
+        <span class="tt"><b>Theme</b></span>
+        <span class="val">${st.theme==='system'?'System':st.theme==='light'?'Light':'Dark'}</span></div>
       <div class="row" onclick="toggleWatch()">
         <span class="tt"><b>Watch my clipboard</b><span>everything stays on this phone</span></span>
         <span class="sw${st.watch?' on':''}"></span></div>
-      <div class="row" onclick="toast('When the ${AUTO_CAP} fill up, the one you use least drops off. Pins and kept things never leave.')">
-        <span class="tt"><b>Auto-clean</b><span>Keeps the newest ${AUTO_CAP} you have not used</span></span></div>
     </div>
 
-    <div class="sect">Look</div>
+    <div class="sect">More</div>
     <div class="set">
-      <div class="row" onclick="cycleTheme()">
-        <span class="tt"><b>Theme</b></span>
-        <span class="val">${st.theme==='system'?'System':st.theme==='light'?'Light':'Dark'}</span></div>
+      <div class="row" onclick="toast('When the ${AUTO_CAP} fill up, the one you use least drops off. Pins and kept things never leave.')">
+        <span class="tt"><b>Auto-clean</b><span>Keeps the newest ${AUTO_CAP} you have not used</span></span></div>
       <div class="row inert">
         <span class="tt"><b>Layout</b></span>
         <span class="val">3 across</span></div>
     </div>
-
-    <div class="sect">Room</div>
     <div class="gauge" onclick="go('plan')"><div class="row">
       <span style="font-size:15.5px;font-weight:600">Pinned things</span>
       <span class="num" style="color:var(--c-lnk)">${pinned().length}<i>/${st.pinCap}</i></span></div>
@@ -719,19 +827,23 @@ you:()=>`${sbar()}${tbar("go('vault')",'','')}
       <span style="font-size:15.5px;font-weight:600">Files and images</span>
       <span class="num" style="color:var(--c-doc)">${byType('img').length+byType('doc').length}<i>/20</i></span></div>
       <div class="track"><i style="width:${(byType('img').length+byType('doc').length)/20*100}%;background:var(--c-doc)"></i></div></div>
-
-    <div class="sect">Reach</div>
     <div class="set">
       <div class="row" onclick="go('reach')">
         <span class="tt"><b>Reach</b><span>ways in without opening this</span></span>${ic('next',17)}</div>
     </div>
-
-    <div class="sect">About</div>
     <div class="set">
       <div class="row inert">
         <span class="tt"><b>Version</b></span><span class="val">0.1 - prototype</span></div>
       <div class="row" onclick="toast('Bricolage Grotesque and IBM Plex, under the SIL Open Font License')">
         <span class="tt"><b>Fonts and licenses</b></span>${ic('next',17)}</div>
+    </div>
+
+    <div class="sect">More prototypes</div>
+    <div class="set">
+      ${[['Hub','/reel/'],['Extensions','/reel/extensions/'],['iOS','/reel/ios/'],['Island','/reel/island/']]
+        .map(l=>`<a class="row" href="${l[1]}" style="text-decoration:none">
+          <span class="tt"><b style="font-weight:500;color:var(--ink-2)">${l[0]}</b></span>
+          <span style="color:var(--ink-3);display:flex">${ic('next',15)}</span></a>`).join('')}
     </div>
 
     <div class="ideasrow" onclick="go('ideas')">Ideas - vote yes or no</div>
@@ -814,19 +926,20 @@ ideas:()=>{const back="go('"+(st.arg==='vault'?'vault':'you')+"')";
     <div class="sect">Ten ideas</div>
     ${IDEAS.map((d,i)=>`<div class="card" style="cursor:default"><div class="in">
       <b style="display:block;font-size:15.5px;font-weight:600">${d[0]}</b>
-      <div style="font-size:13px;color:var(--ink-3);line-height:1.5;margin-top:3px">${d[1]}</div>
+      <span class="ideatag">${d[2]}</span>
+      <div style="font-size:13px;color:var(--ink-3);line-height:1.5;margin-top:5px">${d[1]}</div>
       <div class="vote">${['yes','no','later'].map(o=>`<span class="${VOTES[i]===o?'on':''}" onclick="vote(${i},'${o}')">${o[0].toUpperCase()+o.slice(1)}</span>`).join('')}</div>
     </div></div>`).join('')}
     <div class="empty" style="padding:14px 34px 24px"><div class="e2">Nothing here is promised. A vote is a nudge, not an order form.</div></div>
   </div>`},
 };
 
-function sheet(){
-  const it=find(st.sheet); if(!it)return'';
+/* The item's rows — value, copy, keep, edit, tags, pin, send, delete — shared
+   verbatim between the phone bottom sheet and the tablet's docked detail panel,
+   so the two surfaces can never drift apart. */
+function sheetBody(it){
   const c=it.t;
-  return `<div class="scrim" onclick="closeSheet()"></div>
-  <div class="sheet"><div class="grip"></div>
-    <div style="padding:2px 20px 16px">
+  return `<div style="padding:2px 20px 16px">
       <div style="font-size:${it.code?18:17}px;line-height:1.5;${it.code?'font-family:var(--mono);letter-spacing:-.02em':''}">
         ${it.g?`<div class="thumb" style="background:${it.g};margin:0 0 12px;height:104px"></div>`:''}${it.v.replace(/\n/g,'<br>')}</div>
     </div>
@@ -847,26 +960,64 @@ function sheet(){
     <div class="opt" onclick="toast('Share sheet would open');closeSheet()">
       <span style="color:var(--ink-2)">${ic('send',19)}</span><span class="t">Send somewhere</span>${ic('next',16)}</div>
     <div class="opt" onclick="del(${it.id})"><span style="color:var(--c-lnk)">${ic('trash',19)}</span>
-      <span class="t" style="color:var(--c-lnk)">Delete</span></div>
-  </div>`;
+      <span class="t" style="color:var(--c-lnk)">Delete</span></div>`;
+}
+function sheet(){
+  const it=find(st.sheet); if(!it)return'';
+  return `<div class="scrim" onclick="closeSheet()"></div>
+  <div class="sheet"><div class="grip"></div>${sheetBody(it)}</div>`;
 }
 
 /* tags are edited here and shown nowhere else — tiles stay clean. Search matches
    them, which is the whole point: a private word that finds the thing. */
-function tagSheet(){
-  const it=find(st.sheet); if(!it)return'';
+function tagBody(it){
   const chips=(it.tags||[]).map((t,i)=>`<span class="tchip">${esc(t)}<span class="x" onclick="removeTag(${i})">${ic('close',12,2.4)}</span></span>`).join('');
-  return `<div class="scrim" onclick="closeSheet()"></div>
-  <div class="sheet"><div class="grip"></div>
-    <div style="display:flex;align-items:center;padding:2px 20px 12px">
+  return `<div style="display:flex;align-items:center;padding:2px 20px 12px">
       <b style="font-size:16px;font-weight:600;flex:1">Tags</b>
       <span class="cancel" onclick="closeTags()">Done</span></div>
     <div class="tagwrap">${chips||'<span class="tnone">No tags yet</span>'}</div>
     <div class="tagform"><input id="tagin" placeholder="Add a tag" autocomplete="off"
       enterkeyhint="done" onkeydown="if(event.key==='Enter')addTag()"></div>
-    <div class="thint">Search finds these too</div>
-  </div>`;
+    <div class="thint">Search finds these too</div>`;
 }
+function tagSheet(){
+  const it=find(st.sheet); if(!it)return'';
+  return `<div class="scrim" onclick="closeSheet()"></div>
+  <div class="sheet"><div class="grip"></div>${tagBody(it)}</div>`;
+}
+
+/* ── tablet: the docked detail panel ──
+   Item actions land here instead of rising as a bottom sheet. Same rows via
+   sheetBody/tagBody; only the container differs. */
+function dock(){
+  const it=st.sheet?find(st.sheet):null;
+  if(!it)return `<div class="dockempty">${ic('copy',22,1.5)}<span>Select something</span></div>`;
+  return `<div class="dock">
+    <div class="dockhead"><span class="dtitle">${TYPE[it.t]}</span>
+      <span class="tbtn" style="width:30px;height:30px" onclick="closeSheet()">${ic('close',14,2)}</span></div>
+    ${st.tagEdit?tagBody(it):sheetBody(it)}</div>`;
+}
+
+/* ── flip: the cover screen, folded shut — CONCEPT ──
+   BACKLOG has cover-screen pins "in discussion"; this view is the discussion
+   aid. Top four pins, 2x2, tap to copy. The phone is closed: no nav, no
+   search, no add. Empty slots show a muted hint. */
+function flipCover(){
+  const pins=pinned().slice(0,4);
+  const cells=[0,1,2,3].map(n=>{
+    const it=pins[n];
+    if(!it)return `<div class="fcell slot"><span>Empty slot<br>pin a thing in the app</span></div>`;
+    const label=it.t==='img'||it.t==='doc'?esc(it.v):wbr(esc(it.v)).replace(/\n/g,'<br>');
+    return `<div class="fcell" onclick="flipCopy(${it.id})">
+      <span class="ftx${it.code?' code':''}">${label}</span>
+      ${st.flipFlash===it.id?'<span class="fchip">Copied</span>':''}</div>`;
+  }).join('');
+  return `<div class="fbar"><span class="fmark">Reel</span><span class="ftag">concept</span>
+    <span class="ftime">9:41</span></div><div class="fgrid">${cells}</div>`;
+}
+function flipCopy(id){const it=find(id); if(!it)return; touchItem(it);
+  st.flipFlash=id;render();
+  clearTimeout(flipCopy._t);flipCopy._t=setTimeout(()=>{st.flipFlash=null;render()},1100);}
 function openTags(){st.tagEdit=true;render();const el=document.getElementById('tagin');if(el)el.focus();}
 function closeTags(){st.tagEdit=false;render();}
 function addTag(){
@@ -889,28 +1040,64 @@ function removeTag(ix){
 }
 
 /* the in-app Theme setting: System follows the header seg (the fake phone's system
-   theme), Light and Dark override it — same three choices the real app offers */
-function cycleTheme(){const o=['system','light','dark'];st.theme=o[(o.indexOf(st.theme)+1)%3];render();}
+   theme), Light and Dark override it — same three choices the real app offers.
+   A small picker sheet now, not a cycle (owner dogfood 2026-08-05: "wish there
+   was a pop up for trying to select a theme instead of just cycling"). */
+function openThemePicker(){st.themePicker=true;render();}
+function closeThemePicker(){st.themePicker=false;render();}
+function setTheme(v){st.theme=v;st.themePicker=false;render();}
+function themeSheet(){
+  const opts=[['system','Follows system'],['light','Light'],['dark','Dark']];
+  return `<div class="scrim" onclick="closeThemePicker()"></div>
+  <div class="sheet"><div class="grip"></div>
+    <div style="padding:2px 20px 10px;font-size:13px;font-weight:600;color:var(--ink-3)">Theme</div>
+    ${opts.map(o=>`<div class="opt" onclick="setTheme('${o[0]}')">
+      <span class="t">${o[1]}</span>
+      ${st.theme===o[0]?`<span style="color:var(--c-doc);display:flex">${ic('ok',18,2.2)}</span>`:''}</div>`).join('')}
+  </div>`;
+}
 function render(){
   saveStore();   /* every mutation ends in render, so the store can never drift */
   const dark=st.theme==='dark'||(st.theme==='system'&&THEME==='dark');
-  document.body.className=(PLAT==='ios'?'ios':'md')+(dark?' dark':'');
-  document.getElementById('scr').innerHTML=(V[st.view]||V.vault)()
-    +(st.sheet?(st.tagEdit?tagSheet():sheet()):'')+(st.toast?`<div class="toast">${st.toast}</div>`:'');
+  document.body.className=(PLAT==='ios'?'ios':'md')+(dark?' dark':'')+' device-'+DEVICE;
+  let scrHTML;
+  if(DEVICE==='flip'){
+    /* the phone is shut — the cover ignores navigation, sheets and toasts */
+    scrHTML=flipCover();
+  }else if(DEVICE==='tablet'){
+    scrHTML=sbar()
+      +`<div class="panes"><div class="pane-l">${(V[st.view]||V.vault)()}</div>`
+      +`<div class="pane-r">${dock()}</div></div>`
+      +(st.themePicker?themeSheet():'')
+      +(st.toast?`<div class="toast">${st.toast}</div>`:'');
+  }else{
+    scrHTML=(V[st.view]||V.vault)()
+      +(st.sheet?(st.tagEdit?tagSheet():sheet()):'')+(st.themePicker?themeSheet():'')
+      +(st.toast?`<div class="toast">${st.toast}</div>`:'');
+  }
+  document.getElementById('scr').innerHTML=scrHTML;
   document.getElementById('platSeg').innerHTML=[['md','Android'],['ios','iOS']]
     .map(p=>`<button data-p="${p[0]}" data-on="${PLAT===p[0]?1:0}">${p[1]}</button>`).join('');
   document.getElementById('themeSeg').innerHTML=[['light','Light'],['dark','Dark']]
     .map(t=>`<button data-t="${t[0]}" data-on="${THEME===t[0]?1:0}">${t[1]}</button>`).join('');
-  [...document.getElementById('platSeg').children].forEach(b=>b.onclick=()=>{PLAT=b.dataset.p;relaunch()});
+  document.getElementById('devSeg').innerHTML=(PLAT==='ios'?DEVICES_IOS:DEVICES_MD)
+    .map(d=>`<button data-d="${d[0]}" data-on="${DEVICE===d[0]?1:0}">${d[1]}</button>`).join('');
+  [...document.getElementById('platSeg').children].forEach(b=>b.onclick=()=>{
+    PLAT=b.dataset.p;
+    if(PLAT==='ios'&&(DEVICE==='flip'||DEVICE==='fold'))DEVICE='phone';   /* Samsung hardware */
+    relaunch()});
   [...document.getElementById('themeSeg').children].forEach(b=>b.onclick=()=>{THEME=b.dataset.t;relaunch()});
+  [...document.getElementById('devSeg').children].forEach(b=>b.onclick=()=>{DEVICE=b.dataset.d;relaunch()});
   document.getElementById('notes').innerHTML=`
     <h3>Try these</h3>
     <p>Tap a <b>type tile</b> to open it · tap any <b>card</b> for its sheet, then <b>Tags</b> · <b>Pin</b> and watch the Vault reorder · try pinning a <b>third</b> thing · tap the <b>search pill</b> and type "cal", "pdf" or a tag · the <b>gear</b> opens Settings.</p>
     <h3>One screen, search-first</h3>
     <p><b>Vault:</b> home, inline search, the item sheet, manual add — no bottom nav. The clipboard watcher is on by default and sits at the bottom as a quiet gauge row; tapping it opens Settings, where the real switch lives.<br>
-       <b>Settings</b> (gear, top-right): Capture, Look, Room, Reach, About — and the <b>Ideas</b> page, ten proposals with yes / no / later votes that stick.</p>
+       <b>Settings</b> (gear, top-right): The everyday (Theme, clipboard watch) up top, everything else under More — and the <b>Ideas</b> page, ten proposals with yes / no / later votes that stick.</p>
     <h3>What the paywall does</h3>
     <p>Pinning a third thing doesn't error — it takes you to the upgrade page, in the moment the limit actually matters. Gate on scale, never on access.</p>
+    <h3>Device views</h3>
+    <p>The third switch tries the same app on other glass. <b>Fold</b> is the inner screen and it is <b>medium</b> (~673dp), not a tablet: grids go 4-across, search sticks to the top, and a hairline marks the hinge — tiles clear it through the middle gap. <b>Tablet / iPad</b> is expanded: vault on the left, and tapping a tile docks its actions on the right instead of raising a sheet. <b>Flip</b> is the cover-screen concept from the Ideas page — top four pins, tap to copy, the phone stays shut.</p>
     <h3>Still to design</h3>
     <p>Onboarding · the dial and keyboard themselves (separate prototype) · multi-select · Recently deleted · widget gallery · where the plus button lands long-term.</p>`;
 }
@@ -922,7 +1109,7 @@ function renderKeepFocus(){
 }
 Object.assign(window,{go,openSearch,closeSearch,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
   saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch,dismissNote,
-  cycleTheme,vote,openTags,closeTags,addTag,removeTag});
+  openThemePicker,closeThemePicker,setTheme,vote,openTags,closeTags,addTag,removeTag,flipCopy});
 render();
 /* let the bounce finish, then never again this session */
 setTimeout(()=>{firstOpen=false},600);
