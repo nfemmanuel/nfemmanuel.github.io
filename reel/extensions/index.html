@@ -50,7 +50,7 @@
   p{margin:0 0 10px;color:var(--dim)}
   a{color:var(--accent)}
   .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin-bottom:4px}
-  .wordmark{display:flex;align-items:center;gap:9px;margin-bottom:22px;user-select:none}
+  .wordmark{display:flex;align-items:center;gap:8px 9px;flex-wrap:wrap;margin-bottom:22px;user-select:none}
   .wordmark .knob{width:26px;height:26px;border-radius:50%;
     background:conic-gradient(from 40deg,#1A1F26 0 70%,#333B45 0 78%,#1A1F26 0);
     border:2px solid #333B45;position:relative;flex:0 0 auto}
@@ -206,13 +206,85 @@
   .pk-cancel{text-align:center;color:var(--dim);font-size:14px;padding:12px 0 2px;cursor:pointer;
     border-top:1px solid var(--line);margin-top:8px}
 
+  /* ═══ device form-factor views ═══
+     Header seg (visually matched to app-mockup.html's pill segs) sets one body
+     class — device-phone/fold/tablet/ipad. Phone adds no overrides at all:
+     today's view, untouched. Frame widths stand in for dp: Fold inner 673
+     (MEDIUM per docs/design-decisions.md — not a tablet), tablet/iPad 1024. */
+  .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px;margin-left:auto}
+  .seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;
+    color:var(--dim);padding:5px 11px;border-radius:99px;cursor:pointer;transition:.2s}
+  .seg button[data-on="1"]{background:var(--ink);color:var(--paper)}
+
+  #devframe{display:none;position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);
+    pointer-events:none;z-index:44;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  body.device-fold #devframe{display:block;width:min(673px,100vw)}
+  body.device-tablet #devframe,body.device-ipad #devframe{display:block;width:min(1024px,100vw)}
+  /* the Fold's crease is physical — in front of every UI layer, deliberately faint */
+  #hinge{display:none;position:fixed;top:0;bottom:0;left:50%;width:10px;transform:translateX(-50%);
+    pointer-events:none;z-index:90;background:
+    linear-gradient(90deg,transparent,rgba(128,138,150,.14) 50%,transparent),
+    linear-gradient(90deg,transparent calc(50% - 1px),rgba(128,138,150,.38) 50%,transparent calc(50% + 1px))}
+  body.device-fold #hinge{display:block}
+
+  /* Fold inner (~673dp): the vault keyboard spans the fold width. Three tiles per
+     row (medium class) packed 1+2 so the hinge lands in the first grid gutter —
+     no tap target is centered on the crease; the wide left tile spends its extra
+     width on longer text previews. */
+  body.device-fold #kb,body.device-ipad #kb{left:50%;right:auto;transform:translateX(-50%) translateY(105%)}
+  body.device-fold #kb{width:min(673px,100vw)}
+  body.device-ipad #kb{width:min(1024px,100vw)}
+  body.device-fold #kb.up,body.device-ipad #kb.up{transform:translateX(-50%) translateY(0)}
+  body.device-fold #kb .grid{grid-template-columns:calc(50% - 7px) 1fr 1fr;column-gap:14px}
+  /* no scrollbar inside the tile grid on these frames — a visible scrollbar would
+     shift the column math so the gutter no longer lands on the crease (and no
+     real IME shows one anyway) */
+  body.device-fold #kb .grid,body.device-ipad #kb .grid{scrollbar-width:none}
+  body.device-fold #kb .grid::-webkit-scrollbar,body.device-ipad #kb .grid::-webkit-scrollbar{display:none}
+  /* category tabs take the same columns, so their boundaries also clear the crease */
+  body.device-fold #kb .cats{display:grid;grid-template-columns:calc(50% - 7px) 1fr 1fr;column-gap:14px}
+  body.device-fold #kbfab{right:max(16px,calc(50vw - 320px))}
+
+  /* Tablet landscape (~1024): floating, narrowed keyboard — the norm on tablets —
+     docked toward the lower right; the vault strip rides it instead of spanning
+     the screen. Form cards flow two-column so the dial's insert visibly crosses
+     the screen to reach a far-side field. */
+  body.device-tablet #kb{left:auto;right:max(14px,calc(50vw - 498px));bottom:14px;width:392px;
+    border:1px solid #30363E;border-radius:16px;overflow:hidden;transform:translateY(115%)}
+  body.device-tablet #kb.up{transform:translateY(0)}
+  body.device-tablet #kbfab,body.device-ipad #kbfab{right:max(16px,calc(50vw - 496px))}
+  body.device-tablet main,body.device-ipad main{max-width:952px}
+  body.device-tablet .task,body.device-ipad .task{columns:2;column-gap:30px}
+  body.device-tablet .task .co,body.device-ipad .task .co{column-span:all}
+  body.device-tablet .task label,body.device-ipad .task label{break-after:avoid;page-break-after:avoid}
+  body.device-tablet .task input,body.device-tablet .task textarea,body.device-tablet .task .drop,
+  body.device-tablet .task .chatlog,body.device-ipad .task input,body.device-ipad .task textarea,
+  body.device-ipad .task .drop,body.device-ipad .task .chatlog{break-inside:avoid;page-break-inside:avoid}
+
+  /* iPad: keyboard path only, wearing iOS chrome — blur, bigger radii. The dial
+     page swaps its demo for the honest no-overlay card (#ipadDialCard). */
+  body.device-ipad #kb{background:rgba(26,29,34,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border-radius:18px 18px 0 0;border-top:1px solid rgba(255,255,255,.08);overflow:hidden}
+  body.device-ipad #kb .grid{grid-template-columns:repeat(4,1fr)}
+  body.device-ipad .key{border-radius:9px}
+  body.device-ipad #kb .it{border-radius:12px}
+  body.device-ipad .card,body.device-ipad .task,body.device-ipad .navcard{border-radius:18px}
+  body.device-ipad [data-page="dial"] h1 + p,
+  body.device-ipad [data-page="dial"] .tips,
+  body.device-ipad [data-page="dial"] .task{display:none}
+
   [hidden]{display:none !important}
   footer{margin-top:26px;font-size:12px;color:var(--dim);text-align:center;line-height:1.7}
   button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 
 <main>
-  <div class="wordmark"><div class="knob"></div><div><b>reel</b> <span>· prototype</span></div></div>
+  <div class="wordmark"><div class="knob"></div><div><b>reel</b> <span>· prototype</span></div>
+    <!-- Phone | Fold | Tablet | iPad. No Flip view on purpose: the extensions need an
+         open screen (the dial floats over one) and a keyboard (something to type with) —
+         a closed Flip has neither, and faking a cover-screen dial would claim support
+         the platform can't deliver. The Flip story lives in the app mockup, not here. -->
+    <div class="seg" id="devseg" aria-label="Device"></div></div>
 
   <!-- ============ HOME ============ -->
   <section data-page="home">
@@ -235,6 +307,12 @@
     <div class="eyebrow">Test 1 · the dial</div>
     <h1>Apply to Northbeam using only the dial →</h1>
     <p style="margin:-2px 0 10px">The round button on the right edge is the app. It floats over whatever you're doing.</p>
+    <!-- iPad only: iOS has no overlay API — no AccessibilityService, no
+         SYSTEM_ALERT_WINDOW equivalent — so a floating dial cannot exist there.
+         This card replaces the dial demo. A statement, not an apology; link nothing. -->
+    <div class="card" id="ipadDialCard" hidden>
+      <p style="margin:0">No overlays on iOS — the dial is Android's. On iPad the vault rides the keyboard, the share sheet, and the Files app instead.</p>
+    </div>
     <div class="card tips">
       <h2>Three moves</h2>
       <table>
@@ -330,6 +408,8 @@
 </main>
 
 <input type="file" id="filepick" multiple hidden>
+<div id="devframe" aria-hidden="true"></div>
+<div id="hinge" aria-hidden="true"></div>
 <svg id="dialsvg" aria-hidden="true"></svg>
 <div class="glidechip" id="glidechip">release to insert</div>
 <button id="kbfab" hidden aria-label="Open vault keyboard"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.6" y="6.4" width="18.8" height="11.2" rx="2.4"/><path d="M6.4 10h.01M9.8 10h.01M13.2 10h.01M16.6 10h.01M9 13.8h6"/></svg></button>
@@ -575,6 +655,35 @@ chip.addEventListener('pointerdown',e=>{
   refreshKb();
 });
 
+/* ================= device form-factor views ================= */
+/* One body class + one frame anchor; the dial and keyboard reflow to tell each
+   platform's truth. Selection persists like everything else here: a versioned
+   key that self-heals to 'phone' on any unknown value. */
+const DKEY='reel.device.v1';
+const DEVICES=[['phone','Phone'],['fold','Fold'],['tablet','Tablet'],['ipad','iPad']];
+let DEV=(()=>{try{const d=localStorage.getItem(DKEY);return DEVICES.some(x=>x[0]===d)?d:'phone'}
+  catch(_){return 'phone'}})();
+const devseg=document.getElementById('devseg');
+devseg.innerHTML=DEVICES.map(d=>`<button type="button" data-d="${d[0]}">${d[1]}</button>`).join('');
+[...devseg.children].forEach(b=>b.onclick=()=>{
+  if(DEV===b.dataset.d)return;
+  DEV=b.dataset.d;kbHide();closePicker();applyDevice();
+});
+const dialH1=document.querySelector('[data-page="dial"] h1');
+const DIAL_H1=dialH1.textContent;
+function applyDevice(){
+  for(const d of DEVICES)document.body.classList.remove('device-'+d[0]);
+  document.body.classList.add('device-'+DEV);
+  [...devseg.children].forEach(b=>b.dataset.on=b.dataset.d===DEV?'1':'0');
+  try{localStorage.setItem(DKEY,DEV)}catch(_){}
+  /* iPad: no overlay API on iOS, so the dial page swaps its demo for the honest
+     card; the keyboard path is the whole iPad story */
+  const ipad=DEV==='ipad';
+  document.getElementById('ipadDialCard').hidden=!ipad;
+  dialH1.textContent=ipad?'There is no dial on iPad':DIAL_H1;
+  sizes();route();
+}
+
 /* ================= router ================= */
 const PAGES=['home','dial','keyboard'];
 function route(){
@@ -583,7 +692,7 @@ function route(){
   document.querySelectorAll('[data-page]').forEach(s=>s.hidden=s.dataset.page!==page);
   document.getElementById('kbfab').hidden=page!=='keyboard';
   if(page!=='keyboard')kbHide();
-  DIAL.enabled=page==='dial';
+  DIAL.enabled=page==='dial'&&DEV!=='ipad';   // iOS: no overlay API, no dial
   if(!DIAL.enabled){DIAL.mode='closed';DIAL.open=0;DIAL.openT=0;document.body.classList.remove('dialing');}
   T.field=null;T.drop=null;
   scrollTo(0,0);drawDial();
@@ -769,23 +878,41 @@ function turn(ring,deltaDeg){
 }
 function settle(ring){const D=DIAL;D['raw'+ring]=D['t'+ring];}
 const STEP_IN=42,STEP_OUT=33,WIN_IN=46,WIN_OUT=70;
-let VW=innerWidth,VH=innerHeight,R=0,HUB=0,IN0=0,IN1=0,OUT0=0,OUT1=0,CY=0;
+let VW=innerWidth,VH=innerHeight,FW=innerWidth,AX=innerWidth,R=0,HUB=0,IN0=0,IN1=0,OUT0=0,OUT1=0,CY=0;
 function sizes(){
-  VW=innerWidth;VH=innerHeight;
-  R=Math.min(VW*0.46,205);
-  HUB=R*.17;IN0=R*.25;IN1=R*.52;OUT0=R*.58;OUT1=R*.88;CY=VH*.56;
+  /* scrollingElement.clientWidth, not innerWidth: CSS left:50% (frame, hinge,
+     keyboard) resolves against the layout viewport, which excludes a classic
+     scrollbar — the JS anchor must use the same reference or the dial drifts
+     half a scrollbar off the frame edge. scrollingElement, not documentElement:
+     this file has no doctype, and in quirks mode documentElement.clientHeight
+     is the document height, not the viewport. On phones (overlay scrollbars)
+     all of these equal innerWidth/Height. */
+  const SE=document.scrollingElement||document.documentElement;
+  VW=SE.clientWidth||innerWidth;
+  VH=SE.clientHeight||innerHeight;
+  /* The device frame: widths stand in for dp (Fold inner 673 = MEDIUM, not a
+     tablet; tablet/iPad landscape 1024). The dial anchors to the FRAME's right
+     edge (AX), not the browser's, so each view keeps its proportions on any
+     monitor. Phone: FW=VW and AX=VW — exactly the old math, zero drift. */
+  FW=DEV==='fold'?Math.min(673,VW):(DEV==='tablet'||DEV==='ipad')?Math.min(1024,VW):VW;
+  AX=(VW+FW)/2;
+  R=Math.min(FW*0.46,205);
+  HUB=R*.17;IN0=R*.25;IN1=R*.52;OUT0=R*.58;OUT1=R*.88;
+  /* Tablet: the dial rides the LOWER third — where the thumb lands when a hand
+     grips a tablet's side edge — clamped so the ring never falls off-screen. */
+  CY=DEV==='tablet'?Math.min(VH*.72,VH-(R*.88+44)):VH*.56;
   svg.setAttribute('width',VW);svg.setAttribute('height',VH);
   svg.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
 }
 sizes();addEventListener('resize',()=>{sizes();drawDial();});
 const rad=d=>(d-90)*Math.PI/180;
-const P=(r,deg)=>({x:VW+r*Math.cos(rad(deg)),y:CY+r*Math.sin(rad(deg))});
+const P=(r,deg)=>({x:AX+r*Math.cos(rad(deg)),y:CY+r*Math.sin(rad(deg))});
 const P2=(cx,cy,r,deg)=>({x:cx+r*Math.cos(rad(deg)),y:cy+r*Math.sin(rad(deg))});
-const onLogoBtn=(x,y)=>Math.hypot(x-(VW-BTN_R),y-CY)<=BTN_R+11;
+const onLogoBtn=(x,y)=>Math.hypot(x-(AX-BTN_R),y-CY)<=BTN_R+11;
 const wrapDeg=x=>((x+180)%360+360)%360-180;
 const mod=(a,n)=>((a%n)+n)%n;
-const dist=(x,y)=>Math.hypot(x-VW,y-CY);
-const ang=(x,y)=>mod(Math.atan2(y-CY,x-VW)*180/Math.PI+90,360);
+const dist=(x,y)=>Math.hypot(x-AX,y-CY);
+const ang=(x,y)=>mod(Math.atan2(y-CY,x-AX)*180/Math.PI+90,360);
 const band=d=>(d>=IN0-8&&d<=IN1+8)?'In':(d>=OUT0-8&&d<=OUT1+14)?'Out':null;
 /* Glide zones: while holding, how far OUT the finger is picks which ring it turns.
    Hysteresis (H) so a ring you're already turning doesn't flip on small wobble. */
@@ -827,9 +954,9 @@ function drawDial(){
     <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0" stop-color="#5C4A6E"/><stop offset="1" stop-color="#2C2438"/></linearGradient></defs>`;
   if(f<.02){
-    const bx=VW-BTN_R,by=CY;
+    const bx=AX-BTN_R,by=CY;
     // secondary: the docked panel edge, a quiet hint that something lives here
-    h+=`<rect x="${VW-4}" y="${CY-52}" width="3" height="104" rx="1.5" fill="#3A4655" opacity=".45"/>`;
+    h+=`<rect x="${AX-4}" y="${CY-52}" width="3" height="104" rx="1.5" fill="#3A4655" opacity=".45"/>`;
     // primary: round logo button
     h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="#151A21" stroke="#39424F" stroke-width="2"/>`;
     for(let a=-70;a<=70;a+=10){const p1=P2(bx,by,BTN_R-4,a),p2=P2(bx,by,BTN_R-1,a);
@@ -837,10 +964,21 @@ function drawDial(){
     h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-9}" fill="none" stroke="#4A5563" stroke-width="1.4"/>`;
     h+=`<circle cx="${bx}" cy="${by}" r="6.5" fill="#2FB9A9"/>`;
     h+=`<line x1="${bx}" y1="${by-BTN_R+3}" x2="${bx}" y2="${by-BTN_R+10}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round"/>`;
+    if(DEV==='fold'){
+      /* Reach changes on a wide unfolded screen: the right edge is a long way
+         from a left thumb. Dock-either-edge is the design answer — the real
+         build lets the handle be dragged to whichever edge the holding hand
+         owns. Here: a drag-handle hint plus one line of truth. */
+      for(const dy of [-7,0,7])for(const dx of [-2.6,2.6])
+        h+=`<circle cx="${bx-BTN_R-8+dx}" cy="${by+dy}" r="1.3" fill="#8A94A0"/>`;
+      const cw=224,cx0=AX-12-cw,cy0=by+BTN_R+16;
+      h+=`<rect x="${cx0}" y="${cy0}" width="${cw}" height="24" rx="8" fill="rgba(10,13,17,.88)" stroke="#2B333D"/>`;
+      h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">Docks to either edge on the real thing</text>`;
+    }
     h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
     svg.innerHTML=h;return;
   }
-  h+=`<circle cx="${VW}" cy="${CY}" r="${o(OUT1)+22}" fill="rgba(5,8,12,${.5*f})"/>`;
+  h+=`<circle cx="${AX}" cy="${CY}" r="${o(OUT1)+22}" fill="rgba(5,8,12,${.5*f})"/>`;
   const A0=270-WIN_OUT-16,A1=270+WIN_OUT+16;
   h+=`<path d="${seg(o(IN0),o(IN1),A0,A1)}" fill="url(#brl)" stroke="#2A323D"/>`;
   h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="url(#brl)" stroke="#2A323D"/>`;
@@ -893,8 +1031,8 @@ function drawDial(){
   pinnedItems().forEach((pn,k)=>{h+=card(pn,270+(k===0?-PIN_OFF:PIN_OFF),1,f,true);});
   const m1=P(o(OUT1)+9,270),m2=P(o(OUT1)+17,270);
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round" opacity="${f}"/>`;
-  h+=`<circle cx="${VW}" cy="${CY}" r="${HUB}" fill="url(#hb)" stroke="#39424F" stroke-width="1.5" opacity="${f}"/>`;
-  h+=`<text x="${VW-HUB*.45}" y="${CY}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#C9D3DF" opacity="${f}">✕</text>`;
+  h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#hb)" stroke="#39424F" stroke-width="1.5" opacity="${f}"/>`;
+  h+=`<text x="${AX-HUB*.45}" y="${CY}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#C9D3DF" opacity="${f}">✕</text>`;
   if(DIAL.mode==='glide'){                 // glide keeps its one-line mode hint; browse needs none —
     const cp=P(o(OUT1)+24,270);            // the cards show their own content now
     h+=`<g opacity="${f}"><rect x="${cp.x-128}" y="${cp.y-12}" width="128" height="24" rx="8" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
@@ -954,7 +1092,7 @@ addEventListener('pointerdown',e=>{
       clearTimeout(D.tapTimer);D.tapTimer=null;
       D.mode='glide';D.glideZone=null;D.openT=1;tick();
       glidechip.style.display='block';glidechip.textContent='move out to pick a ring';
-      glidechip.style.right=(R+40)+'px';glidechip.style.top=(CY-34)+'px';
+      glidechip.style.right=((VW-AX)+R+40)+'px';glidechip.style.top=(CY-34)+'px';
     },350);
     e.preventDefault();return;
   }
@@ -1056,19 +1194,19 @@ addEventListener('pointercancel',e=>{
   if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
 });
 
-/* first-visit coach */
+/* first-visit coach — not on iPad: there is no handle there */
 addEventListener('hashchange',()=>{
-  if(location.hash==='#dial'&&!localStorage.getItem('reel.coach.dial')){
+  if(location.hash==='#dial'&&DEV!=='ipad'&&!localStorage.getItem('reel.coach.dial')){
     setTimeout(()=>toast('Tap the handle on the right edge →'),500);
     localStorage.setItem('reel.coach.dial','1');
   }
 });
-if(location.hash==='#dial'&&!localStorage.getItem('reel.coach.dial')){
+if(location.hash==='#dial'&&DEV!=='ipad'&&!localStorage.getItem('reel.coach.dial')){
   setTimeout(()=>toast('Tap the handle on the right edge →'),600);
   localStorage.setItem('reel.coach.dial','1');
 }
 
-refreshKb();route();
+refreshKb();applyDevice();
 </script>
 
 </body>
