@@ -14,6 +14,8 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%231A1F26%22 stroke=%22%23333B45%22 stroke-width=%228%22/><rect x=%2246%22 y=%228%22 width=%228%22 height=%2224%22 rx=%224%22 fill=%22%23FF4D4D%22/></svg>">
 </head>
 <body>
+<meta charset="utf-8">
+<title>Reel — the job application, one gesture at a time</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,9 +48,9 @@
   }
 
   /* ═══ current product tokens (app-mockup.html is canonical) ═══
-     The dial page speaks this language; the keyboard page still wears the
-     teal-era coat (noted debt). body.on-dial remaps the old var names so the
-     whole page chrome retunes without touching keyboard-page CSS. */
+     Both extension pages speak this language now: body.on-dial and body.on-kb
+     each remap the old var names so the page chrome retunes per page without
+     touching page-agnostic CSS. The teal era is over on both. */
   :root{
     --display:"Bricolage Grotesque",system-ui,sans-serif;
     --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
@@ -171,64 +173,227 @@
   .glidechip{position:fixed;z-index:51;background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;
     border-radius:10px;padding:6px 11px;font-size:12.5px;pointer-events:none;display:none}
 
-  #kb{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#1C1F24;border-top:1px solid #000;
-    padding:6px 6px 8px;transform:translateY(105%);transition:transform .22s;
+  /* ═══ keyboard page: the iOS surface, in the current product language ═══
+     body.on-kb remaps the old var names exactly as body.on-dial does, so the
+     page chrome retunes to the app-mockup tokens. The keyboard itself wears
+     iOS-26-flavoured chrome — a translucent blurred deck, hairline top — and
+     the vault is ONE mixed strip of app-language tiles: pins first, newest
+     after, items the focused field can't take greyed, never hidden (round 4). */
+  body.on-kb{
+    --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
+    --accent:var(--c-doc); --accent-soft:#356BA622;
+    --field:#F6F6F7; --field-line:#DFE1E5;
+    --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+    --spring:cubic-bezier(.34,1.56,.5,1);
+    font-family:var(--ui);
+    --kb-blur:rgba(243,244,246,.78); --kb-hair:rgba(20,22,26,.12);
+    --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
+    --kb-key:#FFFFFF; --kb-key-dim:#E4E6EB; --kb-key-shadow:0 1px 0 rgba(16,20,26,.22);
+    --sys-bg:rgba(206,210,217,.92); --sys-key:#FFF; --sys-key-dim:#AEB4BE;
+    --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A;
+  }
+  @media (prefers-color-scheme: dark){body.on-kb{
+    --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
+    --accent:var(--c-doc); --accent-soft:#8FC6FF26;
+    --field:#131519; --field-line:#2E333A;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.55);
+    --kb-blur:rgba(17,19,23,.72); --kb-hair:rgba(255,255,255,.08);
+    --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
+    --kb-key:#41464F; --kb-key-dim:#2B2F36; --kb-key-shadow:0 1px 0 rgba(0,0,0,.5);
+    --sys-bg:rgba(30,31,34,.9); --sys-key:#6B6B6F; --sys-key-dim:#464649;
+    --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6;
+  }}
+  :root[data-theme="dark"] body.on-kb{
+    --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
+    --accent:var(--c-doc); --accent-soft:#8FC6FF26;
+    --field:#131519; --field-line:#2E333A;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.55);
+    --kb-blur:rgba(17,19,23,.72); --kb-hair:rgba(255,255,255,.08);
+    --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
+    --kb-key:#41464F; --kb-key-dim:#2B2F36; --kb-key-shadow:0 1px 0 rgba(0,0,0,.5);
+    --sys-bg:rgba(30,31,34,.9); --sys-key:#6B6B6F; --sys-key-dim:#464649;
+    --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6;
+  }
+  :root[data-theme="light"] body.on-kb{
+    --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
+    --accent:var(--c-doc); --accent-soft:#356BA622;
+    --field:#F6F6F7; --field-line:#DFE1E5;
+    --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+    --kb-blur:rgba(243,244,246,.78); --kb-hair:rgba(20,22,26,.12);
+    --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
+    --kb-key:#FFFFFF; --kb-key-dim:#E4E6EB; --kb-key-shadow:0 1px 0 rgba(16,20,26,.22);
+    --sys-bg:rgba(206,210,217,.92); --sys-key:#FFF; --sys-key-dim:#AEB4BE;
+    --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A;
+  }
+  [data-page="keyboard"] h1{font-family:var(--display);font-weight:800;letter-spacing:-.035em}
+  [data-page="keyboard"] h2{font-family:var(--display);font-weight:700;letter-spacing:-.02em}
+  [data-page="keyboard"] .eyebrow{color:var(--ink-3,var(--dim))}
+  body.on-kb .card,body.on-kb .task,body.on-kb .navcard{border-radius:18px}
+  body.on-kb input[type=text],body.on-kb textarea{border-radius:12px;border-width:1px}
+  body.on-kb .filebtn{background:var(--ink);color:var(--paper);border-radius:12px}
+  body.on-kb #savechip b{color:#8FC6FF}
+  [data-page="keyboard"] input[type=password]{width:100%;background:var(--field);border:1px solid var(--field-line);
+    border-radius:12px;padding:9px 11px;font:inherit;color:var(--ink)}
+  [data-page="keyboard"] input[type=password]:focus{outline:none;border-color:var(--accent)}
+
+  #kb{position:fixed;left:0;right:0;bottom:0;z-index:50;font-family:var(--ui);
+    background:var(--kb-blur);backdrop-filter:blur(30px) saturate(1.6);-webkit-backdrop-filter:blur(30px) saturate(1.6);
+    border-top:1px solid var(--kb-hair);
+    padding:6px 8px calc(10px + env(safe-area-inset-bottom,0px));
+    transform:translateY(105%);transition:transform .26s cubic-bezier(.2,.85,.3,1);
     display:flex;flex-direction:column;height:332px}
   #kb.up{transform:translateY(0)}
   @media (prefers-reduced-motion: reduce){#kb{transition:none}}
   .kdots{display:flex;gap:6px;justify-content:center;padding:2px 0 6px;flex:0 0 auto}
-  .kdots span{width:6px;height:6px;border-radius:50%;background:#3A414B;cursor:pointer;transition:.15s}
-  .kdots span.on{background:#2FB9A9;width:16px;border-radius:3px}
+  .kdots span{width:6px;height:6px;border-radius:50%;background:var(--kb-key-dim);cursor:pointer;transition:.15s}
+  .kdots span.on{background:var(--ink-3);width:16px;border-radius:3px}
   .kpager{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:0}
   .kpager::-webkit-scrollbar{display:none}
-  .kpage{flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-height:0;padding:0 2px}
-  .ksearch{height:32px;border-radius:8px;background:#262B32;border:1px solid #333941;
-    display:flex;align-items:center;padding:0 10px;gap:7px;color:#6D7783;font-size:13px;
-    cursor:pointer;flex:0 0 auto;margin-bottom:6px}
-  .ksearch .q{color:#E9EDF2;white-space:pre}
-  .ksearch .caret{width:1.5px;height:16px;background:#2FB9A9;animation:kblink 1s step-end infinite}
+  .kpage{position:relative;flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-height:0;padding:0 2px}
+  .ksearch{height:38px;border-radius:12px;background:var(--kb-tile);border:1px solid var(--kb-tile-line);
+    display:flex;align-items:center;padding:0 12px;gap:8px;color:var(--ink-3);font-size:13px;
+    cursor:pointer;flex:0 0 auto;margin-bottom:8px}
+  .ksearch.off{opacity:.45}
+  .ksearch .q{color:var(--ink);white-space:pre}
+  .ksearch .caret{width:2px;height:16px;border-radius:1px;background:var(--accent);animation:kblink 1s step-end infinite}
   @keyframes kblink{50%{opacity:0}}
-  .ksearch .x{margin-left:auto;color:#8A94A0;padding:2px 4px}
-  #kb .cats{display:flex;gap:6px;margin-bottom:6px;flex:0 0 auto}
-  #kb .cat{flex:1;height:32px;border-radius:8px;background:#242A31;border:1px solid transparent;
-    display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
-  #kb .cat.on{background:#2F3A4A;border-color:#5B8CFF}
-  #kb .grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start;min-height:0}
-  #kb .it{background:#2A2F36;border:1px solid #333941;border-radius:9px;padding:8px 10px;
-    font-size:11.5px;color:#CFD8E3;cursor:pointer;display:flex;align-items:flex-start;gap:6px;
-    overflow:hidden;min-height:52px}
-  #kb .it:active{background:#333A43}
-  #kb .it .pv{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-    line-height:1.4;word-break:break-word;flex:1}
-  #kb .it .pin{flex:0 0 auto;font-size:10px;line-height:1.4}
-  #kb .it .thumb{flex:1;height:36px;border-radius:6px;align-self:center}
-  #kb .it .b{margin-left:auto;font-size:9px;color:#7A8492;flex:0 0 auto;line-height:1.4}
-  #kb .it[data-t=txt]{background:#2B2A21}
-  #kb .it[data-t=url]{background:#222A3A}
-  #kb .it[data-t=doc]{background:#2A2430}
-  .kresults{display:flex;gap:6px;overflow-x:auto;flex:0 0 46px;margin-bottom:6px;scrollbar-width:none}
+  .ksearch .x{margin-left:auto;color:var(--ink-3);padding:2px 6px}
+  /* ONE mixed strip: pins first, then newest — text, links, images together.
+     Square-ish app-language tiles; .off is the greyed (never hidden) state. */
+  #kb .grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+    grid-auto-rows:104px;align-content:start;min-height:0;padding:2px 2px 8px;scrollbar-width:none}
+  #kb .grid::-webkit-scrollbar{display:none}
+  #kb .it{position:relative;background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:16px;
+    padding:10px 11px;color:var(--ink);cursor:pointer;overflow:hidden;display:flex;
+    transition:transform .18s var(--spring),opacity .15s,filter .15s}
+  #kb .it:active{transform:scale(.96)}
+  #kb .it.off{opacity:.35;filter:saturate(.15)}
+  #kb .it .pv{margin:auto 0;width:100%;font-size:11.5px;line-height:1.42;font-weight:450;word-break:break-word;
+    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  #kb .it .pv.s1{font-size:15px;line-height:1.3;letter-spacing:-.015em;-webkit-line-clamp:3}
+  #kb .it .pv.s2{font-size:13px;line-height:1.38;letter-spacing:-.01em}
+  #kb .it .pv.code{font-family:var(--mono);font-size:10.5px}
+  #kb .it .pv.code.s1{font-size:14px}
+  #kb .it .tit{margin:auto 0;width:100%}
+  #kb .it .tit .t{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+    font-size:11.5px;font-weight:600;line-height:1.35;word-break:break-word}
+  #kb .it .tit .d{display:block;font-size:10px;color:var(--c-lnk);font-weight:650;margin-top:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #kb .it.img{padding:0}
+  #kb .it.img .shot{position:absolute;inset:0}
+  #kb .it.img .cap{position:absolute;left:0;right:0;bottom:0;padding:18px 9px 8px;color:#fff;
+    font-size:10.5px;font-weight:600;letter-spacing:-.01em;background:linear-gradient(transparent,rgba(0,0,0,.62))}
+  #kb .it .pin{position:absolute;top:8px;right:8px;color:var(--ink-3);opacity:.6;display:flex}
+  #kb .it.img .pin{color:#fff;opacity:.92}
+  #kb .it .b{position:absolute;right:8px;bottom:7px;font-size:9px;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);border-radius:99px;padding:2px 7px}
+  #kb .it .lock{margin:auto 0;width:100%}
+  #kb .it .lock .lab{display:block;font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
+  #kb .it .lock .dots{display:block;font-size:13px;letter-spacing:.16em;color:var(--ink);margin-top:3px}
+  #kb .kempty{grid-column:1/-1;color:var(--ink-3);font-size:12.5px;padding:14px;text-align:center}
+  .kresults{display:flex;gap:7px;overflow-x:auto;flex:0 0 52px;margin-bottom:8px;scrollbar-width:none}
   .kresults::-webkit-scrollbar{display:none}
-  .kresults .it{flex:0 0 auto;min-height:40px}
-  .kfoot{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding-top:6px;color:#6D7783;font-size:11px}
-  .kfoot .fbtn{background:#2A2F36;border:1px solid #333941;color:#C9D2DD;border-radius:7px;
-    padding:6px 11px;font:inherit;font-size:12px;cursor:pointer}
-  .kfoot .hint{flex:1;text-align:center}
-  .krows{flex:1;display:flex;flex-direction:column;gap:5px;justify-content:flex-end;min-height:0;padding-bottom:2px}
-  .krow{display:flex;gap:4.5px}
-  .key{flex:1;height:37px;border-radius:6.5px;background:#3A3F47;color:#E9EDF2;display:flex;
-    align-items:center;justify-content:center;font-size:14.5px;cursor:pointer;user-select:none;-webkit-user-select:none}
-  .key:active{background:#4A5160}
-  .key.dim{background:#2A2F36;font-size:12px}
-  .key.act{background:#2FB9A9;color:#fff;font-weight:600}
-  .key.sp{flex:3.2}
-  .fillov{position:absolute;inset:0;background:#1C1F24;z-index:3;display:flex;flex-direction:column;
-    padding:8px 8px 10px}
-  .fprev{flex:0 0 auto;background:#262B32;border:1px solid #333941;border-radius:9px;padding:9px 11px;
-    font-size:12.5px;color:#C9D2DD;margin-bottom:7px;max-height:74px;overflow-y:auto;line-height:1.45}
-  .fprev .blank{background:#2FB9A926;border-bottom:2px solid #2FB9A9;color:#7FE0D2;
+  .kresults .rit{flex:0 0 auto;max-width:150px;display:flex;align-items:center;gap:7px;
+    background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:12px;padding:7px 11px;
+    font-size:11.5px;color:var(--ink);cursor:pointer;overflow:hidden}
+  .kresults .rit.off{opacity:.35;filter:saturate(.15)}
+  .kresults .rit .rp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kresults .rit .rthumb{width:26px;height:26px;border-radius:8px;flex:0 0 auto}
+  .kresults .rnone{color:var(--ink-3);font-size:12px;padding:12px;align-self:center}
+  /* Full Access off: the keyboard still stands, the vault is honestly out of
+     reach — ghost tiles where the strip would be, one quiet enable row. */
+  .klocked{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  .kghosts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(74%,300px)}
+  .kghosts span{aspect-ratio:1.35;border-radius:14px;border:1.5px dashed var(--kb-tile-line)}
+  .kenable{display:flex;align-items:center;gap:12px;max-width:94%;background:var(--kb-tile);
+    border:1px solid var(--kb-tile-line);border-radius:12px;padding:9px 9px 9px 13px;
+    font-size:12px;color:var(--dim);line-height:1.4}
+  .kenable button{flex:0 0 auto;appearance:none;border:none;border-radius:9px;background:var(--ink);
+    color:var(--paper);font:600 12px var(--ui);padding:8px 13px;cursor:pointer}
+  /* the exit, labelled honestly: iOS resurfaces the last-used keyboard, so the
+     globe is a promise — one tap and you're back on yours */
+  .kfoot{display:flex;align-items:center;gap:10px;flex:0 0 auto;padding:8px 2px 0;color:var(--ink-3);font-size:11px}
+  .kexit{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 15px;border-radius:12px;
+    background:var(--kb-key);border:1px solid var(--kb-tile-line);box-shadow:var(--kb-key-shadow);
+    color:var(--ink);font:600 12.5px var(--ui);cursor:pointer}
+  .kexit:active{filter:brightness(.94)}
+  .kfoot .hint{margin-left:auto;text-align:right}
+  /* quiet inline hints: the greyed-tile teach + the once-only exit teach */
+  .khint{position:absolute;left:50%;bottom:56px;transform:translateX(-50%) translateY(6px);opacity:0;
+    background:var(--card);border:1px solid var(--line);border-radius:99px;color:var(--ink);
+    font:500 12px var(--ui);padding:7px 14px;pointer-events:none;transition:.22s;white-space:nowrap;
+    max-width:94%;overflow:hidden;text-overflow:ellipsis;z-index:5;box-shadow:var(--shadow)}
+  .khint.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion: reduce){.khint{transition:none}}
+  .krows{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:flex-end;min-height:0;padding:0 2px 2px}
+  .krow{display:flex;gap:5px}
+  .key{flex:1;height:40px;border-radius:8px;background:var(--kb-key);color:var(--ink);
+    box-shadow:var(--kb-key-shadow);display:flex;align-items:center;justify-content:center;
+    font:15.5px/1 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
+    cursor:pointer;user-select:none;-webkit-user-select:none}
+  .key:active{filter:brightness(.92)}
+  .key.dim{background:var(--kb-key-dim);font-size:13px}
+  .key.act{background:var(--ink);color:var(--paper);font-weight:600;font-size:13.5px}
+  .key.sp{flex:3.2;font-size:12.5px;color:var(--ink-3)}
+  .fillov{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;padding:10px 10px 12px;
+    background:var(--kb-blur);backdrop-filter:blur(30px) saturate(1.6);-webkit-backdrop-filter:blur(30px) saturate(1.6)}
+  .fillov .flab{font-size:11px;color:var(--ink-3);margin-bottom:6px}
+  .fprev{flex:0 0 auto;background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:12px;
+    padding:10px 12px;font-size:12.5px;color:var(--ink);margin-bottom:8px;max-height:74px;overflow-y:auto;line-height:1.5}
+  .fprev .blank{background:var(--accent-soft);border-bottom:2px solid var(--accent);color:var(--ink);
     border-radius:3px;padding:0 3px;white-space:pre}
-  #kbfab{position:fixed;right:16px;bottom:18px;z-index:49;width:52px;height:52px;border-radius:50%;
-    background:var(--accent);color:#fff;border:none;font-size:21px;cursor:pointer;box-shadow:var(--shadow)}
+  /* password truth: iOS force-switches secure fields to Apple's keyboard —
+     this mock system deck replaces ours entirely while a password is focused */
+  .syskb{position:absolute;inset:0;z-index:7;display:flex;flex-direction:column;
+    background:var(--sys-bg);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+    padding:6px 6px calc(10px + env(safe-area-inset-bottom,0px));
+    font-family:ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif}
+  .syscap{flex:0 0 auto;text-align:center;font-size:11.5px;color:var(--sys-cap);padding:5px 14px 8px;font-family:var(--ui)}
+  .syscap.pulse{animation:syspulse .8s 2}
+  @keyframes syspulse{50%{opacity:.35}}
+  @media (prefers-reduced-motion: reduce){.syscap.pulse{animation:none}}
+  .sysrows{flex:1;display:flex;flex-direction:column;gap:7px;justify-content:flex-end}
+  .srow{display:flex;gap:5px}
+  .srow.mid{padding:0 5%}
+  .skey{flex:1;height:41px;border-radius:5.5px;background:var(--sys-key);color:var(--sys-ink);
+    box-shadow:0 1px 0 var(--sys-edge);display:flex;align-items:center;justify-content:center;
+    font-size:17px;cursor:pointer;user-select:none;-webkit-user-select:none}
+  .skey:active{filter:brightness(.9)}
+  .skey.dim{background:var(--sys-key-dim);font-size:14px}
+  .skey.w15{flex:1.6}
+  .skey.spc{flex:4.4;font-size:13px}
+  #kbfab{position:fixed;right:16px;bottom:18px;z-index:49;width:50px;height:50px;border-radius:15px;
+    background:var(--card);color:var(--ink);border:1px solid var(--line);display:flex;align-items:center;
+    justify-content:center;cursor:pointer;box-shadow:var(--shadow)}
+  /* the Full Access moment — our words before the system alert; zero-network
+     is said in the ask because it is the product's badge */
+  #kbperm{display:none;position:fixed;inset:0;z-index:64}
+  .kp-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
+  .kp-sheet{position:absolute;left:0;right:0;bottom:0;max-width:580px;margin:0 auto;
+    background:var(--card);border:1px solid var(--line);border-bottom:none;border-radius:22px 22px 0 0;
+    padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow);
+    animation:pkup .22s cubic-bezier(.2,.9,.3,1.05);font-family:var(--ui)}
+  .kp-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 14px}
+  .kp-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+  .kp-copy{font-size:13.5px;color:var(--dim);line-height:1.55;margin:0 0 12px}
+  .kp-mini{display:flex;justify-content:center;background:var(--field);border:1px solid var(--line);
+    border-radius:14px;padding:12px 0;margin-bottom:14px}
+  .kp-go{display:block;width:100%;height:48px;border:none;border-radius:14px;background:var(--ink);
+    color:var(--paper);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+  .kp-no{display:block;width:100%;padding:13px 0 2px;border:none;background:none;color:var(--dim);
+    font:inherit;font-size:13.5px;cursor:pointer}
+  /* Fold/Tablet frames are Android hardware and the keyboard is iOS-only:
+     those views state the platform truth (honest card, no fake demo) and the
+     dial carries retrieval there. Phone reads as the iPhone; iPad keeps the
+     full demo — the keyboard path IS the iPad story. */
+  #androidKbCard{display:none}
+  body.device-fold [data-page="keyboard"] #androidKbCard,
+  body.device-tablet [data-page="keyboard"] #androidKbCard{display:block}
+  body.device-fold [data-page="keyboard"] #kbintro,body.device-tablet [data-page="keyboard"] #kbintro,
+  body.device-fold [data-page="keyboard"] .tips,body.device-tablet [data-page="keyboard"] .tips,
+  body.device-fold [data-page="keyboard"] #kblab,body.device-tablet [data-page="keyboard"] #kblab,
+  body.device-fold [data-page="keyboard"] .task,body.device-tablet [data-page="keyboard"] .task{display:none}
+  body.device-fold #kbfab,body.device-tablet #kbfab{display:none}
 
   /* attach picker — the File-Provider sheet: Reel appearing as a source inside a host app */
   #picker{display:none;position:fixed;inset:0;z-index:60}
@@ -272,32 +437,20 @@
     linear-gradient(90deg,transparent calc(50% - 1px),rgba(128,138,150,.38) 50%,transparent calc(50% + 1px))}
   body.device-fold #hinge{display:block}
 
-  /* Fold inner (~673dp): the vault keyboard spans the fold width. Three tiles per
-     row (medium class) packed 1+2 so the hinge lands in the first grid gutter —
-     no tap target is centered on the crease; the wide left tile spends its extra
-     width on longer text previews. */
-  body.device-fold #kb,body.device-ipad #kb{left:50%;right:auto;transform:translateX(-50%) translateY(105%)}
-  body.device-fold #kb{width:min(673px,100vw)}
-  body.device-ipad #kb{width:min(1024px,100vw)}
-  body.device-fold #kb.up,body.device-ipad #kb.up{transform:translateX(-50%) translateY(0)}
-  body.device-fold #kb .grid{grid-template-columns:calc(50% - 7px) 1fr 1fr;column-gap:14px}
-  /* no scrollbar inside the tile grid on these frames — a visible scrollbar would
-     shift the column math so the gutter no longer lands on the crease (and no
-     real IME shows one anyway) */
-  body.device-fold #kb .grid,body.device-ipad #kb .grid{scrollbar-width:none}
-  body.device-fold #kb .grid::-webkit-scrollbar,body.device-ipad #kb .grid::-webkit-scrollbar{display:none}
-  /* category tabs take the same columns, so their boundaries also clear the crease */
-  body.device-fold #kb .cats{display:grid;grid-template-columns:calc(50% - 7px) 1fr 1fr;column-gap:14px}
-  body.device-fold #kbfab{right:max(16px,calc(50vw - 320px))}
+  /* iPad: the keyboard deck spans the 1024 frame with rounded shoulders and
+     five tiles across (expanded class per the app's grid rule). Fold/Tablet
+     get no deck at all — Android hardware is dial territory; the honest card
+     on the keyboard page replaces the demo there (rules live with the
+     keyboard CSS above). */
+  body.device-ipad #kb{left:50%;right:auto;width:min(1024px,100vw);transform:translateX(-50%) translateY(105%);
+    border-radius:18px 18px 0 0;border:1px solid var(--kb-hair);border-bottom:none;overflow:hidden}
+  body.device-ipad #kb.up{transform:translateX(-50%) translateY(0)}
+  body.device-ipad #kb .grid{grid-template-columns:repeat(5,1fr)}
 
-  /* Tablet landscape (~1024): floating, narrowed keyboard — the norm on tablets —
-     docked toward the lower right; the vault strip rides it instead of spanning
-     the screen. Form cards flow two-column so the dial's insert visibly crosses
-     the screen to reach a far-side field. */
-  body.device-tablet #kb{left:auto;right:max(14px,calc(50vw - 498px));bottom:14px;width:392px;
-    border:1px solid #30363E;border-radius:16px;overflow:hidden;transform:translateY(115%)}
-  body.device-tablet #kb.up{transform:translateY(0)}
-  body.device-tablet #kbfab,body.device-ipad #kbfab{right:max(16px,calc(50vw - 496px))}
+  /* Tablet landscape (~1024): Android frame — no keyboard deck (see above).
+     Form cards still flow two-column so the dial's insert visibly crosses the
+     screen to reach a far-side field. */
+  body.device-ipad #kbfab{right:max(16px,calc(50vw - 496px))}
   body.device-tablet main,body.device-ipad main{max-width:952px}
   body.device-tablet .task,body.device-ipad .task{columns:2;column-gap:30px}
   body.device-tablet .task .co,body.device-ipad .task .co{column-span:all}
@@ -306,13 +459,9 @@
   body.device-tablet .task .chatlog,body.device-ipad .task input,body.device-ipad .task textarea,
   body.device-ipad .task .drop,body.device-ipad .task .chatlog{break-inside:avoid;page-break-inside:avoid}
 
-  /* iPad: keyboard path only, wearing iOS chrome — blur, bigger radii. The dial
-     page swaps its demo for the honest no-overlay card (#ipadDialCard). */
-  body.device-ipad #kb{background:rgba(26,29,34,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    border-radius:18px 18px 0 0;border-top:1px solid rgba(255,255,255,.08);overflow:hidden}
-  body.device-ipad #kb .grid{grid-template-columns:repeat(4,1fr)}
-  body.device-ipad .key{border-radius:9px}
-  body.device-ipad #kb .it{border-radius:12px}
+  /* iPad: keyboard path only — the deck's iOS chrome (blur, radii) is its base
+     coat on every frame now. The dial page swaps its demo for the honest
+     no-overlay card (#ipadDialCard). */
   body.device-ipad .card,body.device-ipad .task,body.device-ipad .navcard{border-radius:18px}
   body.device-ipad [data-page="dial"] h1 + p,
   body.device-ipad [data-page="dial"] .tips,
@@ -336,6 +485,7 @@
   .dseg button{appearance:none;border:0;background:transparent;font:inherit;font-size:11.5px;font-weight:500;
     color:var(--dim);padding:4px 11px;border-radius:99px;cursor:pointer;transition:.2s}
   .dseg button[data-on="1"]{background:var(--ink);color:var(--paper)}
+  #segStyle button{padding:4px 9px}   /* five-up row: trimmed so it fits a phone */
   .labbtns{gap:8px}
   .stage{appearance:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
     background:var(--field);border:1px solid var(--line);border-radius:10px;padding:8px 13px;cursor:pointer}
@@ -464,8 +614,9 @@
         <tr><td>Double-tap the button</td><td>Your most recent item, instantly. No dial.</td></tr>
         <tr><td>Slow-cycle</td><td>Hold a finger on any off-center item and the ring <b>cycles slowly</b> until you let go.</td></tr>
       </table>
-      <p class="muted" style="margin:8px 0 0">Three switches below — <b>Catch style</b>, <b>Egress</b> and <b>Preview</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
+      <p class="muted" style="margin:8px 0 0">The switches below — <b>Catch style</b>, <b>Egress</b> and <b>Preview</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
       <p class="muted" style="margin:6px 0 0"><b>Preview</b> is the new one: what's up shows at the top of the screen, so your eyes can stay up there while your thumb spins down here.</p>
+      <p class="muted" style="margin:6px 0 0"><b>Style</b> tries five ways the ring can mark what it holds — today's chips down to bare dots. Same metal, same moves; rule by eye.</p>
     </div>
 
     <div class="permrow" id="permrow" hidden>The edge handle is off<b>Turn it on</b></div>
@@ -477,6 +628,8 @@
         <div class="dseg" id="segEgress"><button type="button" data-v="insert">Insert (demo magic)</button><button type="button" data-v="copy">Copy (honest)</button></div></div>
       <div class="labrow"><span>Preview</span>
         <div class="dseg" id="segPreview"><button type="button" data-v="ring">On the ring</button><button type="button" data-v="top">Floating at top</button></div></div>
+      <div class="labrow"><span>Style</span>
+        <div class="dseg" id="segStyle"><button type="button" data-v="chips">Chips</button><button type="button" data-v="markers">Markers</button><button type="button" data-v="scale">Scale</button><button type="button" data-v="window">Window</button><button type="button" data-v="dots">Dots</button></div></div>
       <div class="labrow labbtns"><button type="button" class="stage" id="stagebtn">Copy something in another app</button><button type="button" class="stage ghost" id="firstrunbtn">Replay first run</button></div>
     </div>
 
@@ -525,16 +678,28 @@
     </div>
   </section>
 
-  <!-- ============ KEYBOARD PAGE ============ -->
+  <!-- ============ KEYBOARD PAGE — the iOS surface ============ -->
   <section data-page="keyboard" hidden>
-    <div class="eyebrow">Test 2 · the keyboard</div>
-    <h1>Second application of the day — keyboard style</h1>
-    <p style="font-size:12.5px;border:1px dashed var(--line);border-radius:10px;padding:8px 12px;color:var(--dim)">
-      <b style="color:var(--ink)">Concept exhibit — the iOS keyboard.</b> This page is the
-      iOS surface: on iPhone and iPad, the vault rides the keyboard. On Android the dial
-      carries retrieval instead — the Android IME is what was cut (2026-08-05). Not being
-      built as an Android keyboard.</p>
-    <p>Tap into any box and the vault keyboard rises — <b>vault first, keys one swipe left</b>. Three things to try: the search field (it uses our own keys — a keyboard can't summon a keyboard), the <b>Interview thanks</b> card (it asks you to fill a blank before inserting), and the <b>⇄ done</b> key that hands you straight back to your own keyboard.</p>
+    <div class="eyebrow">Test 2 · the keyboard · iOS</div>
+    <h1>Second application of the day — this time on the iPhone</h1>
+    <p id="kbintro">This is the iOS surface: your stuff rides the keyboard. Nobody switches keyboards to type — you drop in, take what you came for, and leave. On Android the dial carries this job instead.</p>
+    <!-- Fold/Tablet frames only: Android hardware gets the truth, not a fake demo -->
+    <div class="card" id="androidKbCard">
+      <p style="margin:0">This keyboard is iPhone and iPad. The frame you're looking at is Android hardware — there, the <a href="#dial">dial</a> is how the vault travels.</p>
+    </div>
+    <div class="card tips">
+      <h2>Three things to try</h2>
+      <table>
+        <tr><td>Tap a box, tap a tile</td><td>The vault opens first — pins up front, newest after, everything in one strip. A tile lands right at your cursor, done. A box that can't take a thing just dims it: tap into <b>Email</b> and watch the images grey out; the message box lights everything back up.</td></tr>
+        <tr><td>Tap the password box</td><td>iOS hands passwords to Apple's own keyboard, automatically. Watch the swap — nothing custom ever sees a password.</td></tr>
+        <tr><td>Leave</td><td>One tap on <b>back to your keyboard</b> and you're typing on your own again. iOS brings up whichever keyboard you used last, so a fast exit is part of the design.</td></tr>
+      </table>
+      <p class="muted" style="margin:8px 0 0">Also here: search runs on our own keys (a keyboard can't summon a keyboard), and the <b>Interview thanks</b> tile asks you to fill a blank before it inserts. <b>Replay first run</b> below shows the one-time Full Access moment — try both answers.</p>
+    </div>
+
+    <div class="card" id="kblab">
+      <div class="labrow labbtns"><button type="button" class="stage ghost" id="kbfirstrun">Replay first run</button></div>
+    </div>
 
     <div class="task">
       <div class="co"><div class="logo" style="background:#B0632F">F</div>
@@ -543,7 +708,8 @@
         <div><label>Full name</label><input type="text" placeholder="Same name, again…"></div>
         <div><label>Email</label><input type="text" placeholder="Same email, again…"></div>
       </div>
-      <label>Tell us about something you shipped</label><textarea rows="3" placeholder="Saved a line on the dial page? It's in Clipboard."></textarea>
+      <label>Create a password</label><input type="password" placeholder="Quick apply wants an account, of course">
+      <label>Tell us about something you shipped</label><textarea rows="3" placeholder="Saved a line on the dial page? It's in the strip."></textarea>
       <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
     </div>
 
@@ -561,7 +727,7 @@
       <div class="co"><div class="logo" style="background:#5A4FB3">S</div>
         <div><b>Set up the call</b><small>Riya · scheduling</small></div></div>
       <div class="chatlog"><div class="bub">what times work for you this week?</div></div>
-      <label>Reply</label><input type="text" placeholder="Text → Availability (or search 'ava')">
+      <label>Reply</label><input type="text" placeholder="Search 'ava' — or scroll, it's all one strip">
     </div>
   </section>
 
@@ -579,21 +745,26 @@
   <div class="kpager" id="kpager">
     <div class="kpage" id="kpageVault">
       <div class="ksearch" id="ksearch"></div>
-      <div class="cats" id="kbcats"></div>
       <div class="grid" id="kbgrid"></div>
+      <div class="klocked" id="klocked" style="display:none">
+        <div class="kghosts" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="kenable"><span>Full Access is off — the vault can't reach this keyboard.</span>
+          <button type="button" id="kballow">Allow</button></div>
+      </div>
       <div class="kresults" id="kresults" style="display:none"></div>
       <div class="krows" id="ksrows" style="display:none"></div>
       <div class="kfoot" id="kfootV">
-        <button class="fbtn" data-kx="globe" aria-label="Next keyboard"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/></svg></button>
+        <button class="kexit" type="button" aria-label="Back to your keyboard"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/></svg> back to your keyboard</button>
         <span class="hint">swipe left for keys →</span>
-        <button class="fbtn" data-kx="exit">⇄ done</button>
       </div>
+      <div class="khint" id="khint" role="status"></div>
     </div>
     <div class="kpage" id="kpageKeys">
       <div class="krows" id="ktyperows"></div>
     </div>
   </div>
   <div class="fillov" id="fillov" style="display:none"></div>
+  <div class="syskb" id="syskb" style="display:none" aria-label="System keyboard"></div>
 </div>
 <div id="savechip"><b>＋</b> Save to Reel</div>
 <div id="toast" role="status"></div>
@@ -603,6 +774,7 @@
 <div id="pastechip" role="button"></div>
 <div id="dialpulse" aria-hidden="true"></div>
 <div id="perm"></div>
+<div id="kbperm"></div>
 
 <script>
 'use strict';
@@ -678,7 +850,7 @@ function lastUsed(){
   const used=vault.filter(i=>i.last_used_at).sort((a,b)=>b.last_used_at-a.last_used_at);
   return used[0]||byType('txt')[0]||vault[0];
 }
-document.getElementById('resetbtn').onclick=()=>{localStorage.removeItem(KEY);vault=load();toast('Demo data reset');refreshKb();};
+document.getElementById('resetbtn').onclick=()=>{localStorage.removeItem(KEY);kbResetDemo();vault=load();toast('Demo data reset');refreshKb();};
 
 /* add-your-own-file: name only, nothing is read or uploaded */
 const filepick=document.getElementById('filepick');
@@ -721,6 +893,12 @@ let EGRESS=(()=>{try{const v=localStorage.getItem(EGRESSKEY);return v==='insert'
    the thumb is the input, the top of the screen is the output — so it defaults on. */
 const PREVKEY='reel.dial.preview.v1';
 let PREVIEW=(()=>{try{const v=localStorage.getItem(PREVKEY);return v==='ring'||v==='top'?v:'top'}catch(_){return 'top'}})();
+/* Style explorer (2026-08-06): five ways the ring can MARK its items. The Sony
+   finish — knurl, accent band, hub, index, engraving language — never changes;
+   a style swaps the item representation only. 'chips' is the pre-explorer
+   look, kept exact as the baseline to rule against. */
+const STYLEKEY='reel.dial.style.v1',DIALSTYLES=['chips','markers','scale','window','dots'];
+let STYLE=(()=>{try{const v=localStorage.getItem(STYLEKEY);return DIALSTYLES.includes(v)?v:'chips'}catch(_){return 'chips'}})();
 let PERM=(()=>{try{return localStorage.getItem(PERMKEY)==='denied'?'denied':'granted'}catch(_){return 'granted'}})();
 const DOCKS=(()=>{const def={phone:'right',fold:'right',tablet:'right',ipad:'right'};
   try{const j=JSON.parse(localStorage.getItem(DOCKKEY));
@@ -856,6 +1034,7 @@ function bindSeg(id,get,set){
 bindSeg('segCatch',()=>CATCH,v=>{CATCH=v;persist(CATCHKEY,v);});
 bindSeg('segEgress',()=>EGRESS,v=>{EGRESS=v;persist(EGRESSKEY,v);});
 bindSeg('segPreview',()=>PREVIEW,v=>{PREVIEW=v;persist(PREVKEY,v);});  // the loop re-syncs live
+bindSeg('segStyle',()=>STYLE,v=>{STYLE=v;persist(STYLEKEY,v);});       // redraws next frame, live
 document.getElementById('stagebtn').onclick=stageClip;
 document.getElementById('firstrunbtn').onclick=openPerm;
 document.getElementById('permrow').onclick=openPerm;
@@ -1015,6 +1194,7 @@ function route(){
   document.querySelectorAll('[data-page]').forEach(s=>s.hidden=s.dataset.page!==page);
   document.getElementById('kbfab').hidden=page!=='keyboard';
   document.body.classList.toggle('on-dial',page==='dial');   // dial page wears the current tokens
+  document.body.classList.toggle('on-kb',page==='keyboard'); // so does the keyboard page, its own way
   if(page!=='keyboard')kbHide();
   DIAL.enabled=page==='dial'&&DEV!=='ipad';   // iOS: no overlay API, no dial
   if(!DIAL.enabled){DIAL.mode='closed';DIAL.open=0;DIAL.openT=0;DIAL.offer=null;document.body.classList.remove('dialing');}
@@ -1023,18 +1203,35 @@ function route(){
 }
 addEventListener('hashchange',route);
 
-/* ========== keyboard: vault-first, swipe left for keys ========== */
+/* ========== keyboard: the iOS surface — vault-first, one mixed strip ========== */
+/* Nobody switches keyboards to type; they visit for the vault. So the strip is
+   the whole opening view, the exit is labelled and generous, and the two iOS
+   platform truths (password force-switch, Full Access) are staged as designed
+   moments instead of footnotes. */
 const kb=document.getElementById('kb');
 const kpager=document.getElementById('kpager');
-const KB={cat:0,q:'',mode:'browse',fillItem:null,fillBuf:''};
+const KB={q:'',mode:'browse',fillItem:null,fillBuf:'',fillFrom:'browse'};
+/* Full Access + the one-time exit hint, persisted like every other demo pref */
+const KBACCESSKEY='reel.kb.access.v1',KBEXITKEY='reel.kb.exithint.v1';
+let KBACCESS=(()=>{try{return localStorage.getItem(KBACCESSKEY)==='denied'?'denied':'granted'}catch(_){return 'granted'}})();
+function kbResetDemo(){try{localStorage.removeItem(KBACCESSKEY);localStorage.removeItem(KBEXITKEY)}catch(_){}KBACCESS='granted';}
 function kbShow(page){kb.classList.add('up');
   if(page!==undefined)setTimeout(()=>kpager.scrollTo({left:page*kpager.clientWidth}),10);}
-function kbHide(){kb.classList.remove('up');exitSearch();exitFill();}
-function kbExit(){kbHide();toast("Back to your keyboard — on iOS that's this one tap");}
+function kbHide(){kb.classList.remove('up');
+  if(KB.mode==='fill'){KB.fillFrom='browse';exitFill();}
+  exitSearch();hideSysKb();closeKbAccess();}
+function kbExit(){kbHide();toast('Back on your keyboard');}
 document.getElementById('kbfab').onclick=()=>kb.classList.contains('up')?kbHide():(refreshKb(),kbShow(0));
+/* focus decides the deck: password fields swap to the system keyboard (iOS
+   truth — custom keyboards never see secure fields); everything else raises
+   the vault, re-rendered so field acceptance greys the right tiles */
 document.addEventListener('focusin',e=>{
-  if(!document.querySelector('[data-page=keyboard]').hidden
-     &&e.target.matches('input[type=text],textarea')&&e.target.closest('.task')){refreshKb();kbShow(0);}
+  if(document.querySelector('[data-page=keyboard]').hidden)return;
+  if(!e.target.closest('.task'))return;
+  if(e.target.matches('input[type=password]')){PW.field=e.target;showSysKb();return;}
+  if(e.target.matches('input[type=text],textarea')){
+    if(KB.mode==='fill'){KB.fillFrom='browse';exitFill();}
+    exitSearch();hideSysKb();refreshKb();kbShow(0);}
 });
 
 /* pager dots */
@@ -1053,6 +1250,26 @@ function kbeep(){navigator.vibrate&&navigator.vibrate(2);
     g.gain.setValueAtTime(.03,t);g.gain.exponentialRampToValueAtTime(.0001,t+.014);
     o.connect(g).connect(AC.destination);o.start(t);o.stop(t+.02);}catch(_){}}
 
+/* quiet inline hints: the greyed-tile teach and the once-only exit teach share
+   one channel so the keyboard never grows a second voice */
+function khint(msg,ms){const el=document.getElementById('khint');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(khint._t);khint._t=setTimeout(()=>el.classList.remove('show'),ms||1700);}
+function exitHintOnce(){
+  try{if(localStorage.getItem(KBEXITKEY))return;localStorage.setItem(KBEXITKEY,'1');}catch(_){return;}
+  khint('Done here? The globe key hands you back.',5200);
+}
+/* which tiles light is the focused field's call: single-line boxes take text,
+   the message box takes everything — greyed, never hidden (round 4) */
+function fieldTakesImages(){return !!(T.field&&T.field.tagName==='TEXTAREA'&&visibleSection().contains(T.field))}
+function useOrTeach(it){
+  const hasField=T.field&&visibleSection().contains(T.field);
+  if(hasField&&it.type==='img'&&!fieldTakesImages()){khint('This field takes text.');return;}
+  const wasFill=(it.content||'').includes('___');
+  const ok=useItem(it);
+  if(ok&&!wasFill)exitHintOnce();
+}
+
 /* one keyset, three contexts: typing into the page, typing a search, filling a blank */
 const KROWS=[['1','2','3','4','5','6','7','8','9','0'],
   ['q','w','e','r','t','y','u','i','o','p'],
@@ -1061,8 +1278,7 @@ const KROWS=[['1','2','3','4','5','6','7','8','9','0'],
 function rowsHTML(ctx){
   let h=KROWS.map(r=>`<div class="krow">${r.map(k=>`<div class="key" data-k="${k}">${k}</div>`).join('')}</div>`).join('');
   h+=`<div class="krow">
-    <div class="key dim" data-kx="globe"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/></svg></div>
-    <div class="key dim" data-kx="exit">⇄</div>
+    <div class="key dim" data-kx="globe" role="button" aria-label="Back to your keyboard"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/></svg></div>
     <div class="key sp" data-k=" ">space</div>
     <div class="key dim" data-kx="bksp">⌫</div>
     ${ctx==='type'?`<div class="key dim" data-k="&#10;">↩</div>`:''}
@@ -1098,18 +1314,19 @@ function handleKx(kx){
         T.field.dispatchEvent(new Event('input',{bubbles:true}));}}
     return;}
   if(kx==='closeSearch'){exitSearch();refreshKb();return;}
-  if(kx==='cancelFill'){exitFill();refreshKb();return;}
+  if(kx==='cancelFill'){exitFill();if(KB.mode!=='search')refreshKb();return;}
   if(kx==='commitFill'){commitFill();return;}
 }
 
 /* --- search: our own keys, because a keyboard can't summon a keyboard --- */
-function enterSearch(){KB.mode='search';KB.q='';
-  for(const id of ['kbcats','kbgrid','kfootV'])document.getElementById(id).style.display='none';
+function enterSearch(){
+  if(KBACCESS==='denied'){khint('Allow Full Access first — the vault is out of reach.');return;}
+  KB.mode='search';KB.q='';
+  for(const id of ['kbgrid','kfootV'])document.getElementById(id).style.display='none';
   const r=document.getElementById('kresults'),k=document.getElementById('ksrows');
   r.style.display='flex';k.style.display='flex';k.innerHTML=rowsHTML('search');bindKeys(k);
   renderSearch();}
 function exitSearch(){if(KB.mode!=='search')return;KB.mode='browse';KB.q='';
-  document.getElementById('kbcats').style.display='';
   document.getElementById('kbgrid').style.display='';
   document.getElementById('kfootV').style.display='';
   document.getElementById('kresults').style.display='none';
@@ -1118,66 +1335,174 @@ function exitSearch(){if(KB.mode!=='search')return;KB.mode='browse';KB.q='';
 const escq=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 function renderSearchField(){
   const s=document.getElementById('ksearch');
+  s.classList.toggle('off',KBACCESS==='denied');
   if(KB.mode==='search'){
-    s.innerHTML=`${SRCH} <span class="q">${escq(KB.q)}</span><span class="caret"></span><span class="x">✕</span>`;
+    s.innerHTML=`${SRCH} <span class="q">${escq(KB.q)}</span><span class="caret"></span><span class="x" role="button" aria-label="Close search">✕</span>`;
     s.querySelector('.x').onclick=e=>{e.stopPropagation();exitSearch();refreshKb();};
-  }else s.innerHTML=`${SRCH} <span style="color:#6D7783">Search your stuff…</span>`;
+  }else s.innerHTML=`${SRCH} <span>Search your vault…</span>`;
 }
 function renderSearch(){
   renderSearchField();
-  const items=KB.q?vault.filter(i=>(i.label+' '+i.content).toLowerCase().includes(KB.q.toLowerCase()))
-    :vault.slice().sort((a,b)=>b.last_used_at-a.last_used_at).slice(0,6);
+  const items=(KB.q?vault.filter(i=>(i.label+' '+i.content).toLowerCase().includes(KB.q.toLowerCase()))
+    :vault.slice().sort((a,b)=>b.last_used_at-a.last_used_at).slice(0,8)).filter(i=>i.type!=='doc');
+  const imgOK=fieldTakesImages();
   const r=document.getElementById('kresults');
-  r.innerHTML=items.length?items.map(i=>`<div class="it" data-t="${i.type}" style="min-height:40px;max-width:150px">${i.pin_order!=null?`<span class="pin">${PINSVG}</span>`:''}<span class="pv" style="-webkit-line-clamp:1">${escq(i.type==='doc'?i.label:(i.content||i.label))}</span></div>`).join('')
-    :`<div style="color:#6d7783;font-size:12px;padding:12px">No match for “${escq(KB.q)}”</div>`;
-  [...r.children].forEach((el,idx)=>{if(items[idx])el.onclick=()=>useItem(items[idx]);});
+  r.innerHTML=items.length?items.map(i=>{
+    const off=i.type==='img'&&!imgOK?' off':'';
+    if(i.type==='img')return `<div class="rit${off}" role="button"><span class="rthumb" style="background:${kgrad(i.id)}"></span><span class="rp">${escq(i.label)}</span></div>`;
+    const v=i.is_sensitive?i.label+' ····':(i.content||i.label);
+    return `<div class="rit${off}" role="button">${i.pin_order!=null?`<span class="pin" style="display:flex;color:var(--ink-3)">${PINSVG}</span>`:''}<span class="rp">${escq(v)}</span></div>`;
+  }).join(''):`<div class="rnone">No match for “${escq(KB.q)}”</div>`;
+  [...r.children].forEach((el,idx)=>{if(items[idx]){
+    el.addEventListener('pointerdown',e=>e.preventDefault());
+    el.onclick=()=>useOrTeach(items[idx]);}});
 }
 document.getElementById('ksearch').onclick=()=>{if(KB.mode!=='search')enterSearch();};
 
 /* --- template fill: complete the blank before inserting --- */
-function enterFill(it){KB.mode='fill';KB.fillItem=it;KB.fillBuf='';
+function enterFill(it){KB.fillFrom=KB.mode==='search'?'search':'browse';
+  KB.mode='fill';KB.fillItem=it;KB.fillBuf='';
   document.getElementById('fillov').style.display='flex';renderFill();}
 function renderFill(){
   const it=KB.fillItem,parts=escq(it.content).split('___');
   const ov=document.getElementById('fillov');
-  ov.innerHTML=`<div style="font-size:11px;color:#8A94A0;margin-bottom:6px">${escq(it.label)} — fill the blank, then Insert</div>
+  ov.innerHTML=`<div class="flab">${escq(it.label)} — fill the blank, then Insert</div>
     <div class="fprev">${parts[0]}<span class="blank">${KB.fillBuf?escq(KB.fillBuf):'···'}</span>${parts.slice(1).join('___')}</div>
     <div class="krows" id="frows"></div>`;
   const fr=document.getElementById('frows');fr.innerHTML=rowsHTML('fill');bindKeys(fr);
 }
-function exitFill(){if(KB.mode!=='fill')return;KB.mode='browse';KB.fillItem=null;
-  document.getElementById('fillov').style.display='none';}
+function exitFill(){if(KB.mode!=='fill')return;
+  KB.mode=KB.fillFrom==='search'?'search':'browse';KB.fillItem=null;
+  document.getElementById('fillov').style.display='none';
+  if(KB.mode==='search')renderSearch();}
 function commitFill(){
   const it=KB.fillItem,text=it.content.replace('___',KB.fillBuf||'___');
-  exitFill();
+  KB.fillFrom='browse';exitFill();
   if(T.field&&visibleSection().contains(T.field)){
     insertAtCursor(T.field,text);touch(it);
     toast(`Inserted · ${it.label}`);tick();setTimeout(tick,70);
+    refreshKb();exitHintOnce();
   }else{pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');toast('Tap a text box first');}
 }
 
-/* --- browse (default) --- */
+/* --- browse (default): ONE mixed strip — pins first, then newest, no tabs --- */
+function kbItems(){
+  const pins=pinnedItems().filter(i=>i.type!=='doc');
+  const ids=new Set(pins.map(p=>p.id));
+  return [...pins,...vault.filter(i=>i.type!=='doc'&&!ids.has(i.id)&&!i.deleted_at)
+    .sort((a,b)=>b.captured_at-a.captured_at)];
+}
+const KCODE=s=>/\d/.test(s)&&!/[a-z]{3,}/.test(s);   // IBANs, tracking numbers, gates
+const tierOf=v=>v.length<=26?' s1':v.length<=64?' s2':'';
+function tileHTML(i,imgOK){
+  const pin=i.pin_order!=null?`<span class="pin">${PINSVG}</span>`:'';
+  const off=i.type==='img'&&!imgOK?' off':'';
+  if(i.type==='img')
+    return `<div class="it img${off}" role="button" aria-label="${escq(i.label)}"><span class="shot" style="background:${kgrad(i.id)}"></span><span class="cap">${escq(i.label)}</span>${pin}</div>`;
+  if(i.is_sensitive)
+    return `<div class="it" role="button" aria-label="${escq(i.label)}, hidden"><span class="lock"><span class="lab">${escq(i.label)}</span><span class="dots">•••• ••••</span></span>${pin}</div>`;
+  if(i.type==='url'){
+    const dom=(i.content||'').replace(/^https?:\/\//,'').split('/')[0];
+    return `<div class="it${off}" role="button"><span class="tit"><span class="t">${escq(i.title||i.label)}</span><span class="d">${escq(dom)}</span></span>${pin}</div>`;
+  }
+  const v=i.content||i.label;
+  const fill=v.includes('___')?`<span class="b">fill-in</span>`:'';
+  return `<div class="it" role="button"><span class="pv${tierOf(v)}${KCODE(v)?' code':''}">${escq(v)}</span>${pin}${fill}</div>`;
+}
 function refreshKb(){
   renderSearchField();
-  const cats=document.getElementById('kbcats');
-  cats.innerHTML=COLS.map((c,i)=>`<div class="cat ${i===KB.cat?'on':''}" role="button" style="font-size:11.5px;font-weight:600;letter-spacing:.05em">${c[0].toUpperCase()}</div>`).join('');
-  [...cats.children].forEach((el,i)=>el.onclick=()=>{KB.cat=i;refreshKb();});
-  const items=byType(COLS[KB.cat][1])
-    .sort((a,b)=>((b.pin_order!=null)-(a.pin_order!=null)));   // pins first, recency preserved after
+  const locked=KBACCESS==='denied';
   const grid=document.getElementById('kbgrid');
-  grid.innerHTML=items.length?items.map(i=>{
-    const b=i.type==='doc'?'file':(i.content||'').includes('___')?'fill-in':'';
-    const pin=i.pin_order!=null?`<span class="pin">${PINSVG}</span>`:'';
-    const body=i.type==='img'
-      ?`<span class="thumb" style="background:${kgrad(i.id)}"></span>`
-      :`<span class="pv">${escq((i.type==='doc'?i.label:(i.content||i.label)))}</span>`;
-    return `<div class="it" role="button" data-t="${i.type}">${pin}${body}${b?`<span class="b">${b}</span>`:''}</div>`;
-  }).join(''):`<div style="grid-column:1/-1;color:#6d7783;font-size:12.5px;padding:14px;text-align:center">Nothing here yet</div>`;
-  [...grid.children].forEach((el,idx)=>{if(items[idx])el.onclick=()=>useItem(items[idx]);});
+  document.getElementById('klocked').style.display=locked?'flex':'none';
+  grid.style.display=locked?'none':'grid';
+  if(!locked){
+    const items=kbItems(),imgOK=fieldTakesImages();
+    grid.innerHTML=items.length?items.map(i=>tileHTML(i,imgOK)).join('')
+      :`<div class="kempty">Nothing here yet</div>`;
+    [...grid.children].forEach((el,idx)=>{if(items[idx]){
+      el.addEventListener('pointerdown',e=>e.preventDefault());   // host field keeps focus + caret
+      el.onclick=()=>useOrTeach(items[idx]);}});
+  }
   const tr=document.getElementById('ktyperows');
   if(!tr.dataset.built){tr.innerHTML=rowsHTML('type');bindKeys(tr);tr.dataset.built='1';}
-  [...document.querySelectorAll('#kfootV .fbtn')].forEach(b=>b.onclick=()=>handleKx(b.dataset.kx));
+  document.querySelector('#kfootV .kexit').onclick=kbExit;
 }
+
+/* --- the password truth: a mock of Apple's own deck, swapped in whole --- */
+const PW={field:null};
+function showSysKb(){
+  if(KB.mode==='fill'){KB.fillFrom='browse';exitFill();}
+  exitSearch();
+  const s=document.getElementById('syskb');
+  if(!s.dataset.built){buildSysKb(s);s.dataset.built='1';}
+  s.style.display='flex';kb.classList.add('up');
+}
+function hideSysKb(){const s=document.getElementById('syskb');s.style.display='none';PW.field=null;}
+function sysType(ch){
+  if(!PW.field)return;kbeep();
+  const f=PW.field;f.focus();
+  const s0=f.selectionStart??f.value.length,e0=f.selectionEnd??s0;
+  if(f.setRangeText)f.setRangeText(ch,s0,e0,'end');else f.value+=ch;
+}
+function sysBksp(){
+  if(!PW.field)return;kbeep();
+  const f=PW.field;f.focus();
+  const s0=f.selectionStart||0;
+  if(s0>0)f.setRangeText('',s0-1,f.selectionEnd||s0,'end');
+}
+function buildSysKb(s){
+  const K=(lab,cls,sx)=>`<div class="skey${cls?' '+cls:''}" ${sx?`data-sx="${sx}"`:`data-sc="${lab}"`}>${lab}</div>`;
+  s.innerHTML=`<div class="syscap" id="syscap">Passwords never see custom keyboards — iOS switches to Apple&rsquo;s automatically.</div>
+   <div class="sysrows">
+    <div class="srow">${[...'qwertyuiop'].map(c=>K(c)).join('')}</div>
+    <div class="srow mid">${[...'asdfghjkl'].map(c=>K(c)).join('')}</div>
+    <div class="srow">${K('⇧','dim w15','cap')}${[...'zxcvbnm'].map(c=>K(c)).join('')}${K('⌫','dim w15','bksp')}</div>
+    <div class="srow">${K('123','dim w15','nums')}<div class="skey spc" data-sc=" ">space</div>${K('Done','dim w15','done')}</div>
+   </div>`;
+  [...s.querySelectorAll('.skey')].forEach(el=>{
+    el.addEventListener('pointerdown',e=>e.preventDefault());
+    el.onclick=()=>{
+      if(el.dataset.sx==='bksp')return sysBksp();
+      if(el.dataset.sx==='done'){if(PW.field)PW.field.blur();kbHide();return;}
+      if(el.dataset.sx){const c=document.getElementById('syscap');   // shift/123: the caption is the point
+        c.classList.remove('pulse');void c.offsetWidth;c.classList.add('pulse');return;}
+      sysType(el.dataset.sc);
+    };
+  });
+}
+
+/* --- Full Access, the designed moment: our words before the system ask --- */
+const kbperm=document.getElementById('kbperm');
+function openKbAccess(){
+  kbperm.innerHTML=`<div class="kp-scrim"></div>
+   <div class="kp-sheet">
+    <div class="kp-grip"></div>
+    <div class="kp-title">Reach your vault from here</div>
+    <p class="kp-copy">To reach your vault, iOS needs you to allow Full Access. Everything still stays on this phone — nothing goes online.</p>
+    <div class="kp-mini"><svg width="230" height="112" viewBox="0 0 230 112" aria-hidden="true">
+      <rect x="36" y="6" width="158" height="100" rx="14" fill="none" stroke="var(--line)" stroke-width="2"/>
+      <rect x="52" y="20" width="86" height="7" rx="3.5" fill="var(--line)"/>
+      <rect x="52" y="34" width="58" height="7" rx="3.5" fill="var(--line)"/>
+      <rect x="52" y="52" width="38" height="28" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.4"/>
+      <rect x="96" y="52" width="38" height="28" rx="8" fill="none" stroke="var(--line)" stroke-width="1.4"/>
+      <rect x="140" y="52" width="38" height="28" rx="8" fill="none" stroke="var(--line)" stroke-width="1.4"/>
+      <rect x="52" y="88" width="126" height="9" rx="4.5" fill="var(--line)"/>
+    </svg></div>
+    <button type="button" class="kp-go">Continue</button>
+    <button type="button" class="kp-no">Not now</button>
+   </div>`;
+  kbperm.style.display='block';
+  kbperm.querySelector('.kp-scrim').onclick=closeKbAccess;
+  kbperm.querySelector('.kp-go').onclick=()=>{
+    KBACCESS='granted';try{localStorage.setItem(KBACCESSKEY,KBACCESS)}catch(_){}
+    closeKbAccess();refreshKb();toast('Full Access is on — the vault rides your keyboard');};
+  kbperm.querySelector('.kp-no').onclick=()=>{
+    KBACCESS='denied';try{localStorage.setItem(KBACCESSKEY,KBACCESS)}catch(_){}
+    closeKbAccess();refreshKb();};
+}
+function closeKbAccess(){kbperm.style.display='none';kbperm.innerHTML='';}
+document.getElementById('kbfirstrun').onclick=openKbAccess;
+document.getElementById('kballow').onclick=openKbAccess;
 
 /* ================= the dial ================= */
 const svg=document.getElementById('dialsvg');
@@ -1455,7 +1780,9 @@ function drawDial(){
     if(DIAL.glideZone)h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="${catc}" fill-opacity=".10" stroke="${catc}" stroke-width="2"/>`;
     else h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="none" stroke="${catc}" stroke-width="1.5" stroke-dasharray="4 5" opacity=".5"/>`;
   }
-  h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,CA-STEP_OUT/2,CA+STEP_OUT/2)}" fill="${catc}" opacity="${.14*f}"/>`;
+  /* the focused-slot wash belongs to the chip look; the mark styles keep the
+     barrel clean — their focused mark and the index do this job */
+  if(STYLE==='chips')h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,CA-STEP_OUT/2,CA+STEP_OUT/2)}" fill="${catc}" opacity="${.14*f}"/>`;
   /* outer ring = Samsung-clipboard content cards: raw text, image thumbs, filenames.
      No identity icons out here — the inner ring owns wayfinding; only the pin mark decorates.
      Card washes are the current type tints, dimmed for the dark instrument. */
@@ -1509,14 +1836,117 @@ function drawDial(){
     return s+`</g>`;
   };
   const floating=PREVIEW==='top';
+  /* ═══ style explorer (2026-08-06): five item representations, one finish ═══
+     A style only swaps how items MARK themselves on the ring; 'chips' routes
+     to the pre-explorer card/tickSeg pair unchanged. */
+  /* engraved radial tick — the shared stroke of the mark styles: the dark cut
+     shadow a hair above, then the mark itself */
+  const tickLine=(r0,r1,a,col,w,op)=>{
+    const p1=P(r0,a),p2=P(r1,a);
+    return `<line x1="${p1.x}" y1="${p1.y-.7}" x2="${p2.x}" y2="${p2.y-.7}" stroke="${LENS.engraveShadow}" stroke-width="${w+.7}" stroke-linecap="round" opacity="${.75*op}"/>`+
+      `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${col}" stroke-width="${w}" stroke-linecap="round" opacity="${op}"/>`;
+  };
+  /* Markers (and Window's ticks): one fine tick per item, type colour only.
+     Pins run a hair longer and grow a dot head. Focused = brighter + longer —
+     the index mark and the preview do the identifying. Masked items need
+     nothing extra: a tick never carried a value to hide. */
+  const markTick=(it,a,foc,op,pinned)=>{
+    const col=TYPEC[it.type]||'#8A94A0';
+    let s=tickLine(midO-(foc?12.5:9),midO+(foc?12.5:pinned?11:9),a,col,foc?2.2:pinned?1.8:1.6,(foc?1:pinned?.8:.62)*op);
+    if(pinned){const p=P(midO+16.5,a);
+      s+=`<circle cx="${p.x}" cy="${p.y}" r="2.2" fill="${col}" stroke="${LENS.engraveShadow}" stroke-width=".8" opacity="${.9*op}"/>`;}
+    return s;
+  };
+  /* Scale: the full lens lean-in — monochrome engraved ticks rising off the
+     same baseline as the half-detent minors, position numerals in the lens
+     mono (1 = newest). Pins engrave a dot instead of a number. Type colour
+     deliberately lives only in the preview here — that is the experiment. */
+  const scaleTick=(it,a,foc,op,pinned,num)=>{
+    const b0=o(OUT0);
+    let s=tickLine(b0+4,b0+(foc?24:20),a,foc?'#E7EBF0':LENS.engrave,foc?2.2:1.8,(foc?1:.72)*op);
+    const p=P(b0+33,a);
+    if(pinned)
+      s+=`<circle cx="${p.x}" cy="${p.y-.7}" r="2" fill="${LENS.engraveShadow}" opacity="${.7*op}"/>`+
+         `<circle cx="${p.x}" cy="${p.y}" r="2" fill="${LENS.engrave}" opacity="${.85*op}"/>`;
+    else s+=`<g opacity="${op}">`+eng(p.x,p.y,7.5,String(num),
+      `style="font-family:var(--mono)" text-anchor="middle" dominant-baseline="central"`,
+      foc?'#EDF1F5':LENS.engraveDim)+`</g>`;
+    return s;
+  };
+  /* Dots: the most reduced — one dot per item riding just inside the knurl,
+     pins ringed, the focused one swelling with a soft glow. */
+  const dotMark=(it,a,foc,op,pinned)=>{
+    const col=TYPEC[it.type]||'#8A94A0';
+    const p=P(o(OUT1)-9,a);let s='';
+    if(foc)s+=`<circle cx="${p.x}" cy="${p.y}" r="9" fill="${col}" opacity="${.15*op}"/>`+
+              `<circle cx="${p.x}" cy="${p.y}" r="6" fill="${col}" opacity="${.25*op}"/>`;
+    s+=`<circle cx="${p.x}" cy="${p.y}" r="${foc?4.4:pinned?2.7:3}" fill="${col}" stroke="${LENS.engraveShadow}" stroke-width=".9" opacity="${(foc?1:.85)*op}"/>`;
+    if(pinned)s+=`<circle cx="${p.x}" cy="${p.y}" r="5.4" fill="none" stroke="${col}" stroke-width="1.1" opacity="${.8*op}"/>`;
+    return s;
+  };
+  const mark=(it,a,foc,op,pinned,num)=>
+    STYLE==='markers'||STYLE==='window'?markTick(it,a,foc,op,pinned)
+    :STYLE==='scale'?scaleTick(it,a,foc,op,pinned,num)
+    :STYLE==='dots'?dotMark(it,a,foc,op,pinned)
+    :floating?tickSeg(it,a,foc,op,pinned)
+    :card(it,a,pinned?1:foc?1.14:1,op,pinned);
   const its=dialItems();
   slots(its,DIAL.sOut,STEP_OUT,WIN_ROT).forEach(({i,off})=>{
     const foc=Math.abs(off)<STEP_OUT*.45;
     const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_ROT+8)/14))*f;
-    h+=floating?tickSeg(its[i],CA+off,foc,op,false):card(its[i],CA+off,foc?1.14:1,op,false);
+    h+=mark(its[i],CA+off,foc,op,false,i+1);
   });
   pinnedItems().forEach((pn,k)=>{const a=CA+(k===0?-PIN_OFF:PIN_OFF);
-    h+=floating?tickSeg(pn,a,false,f,true):card(pn,a,1,f,true);});
+    h+=mark(pn,a,false,f,true,0);});
+  if(STYLE!=='chips'&&its.length>3){
+    /* scroll-reveal cue: a half-faded chip used to imply "more past the edge";
+       a fine tick can't. So the scale trails off instead — three diminishing
+       engraved marks past each end of the item window, the instrument's way
+       of saying the graduation continues under the barrel. Dots trail as
+       dots, Scale off its baseline, tick styles at mid-band. */
+    for(const sgn of [-1,1])for(const [dd,to,len] of [[8,.32,8],[12.5,.18,6.5],[16.5,.09,5]]){
+      const a=CA+sgn*(WIN_ROT+dd);
+      if(STYLE==='dots'){const p=P(o(OUT1)-9,a);
+        h+=`<circle cx="${p.x}" cy="${p.y}" r="${len*.26}" fill="${LENS.engraveDim}" opacity="${to*f}"/>`;}
+      else if(STYLE==='scale')h+=tickLine(o(OUT0)+4,o(OUT0)+4+len,a,LENS.engraveDim,1.2,to*f);
+      else h+=tickLine(midO-len/2,midO+len/2,a,LENS.engraveDim,1.2,to*f);
+    }
+  }
+  if(STYLE==='window'){
+    /* the index window: one machined recess cut into the band at the index
+       mark — the barrel's ticks slide beneath it, and the focused item's
+       short label reads engraved inside. A lens focus window, not a chip.
+       Sensitive items show their name and dots, never the value. */
+    const wr=(o(OUT0)+o(OUT1))/2,wcx=AX-EDGE*wr,wcy=CY;
+    const winW=Math.min(66,(o(OUT1)-o(OUT0))*.86),winH=26;
+    h+=`<rect x="${wcx-winW/2}" y="${wcy-winH/2}" width="${winW}" height="${winH}" rx="7" fill="#090C10" stroke="#05070A" stroke-width="1.2" opacity="${f}"/>`;
+    h+=`<rect x="${wcx-winW/2+1.2}" y="${wcy-winH/2+1.2}" width="${winW-2.4}" height="${winH-2.4}" rx="6" fill="none" stroke="#000000" stroke-opacity="${.5*f}"/>`;
+    h+=`<path d="M${wcx-winW/2+7} ${wcy+winH/2-1.1}H${wcx+winW/2-7}" stroke="#FFFFFF" stroke-opacity="${.07*f}" stroke-linecap="round"/>`;
+    if(fit){
+      if(fit.is_sensitive){
+        h+=`<g opacity="${f}">`+eng(wcx,wcy-5.5,6.5,escq(fit.label.slice(0,12).toUpperCase()),`letter-spacing=".08em" text-anchor="middle" dominant-baseline="central"`,LENS.engraveDim)
+          +eng(wcx,wcy+6,9,'•••• ••••',`letter-spacing=".14em" text-anchor="middle" dominant-baseline="central"`,LENS.engrave)+`</g>`;
+      }else{
+        const src=fit.type==='url'?(fit.title||fit.label):fit.type==='img'?fit.label:(fit.content||fit.label);
+        const t=src.replace(/\s+/g,' ').trim(),cut=t.slice(0,12)+(t.length>12?'…':'');
+        h+=`<g opacity="${f}">`+eng(wcx,wcy,8.5,escq(cut),`text-anchor="middle" dominant-baseline="central"`,LENS.engrave)+`</g>`;
+      }
+    }
+  }
+  if(!floating&&fit&&!DIAL.offer&&(STYLE==='markers'||STYLE==='scale'||STYLE==='dots')){
+    /* on-ring preview for the shed styles: the lens distance-window reading —
+       the focused item's short label engraved on an arc in the clear metal
+       between hub and band. One curved line does all the identifying. */
+    const rr=(HUB+o(OUT0))/2+6;
+    const rp1=P(rr,CA+42),rp2=P(rr,CA-42);
+    const rd=fit.is_sensitive
+      ?escq(fit.label.replace(/\s+/g,' ').slice(0,10).toUpperCase())+' ••••'
+      :(t=>escq(t.slice(0,16)+(t.length>16?'…':'')))
+        ((fit.type==='url'?(fit.title||fit.label):fit.type==='img'?fit.label:(fit.content||fit.label)).replace(/\s+/g,' ').trim());
+    h+=`<defs><path id="readarc" d="M${rp1.x} ${rp1.y}A${rr} ${rr} 0 0 0 ${rp2.x} ${rp2.y}"/></defs>`;
+    h+=`<text font-size="8" letter-spacing=".05em" style="font-family:var(--mono)" text-anchor="middle" fill="${LENS.engraveShadow}" opacity="${.85*f}" dy="-.7"><textPath href="#readarc" startOffset="50%">${rd}</textPath></text>`;
+    h+=`<text font-size="8" letter-spacing=".05em" style="font-family:var(--mono)" text-anchor="middle" fill="${LENS.engrave}" opacity="${f}"><textPath href="#readarc" startOffset="50%">${rd}</textPath></text>`;
+  }
   /* the index mark: painted-dot crispness — red over a dark rim, flush against
      the knurled edge like a lens body index */
   const m1=P(kn1+2,CA),m2=P(kn1+10,CA);
