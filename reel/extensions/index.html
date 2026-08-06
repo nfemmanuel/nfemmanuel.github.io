@@ -42,6 +42,9 @@
   --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
   --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
   --accent:var(--c-doc); --accent-soft:#356BA622;
+  /* x-ray ownership tints (2026-08-06): three hues from the same palette family —
+     green = ours, blue = Apple's design rebuilt by us, rust = Apple-only surfaces */
+  --xr-ours:#2C8A56; --xr-apple:#356BA6; --xr-sealed:#BA5138;
   --display:"Bricolage Grotesque",system-ui,sans-serif;
   --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
   --spring:cubic-bezier(.34,1.56,.5,1);
@@ -53,6 +56,7 @@
   --shadow-m:0 2px 6px rgba(0,0,0,.4),0 14px 36px rgba(0,0,0,.55);
   --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
   --accent-soft:#8FC6FF26;
+  --xr-ours:#6FD79B; --xr-apple:#8FC6FF; --xr-sealed:#FFA184;
 }}
 :root[data-theme="dark"]{
   --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
@@ -61,6 +65,7 @@
   --shadow-m:0 2px 6px rgba(0,0,0,.4),0 14px 36px rgba(0,0,0,.55);
   --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
   --accent-soft:#8FC6FF26;
+  --xr-ours:#6FD79B; --xr-apple:#8FC6FF; --xr-sealed:#FFA184;
 }
 :root[data-theme="light"]{
   --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
@@ -69,6 +74,7 @@
   --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
   --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
   --accent-soft:#356BA622;
+  --xr-ours:#2C8A56; --xr-apple:#356BA6; --xr-sealed:#BA5138;
 }
 /* keyboard-page deck tokens — the iOS-26 chrome the deck wears, unchanged */
 body.on-kb{
@@ -76,28 +82,28 @@ body.on-kb{
   --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
   --kb-key:#FFFFFF; --kb-key-dim:#E4E6EB; --kb-key-shadow:0 1px 0 rgba(16,20,26,.22);
   --sys-bg:rgba(206,210,217,.92); --sys-key:#FFF; --sys-key-dim:#AEB4BE;
-  --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A;
+  --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A; --sys-blue:#007AFF;
 }
 @media (prefers-color-scheme: dark){body.on-kb{
   --kb-blur:rgba(17,19,23,.72); --kb-hair:rgba(255,255,255,.08);
   --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
   --kb-key:#41464F; --kb-key-dim:#2B2F36; --kb-key-shadow:0 1px 0 rgba(0,0,0,.5);
   --sys-bg:rgba(30,31,34,.9); --sys-key:#6B6B6F; --sys-key-dim:#464649;
-  --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6;
+  --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6; --sys-blue:#0A84FF;
 }}
 :root[data-theme="dark"] body.on-kb{
   --kb-blur:rgba(17,19,23,.72); --kb-hair:rgba(255,255,255,.08);
   --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
   --kb-key:#41464F; --kb-key-dim:#2B2F36; --kb-key-shadow:0 1px 0 rgba(0,0,0,.5);
   --sys-bg:rgba(30,31,34,.9); --sys-key:#6B6B6F; --sys-key-dim:#464649;
-  --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6;
+  --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6; --sys-blue:#0A84FF;
 }
 :root[data-theme="light"] body.on-kb{
   --kb-blur:rgba(243,244,246,.78); --kb-hair:rgba(20,22,26,.12);
   --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
   --kb-key:#FFFFFF; --kb-key-dim:#E4E6EB; --kb-key-shadow:0 1px 0 rgba(16,20,26,.22);
   --sys-bg:rgba(206,210,217,.92); --sys-key:#FFF; --sys-key-dim:#AEB4BE;
-  --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A;
+  --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A; --sys-blue:#007AFF;
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -144,7 +150,7 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .roll{position:relative;flex:1;overflow-y:auto;min-height:0;scrollbar-width:none;padding-top:12px}
 .roll::-webkit-scrollbar{display:none}
 .app[data-appfor="dial"]{padding-bottom:120px}
-.app[data-appfor="keyboard"]{padding-bottom:352px}
+.app[data-appfor="keyboard"]{padding-bottom:432px}
 
 /* the Fold's crease is physical — in front of every UI layer, deliberately faint */
 body.device-fold .phone{max-width:566px;height:auto;min-height:0;max-height:none;aspect-ratio:673/841;border-radius:20px}
@@ -400,9 +406,16 @@ body.dialing #dialsvg{pointer-events:auto}
   background:var(--kb-blur);backdrop-filter:blur(30px) saturate(1.6);-webkit-backdrop-filter:blur(30px) saturate(1.6);
   border-top:1px solid var(--kb-hair);
   padding:6px 8px 10px;
-  transform:translateY(105%);transition:transform .26s cubic-bezier(.2,.85,.3,1);
+  transform:translateY(105%);
+  transition:transform .26s cubic-bezier(.2,.85,.3,1),height .2s ease,background .2s ease;
   display:flex;flex-direction:column;height:332px}
 #kb.up{transform:translateY(0)}
+/* the CLONE page rests on Apple's own deck grey and takes Apple's height —
+   the pager class flips as the swipe settles */
+#kb.on-keys{height:312px;background:var(--sys-bg)}
+#kb.on-keys.kbxray{height:418px}
+body.device-ipad #kb.on-keys{height:306px}
+body.device-ipad #kb.on-keys.kbxray{height:448px}
 @media (prefers-reduced-motion: reduce){#kb{transition:none}}
 body.device-ipad #kb{border-radius:18px 18px 0 0;border:1px solid var(--kb-hair);border-bottom:none;overflow:hidden}
 body.device-ipad #kb .grid{grid-template-columns:repeat(5,1fr)}
@@ -411,7 +424,7 @@ body.device-ipad #kb .grid{grid-template-columns:repeat(5,1fr)}
 .kdots span.on{background:var(--ink-3);width:16px;border-radius:3px}
 .kpager{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:0}
 .kpager::-webkit-scrollbar{display:none}
-.kpage{position:relative;flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-height:0;padding:0 2px}
+.kpage{position:relative;flex:0 0 100%;min-width:0;scroll-snap-align:start;display:flex;flex-direction:column;min-height:0;padding:0 2px}
 .ksearch{height:38px;border-radius:12px;background:var(--kb-tile);border:1px solid var(--kb-tile-line);
   display:flex;align-items:center;padding:0 12px;gap:8px;color:var(--ink-3);font-size:13px;
   cursor:pointer;flex:0 0 auto;margin-bottom:8px}
@@ -519,6 +532,110 @@ body.device-ipad #kb .grid{grid-template-columns:repeat(5,1fr)}
 .skey.dim{background:var(--sys-key-dim);font-size:14px}
 .skey.w15{flex:1.6}
 .skey.spc{flex:4.4;font-size:13px}
+
+/* ═══ the Apple-keyboard CLONE (2026-08-06) ═══
+   The keys page is a faithful iPhone-keyboard replica: Apple's metrics and
+   grey, press balloons, shift/caps states, both symbol layers, contextual
+   return, the accent callout — drawn with the same --sys-* family the
+   password mock already wears. The ONE visible difference in normal mode is
+   the vault strip riding where the suggestion bar would be. X-ray mode tints
+   every region by ownership and draws the sealed Apple-only surfaces as
+   ghosts — the boundary made visible, not just documented. */
+#kpageKeys{justify-content:flex-end}
+.kc-strip{position:relative;flex:0 0 auto;display:flex;align-items:center;gap:6px;margin:0 0 8px;border-radius:17px}
+.kc-scroll{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.kc-scroll::-webkit-scrollbar{display:none}
+.kcs-search,.kcs-gear{flex:0 0 auto;width:30px;height:30px;border-radius:15px;border:1px solid var(--kb-tile-line);
+  background:var(--kb-tile);color:var(--ink-3);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.kcs-gear{margin-right:2px}
+.kcs-search:active,.kcs-gear:active{filter:brightness(.92)}
+.kcs-chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;max-width:150px;height:30px;border-radius:15px;
+  background:var(--kb-tile);border:1px solid var(--kb-tile-line);color:var(--ink);font:450 12px var(--ui);
+  padding:0 11px;cursor:pointer;overflow:hidden;transition:transform .15s var(--spring)}
+.kcs-chip:active{transform:scale(.95)}
+.kcs-chip .tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kcs-chip .pin{display:flex;color:var(--ink-3);flex:0 0 auto}
+.kcs-chip .th{width:18px;height:18px;border-radius:6px;flex:0 0 auto}
+.kcs-chip.off{opacity:.4;filter:saturate(.15)}
+.kc-keys{position:relative;flex:0 0 auto;display:flex;flex-direction:column;gap:10px;padding:4px 1px;border-radius:10px}
+.kc-row{display:flex;gap:6px}
+.kc-row.r2{padding:0 5.2%}
+.kc-key{flex:1;height:42px;border-radius:5px;background:var(--sys-key);color:var(--sys-ink);
+  box-shadow:0 1px 0 var(--sys-edge);display:flex;align-items:center;justify-content:center;
+  font:21.5px/1 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
+  cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}
+.kc-key:active{filter:brightness(.86)}
+.kc-key.fn{background:var(--sys-key-dim);font-size:15.5px}
+.kc-key.fn:active{filter:none;background:var(--sys-key)}
+.kc-key.fn.lit,.kc-key.fn.kc-capslock{background:var(--sys-key)}
+.kc-key.wshift,.kc-key.wbksp{flex:1.42}
+.kc-key.wshift{margin-right:4px}
+.kc-key.wbksp{margin-left:4px}
+.kc-row.r4 .kc-key{flex:1;font-size:15.5px}
+.kc-row.r4 .kc-sp{flex:1.98;font-size:15.5px}
+.kc-key.kret.tinted{background:var(--sys-blue);color:#FFF}
+.kc-key.kret.tinted:active{filter:brightness(.88)}
+.kc-band{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;height:28px;margin-top:6px;
+  padding:0 10px;color:var(--sys-cap);border-radius:9px}
+.kc-band button{appearance:none;border:none;background:none;color:var(--sys-cap);padding:2px 4px;cursor:pointer;display:flex}
+.kc-band button:active{filter:brightness(.7)}
+body.device-ipad .kc-band{display:none}
+body.device-ipad .kc-keys{gap:8px}
+body.device-ipad .kc-row{gap:7px}
+body.device-ipad .kc-key{height:50px;border-radius:6px;font-size:23px}
+body.device-ipad .kc-key.fn,body.device-ipad .kc-row.r4 .kc-key{font-size:16px}
+/* press balloon + accent callout — drawn at the deck level so the pager can't
+   clip them; the neck is key-shaped so the key reads as lifting, like iOS */
+.kc-balloon,.kc-callout{position:absolute;display:none;z-index:8;pointer-events:none;
+  filter:drop-shadow(0 3px 7px rgba(4,8,14,.3))}
+.kc-balloon .bb{background:var(--sys-key);color:var(--sys-ink);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font:31px/1 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif}
+.kc-balloon .bn,.kc-callout .bn{background:var(--sys-key);border-radius:0 0 5px 5px;margin-top:-1px}
+.kc-callout .bb{background:var(--sys-key);border-radius:11px;padding:3px;display:flex;gap:1px}
+.kc-callout .opt{width:30px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  color:var(--sys-ink);font:22px/1 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif}
+.kc-callout .opt.on{background:var(--sys-blue);color:#FFF}
+/* ─── x-ray: ownership made visible ─── */
+.kc-xzone{display:none;flex:0 0 auto;margin:0 2px 10px}
+#kb.kbxray .kc-xzone{display:block}
+.kc-legend{display:flex;gap:11px;flex-wrap:wrap;margin:0 2px 8px;font:600 10px var(--ui);letter-spacing:.02em}
+.kc-legend span{display:inline-flex;align-items:center;gap:5px}
+.kc-legend i{width:9px;height:9px;border-radius:3px;font-style:normal;flex:0 0 auto}
+.kc-legend .lg-ours{color:var(--xr-ours)}.kc-legend .lg-ours i{background:var(--xr-ours)}
+.kc-legend .lg-apple{color:var(--xr-apple)}.kc-legend .lg-apple i{background:var(--xr-apple)}
+.kc-legend .lg-sealed{color:var(--xr-sealed)}.kc-legend .lg-sealed i{background:transparent;border:1.5px dashed var(--xr-sealed)}
+.kc-ghost{display:flex;align-items:center;gap:8px;height:30px;border:1.5px dashed var(--xr-sealed);border-radius:9px;
+  color:var(--xr-sealed);background:color-mix(in srgb,var(--xr-sealed) 7%,transparent);
+  padding:0 10px;margin-bottom:6px;font:600 11px var(--ui)}
+.kc-ghost svg{flex:0 0 auto}
+.kc-ghost small{margin-left:auto;font:500 9px var(--ui);opacity:.85;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.kc-mic-ghost{display:none;align-items:center;gap:7px;color:var(--xr-sealed);font:500 10px var(--ui)}
+.kc-mic-ghost .mg{width:22px;height:22px;border-radius:11px;border:1.5px dashed var(--xr-sealed);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+#kb.kbxray .kc-mic-ghost{display:inline-flex}
+#kb.kbxray .kc-strip{box-shadow:inset 0 0 0 1.5px var(--xr-ours);background:color-mix(in srgb,var(--xr-ours) 8%,transparent)}
+#kb.kbxray .kc-keys{box-shadow:inset 0 0 0 1.5px var(--xr-apple);background:color-mix(in srgb,var(--xr-apple) 8%,transparent)}
+#kb.kbxray .kc-band{box-shadow:inset 0 0 0 1.5px var(--xr-apple);background:color-mix(in srgb,var(--xr-apple) 8%,transparent)}
+#kb.kbxray #kpageVault{box-shadow:inset 0 0 0 1.5px var(--xr-ours);border-radius:14px}
+#kb.kbxray .syskb{box-shadow:inset 0 0 0 2px var(--xr-sealed)}
+#kb.kbxray .syscap{color:var(--xr-sealed)}
+#kb.kbxray .fillov{box-shadow:inset 0 0 0 1.5px var(--xr-ours)}
+.xr-tag{display:none;position:absolute;z-index:9;font:700 8.5px var(--ui);letter-spacing:.07em;text-transform:uppercase;
+  padding:2px 7px;border-radius:99px;background:var(--card);pointer-events:none;white-space:nowrap}
+#kb.kbxray .xr-tag{display:block}
+.xr-tag.ours{color:var(--xr-ours);border:1px solid var(--xr-ours)}
+.xr-tag.apple{color:var(--xr-apple);border:1px solid var(--xr-apple)}
+/* the mini settings sheet — the gear's home: sounds, the return label, theme */
+#kcsheet{display:none;position:absolute;inset:0;z-index:64}
+#kcsheet .ks-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
+#kcsheet .ks-sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+  border-radius:22px 22px 0 0;padding:10px 18px 20px;box-shadow:var(--shadow);
+  animation:pkup .22s cubic-bezier(.2,.9,.3,1.05);font-family:var(--ui)}
+.ks-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 2px;
+  border-top:1px solid var(--line);font-size:13.5px}
+.ks-row:first-of-type{border-top:none}
+.ks-row .ks-sub{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
 #kbfab{position:absolute;right:14px;bottom:16px;z-index:49;width:50px;height:50px;border-radius:15px;
   background:var(--card);color:var(--ink);border:1px solid var(--line);display:flex;align-items:center;
   justify-content:center;cursor:pointer;box-shadow:var(--shadow)}
@@ -664,9 +781,14 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
           <div class="khint" id="khint" role="status"></div>
         </div>
         <div class="kpage" id="kpageKeys">
-          <div class="krows" id="ktyperows"></div>
+          <div class="kc-xzone" id="kcxzone" aria-hidden="true"></div>
+          <div class="kc-strip" id="kcstrip"></div>
+          <div class="kc-keys" id="kckeys"></div>
+          <div class="kc-band" id="kcband"></div>
         </div>
       </div>
+      <div class="kc-balloon" id="kcballoon" aria-hidden="true"></div>
+      <div class="kc-callout" id="kccallout" aria-hidden="true"></div>
       <div class="fillov" id="fillov" style="display:none"></div>
       <div class="syskb" id="syskb" style="display:none" aria-label="System keyboard"></div>
     </div>
@@ -674,6 +796,7 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
     <div id="picker"></div>
     <div id="perm"></div>
     <div id="kbperm"></div>
+    <div id="kcsheet"></div>
   </div>
  </div>
 </div>
@@ -729,23 +852,28 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
   </section>
   <!-- ============ KEYBOARD NOTES ============ -->
   <section data-page="keyboard" hidden>
-    <div class="eyebrow">Test 2 · the keyboard · iOS</div>
+    <div class="eyebrow">Test 2 · the keyboard · iOS <span class="ptag" style="margin-left:6px">Concept exhibit</span></div>
     <h2 class="lead">Second application of the day — this time on the iPhone</h2>
-    <p class="pintro" id="kbintro">This is the iOS surface: your stuff rides the keyboard. Tap into any box on the phone and the vault comes up first — you drop in, take what you came for, and leave. On Android the dial carries this job instead.</p>
+    <p class="pintro" id="kbintro">This is the iOS surface: your stuff rides the keyboard. Tap into any box on the phone and the vault comes up first — you drop in, take what you came for, and leave. Swipe left and the keys page is a faithful twin of the iPhone keyboard — same shapes, same moves, same feel — with one strip of your stuff where the suggestions would be. On Android the dial carries this job instead.</p>
     <!-- Fold/Tablet frames only: Android hardware gets the truth, not a fake demo -->
     <div class="card" id="androidKbCard">
       <p style="margin:0">This keyboard is iPhone and iPad. The frame you picked is Android hardware — there, the <a href="#dial">dial</a> is how the vault travels.</p>
     </div>
     <div class="card tips">
-      <h2>Three things to try</h2>
+      <h2>Five things to try</h2>
       <table>
         <tr><td>Tap a box, tap a tile</td><td>The vault opens first — pins up front, newest after, everything in one strip. A tile lands right at your cursor, done. A box that can't take a thing just dims it: tap into <b>Email</b> and watch the images grey out; the message box lights everything back up.</td></tr>
+        <tr><td>Swipe left — the keys</td><td>A faithful twin of the iPhone keyboard. Keys balloon when you press them, <b>tap shift twice for CAPS</b>, hold <b>e</b> for accents, <b>123</b> and <b>#+=</b> for numbers and symbols, two quick spaces end a sentence. Your vault rides the strip above the keys — tap a chip and it lands at the cursor. The gear tunes sounds and the return key.</td></tr>
+        <tr><td>X-ray it</td><td>Flip <b>X-ray</b> below and every part says who owns it: <b style="color:var(--xr-ours)">green</b> is ours, <b style="color:var(--xr-apple)">blue</b> is Apple's design rebuilt by us, and <b style="color:var(--xr-sealed)">rust</b> marks what only Apple's own keyboard can have — password autofill, codes from Messages, dictation. Those stay ghosts on ours, by iOS's rules, which is why leaving is one tap.</td></tr>
         <tr><td>Tap the password box</td><td>iOS hands passwords to Apple's own keyboard, automatically. Watch the swap — nothing custom ever sees a password.</td></tr>
-        <tr><td>Leave</td><td>One tap on <b>back to your keyboard</b> and you're typing on your own again. iOS brings up whichever keyboard you used last, so a fast exit is part of the design.</td></tr>
+        <tr><td>Leave</td><td>One tap on <b>back to your keyboard</b> — or the globe under the keys — and you're typing on your own again. iOS brings up whichever keyboard you used last, so a fast exit is part of the design.</td></tr>
       </table>
-      <p class="muted" style="margin:8px 0 0">Also here: search runs on our own keys (a keyboard can't summon a keyboard), and the <b>Interview thanks</b> tile asks you to fill a blank before it inserts. <b>Replay first run</b> below shows the one-time Full Access moment — try both answers.</p>
+      <p class="muted" style="margin:8px 0 0">Also here: search runs on our own keys (a keyboard can't summon a keyboard), and the <b>Interview thanks</b> tile asks you to fill a blank before it inserts. <b>Replay first run</b> below shows the one-time Full Access moment — try both answers. On the <b>iPad</b> frame the keys widen into the iPad arrangement, with the tuck-away key at the bottom corner.</p>
     </div>
     <div class="card" id="kblab">
+      <div class="labrow"><span>X-ray</span>
+        <div class="dseg" id="kbXray"><button type="button" data-v="off">Off</button><button type="button" data-v="on">On</button></div>
+        <span class="muted" style="color:var(--ink-3)">who owns each part</span></div>
       <div class="labrow labbtns"><button type="button" class="labbtn ghost" id="kbfirstrun">Replay first run</button><button type="button" class="labbtn" id="addfile2">Add your own file</button></div>
       <p class="muted" style="margin:10px 0 0">A photo you add joins the strip; a document shows up when you attach inside the form. Nothing uploads — only the name is remembered.</p>
     </div>
@@ -1229,7 +1357,7 @@ function applyDevice(){
   const ipad=DEV==='ipad';
   document.getElementById('ipadDialCard').hidden=!ipad;
   dialLead.textContent=ipad?'There is no dial on iPad':DIAL_H1;
-  sizes();route();
+  sizes();route();kcRender();   // the clone reflows per frame (iPhone vs iPad arrangement)
 }
 
 /* ================= router ================= */
@@ -1254,6 +1382,10 @@ function route(){
   DIAL.enabled=page==='dial'&&DEV!=='ipad';   // iOS: no overlay API, no dial
   if(!DIAL.enabled){DIAL.mode='closed';DIAL.open=0;DIAL.openT=0;DIAL.offer=null;
     cruiseStop();flickStop();DIAL.cruised=false;document.body.classList.remove('dialing');}
+  /* a routed-away page must not strand a live caret: blur the fake app's
+     field so the next tap re-fires focusin and raises the right deck */
+  if(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.task'))
+    document.activeElement.blur();
   T.field=null;T.drop=null;clearPaste();closePerm();
   roll.scrollTop=0;scrollTo(0,0);sizes();drawDial();
 }
@@ -1270,12 +1402,13 @@ const KB={q:'',mode:'browse',fillItem:null,fillBuf:'',fillFrom:'browse'};
 /* Full Access + the one-time exit hint, persisted like every other demo pref */
 const KBACCESSKEY='reel.kb.access.v1',KBEXITKEY='reel.kb.exithint.v1';
 let KBACCESS=(()=>{try{return localStorage.getItem(KBACCESSKEY)==='denied'?'denied':'granted'}catch(_){return 'granted'}})();
-function kbResetDemo(){try{localStorage.removeItem(KBACCESSKEY);localStorage.removeItem(KBEXITKEY)}catch(_){}KBACCESS='granted';}
+function kbResetDemo(){try{localStorage.removeItem(KBACCESSKEY);localStorage.removeItem(KBEXITKEY);
+  localStorage.removeItem('reel.kb.clone.v1');localStorage.removeItem('reel.kb.xray.v1')}catch(_){}KBACCESS='granted';}
 function kbShow(page){kb.classList.add('up');
   if(page!==undefined)setTimeout(()=>kpager.scrollTo({left:page*kpager.clientWidth}),10);}
 function kbHide(){kb.classList.remove('up');
   if(KB.mode==='fill'){KB.fillFrom='browse';exitFill();}
-  exitSearch();hideSysKb();closeKbAccess();}
+  exitSearch();hideSysKb();closeKbAccess();kcCloseSheet();}
 function kbExit(){kbHide();toast('Back on your keyboard');}
 document.getElementById('kbfab').onclick=()=>kb.classList.contains('up')?kbHide():(refreshKb(),kbShow(0));
 /* the deck covers the frame's foot — nudge the focused field's card above it */
@@ -1283,7 +1416,7 @@ function revealField(){
   const f=T.field||PW.field;
   if(!f||!kb.classList.contains('up'))return;
   const fr=f.getBoundingClientRect(),sr=scrEl.getBoundingClientRect();
-  const kbTop=sr.bottom-332-10;
+  const kbTop=sr.bottom-kb.offsetHeight-10;
   if(fr.bottom>kbTop)roll.scrollTop+=fr.bottom-kbTop;
 }
 /* focus decides the deck: password fields swap to the system keyboard (iOS
@@ -1295,14 +1428,24 @@ document.addEventListener('focusin',e=>{
   if(e.target.matches('input[type=password]')){PW.field=e.target;showSysKb();setTimeout(revealField,90);return;}
   if(e.target.matches('input[type=text],textarea')){
     if(KB.mode==='fill'){KB.fillFrom='browse';exitFill();}
-    exitSearch();hideSysKb();refreshKb();kbShow(0);setTimeout(revealField,90);}
+    exitSearch();hideSysKb();refreshKb();
+    /* vault-first on a fresh open; an already-raised deck HOLDS its page, so
+       typing across fields on the clone keys never yanks you back (iOS-true) */
+    if(!kb.classList.contains('up'))kbShow(0);
+    setTimeout(revealField,90);}
 });
 
-/* pager dots */
+/* pager dots — and the deck's clone posture: on the keys page the deck takes
+   Apple's grey and Apple's height, and arriving flashes the name on the
+   spacebar the way iOS greets a keyboard switch */
 const kdots=document.getElementById('kdots');
+let kcWasKeys=false;
 kpager.addEventListener('scroll',()=>{
   const p=kpager.scrollLeft>kpager.clientWidth/2?1:0;
   [...kdots.children].forEach((d,i)=>d.classList.toggle('on',i===p));
+  kb.classList.toggle('on-keys',p===1);
+  if(p===1&&!kcWasKeys){kcWasKeys=true;kcArrive();}
+  if(p===0)kcWasKeys=false;
 },{passive:true});
 [...kdots.children].forEach((d,i)=>d.onclick=()=>kpager.scrollTo({left:i*kpager.clientWidth,behavior:'smooth'}));
 
@@ -1345,7 +1488,6 @@ function rowsHTML(ctx){
     <div class="key dim" data-kx="globe" role="button" aria-label="Back to your keyboard"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/></svg></div>
     <div class="key sp" data-k=" ">space</div>
     <div class="key dim" data-kx="bksp">⌫</div>
-    ${ctx==='type'?`<div class="key dim" data-k="&#10;">↩</div>`:''}
     ${ctx==='search'?`<div class="key act" data-kx="closeSearch">Done</div>`:''}
     ${ctx==='fill'?`<div class="key dim" data-kx="cancelFill">✕</div><div class="key act" data-kx="commitFill">Insert</div>`:''}
   </div>`;
@@ -1426,6 +1568,7 @@ document.getElementById('ksearch').onclick=()=>{if(KB.mode!=='search')enterSearc
 /* --- template fill: complete the blank before inserting --- */
 function enterFill(it){KB.fillFrom=KB.mode==='search'?'search':'browse';
   KB.mode='fill';KB.fillItem=it;KB.fillBuf='';
+  kpager.scrollTo({left:0});   // fill keys need the taller vault-page deck
   document.getElementById('fillov').style.display='flex';renderFill();}
 function renderFill(){
   const it=KB.fillItem,parts=escq(it.content).split('___');
@@ -1487,8 +1630,7 @@ function refreshKb(){
       el.addEventListener('pointerdown',e=>e.preventDefault());   // host field keeps focus + caret
       el.onclick=()=>useOrTeach(items[idx]);}});
   }
-  const tr=document.getElementById('ktyperows');
-  if(!tr.dataset.built){tr.innerHTML=rowsHTML('type');bindKeys(tr);tr.dataset.built='1';}
+  kcRender();
   document.querySelector('#kfootV .kexit').onclick=kbExit;
 }
 
@@ -1567,6 +1709,302 @@ function openKbAccess(){
 function closeKbAccess(){kbperm.style.display='none';kbperm.innerHTML='';}
 document.getElementById('kbfirstrun').onclick=openKbAccess;
 document.getElementById('kballow').onclick=openKbAccess;
+
+/* ═══════════ the Apple-keyboard CLONE (2026-08-06) ═══════════
+   The clone doctrine (design-decisions.md): Apple users love defaults, so the
+   keys page shows we are basically the default — geometry, balloons, shift and
+   caps, both symbol layers, the accent callout, the name-flash on the space
+   bar. The vault strip where the suggestions would be is the ONE visible
+   difference. Honest ceiling, kept visible: the X-RAY toggle tints every
+   region by ownership and draws the three surfaces no keyboard but Apple's
+   can have — password autofill, the Messages code bar, dictation — as
+   ghosts. The sealed list mirrors docs/analysis/ios-keyboard-parity.md
+   exactly. iPad reflows to the iPad arrangement with the tuck-away key. */
+const KCKEY='reel.kb.clone.v1',KCXRAYKEY='reel.kb.xray.v1';
+const KC={layer:'abc',shift:'lower',lastShift:0,lastSpace:0,flash:'',sound:true,ret:'return',xray:false};
+const escA=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+/* inline glyphs — the no-emoji rule: every icon is SVG */
+const SH_OUT='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 4.5 4.8 12h3.7v5.5h7V12h3.7Z"/></svg>';
+const SH_FILL='<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 4.5 4.8 12h3.7v5.5h7V12h3.7Z"/></svg>';
+const SH_CAPS='<svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path fill="currentColor" d="M12 3.5 4.8 11h3.7v4.5h7V11h3.7Z"/><path fill="none" d="M8.5 20.5h7"/></svg>';
+const BKSP_K='<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 5.8h11a1.6 1.6 0 0 1 1.6 1.6v9.2a1.6 1.6 0 0 1-1.6 1.6h-11L3 12Z"/><path d="m11.6 9.6 4.8 4.8m0-4.8-4.8 4.8"/></svg>';
+const GLOBE_K='<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.4 2.3 3.7 5.2 3.7 8.4s-1.3 6.1-3.7 8.4c-2.4-2.3-3.7-5.2-3.7-8.4s1.3-6.1 3.7-8.4Z"/></svg>';
+const DISM_K='<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="3.8" width="17.6" height="10.4" rx="2"/><path d="M6.6 7h.01M9.9 7h.01M13.2 7h.01M16.5 7h.01M8 10.8h8"/><path d="m9.2 18.2 2.8 2.6 2.8-2.6"/></svg>';
+const GEAR_K='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.2 12a7.2 7.2 0 0 0-.1-1.2l2.1-1.6-1.8-3.1-2.5 1a7.6 7.6 0 0 0-2-1.2L14.5 3h-3.6l-.4 2.7a7.6 7.6 0 0 0-2 1.2l-2.5-1-1.8 3.1 2.1 1.6a7.2 7.2 0 0 0 0 2.4l-2.1 1.6 1.8 3.1 2.5-1a7.6 7.6 0 0 0 2 1.2l.4 2.7h3.6l.4-2.7a7.6 7.6 0 0 0 2-1.2l2.5 1 1.8-3.1-2.1-1.6c.06-.4.1-.8.1-1.2Z"/></svg>';
+const MIC_K='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="9.2" y="3.2" width="5.6" height="10.6" rx="2.8"/><path d="M5.8 11.6a6.2 6.2 0 0 0 12.4 0M12 17.8v2.6"/></svg>';
+const KEYIC='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7.8" cy="12" r="3.4"/><path d="M11.2 12h9.2m-2.6 0v3.2m-3.4-3.2v2.4"/></svg>';
+const MSGIC='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.4 6.2A1.8 1.8 0 0 1 5.2 4.4h13.6a1.8 1.8 0 0 1 1.8 1.8v8.4a1.8 1.8 0 0 1-1.8 1.8H10l-4.6 3.8v-3.8H5.2a1.8 1.8 0 0 1-1.8-1.8Z"/></svg>';
+const EACC=['è','é','ê','ë','ē','ė','ę'];   // the long-press demonstration key: e
+const kckeys=document.getElementById('kckeys');
+const kcstrip=document.getElementById('kcstrip');
+const balloonEl=document.getElementById('kcballoon');
+const calloutEl=document.getElementById('kccallout');
+const kcsheet=document.getElementById('kcsheet');
+
+/* --- layouts: iPhone metrics, and the iPad arrangement on the iPad frame --- */
+const KCH=s=>[...s].map(c=>({t:'ch',c}));
+function kcLayoutPhone(){
+  if(KC.layer==='abc')return[
+    {ks:KCH('qwertyuiop')},
+    {cls:'r2',ks:KCH('asdfghjkl')},
+    {ks:[{t:'shift',wc:'wshift'},...KCH('zxcvbnm'),{t:'bksp',wc:'wbksp'}]},
+    {cls:'r4',ks:[{t:'layer',to:'num',lab:'123'},{t:'space'},{t:'ret'}]}];
+  const num=KC.layer==='num';
+  return[
+    {ks:KCH(num?'1234567890':'[]{}#%^*+=')},
+    {ks:KCH(num?'-/:;()$&@"':'_\\|~<>€£¥•')},
+    {ks:[{t:'layer',to:num?'sym':'num',lab:num?'#+=':'123',wc:'wshift'},...KCH(".,?!'"),{t:'bksp',wc:'wbksp'}]},
+    {cls:'r4',ks:[{t:'layer',to:'abc',lab:'ABC'},{t:'space'},{t:'ret'}]}];
+}
+function kcLayoutPad(){
+  if(KC.layer==='abc')return[
+    {ks:[...KCH('qwertyuiop'),{t:'bksp',wc:'wbksp'}]},
+    {ks:[...KCH('asdfghjkl'),{t:'ret',wc:'wbksp'}]},
+    {ks:[{t:'shift',wc:'wshift'},...KCH('zxcvbnm,.'),{t:'shift',wc:'wbksp'}]},
+    {cls:'r4',ks:[{t:'layer',to:'num',lab:'.?123'},{t:'globe'},{t:'space'},{t:'layer',to:'num',lab:'.?123'},{t:'dismiss'}]}];
+  const num=KC.layer==='num';
+  const t3l={t:'layer',to:num?'sym':'num',lab:num?'#+=':'123',wc:'wshift'};
+  const t3r={t:'layer',to:num?'sym':'num',lab:num?'#+=':'123',wc:'wbksp'};
+  return[
+    {ks:[...KCH(num?'1234567890':'[]{}#%^*+='),{t:'bksp',wc:'wbksp'}]},
+    {ks:[...KCH(num?'@#$&*()\'"':'_\\|~<>€£¥'),{t:'ret',wc:'wbksp'}]},
+    {ks:[t3l,...KCH(num?'%-+=/;:!?':'.,?!\'"•—'),t3r]},
+    {cls:'r4',ks:[{t:'layer',to:'abc',lab:'ABC'},{t:'globe'},{t:'space'},{t:'layer',to:'abc',lab:'ABC'},{t:'dismiss'}]}];
+}
+function kcKeyHTML(k){
+  const wc=k.wc?' '+k.wc:'';
+  if(k.t==='ch'){
+    const v=KC.shift!=='lower'?k.c.toUpperCase():k.c;
+    return `<div class="kc-key" data-ch="${escA(k.c)}"${k.c==='e'?' data-acc="1"':''} role="button">${escq(v)}</div>`;
+  }
+  if(k.t==='shift'){
+    const g=KC.shift==='caps'?SH_CAPS:KC.shift==='shift'?SH_FILL:SH_OUT;
+    const st=KC.shift==='caps'?' kc-capslock':KC.shift==='shift'?' lit':'';
+    return `<div class="kc-key fn${wc}${st}" data-kfn="shift" role="button" aria-label="Shift"${KC.shift==='caps'?' aria-pressed="true"':''}>${g}</div>`;
+  }
+  if(k.t==='bksp')return `<div class="kc-key fn${wc}" data-kfn="bksp" role="button" aria-label="Delete">${BKSP_K}</div>`;
+  if(k.t==='layer')return `<div class="kc-key fn${wc}" data-kfn="layer" data-to="${k.to}" role="button">${escq(k.lab)}</div>`;
+  if(k.t==='space')return `<div class="kc-key kc-sp" data-kfn="space" role="button" aria-label="Space"><span>${escq(KC.flash||'space')}</span></div>`;
+  if(k.t==='ret')return `<div class="kc-key fn kret${wc}${KC.ret!=='return'?' tinted':''}" data-kfn="ret" role="button">${escq(KC.ret)}</div>`;
+  if(k.t==='globe')return `<div class="kc-key fn${wc}" data-kfn="globe" role="button" aria-label="Back to your keyboard">${GLOBE_K}</div>`;
+  if(k.t==='dismiss')return `<div class="kc-key fn${wc}" data-kfn="dismiss" role="button" aria-label="Tuck the keyboard away">${DISM_K}</div>`;
+  return '';
+}
+
+/* --- render: keys, strip, safe-area band, x-ray zone --- */
+function kcRenderKeys(){
+  const rows=DEV==='ipad'?kcLayoutPad():kcLayoutPhone();
+  kckeys.innerHTML=rows.map(r=>`<div class="kc-row${r.cls?' '+r.cls:''}">${r.ks.map(kcKeyHTML).join('')}</div>`).join('')
+    +`<span class="xr-tag apple" style="top:-9px;right:10px">Apple&rsquo;s design &middot; our build</span>`;
+}
+function kcRenderStrip(){
+  const items=kbItems(),imgOK=fieldTakesImages(),locked=KBACCESS==='denied';
+  const chip=it=>{
+    const off=it.type==='img'&&!imgOK?' off':'';
+    const pin=it.pin_order!=null?`<span class="pin">${PINSVG}</span>`:'';
+    if(it.type==='img')return `<button type="button" class="kcs-chip${off}" data-kid="${it.id}"><span class="th" style="background:${kgrad(it.id)}"></span><span class="tx">${escq(it.label)}</span></button>`;
+    if(it.is_sensitive)return `<button type="button" class="kcs-chip" data-kid="${it.id}">${pin}<span class="tx">${escq(it.label)} ••••</span></button>`;
+    const v=(it.content||'').includes('___')?it.label
+      :(it.type==='url'?it.label:(it.content||it.label)).replace(/\s+/g,' ').trim();
+    return `<button type="button" class="kcs-chip" data-kid="${it.id}">${pin}<span class="tx">${escq(v.slice(0,30))}</span></button>`;
+  };
+  kcstrip.innerHTML=`<div class="kc-scroll"><button type="button" class="kcs-search" aria-label="Search your vault">${SRCH}</button>`
+    +(locked?`<span class="muted" style="flex:0 0 auto;font-size:11px;padding:0 4px">Full Access is off — the vault stays home</span>`:items.map(chip).join(''))
+    +`</div><button type="button" class="kcs-gear" aria-label="Keyboard settings">${GEAR_K}</button>`
+    +`<span class="xr-tag ours" style="top:-9px;left:10px">Ours</span>`;
+}
+function kcRenderBand(){
+  document.getElementById('kcband').innerHTML=
+    `<button type="button" data-bfn="globe" aria-label="Back to your keyboard">${GLOBE_K}</button>`
+    +`<span class="kc-mic-ghost"><span class="mg">${MIC_K}</span><span>Dictation &middot; stays with Apple</span></span>`;
+}
+/* the sealed set, drawn — matches the parity doc exactly: password autofill,
+   the Messages code suggestion, dictation. Nothing else is claimed sealed. */
+function kcRenderXzone(){
+  document.getElementById('kcxzone').innerHTML=
+    `<div class="kc-legend"><span class="lg-ours"><i></i>Ours</span>`
+    +`<span class="lg-apple"><i></i>Apple&rsquo;s design, our build</span>`
+    +`<span class="lg-sealed"><i></i>Apple-only</span></div>`
+    +`<div class="kc-ghost">${KEYIC}<b>Password autofill</b><small>Apple&rsquo;s keyboard only</small></div>`
+    +`<div class="kc-ghost">${MSGIC}<b>Codes from Messages</b><small>Apple&rsquo;s bar only</small></div>`
+    +(DEV==='ipad'?`<div class="kc-ghost">${MIC_K}<b>Dictation</b><small>Apple&rsquo;s keyboard only</small></div>`:'');
+}
+function kcRender(){kcRenderXzone();kcRenderStrip();kcRenderKeys();kcRenderBand();}
+
+/* --- feel: the Apple-ish click (settings-gated), the name flash --- */
+function kclick(){
+  if(!KC.sound)return;
+  if(navigator.vibrate)navigator.vibrate(2);
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+    o.type='triangle';o.frequency.value=860;
+    g.gain.setValueAtTime(.035,t);g.gain.exponentialRampToValueAtTime(.0001,t+.012);
+    o.connect(g).connect(AC.destination);o.start(t);o.stop(t+.016);}catch(_){}
+}
+let kcFlashT=null;
+function kcFlashName(){
+  KC.flash='Reel';
+  clearTimeout(kcFlashT);
+  kcFlashT=setTimeout(()=>{KC.flash='';
+    const sp=kckeys.querySelector('.kc-sp span');if(sp)sp.textContent='space';},700);
+}
+/* arriving on the keys page = iOS greeting a keyboard switch: the name flashes
+   on the space bar, and an empty field starts capitalised */
+function kcArrive(){
+  KC.layer='abc';
+  KC.shift=(T.field&&!T.field.value)?'shift':'lower';
+  kcFlashName();kcRenderKeys();
+}
+
+/* --- typing into the page's field (the same insert engine as everything) --- */
+function kcHasField(){return !!(T.field&&visibleSection().contains(T.field))}
+function kcNoField(){pulse('.app:not([hidden]) input[type=text],.app:not([hidden]) textarea');toast('Tap a text box first');}
+function kcChar(ch){
+  if(!kcHasField())return kcNoField();
+  insertAtCursor(T.field,KC.shift!=='lower'?ch.toUpperCase():ch);
+  if(KC.shift==='shift'){KC.shift='lower';kcRenderKeys();}
+}
+function kcSpace(){
+  if(!kcHasField())return kcNoField();
+  const f=T.field,now=Date.now(),at=f.selectionStart??f.value.length;
+  if(now-KC.lastSpace<380&&at>0&&/[^\s.,!?;:] $/.test(f.value.slice(0,at))){
+    f.focus();f.setRangeText('. ',at-1,at,'end');           // double-space period, like iOS
+    f.dispatchEvent(new Event('input',{bubbles:true}));
+    KC.shift='shift';kcRenderKeys();
+  }else insertAtCursor(f,' ');
+  KC.lastSpace=now;
+}
+function kcBksp(){
+  if(!kcHasField())return;
+  const f=T.field,s=f.selectionStart||0;
+  if(s>0){f.focus();f.setRangeText('',s-1,f.selectionEnd||s,'end');
+    f.dispatchEvent(new Event('input',{bubbles:true}));}
+}
+function kcReturn(){
+  if(!kcHasField())return kcNoField();
+  if(T.field.tagName==='TEXTAREA')insertAtCursor(T.field,'\n');
+  else{T.field.classList.remove('flash');void T.field.offsetWidth;T.field.classList.add('flash');}
+}
+function kcShiftTap(){
+  const now=Date.now();
+  if(now-KC.lastShift<340&&KC.shift==='shift')KC.shift='caps';   // double-tap = CAPS LOCK
+  else KC.shift=KC.shift==='lower'?'shift':'lower';
+  KC.lastShift=now;kcRenderKeys();
+}
+function kcLayer(to){KC.layer=to;KC.shift='lower';kcFlashName();kcRenderKeys();}
+
+/* --- press balloons + the accent callout, drawn at the deck level --- */
+function kcBalloonShow(el){
+  if(DEV==='ipad')return;                                   // iPads don't balloon; neither do we
+  const kr=el.getBoundingClientRect(),br=kb.getBoundingClientRect();
+  const bw=Math.max(kr.width*1.62,46),bh=50;
+  const left=Math.max(4,Math.min(br.width-bw-4,kr.left-br.left+kr.width/2-bw/2));
+  balloonEl.innerHTML=`<div class="bb" style="width:${bw}px;height:${bh}px">${escq(el.textContent)}</div>`
+    +`<div class="bn" style="width:${kr.width}px;height:${kr.height+2}px;margin-left:${kr.left-br.left-left}px"></div>`;
+  balloonEl.style.left=left+'px';
+  balloonEl.style.top=(kr.top-br.top-bh)+'px';
+  balloonEl.style.display='block';
+}
+function kcBalloonHide(){balloonEl.style.display='none';}
+function kcCalloutShow(el,cx){
+  const kr=el.getBoundingClientRect(),br=kb.getBoundingClientRect();
+  const opts=EACC.map(c=>KC.shift!=='lower'?c.toUpperCase():c);
+  const w=opts.length*31+6;
+  const left=Math.max(4,Math.min(br.width-w-4,kr.left-br.left+kr.width/2-w/2));
+  calloutEl.innerHTML=`<div class="bb">${opts.map(c=>`<span class="opt">${escq(c)}</span>`).join('')}</div>`
+    +`<div class="bn" style="width:${kr.width}px;height:${kr.height+2}px;margin-left:${kr.left-br.left-left}px"></div>`;
+  calloutEl.style.left=left+'px';
+  calloutEl.style.top=(kr.top-br.top-44)+'px';
+  calloutEl.style.display='block';
+  kcCalloutTrack(cx);
+}
+function kcCalloutTrack(cx){
+  const os=[...calloutEl.querySelectorAll('.opt')];
+  let best=0,bd=1e9;
+  os.forEach((o,i)=>{const r=o.getBoundingClientRect(),d=Math.abs(cx-(r.left+r.width/2));
+    if(d<bd){bd=d;best=i;}});
+  os.forEach((o,i)=>o.classList.toggle('on',i===best));
+  return best;
+}
+function kcCalloutHide(){calloutEl.style.display='none';calloutEl.innerHTML='';}
+function kcCalloutCommit(cx){const i=kcCalloutTrack(cx);kcCalloutHide();kcChar(EACC[i]);}
+
+/* --- one press session at a time; commits ride pointerUP like iOS letters --- */
+let KP=null;
+function kcPressClear(S){clearTimeout(S.hold);clearTimeout(S.rep1);clearInterval(S.rep);kcBalloonHide();}
+kckeys.addEventListener('pointerdown',e=>{
+  const el=e.target.closest('.kc-key');if(!el)return;
+  e.preventDefault();                                       // the page's field keeps focus + caret
+  if(KP){kcPressClear(KP);kcCalloutHide();KP=null;}
+  const S=KP={el,id:e.pointerId};
+  kclick();
+  if(el.dataset.ch!=null){
+    kcBalloonShow(el);
+    if(el.dataset.acc)S.hold=setTimeout(()=>{S.callout=true;kcBalloonHide();kcCalloutShow(el,e.clientX);},430);
+  }else{
+    const fn=el.dataset.kfn;
+    if(fn==='bksp'){kcBksp();S.rep1=setTimeout(()=>{S.rep=setInterval(()=>{kclick();kcBksp();},68);},430);}
+    else if(fn==='shift')kcShiftTap();
+    else if(fn==='layer')kcLayer(el.dataset.to);
+  }
+});
+addEventListener('pointermove',e=>{if(KP&&e.pointerId===KP.id&&KP.callout)kcCalloutTrack(e.clientX);});
+addEventListener('pointerup',e=>{
+  if(!KP||e.pointerId!==KP.id)return;
+  const S=KP;KP=null;kcPressClear(S);
+  if(S.callout){kcCalloutCommit(e.clientX);return;}
+  const el=S.el,fn=el.dataset.kfn;
+  if(el.dataset.ch!=null){kcChar(el.dataset.ch);return;}
+  if(fn==='space')kcSpace();
+  else if(fn==='ret')kcReturn();
+  else if(fn==='globe')kbExit();
+  else if(fn==='dismiss'){kbHide();toast('Keyboard tucked away');}
+});
+addEventListener('pointercancel',e=>{
+  if(KP&&e.pointerId===KP.id){kcPressClear(KP);kcCalloutHide();KP=null;}
+});
+
+/* --- the strip: search affordance, chips insert-on-tap, the gear --- */
+kcstrip.addEventListener('pointerdown',e=>{if(e.target.closest('button'))e.preventDefault();});
+kcstrip.addEventListener('click',e=>{
+  if(e.target.closest('.kcs-gear')){kcOpenSheet();return;}
+  if(e.target.closest('.kcs-search')){kpager.scrollTo({left:0,behavior:'smooth'});setTimeout(enterSearch,240);return;}
+  const c=e.target.closest('.kcs-chip');
+  if(c){const it=vault.find(v=>v.id===c.dataset.kid);if(it)useOrTeach(it);}
+});
+const kcband=document.getElementById('kcband');
+kcband.addEventListener('pointerdown',e=>{if(e.target.closest('button'))e.preventDefault();});
+kcband.addEventListener('click',e=>{if(e.target.closest('[data-bfn=globe]'))kbExit();});
+
+/* --- the mini settings sheet: sounds, the return label, theme note --- */
+function kcSave(){try{localStorage.setItem(KCKEY,JSON.stringify({sound:KC.sound,ret:KC.ret}))}catch(_){}}
+function kcOpenSheet(){
+  kcsheet.innerHTML=`<div class="ks-scrim"></div><div class="ks-sheet">
+   <div class="pm-grip"></div>
+   <div class="pm-title">This keyboard</div>
+   <div class="ks-row"><div>Key sounds<span class="ks-sub">A soft click under every tap</span></div>
+     <div class="dseg" id="ksSound"><button type="button" data-v="on">On</button><button type="button" data-v="off">Off</button></div></div>
+   <div class="ks-row"><div>Return key says<span class="ks-sub">Whatever the moment calls for</span></div>
+     <div class="dseg" id="ksRet"><button type="button" data-v="return">return</button><button type="button" data-v="go">go</button><button type="button" data-v="search">search</button></div></div>
+   <div class="ks-row"><div>Theme<span class="ks-sub">Follows the Light and Dark switch up top</span></div></div>
+  </div>`;
+  kcsheet.style.display='block';
+  kcsheet.querySelector('.ks-scrim').onclick=kcCloseSheet;
+  bindSeg('ksSound',()=>KC.sound?'on':'off',v=>{KC.sound=v==='on';kcSave();if(KC.sound)kclick();});
+  bindSeg('ksRet',()=>KC.ret,v=>{KC.ret=v;kcSave();kcRenderKeys();});
+}
+function kcCloseSheet(){kcsheet.style.display='none';kcsheet.innerHTML='';}
+
+/* --- boot: prefs + the x-ray seg in the notes card --- */
+(function(){
+  try{const j=JSON.parse(localStorage.getItem(KCKEY));
+    if(j&&typeof j==='object'){if(j.sound===false)KC.sound=false;
+      if(['return','go','search'].includes(j.ret))KC.ret=j.ret;}}catch(_){}
+  try{KC.xray=localStorage.getItem(KCXRAYKEY)==='on'}catch(_){}
+  kb.classList.toggle('kbxray',KC.xray);
+  bindSeg('kbXray',()=>KC.xray?'on':'off',
+    v=>{KC.xray=v==='on';persist(KCXRAYKEY,v);kb.classList.toggle('kbxray',KC.xray);});
+})();
 
 /* ================= the dial ================= */
 const svg=document.getElementById('dialsvg');
