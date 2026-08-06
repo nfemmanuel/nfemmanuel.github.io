@@ -186,7 +186,8 @@
   .trow .markrow svg{color:var(--accent);flex:0 0 auto}
   .trow .markrow b{font-family:var(--display);font-size:15.5px;font-weight:700;letter-spacing:-.02em;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .gearbtn{margin-left:auto;width:33px;height:33px;border-radius:50%;flex:0 0 auto;
+  .hbtns{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
+  .gearbtn{width:33px;height:33px;border-radius:50%;flex:0 0 auto;
     display:flex;align-items:center;justify-content:center;color:var(--ink-2);cursor:pointer;
     background:color-mix(in srgb,var(--surf) 70%,transparent);border:.5px solid var(--hair)}
   .cap{height:42px;border-radius:21px;display:flex;align-items:center;gap:8px;padding:0 15px;
@@ -452,6 +453,7 @@ const I={
   pin:'<path d="M9.5 3h5v5.6l2.3 3.1v2.1H7.2v-2.1L9.5 8.6z"/><path d="M12 13.8V21"/>',
   find:'<circle cx="11" cy="11" r="6.4"/><path d="m15.6 15.6 4 4"/>',
   cog:'<circle cx="12" cy="12" r="3.1"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.4 5.4 7.2 7.2M16.8 16.8l1.8 1.8M18.6 5.4 16.8 7.2M7.2 16.8l-1.8 1.8"/>',
+  plus:'<path d="M12 5.4v13.2M5.4 12h13.2"/>',
   copy:'<rect x="8.6" y="8.6" width="12.4" height="12.4" rx="2.6"/><path d="M15.4 5.6V5A2 2 0 0 0 13.4 3H5A2 2 0 0 0 3 5v8.4a2 2 0 0 0 2 2h.6"/>',
   send:'<path d="M12 15.6V3.4"/><path d="m8.4 6.8 3.6-3.4 3.6 3.4"/><path d="M6.8 10.6H5.2v10h13.6v-10h-1.6"/>',
   pencil:'<path d="M16.4 3.6a2.3 2.3 0 0 1 3.3 3.3L8.2 18.4l-4.3 1 1-4.3z"/><path d="m14.6 5.4 4 4"/>',
@@ -545,16 +547,16 @@ const lensRow=on=>'<div class="lens">'+['all','txt','lnk','img','doc'].map(t=>{
     +(t==='all'?'':`<span class="cnt">${ALL.filter(i=>i.t===t).length}</span>`)+`</div>`;
 }).join('')+'</div>';
 
-/* the fixed glass slab: title row (mark + wordmark line, gear), the search
-   capsule, the lens chips. It never scrolls — cross-platform law — and the
-   grid slides under it. liveId gives the interactive copy its handle; the
-   dimmed backdrops behind sheets reuse the same slab without one. */
+/* the fixed glass slab: title row (mark + wordmark line, quiet add, gear),
+   the search capsule, the lens chips. It never scrolls — cross-platform law —
+   and the grid slides under it. liveId gives the interactive copy its handle;
+   the dimmed backdrops behind sheets reuse the same slab without one. */
 const glassHead=(o)=>`
   <div class="lg-head lg-glass"${o&&o.live?' id="glasshead"':''}>
     <div class="inwrap">
       <div class="trow">
         <span class="markrow">${ic('mark',20,1.8)}<b>Everything you reuse</b></span>
-        <span class="gearbtn">${ic('cog',16)}</span>
+        <span class="hbtns"><span class="gearbtn">${ic('plus',16)}</span><span class="gearbtn">${ic('cog',16)}</span></span>
       </div>
       ${o&&o.q!==undefined
         ?`<div class="cap on">${ic('find',17)}<span class="qtx">${esc(o.q)}</span><span class="caret"></span><span class="cancel">Cancel</span></div>`
