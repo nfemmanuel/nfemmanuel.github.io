@@ -500,8 +500,15 @@
     opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
   #receipt.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
   #pastechip{position:absolute;z-index:56;display:none;background:var(--ink);color:var(--paper);
-    border-radius:99px;padding:8px 14px;font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer;
+    border:1.5px solid var(--accent);border-radius:99px;padding:8px 14px;font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer;
     box-shadow:var(--shadow);user-select:none;white-space:nowrap}
+  /* the chip pops ONCE when it lands — in honest mode this chip IS the paste
+     step, so its arrival cannot be missable (owner dogfood, 2026-08-06) */
+  #pastechip.pop{animation:chippop .5s cubic-bezier(.2,.9,.3,1.35)}
+  @keyframes chippop{0%{transform:scale(.72);box-shadow:0 0 0 0 var(--accent-soft),var(--shadow)}
+    60%{transform:scale(1.08);box-shadow:0 0 0 10px transparent,var(--shadow)}
+    100%{transform:scale(1)}}
+  @media (prefers-reduced-motion: reduce){#pastechip.pop{animation:none}}
   #dialpulse{position:fixed;z-index:61;width:84px;height:84px;border-radius:50%;
     border:2.5px solid var(--c-doc);pointer-events:none;opacity:0}
   #dialpulse.go{animation:dialpulse .55s ease-out}
@@ -512,10 +519,33 @@
      under the hand and the thing that WOULD be pasted reads up here — Dynamic
      Island placement, but Android has none, so it floats. Solid surface on
      purpose: legibility over whatever app is underneath beats translucency. */
+  /* the pill wears a GLOW, not a bar (owner ruling, 2026-08-06): type identity
+     is an ambient aura — layered type-colour shadows at low alpha plus a 1px
+     type-colour border at ~.35 — cross-fading with the content on each detent.
+     Sensitive items glow neutral ink: deliberately colourless. */
   #dialprev{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:58;
     width:max-content;max-width:86vw;pointer-events:none;display:none;
-    background:var(--card);border:1px solid var(--line);border-radius:19px;
-    box-shadow:0 10px 30px rgba(10,14,20,.22);font-family:var(--ui);overflow:hidden}
+    --gc:var(--dim);
+    background:var(--card);border:1px solid color-mix(in srgb,var(--gc) 35%,transparent);border-radius:19px;
+    box-shadow:0 10px 30px rgba(10,14,20,.16),
+      0 0 10px color-mix(in srgb,var(--gc) 18%,transparent),
+      0 0 26px color-mix(in srgb,var(--gc) 8%,transparent);
+    transition:box-shadow .16s linear,border-color .16s linear;
+    font-family:var(--ui);overflow:hidden}
+  #dialprev.gl-txt{--gc:var(--c-txt)}#dialprev.gl-lnk{--gc:var(--c-lnk)}
+  #dialprev.gl-img{--gc:var(--c-img)}#dialprev.gl-sens{--gc:var(--dim)}
+  @media (prefers-color-scheme: dark){#dialprev{
+    box-shadow:0 10px 30px rgba(0,0,0,.38),
+      0 0 10px color-mix(in srgb,var(--gc) 30%,transparent),
+      0 0 26px color-mix(in srgb,var(--gc) 14%,transparent)}}
+  :root[data-theme="dark"] #dialprev{
+    box-shadow:0 10px 30px rgba(0,0,0,.38),
+      0 0 10px color-mix(in srgb,var(--gc) 30%,transparent),
+      0 0 26px color-mix(in srgb,var(--gc) 14%,transparent)}
+  :root[data-theme="light"] #dialprev{
+    box-shadow:0 10px 30px rgba(10,14,20,.16),
+      0 0 10px color-mix(in srgb,var(--gc) 18%,transparent),
+      0 0 26px color-mix(in srgb,var(--gc) 8%,transparent)}
   body.device-fold #dialprev{max-width:min(579px,86vw)}    /* 86% of the 673 frame */
   body.device-tablet #dialprev{max-width:min(560px,86vw)}  /* top-centred, never dial-hugging */
   #dialprev.show{display:block;animation:dpin .22s cubic-bezier(.2,.9,.3,1.18)}
@@ -530,10 +560,20 @@
   #dialprev .dp-stack{display:grid}
   #dialprev .dp-layer{grid-area:1/1;opacity:0;transition:opacity .12s linear}
   #dialprev .dp-layer.on{opacity:1}
-  .dp-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px 10px 13px}
+  .dp-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px}
   .dp-row.center{align-items:center}
   .dp-row>div{min-width:0}
-  .dp-bar{flex:0 0 3px;align-self:stretch;min-height:16px;border-radius:2px}
+  /* Peek · Neighbors: the pill becomes a three-up filmstrip — prev | FOCUSED |
+     next. Sides ride at ~72% scale, heavy-dimmed, truncated hard; tapping one
+     steps a detent (springy). Masked items show dots here, never values. */
+  .dp-strip{display:flex;align-items:center}
+  .dp-strip .dp-mid{min-width:0}
+  .dp-side{flex:0 0 auto;max-width:84px;padding:10px 9px;font-size:10px;line-height:1.35;
+    color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    pointer-events:auto;cursor:pointer;user-select:none;-webkit-user-select:none;
+    transition:transform .16s cubic-bezier(.34,1.56,.5,1)}
+  .dp-side:active{transform:scale(.9)}
+  .dp-side.prev{padding-left:13px}.dp-side.next{padding-right:13px}
   .dp-text{font-size:13.5px;line-height:1.45;color:var(--ink);
     display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
   .dp-text.mono{font-family:var(--mono);font-size:12.5px}
@@ -607,16 +647,17 @@
     <div class="card tips">
       <h2>The moves</h2>
       <table>
-        <tr><td>Tap the round button</td><td>Opens and stays. Copied something just before? The dial catches it — or offers to, depending on the catch switch below. Spin the ring: it steps one item at a time and settles; the item at the <b style="color:#FF4D4D">red mark</b> is up. Tap it — copied, receipt, and the dial slips away. One paste finishes the job.</td></tr>
+        <tr><td>Tap the round button</td><td>Opens and stays. Copied something just before? The dial catches it — or offers to, depending on the catch switch below. Spin the ring: it steps one item at a time and settles; the item at the <b>index mark</b> is up. Tap it — copied, receipt, and the box you were in grows a <b>Paste</b> chip: tap that and the job is done. Tap the glass centre to put the dial away.</td></tr>
         <tr><td>One ring, everything on it</td><td>Your two <b>pinned items hold the edge slots</b> — same place forever, tap to use — and everything else follows, <b>newest first</b>, all types together. Colour says the type: <b style="color:var(--c-txt)">amber</b> is text, <b style="color:var(--c-lnk)">rust</b> is a link, <b style="color:var(--c-img)">violet</b> is an image.</td></tr>
         <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button and slide <b>out</b> onto the ring, then arc your finger to spin it. Release on an item to take it and put the dial away.</td></tr>
-        <tr><td>Hold · drag across</td><td>Drag the button past the middle of the screen and let go — it <b>docks to the other edge</b> and stays there.</td></tr>
+        <tr><td>Hold · drag</td><td>Drag the button anywhere and let go — it <b>clings to the nearest edge, at the height you left it</b>, and stays there.</td></tr>
         <tr><td>Double-tap the button</td><td>Your most recent item, instantly. No dial.</td></tr>
         <tr><td>Slow-cycle</td><td>Hold a finger on any off-center item and the ring <b>cycles slowly</b> until you let go.</td></tr>
       </table>
-      <p class="muted" style="margin:8px 0 0">The switches below — <b>Catch style</b>, <b>Egress</b> and <b>Preview</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
-      <p class="muted" style="margin:6px 0 0"><b>Preview</b> is the new one: what's up shows at the top of the screen, so your eyes can stay up there while your thumb spins down here.</p>
+      <p class="muted" style="margin:8px 0 0">The switches below — <b>Catch style</b>, <b>Egress</b>, <b>Preview</b> and <b>Peek</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
+      <p class="muted" style="margin:6px 0 0"><b>Preview</b>: what's up shows at the top of the screen, so your eyes can stay up there while your thumb spins down here.</p>
       <p class="muted" style="margin:6px 0 0"><b>Style</b> tries five ways the ring can mark what it holds — today's chips down to bare dots. Same metal, same moves; rule by eye.</p>
+      <p class="muted" style="margin:6px 0 0"><b>Peek</b> answers "what's coming": <b>Neighbors</b> sits the previous and next item beside the floating preview — tap one to step; <b>Fan</b> flashes every visible label outward the moment the dial opens. Rule by feel.</p>
     </div>
 
     <div class="permrow" id="permrow" hidden>The edge handle is off<b>Turn it on</b></div>
@@ -630,6 +671,9 @@
         <div class="dseg" id="segPreview"><button type="button" data-v="ring">On the ring</button><button type="button" data-v="top">Floating at top</button></div></div>
       <div class="labrow"><span>Style</span>
         <div class="dseg" id="segStyle"><button type="button" data-v="chips">Chips</button><button type="button" data-v="markers">Markers</button><button type="button" data-v="scale">Scale</button><button type="button" data-v="window">Window</button><button type="button" data-v="dots">Dots</button></div></div>
+      <div class="labrow"><span>Peek</span>
+        <div class="dseg" id="segPeek"><button type="button" data-v="off">Off</button><button type="button" data-v="neighbors">Neighbors</button><button type="button" data-v="fan">Fan</button></div>
+        <span class="muted" id="peeknote" style="color:var(--ink-3)" hidden>needs the floating preview</span></div>
       <div class="labrow labbtns"><button type="button" class="stage" id="stagebtn">Copy something in another app</button><button type="button" class="stage ghost" id="firstrunbtn">Replay first run</button></div>
     </div>
 
@@ -899,10 +943,27 @@ let PREVIEW=(()=>{try{const v=localStorage.getItem(PREVKEY);return v==='ring'||v
    look, kept exact as the baseline to rule against. */
 const STYLEKEY='reel.dial.style.v1',DIALSTYLES=['chips','markers','scale','window','dots'];
 let STYLE=(()=>{try{const v=localStorage.getItem(STYLEKEY);return DIALSTYLES.includes(v)?v:'chips'}catch(_){return 'chips'}})();
+/* Peek (2026-08-06): the answer to "what's coming" while the ring spins — the
+   honest cost of shedding text off the ring. Two candidates, NF rules by feel:
+   'neighbors' = three-up filmstrip in the floating pill; 'fan' = every visible
+   label flashes radially outward on open, then pure instrument. Both honor
+   masked items (dots, never values). */
+const PEEKKEY='reel.dial.peek.v1',PEEKS=['off','neighbors','fan'];
+let PEEK=(()=>{try{const v=localStorage.getItem(PEEKKEY);return PEEKS.includes(v)?v:'neighbors'}catch(_){return 'neighbors'}})();
 let PERM=(()=>{try{return localStorage.getItem(PERMKEY)==='denied'?'denied':'granted'}catch(_){return 'granted'}})();
-const DOCKS=(()=>{const def={phone:'right',fold:'right',tablet:'right',ipad:'right'};
+/* the dock store grew a second axis (2026-08-06): edge + y-fraction per
+   device. Self-healing both ways — the old bare 'left'/'right' strings still
+   parse (edge only, default height), junk falls back to the per-device
+   default. Tablet defaults lower: where the thumb lands when a hand grips a
+   tablet's side edge. */
+const DOCKS=(()=>{
+  const def={phone:{edge:'right',y:.56},fold:{edge:'right',y:.56},tablet:{edge:'right',y:.72},ipad:{edge:'right',y:.56}};
   try{const j=JSON.parse(localStorage.getItem(DOCKKEY));
-    if(j&&typeof j==='object')for(const k in def)if(j[k]==='left'||j[k]==='right')def[k]=j[k];
+    if(j&&typeof j==='object')for(const k in def){const v=j[k];
+      if(v==='left'||v==='right')def[k].edge=v;
+      else if(v&&typeof v==='object'){
+        if(v.edge==='left'||v.edge==='right')def[k].edge=v.edge;
+        const y=+v.y;if(isFinite(y)&&y>0&&y<1)def[k].y=y;}}
   }catch(_){}
   return def})();
 function persist(k,v){try{localStorage.setItem(k,v)}catch(_){}}
@@ -935,6 +996,7 @@ function doCatch(content){
   DIAL.tOut=0;DIAL.rawOut=0;          // the caught item lands at the index mark
   DIAL.offer=null;stagedClip=null;
   receipt('Caught');
+  fanStart();                         // the fan re-sweeps: what moved, said out loud
 }
 function catchOnOpen(){
   if(!stagedClip)return;
@@ -957,7 +1019,10 @@ function dialPulse(color){
   pulseEl.style.left=(AX-42)+'px';pulseEl.style.top=(CY-42)+'px';
   pulseEl.classList.remove('go');void pulseEl.offsetWidth;pulseEl.classList.add('go');
 }
-/* the paste affordance — after an honest copy, the errand still completes */
+/* the paste affordance — after an honest copy, the errand still completes.
+   Dogfood truth (2026-08-06): the machinery worked; nothing SAID so. The chip
+   is the paste step, so it lands with a one-shot pop every time it appears —
+   whether the copy found the field focused or the focus came after. */
 const pastechip=document.getElementById('pastechip');
 let pendingPaste=null;
 function showPasteChip(){
@@ -967,6 +1032,7 @@ function showPasteChip(){
   pastechip.style.display='block';
   pastechip.style.left=Math.max(8,r.right+scrollX-pastechip.offsetWidth)+'px';
   pastechip.style.top=(r.top+scrollY-42)+'px';
+  pastechip.classList.remove('pop');void pastechip.offsetWidth;pastechip.classList.add('pop');
 }
 function clearPaste(){pendingPaste=null;pastechip.style.display='none';}
 pastechip.addEventListener('pointerdown',e=>{
@@ -981,7 +1047,7 @@ function copyEgress(it){
   const txt=it.content||it.label;
   try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).catch(()=>{});}catch(_){}
   if(it.type==='txt'||it.type==='url')pendingPaste={text:txt,label:it.label};
-  receipt('Copied — paste where you were');
+  receipt('Copied — tap the box to paste');
   dialPulse(TYPEC[it.type]);tick();
   showPasteChip();
   return true;
@@ -1006,10 +1072,10 @@ function openPerm(){
       <rect x="76" y="50" width="64" height="7" rx="3.5" fill="var(--line)"/>
       <g class="arcgrp">
         <path d="M164 26 A34 34 0 0 0 164 94" fill="none" stroke="#23282F" stroke-width="12"/>
-        <path d="M164 33 A27 27 0 0 0 164 87" fill="none" stroke="#E2472B" stroke-width="1.2" opacity=".8"/>
+        <path d="M164 33 A27 27 0 0 0 164 87" fill="none" stroke="#E2472B" stroke-width="1.2" opacity=".35"/>
       </g>
       <circle cx="170" cy="60" r="11" fill="#0A0D11" stroke="#2A323D" stroke-width="2"/>
-      <line x1="170" y1="50" x2="170" y2="54" stroke="#FF4D4D" stroke-width="2.4" stroke-linecap="round"/>
+      <line x1="170" y1="50" x2="170" y2="54" stroke="#E8ECF0" stroke-width="2.4" stroke-linecap="round"/>
     </svg></div>
     <button type="button" class="pm-go">Continue</button>
     <button type="button" class="pm-no">Not now</button>
@@ -1033,8 +1099,13 @@ function bindSeg(id,get,set){
 }
 bindSeg('segCatch',()=>CATCH,v=>{CATCH=v;persist(CATCHKEY,v);});
 bindSeg('segEgress',()=>EGRESS,v=>{EGRESS=v;persist(EGRESSKEY,v);});
-bindSeg('segPreview',()=>PREVIEW,v=>{PREVIEW=v;persist(PREVKEY,v);});  // the loop re-syncs live
+bindSeg('segPreview',()=>PREVIEW,v=>{PREVIEW=v;persist(PREVKEY,v);syncPeekNote();});  // the loop re-syncs live
 bindSeg('segStyle',()=>STYLE,v=>{STYLE=v;persist(STYLEKEY,v);});       // redraws next frame, live
+bindSeg('segPeek',()=>PEEK,v=>{PEEK=v;persist(PEEKKEY,v);syncPeekNote();});
+/* Neighbors reads in the floating pill; on-ring mode has no pill to read in.
+   The seg stays selectable — this quiet note beside it carries the truth. */
+function syncPeekNote(){document.getElementById('peeknote').hidden=!(PEEK==='neighbors'&&PREVIEW==='ring');}
+syncPeekNote();
 document.getElementById('stagebtn').onclick=stageClip;
 document.getElementById('firstrunbtn').onclick=openPerm;
 document.getElementById('permrow').onclick=openPerm;
@@ -1116,18 +1187,23 @@ function useItem(it,via){
   }
   if(it.type==='img'){
     touch(it);   // images ride the clipboard, like the real app — both egress modes agree
-    if(via==='dial'){receipt('Copied — paste where you were');dialPulse(TYPEC.img);tick();return true;}
+    if(via==='dial'){receipt(`Copied · ${it.label}`);dialPulse(TYPEC.img);tick();return true;}
     toast(`${it.label} copied — paste it where you need it`);
     tick();setTimeout(tick,70);return true;
   }
   return false;   // docs never reach the rings; the upload picker is their surface
 }
+/* double-tap = the most recent thing, no dial. Its effect must be LEGIBLE
+   (owner dogfood, 2026-08-06): the receipt names the item every time, and in
+   honest mode the paste chip pops on the focused box — something visibly
+   happened, whichever switch is set. */
 function pasteLast(){
   const it=lastUsed();
   if(!it)return;
-  if((it.type==='txt'||it.type==='url')&&EGRESS!=='copy'){
-    const r=useItem(it,'dial');if(r)toast(`Pasted last · ${it.label}`);
-  }else useItem(it,'dial');
+  if(!useItem(it,'dial'))return;
+  if(it.type==='img')receipt(`Copied · ${it.label}`);
+  else if(EGRESS==='copy')receipt(`Copied · ${it.label} — tap the box to paste`);
+  else receipt(`Pasted last · ${it.label}`);
 }
 
 /* ================= selection capture ================= */
@@ -1533,6 +1609,10 @@ function turn(ring,deltaDeg){
 }
 function settle(ring){const D=DIAL;D['raw'+ring]=D['t'+ring];}
 const STEP_OUT=33,WIN_OUT=70;
+/* De-red ruling (2026-08-06): real lens index marks are white — the red was
+   grabbing attention the instrument doesn't want. RED_INDEX is the one-line
+   restore if a future logo asks for the red back. */
+const RED_INDEX=null;   // set to '#FF4D4D' to restore the painted red index
 /* ═══ Sony lens finish — tunable constants (the native build mirrors these) ═══ */
 const LENS={
   body:['#1E2126','#17191C','#141619'],  // barrel matte anodize: lit edge → base → shadowed
@@ -1543,11 +1623,12 @@ const LENS={
   knGap:3,                               // gap between content band and rib band, px
   knLight:'#272C33',knDark:'#0F1114',    // alternating rib tones, a hair off the body
   engrave:'#B9BEC5',engraveDim:'#8F969E',engraveShadow:'#07090B',
-  accent:['#F05A38','#C93A22'],          // the G Master band (~#E2472B), lit → shadowed
-  index:'#FF4D4D',indexRim:'#3A0D0A',    // painted index mark + its dark rim
+  accent:['#F05A38','#C93A22'],          // the G Master band (~#E2472B) — a whisper now
+  index:RED_INDEX||'#E8ECF0',            // engraved off-white index (RED_INDEX restores red)
+  indexRim:'#3A0D0A',                    // the dark rim stays — the crispness lives there
   glass:['#10151C','#080B0F','#05070A'], // hub lens element, centre → edge
 };
-let VW=innerWidth,VH=innerHeight,FW=innerWidth,AX=innerWidth,R=0,HUB=0,OUT0=0,OUT1=0,CY=0;
+let VW=innerWidth,VH=innerHeight,FW=innerWidth,AX=innerWidth,R=0,HUB=0,OUT0=0,OUT1=0,CY=0,DYMIN=0,DYMAX=0;
 /* either-edge docking: DOCK is per-device, persisted; CA is the arc's center
    angle (270 opens leftward from the right edge, 90 mirrors it) */
 let DOCK='right',EDGE=1,CA=270;
@@ -1567,13 +1648,21 @@ function sizes(){
      edge (AX), not the browser's, so each view keeps its proportions on any
      monitor. Phone: FW=VW and AX=VW — exactly the old math, zero drift. */
   FW=DEV==='fold'?Math.min(673,VW):(DEV==='tablet'||DEV==='ipad')?Math.min(1024,VW):VW;
-  DOCK=DOCKS[DEV]||'right';EDGE=DOCK==='right'?1:-1;CA=DOCK==='right'?270:90;
+  const dk=DOCKS[DEV]||{edge:'right',y:.56};
+  DOCK=dk.edge;EDGE=DOCK==='right'?1:-1;CA=DOCK==='right'?270:90;
   AX=DOCK==='right'?(VW+FW)/2:(VW-FW)/2;
   R=Math.min(FW*0.46,205);
   HUB=R*.20;OUT0=R*.40;OUT1=R*.84;   // one wide band; the knurling rides outside OUT1
-  /* Tablet: the dial rides the LOWER third — where the thumb lands when a hand
-     grips a tablet's side edge — clamped so the ring never falls off-screen. */
-  CY=DEV==='tablet'?Math.min(VH*.72,VH-(OUT1+LENS.knGap+LENS.knDepth+40)):VH*.56;
+  /* The handle slides freely along its edge (2026-08-06): CY comes from the
+     persisted per-device y-fraction, clamped to the safe rail — below the
+     floating-pill zone, above the bottom inset, and never so far that the
+     open ring falls off-screen. (Tablet's old lower-third default lives on
+     as its default y.) */
+  const ringExt=OUT1+LENS.knGap+LENS.knDepth+26;
+  DYMIN=Math.max(96,ringExt+8);
+  DYMAX=VH-Math.max(34,ringExt+8);
+  if(DYMAX<DYMIN)DYMIN=DYMAX=Math.round(VH*.55);
+  CY=Math.max(DYMIN,Math.min(DYMAX,dk.y*VH));
   svg.setAttribute('width',VW);svg.setAttribute('height',VH);
   svg.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
 }
@@ -1615,7 +1704,9 @@ function pinnedItems(){return vault.filter(i=>i.pin_order!=null&&!i.deleted_at)
 function dialItems(){const pins=new Set(pinnedItems().map(p=>p.id));
   return vault.filter(i=>i.type!=='doc'&&!pins.has(i.id)&&!i.deleted_at)
     .sort((a,b)=>b.captured_at-a.captured_at)}
-function focusedItem(){const its=dialItems();return its.length?its[mod(Math.round(DIAL.sOut),its.length)]:null}
+/* selection reads the COMMITTED detent (tOut), not the easing sOut — a release
+   right after a click can no longer take the neighbour it just left */
+function focusedItem(){const its=dialItems();return its.length?its[mod(DIAL.tOut,its.length)]:null}
 
 /* ═══ the floating preview ═══
    The item at the index mark, rendered where the eyes are — the top of the
@@ -1628,35 +1719,63 @@ const looksLikeCode=s=>/\d/.test(s)&&!/[a-z]{3,}/.test(s);   // IBANs, tracking 
 function previewItem(){const its=dialItems();return its.length?its[mod(DIAL.tOut,its.length)]:null}
 function previewHTML(it){
   if(!it)return `<div class="dp-row"><div class="dp-text" style="color:var(--dim)">Nothing here yet</div></div>`;
-  const c=({txt:'var(--c-txt)',url:'var(--c-lnk)',img:'var(--c-img)'})[it.type]||'var(--line)';
   if(it.is_sensitive){
     /* masked, exactly as on the ring — and masking matters MORE here: this
        surface is designed to be read at a glance, which is precisely what a
        shoulder-surfer does. The dots must survive every readable surface. */
-    return `<div class="dp-row"><div class="dp-bar" style="background:${c}"></div>
-      <div><div class="dp-caplabel">${escq(it.label.slice(0,20))}</div><div class="dp-dots">••••&#8202;••••</div></div></div>`;}
+    return `<div class="dp-row"><div><div class="dp-caplabel">${escq(it.label.slice(0,20))}</div><div class="dp-dots">••••&#8202;••••</div></div></div>`;}
   if(it.type==='url'){
     const t=it.title||it.label;
-    return `<div class="dp-row"><div class="dp-bar" style="background:${c}"></div>
-      <div><div class="dp-title">${escq(t)}</div><div class="dp-url">${escq(it.content||'')}</div></div></div>`;}
+    return `<div class="dp-row"><div><div class="dp-title">${escq(t)}</div><div class="dp-url">${escq(it.content||'')}</div></div></div>`;}
   if(it.type==='img')
     return `<div class="dp-row center"><div class="dp-thumb" style="background:${kgrad(it.id)}"></div>
       <div class="dp-name">${escq(it.label)}</div></div>`;
   const v=it.content||it.label;
-  return `<div class="dp-row"><div class="dp-bar" style="background:${c}"></div>
-    <div class="dp-text${looksLikeCode(v)?' mono':''}">${escq(v)}</div></div>`;
+  return `<div class="dp-row"><div class="dp-text${looksLikeCode(v)?' mono':''}">${escq(v)}</div></div>`;
+}
+/* Peek · Neighbors — the side entries of the filmstrip. Masked items surface
+   as dots here, never values, exactly like every other readable surface. */
+function itemAt(k){const its=dialItems();return its.length?its[mod(DIAL.tOut+k,its.length)]:null}
+function sideHTML(it,step){
+  if(!it)return '';
+  const t=it.is_sensitive?'•••• ••••'
+    :((it.type==='url'?(it.title||it.label):it.type==='img'?it.label:(it.content||it.label))
+      .replace(/\s+/g,' ').trim());
+  return `<div class="dp-side ${step<0?'prev':'next'}" data-step="${step}" role="button">${escq(t.slice(0,18))}</div>`;
 }
 function renderPreview(force){
   const it=previewItem();
-  const key=it?it.id:'none';
+  const its=dialItems();
+  const strip=PEEK==='neighbors'&&its.length>1;
+  const key=PEEK+':'+(it?it.id:'none')+(strip?':'+mod(DIAL.tOut,Math.max(its.length,1)):'');
   if(!force&&key===prevKey)return;
   prevKey=key;
   const layers=prevEl.querySelectorAll('.dp-layer');
   const inL=layers[prevLayer^1],outL=layers[prevLayer];
   prevLayer^=1;
-  inL.innerHTML=previewHTML(it);
+  const mid=previewHTML(it);
+  inL.innerHTML=strip
+    ?`<div class="dp-strip">${sideHTML(itemAt(-1),-1)}<div class="dp-mid">${mid}</div>${its.length>2?sideHTML(itemAt(1),1):''}</div>`
+    :mid;
+  /* the glow IS the type identity now (no bar): aura + border in the item's
+     colour; sensitive items go deliberately colourless (neutral ink) */
+  prevEl.classList.remove('gl-txt','gl-lnk','gl-img','gl-sens');
+  prevEl.classList.add(!it||it.is_sensitive?'gl-sens':({txt:'gl-txt',url:'gl-lnk',img:'gl-img'})[it.type]||'gl-sens');
   inL.classList.add('on');outL.classList.remove('on');   // 120ms cross-fade — the ring moves, the preview swaps
 }
+/* tapping a filmstrip side steps ONE detent — the ring's own spring answers */
+prevEl.addEventListener('pointerdown',e=>{
+  const s=e.target.closest('.dp-side');if(!s)return;
+  e.preventDefault();e.stopPropagation();
+  DIAL.tOut+=+s.dataset.step;DIAL.rawOut=DIAL.tOut;
+});
+/* Peek · Fan — on dial open, the visible items' short labels flash radially
+   outward from their ring positions: engraved, staggered ~30ms, hold ~500ms,
+   fade ~250ms — a focus-assist sweep, then pure instrument. Re-fires when a
+   catch lands (the caught thing is at the mark; the sweep says what moved). */
+const FAN={t0:0};
+function fanStart(){if(PEEK==='fan')FAN.t0=performance.now();}
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function syncPreview(){
   const want=DIAL.enabled&&PREVIEW==='top'&&DIAL.openT>0;
   if(want&&!prevShown){
@@ -1671,15 +1790,14 @@ function syncPreview(){
 }
 
 function handleSVG(bx,by){
-  /* the closed handle is a miniature of the lens ring: matte charcoal body,
-     ribbed rim, a thin accent ring, and the painted red index */
+  /* the closed handle is a plain machined pull-tab (owner ruling, 2026-08-06):
+     charcoal body, full-turn knurl ribs, one dark machined groove — no tick,
+     no glyph, no logo motif. Branding waits for a name; when one lands, the
+     OPEN hub's engraved glass cap is its natural home, not this tab. */
   let s=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="#17191C" stroke="#2A2F36" stroke-width="2"/>`;
-  for(let a=-70,i=0;a<=70;a+=8,i++){const p1=P2(bx,by,BTN_R-6,a),p2=P2(bx,by,BTN_R-1.5,a);
+  for(let a=0,i=0;a<360;a+=8,i++){const p1=P2(bx,by,BTN_R-6,a),p2=P2(bx,by,BTN_R-1.5,a);
     s+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${i%2?LENS.knDark:LENS.knLight}" stroke-width="1.4" stroke-linecap="round" opacity=".9"/>`;}
-  s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-8.5}" fill="none" stroke="#B8452C" stroke-width="1" opacity=".8"/>`;
-  s+=`<circle cx="${bx}" cy="${by}" r="6.5" fill="#0B0E12" stroke="#39424F" stroke-width="1"/>`;
-  s+=`<line x1="${bx}" y1="${by-BTN_R+2}" x2="${bx}" y2="${by-BTN_R+10}" stroke="${LENS.indexRim}" stroke-width="4.4" stroke-linecap="round"/>`;
-  s+=`<line x1="${bx}" y1="${by-BTN_R+3}" x2="${bx}" y2="${by-BTN_R+9.5}" stroke="${LENS.index}" stroke-width="2.6" stroke-linecap="round"/>`;
+  s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-7.5}" fill="none" stroke="#0B0E12" stroke-width="1.2" opacity=".85"/>`;
   return s;
 }
 function drawDial(){
@@ -1713,9 +1831,16 @@ function drawDial(){
       <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#000000" flood-opacity="${darkPage?.55:.30}"/></filter>
   </defs>`;
   if(DIAL.mode==='dock'){
-    /* the handle rides the finger; a dashed target waits at the other edge */
-    const oppAX=DOCK==='right'?(VW-FW)/2:(VW+FW)/2;
-    h+=`<circle cx="${oppAX+EDGE*BTN_R}" cy="${CY}" r="${BTN_R}" fill="none" stroke="#39424F" stroke-width="2" stroke-dasharray="5 6" opacity=".85"/>`;
+    /* the handle rides the finger; the NEAREST side wall shows the dashed
+       target at the height it would cling to, and a faint vertical rail marks
+       the slide range the magnet allows (below the pill zone, above the
+       bottom inset) — edge-crossing and height-setting share one gesture */
+    const tEdge=DIAL.dockX<VW/2?'left':'right';
+    const tAX=tEdge==='right'?(VW+FW)/2:(VW-FW)/2,tE=tEdge==='right'?1:-1;
+    const ty=Math.max(DYMIN,Math.min(DYMAX,DIAL.dockY));
+    const railX=tAX-tE*3;
+    h+=`<line x1="${railX}" y1="${DYMIN}" x2="${railX}" y2="${DYMAX}" stroke="#39424F" stroke-width="1.5" stroke-dasharray="2 7" opacity=".45"/>`;
+    h+=`<circle cx="${tAX-tE*BTN_R}" cy="${ty}" r="${BTN_R}" fill="none" stroke="#39424F" stroke-width="2" stroke-dasharray="5 6" opacity=".85"/>`;
     h+=`<g opacity=".8">`+handleSVG(DIAL.dockX,DIAL.dockY)+`</g>`;
     svg.innerHTML=h;return;
   }
@@ -1736,7 +1861,7 @@ function drawDial(){
            what the dots offer, on the device that needs it most. */
         const cw=210,cx0=DOCK==='right'?AX-12-cw:AX+12,cy0=by+BTN_R+16;
         h+=`<rect x="${cx0}" y="${cy0}" width="${cw}" height="24" rx="8" fill="rgba(10,13,17,.88)" stroke="#2B333D"/>`;
-        h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">Hold and drag across — docks either edge</text>`;
+        h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">Hold and drag — any edge, any height</text>`;
       }
       h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
     }
@@ -1753,8 +1878,9 @@ function drawDial(){
   /* hair-thin bevels: a dark inner cut plus a whisper of rim light beside it */
   h+=`<path d="${arcAt(o(OUT0),A0,A1)}" fill="none" stroke="#0A0C0F" stroke-opacity="${.8*f}"/>`;
   h+=`<path d="${arcAt(o(OUT0)+1,A0,A1)}" fill="none" stroke="#FFFFFF" stroke-opacity="${.06*f}"/>`;
-  /* the G Master signature: one thin brushed accent band — noticed second */
-  h+=`<path d="${arcAt(o(OUT1)+1,A0+1.5,A1-1.5)}" fill="none" stroke="url(#acc)" stroke-width="1.6" opacity="${.85*f}"/>`;
+  /* the G Master signature: a whisper of brushed accent — present, noticed
+     third, after the content and the knurl (de-red ruling, 2026-08-06) */
+  h+=`<path d="${arcAt(o(OUT1)+1,A0+1.5,A1-1.5)}" fill="none" stroke="url(#acc)" stroke-width="1.2" opacity="${.35*f}"/>`;
   /* KNURLING: fine-pitch radial ribs, alternating a hair light/dark, rounded
      ends, curving with the ring — they shift with sOut like real grip metal */
   {const sh=-(DIAL.sOut*STEP_OUT)%(LENS.knPitch*2);
@@ -1947,36 +2073,59 @@ function drawDial(){
     h+=`<text font-size="8" letter-spacing=".05em" style="font-family:var(--mono)" text-anchor="middle" fill="${LENS.engraveShadow}" opacity="${.85*f}" dy="-.7"><textPath href="#readarc" startOffset="50%">${rd}</textPath></text>`;
     h+=`<text font-size="8" letter-spacing=".05em" style="font-family:var(--mono)" text-anchor="middle" fill="${LENS.engrave}" opacity="${f}"><textPath href="#readarc" startOffset="50%">${rd}</textPath></text>`;
   }
-  /* the index mark: painted-dot crispness — red over a dark rim, flush against
-     the knurled edge like a lens body index */
+  /* the index mark: engraved off-white over its dark rim — the crispness of a
+     real lens body index, none of the shout (de-red ruling, 2026-08-06) */
   const m1=P(kn1+2,CA),m2=P(kn1+10,CA);
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="${LENS.indexRim}" stroke-width="4.6" stroke-linecap="round" opacity="${f}"/>`;
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="${LENS.index}" stroke-width="2.8" stroke-linecap="round" opacity="${f}"/>`;
+  if(FAN.t0&&PEEK==='fan'){
+    /* the fan sweep: labels bloom from the index outward, ride just past the
+       knurl, hold, and fade — masked items flash dots, never values */
+    const now=performance.now(),IN=120,HOLD=500,FADE=250;
+    const fanSlots=[...slots(its,DIAL.sOut,STEP_OUT,WIN_ROT).map(s=>({a:CA+s.off,it:its[s.i],d:Math.abs(s.off)})),
+      ...pinnedItems().map((pn,k)=>({a:CA+(k===0?-PIN_OFF:PIN_OFF),it:pn,d:PIN_OFF}))]
+      .sort((x,y)=>x.d-y.d);
+    let live=false;
+    fanSlots.forEach((sl,i)=>{
+      const t=now-FAN.t0-i*30;
+      if(t<0){live=true;return;}
+      if(t>IN+HOLD+FADE)return;
+      live=true;
+      const op=(t<IN?t/IN:t<IN+HOLD?1:1-(t-IN-HOLD)/FADE)*f;
+      const slide=RM?8:Math.min(1,t/IN)*8;
+      const p=P(kn1+10+slide,sl.a);
+      const lab=sl.it.is_sensitive?'••••'
+        :(s=>s.slice(0,12)+(s.length>12?'…':''))
+          ((sl.it.type==='url'?(sl.it.title||sl.it.label):sl.it.label).replace(/\s+/g,' ').trim());
+      h+=`<g opacity="${op}" text-anchor="${EDGE===1?'end':'start'}">`
+        +eng(p.x,p.y,8.5,escq(lab),`dominant-baseline="central"`,LENS.engrave)+`</g>`;
+    });
+    if(!live)FAN.t0=0;   // sweep done: pure instrument again
+  }
   if(DIAL.offer){
     /* catch-on-open, "ask" style: the clipboard's newest thing waits at the
-       center; tapping it catches, anything else lets it go */
-    const HO=HUB+13,oc=TYPEC[/^https?:\/\//.test(DIAL.offer)?'url':'txt'];
+       center; tapping it catches, anything else lets it go. The offer ring is
+       neutral ink — chrome never wears type colour (de-red ruling) */
+    const HO=HUB+13;
     const sn=DIAL.offer.replace(/\s+/g,' ').slice(0,11)+(DIAL.offer.length>11?'…':'');
-    h+=`<circle cx="${AX}" cy="${CY}" r="${HO}" fill="url(#lensg)" stroke="${oc}" stroke-width="2" opacity="${f}"/>`;
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HO}" fill="url(#lensg)" stroke="${LENS.engraveDim}" stroke-width="2" opacity="${f}"/>`;
     h+=`<text x="${AX-EDGE*HO*.48}" y="${CY-7}" font-size="11.5" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#F0F1F3" opacity="${f}">Catch?</text>`;
     h+=`<text x="${AX-EDGE*HO*.48}" y="${CY+8}" font-size="8" text-anchor="middle" dominant-baseline="central" fill="#98A3B0" opacity="${f}">${escq(sn)}</text>`;
   }else{
     /* the hub is a lens element: coated near-black glass, two dim cool
-       reflection arcs (mirrored with the dock), a hair-thin bevel collar */
+       reflection arcs (mirrored with the dock), a hair-thin bevel collar.
+       NO close glyph (owner ruling, 2026-08-06): the whole cap is the
+       tap-to-close target, and the coach says so once. The empty engraved
+       glass is also the natural home for a future logo once naming lands. */
     h+=`<circle cx="${AX}" cy="${CY}" r="${HUB+1.6}" fill="none" stroke="#0A0C0F" opacity="${.7*f}"/>`;
     h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#lensg)" stroke="#262C33" stroke-width="1.2" opacity="${f}"/>`;
     h+=`<circle cx="${AX}" cy="${CY}" r="${HUB-.8}" fill="none" stroke="url(#rimg)" stroke-width=".8" opacity="${.6*f}"/>`;
     const ra0=EDGE===1?-72:8,ra1=EDGE===1?-8:72;
     h+=`<path d="${arcAt(HUB*.62,ra0,ra1)}" fill="none" stroke="#5E7186" stroke-width="1.3" opacity="${.3*f}"/>`;
     h+=`<path d="${arcAt(HUB*.40,ra0-EDGE*108,ra1-EDGE*108)}" fill="none" stroke="#46586A" opacity="${.18*f}"/>`;
-    h+=`<text x="${AX-EDGE*HUB*.45}" y="${CY}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#C9D3DF" opacity="${f}">✕</text>`;
   }
-  if(DIAL.mode==='glide'){                 // glide keeps its one-line mode hint; browse needs none —
-    const cp=P(kn1+26,CA);                 // the ring shows its own content now
-    const gx=DOCK==='right'?cp.x-128:cp.x;
-    h+=`<g opacity="${f}"><rect x="${gx}" y="${cp.y-12}" width="128" height="24" rx="8" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
-    <text x="${gx+64}" y="${cp.y+1}" font-size="9.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">${DIAL.glideZone==='Out'?(EGRESS==='copy'?'release to copy':'release to insert'):'slide out to the ring'}</text></g>`;
-  }
+  /* glide's hint is the HTML glidechip riding the finger — ONE voice; the SVG
+     duplicate that used to sit by the ring was cut (dedup, 2026-08-06) */
   svg.innerHTML=h;
 }
 
@@ -2028,7 +2177,7 @@ addEventListener('pointerdown',e=>{
     D.holdTimer=setTimeout(()=>{
       D.holdTimer=null;
       clearTimeout(D.tapTimer);D.tapTimer=null;
-      D.mode='glide';D.glideZone=null;D.openT=1;tick();catchOnOpen();
+      D.mode='glide';D.glideZone=null;D.openT=1;tick();catchOnOpen();fanStart();
       glidechip.style.display='block';glidechip.textContent='slide out to the ring';
       if(DOCK==='right'){glidechip.style.left='auto';glidechip.style.right=((VW-AX)+R+40)+'px';}
       else{glidechip.style.right='auto';glidechip.style.left=(AX+R+40)+'px';}
@@ -2043,16 +2192,21 @@ addEventListener('pointermove',e=>{
   const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;
   if(D.mode==='dock'){
     D.dockX=e.clientX;D.dockY=e.clientY;
-    const past=DOCK==='right'?e.clientX<VW/2:e.clientX>VW/2;
-    glidechip.textContent=past?('release to dock '+(DOCK==='right'?'left':'right')):'slide back to cancel';
+    /* release ALWAYS docks now — nearest edge, at this height */
+    glidechip.textContent='release to dock '+(e.clientX<VW/2?'left':'right');
     glidechip.style.right='auto';
     glidechip.style.left=Math.max(8,Math.min(VW-140,e.clientX-60))+'px';
     glidechip.style.top=(Math.max(12,e.clientY-52))+'px';
     e.preventDefault();return;
   }
   if(D.mode==='glide'){
-    /* long-press-drag across the midline ⇒ re-dock, the Fold hint made real */
-    if((DOCK==='right'&&e.clientX<VW/2-12)||(DOCK==='left'&&e.clientX>VW/2+12)){
+    /* long-press-drag past the ring (or across the midline) ⇒ the handle
+       comes off the wall (2026-08-06): move it anywhere, release to cling.
+       The radial escape only fires OUTSIDE the item window, so overshooting
+       the knurl while selecting never ejects the ring from under the finger. */
+    const rr=dist(e.clientX,e.clientY),ra=Math.abs(wrapDeg(ang(e.clientX,e.clientY)-CA));
+    if((DOCK==='right'&&e.clientX<VW/2-12)||(DOCK==='left'&&e.clientX>VW/2+12)
+       ||(rr>OUT1+LENS.knGap+LENS.knDepth+30&&ra>WIN_OUT+16)){
       D.mode='dock';D.glideZone=null;D.openT=0;
       D.dockX=e.clientX;D.dockY=e.clientY;
       e.preventDefault();return;
@@ -2092,12 +2246,13 @@ addEventListener('pointerup',e=>{
   if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}
   if(D.mode==='dock'){
     D.mode='closed';glidechip.style.display='none';
-    const past=DOCK==='right'?e.clientX<VW/2:e.clientX>VW/2;
-    if(past){
-      DOCKS[DEV]=DOCK==='right'?'left':'right';
-      try{localStorage.setItem(DOCKKEY,JSON.stringify(DOCKS))}catch(_){}
-      sizes();tick();receipt('Docked '+DOCKS[DEV]);
-    }
+    /* the magnet: cling to the NEAREST side wall, at the height you left it —
+       edge + y-fraction persist per device, self-healing on load */
+    const edge=e.clientX<VW/2?'left':'right';
+    const y=Math.max(DYMIN,Math.min(DYMAX,e.clientY))/VH;
+    DOCKS[DEV]={edge,y:Math.round(y*1000)/1000};
+    try{localStorage.setItem(DOCKKEY,JSON.stringify(DOCKS))}catch(_){}
+    sizes();tick();receipt('Docked '+edge);
     D.downBand=null;drawDial();return;
   }
   if(D.cycOn){D.cycOn=false;                     // a cycle-hold is not a tap
@@ -2120,7 +2275,7 @@ addEventListener('pointerup',e=>{
     const now=Date.now();
     if(now-D.lastTapAt<300){clearTimeout(D.tapTimer);D.tapTimer=null;D.lastTapAt=0;pasteLast();return;}
     D.lastTapAt=now;
-    D.tapTimer=setTimeout(()=>{D.openT=1;tick();D.tapTimer=null;catchOnOpen();},290);
+    D.tapTimer=setTimeout(()=>{D.openT=1;tick();D.tapTimer=null;catchOnOpen();fanStart();},290);
     return;
   }
   if(D.offer&&d<=HUB+21){doCatch(D.offer);D.downBand=null;return;}   // the center offer
@@ -2162,12 +2317,12 @@ addEventListener('pointercancel',e=>{
 /* first-visit coach — not on iPad: there is no handle there */
 addEventListener('hashchange',()=>{
   if(location.hash==='#dial'&&DEV!=='ipad'&&!localStorage.getItem('reel.coach.dial')){
-    setTimeout(()=>toast('Tap the round handle at the screen edge'),500);
+    setTimeout(()=>toast('Tap the round handle at the screen edge — tap the glass to close'),500);
     localStorage.setItem('reel.coach.dial','1');
   }
 });
 if(location.hash==='#dial'&&DEV!=='ipad'&&!localStorage.getItem('reel.coach.dial')){
-  setTimeout(()=>toast('Tap the round handle at the screen edge'),600);
+  setTimeout(()=>toast('Tap the round handle at the screen edge — tap the glass to close'),600);
   localStorage.setItem('reel.coach.dial','1');
 }
 
