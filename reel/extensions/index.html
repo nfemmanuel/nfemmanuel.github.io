@@ -14,654 +14,698 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%231A1F26%22 stroke=%22%23333B45%22 stroke-width=%228%22/><rect x=%2246%22 y=%228%22 width=%228%22 height=%2224%22 rx=%224%22 fill=%22%23FF4D4D%22/></svg>">
 </head>
 <body>
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
-<title>Reel — the job application, one gesture at a time</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Reel — extensions prototype</title>
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper:#F6F4EF; --card:#FFFFFF; --ink:#23282E; --dim:#6E7681; --line:#E4E0D6;
-    --accent:#0E8C7F; --accent-soft:#0E8C7F22; --ok:#2E9E5B; --warn:#B27818;
-    --field:#FBFAF7; --field-line:#D8D3C8;
-    --shadow:0 10px 30px rgba(30,35,40,.10);
-  }
-  @media (prefers-color-scheme: dark){:root{
-    --paper:#101317; --card:#181D23; --ink:#E7EBEF; --dim:#8D97A1; --line:#262D35;
-    --accent:#2FB9A9; --accent-soft:#2FB9A926;
-    --field:#131820; --field-line:#2C343E;
-    --shadow:0 10px 30px rgba(0,0,0,.45);
-  }}
-  :root[data-theme="dark"]{
-    --paper:#101317; --card:#181D23; --ink:#E7EBEF; --dim:#8D97A1; --line:#262D35;
-    --accent:#2FB9A9; --accent-soft:#2FB9A926;
-    --field:#131820; --field-line:#2C343E;
-    --shadow:0 10px 30px rgba(0,0,0,.45);
-  }
-  :root[data-theme="light"]{
-    --paper:#F6F4EF; --card:#FFFFFF; --ink:#23282E; --dim:#6E7681; --line:#E4E0D6;
-    --accent:#0E8C7F; --accent-soft:#0E8C7F22;
-    --field:#FBFAF7; --field-line:#D8D3C8;
-    --shadow:0 10px 30px rgba(30,35,40,.10);
-  }
+/* ═══ chassis conversion (2026-08-06) ═══
+   The extensions prototype now wears app-mockup.html's presentation MO:
+   a real .phone frame with a status bar, SIMULATED APP SCREENS inside it
+   (the Northbeam form is a jobs-app screen, the Fielder form likewise),
+   and everything meta — tips, moves, the lab, prose — OUTSIDE the frame,
+   as the notes column on desktop. The dial docks to the FRAME's edges and
+   floats over the fake app; the keyboard rises inside the frame. One
+   header seg switches page (Dial|Keyboard), one switches Light|Dark
+   (explicit, persisted), one switches device glass (resizes the frame).
+   Every behavior and storage key from the pre-chassis build survives. */
+:root{
+  --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
+  --field:#F6F6F7; --field-line:#DFE1E5;
+  --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+  --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
+  --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
+  --accent:var(--c-doc); --accent-soft:#356BA622;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
+  --spring:cubic-bezier(.34,1.56,.5,1);
+}
+@media (prefers-color-scheme: dark){:root{
+  --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
+  --field:#131519; --field-line:#2E333A;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.3);
+  --shadow-m:0 2px 6px rgba(0,0,0,.4),0 14px 36px rgba(0,0,0,.55);
+  --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
+  --accent-soft:#8FC6FF26;
+}}
+:root[data-theme="dark"]{
+  --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
+  --field:#131519; --field-line:#2E333A;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.3);
+  --shadow-m:0 2px 6px rgba(0,0,0,.4),0 14px 36px rgba(0,0,0,.55);
+  --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
+  --accent-soft:#8FC6FF26;
+}
+:root[data-theme="light"]{
+  --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
+  --field:#F6F6F7; --field-line:#DFE1E5;
+  --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+  --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
+  --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
+  --accent-soft:#356BA622;
+}
+/* keyboard-page deck tokens — the iOS-26 chrome the deck wears, unchanged */
+body.on-kb{
+  --kb-blur:rgba(243,244,246,.78); --kb-hair:rgba(20,22,26,.12);
+  --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
+  --kb-key:#FFFFFF; --kb-key-dim:#E4E6EB; --kb-key-shadow:0 1px 0 rgba(16,20,26,.22);
+  --sys-bg:rgba(206,210,217,.92); --sys-key:#FFF; --sys-key-dim:#AEB4BE;
+  --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A;
+}
+@media (prefers-color-scheme: dark){body.on-kb{
+  --kb-blur:rgba(17,19,23,.72); --kb-hair:rgba(255,255,255,.08);
+  --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
+  --kb-key:#41464F; --kb-key-dim:#2B2F36; --kb-key-shadow:0 1px 0 rgba(0,0,0,.5);
+  --sys-bg:rgba(30,31,34,.9); --sys-key:#6B6B6F; --sys-key-dim:#464649;
+  --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6;
+}}
+:root[data-theme="dark"] body.on-kb{
+  --kb-blur:rgba(17,19,23,.72); --kb-hair:rgba(255,255,255,.08);
+  --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
+  --kb-key:#41464F; --kb-key-dim:#2B2F36; --kb-key-shadow:0 1px 0 rgba(0,0,0,.5);
+  --sys-bg:rgba(30,31,34,.9); --sys-key:#6B6B6F; --sys-key-dim:#464649;
+  --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6;
+}
+:root[data-theme="light"] body.on-kb{
+  --kb-blur:rgba(243,244,246,.78); --kb-hair:rgba(20,22,26,.12);
+  --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
+  --kb-key:#FFFFFF; --kb-key-dim:#E4E6EB; --kb-key-shadow:0 1px 0 rgba(16,20,26,.22);
+  --sys-bg:rgba(206,210,217,.92); --sys-key:#FFF; --sys-key-dim:#AEB4BE;
+  --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A;
+}
 
-  /* ═══ current product tokens (app-mockup.html is canonical) ═══
-     Both extension pages speak this language now: body.on-dial and body.on-kb
-     each remap the old var names so the page chrome retunes per page without
-     touching page-agnostic CSS. The teal era is over on both. */
-  :root{
-    --display:"Bricolage Grotesque",system-ui,sans-serif;
-    --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
-    --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
-  }
-  @media (prefers-color-scheme: dark){:root{
-    --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
-  }}
-  :root[data-theme="dark"]{--c-txt:#FFC978;--c-img:#C6A8FF;--c-doc:#8FC6FF;--c-lnk:#FFA184}
-  :root[data-theme="light"]{--c-txt:#B4761C;--c-img:#7B55B4;--c-doc:#356BA6;--c-lnk:#BA5138}
-  body.on-dial{
-    --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
-    --accent:var(--c-doc); --accent-soft:#356BA622;
-    --field:#F6F6F7; --field-line:#DFE1E5;
-    --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
-    font-family:var(--ui);
-  }
-  @media (prefers-color-scheme: dark){body.on-dial{
-    --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
-    --accent:var(--c-doc); --accent-soft:#8FC6FF26;
-    --field:#131519; --field-line:#2E333A;
-    --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.55);
-  }}
-  :root[data-theme="dark"] body.on-dial{
-    --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
-    --accent:var(--c-doc); --accent-soft:#8FC6FF26;
-    --field:#131519; --field-line:#2E333A;
-    --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.55);
-  }
-  :root[data-theme="light"] body.on-dial{
-    --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
-    --accent:var(--c-doc); --accent-soft:#356BA622;
-    --field:#F6F6F7; --field-line:#DFE1E5;
-    --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
-  }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);
+  font-size:15px;line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+h2{font-family:var(--display);font-size:15.5px;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
+p{margin:0 0 10px;color:var(--dim)}
+a{color:var(--accent)}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-weight:700;margin-bottom:4px}
+.lead{font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:-.03em;margin:0 0 6px;text-wrap:balance;color:var(--ink)}
+.pintro{margin:0 0 12px}
 
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);
-    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    -webkit-tap-highlight-color:transparent}
-  main{max-width:580px;margin:0 auto;padding:22px 18px 340px}
-  h1{font-size:25px;letter-spacing:-.02em;margin:0 0 8px;text-wrap:balance}
-  h2{font-size:16px;letter-spacing:-.01em;margin:0 0 4px}
-  p{margin:0 0 10px;color:var(--dim)}
-  a{color:var(--accent)}
-  .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin-bottom:4px}
-  .wordmark{display:flex;align-items:center;gap:8px 9px;flex-wrap:wrap;margin-bottom:22px;user-select:none}
-  .wordmark .knob{width:26px;height:26px;border-radius:50%;
-    background:conic-gradient(from 40deg,#1A1F26 0 70%,#333B45 0 78%,#1A1F26 0);
-    border:2px solid #333B45;position:relative;flex:0 0 auto}
-  .wordmark .knob::after{content:"";position:absolute;top:1px;left:50%;width:2px;height:6px;background:#FF4D4D;transform:translateX(-50%);border-radius:2px}
-  .wordmark b{font-size:17px;letter-spacing:-.01em}
-  .wordmark span{font-size:12px;color:var(--dim)}
+/* ═══ chassis shell: header, segs, stage+frame, notes ═══ */
+header{padding:16px 16px 4px;max-width:920px;margin:0 auto}
+.hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-.035em;margin:0}
+.ptag{font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:99px;padding:2px 8px;white-space:nowrap}
+.lede{font-size:12.5px;color:var(--dim);margin:8px 0 0;line-height:1.55;max-width:68ch}
+.lede b{color:var(--ink);font-weight:600}
+.ctrls{display:flex;flex-direction:column;gap:7px;margin-left:auto;align-items:flex-end}
+.crow{display:flex;gap:7px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px}
+.seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:500;
+  color:var(--ink-3);padding:6px 12px;border-radius:99px;cursor:pointer;transition:.2s}
+.seg button[data-on="1"]{background:var(--ink);color:var(--paper)}
+#devseg button{padding:6px 10px}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
-    padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
-  .navcards{display:grid;gap:12px;grid-template-columns:1fr 1fr}
-  @media (max-width:520px){.navcards{grid-template-columns:1fr}}
-  .navcard{display:block;text-decoration:none;color:var(--ink);background:var(--card);
-    border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);transition:.15s}
-  .navcard:hover{border-color:var(--accent)}
-  .navcard .big{font-size:28px;margin-bottom:6px;display:block}
-  .navcard b{display:block;margin-bottom:3px}
-  .navcard small{color:var(--dim);line-height:1.45;display:block}
+.wrap{max-width:920px;margin:0 auto}
+.stage{display:flex;justify-content:center;padding:14px 12px 6px}
+.phone{position:relative;width:100%;max-width:392px;height:74vh;min-height:480px;max-height:800px;
+  border-radius:30px;overflow:hidden;background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow-m)}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--paper)}
+.sbar{height:34px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;font-size:12px;font-weight:600}
+.appbar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:9px 14px 10px;
+  background:var(--card);border-bottom:1px solid var(--line)}
+.appbar .alogo{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:#fff;flex:0 0 auto}
+.appbar .atxt{min-width:0}
+.appbar .atxt b{display:block;font-size:14px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .atxt small{display:block;font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .amenu{margin-left:auto;color:var(--ink-3);display:flex;flex:0 0 auto}
+.roll{position:relative;flex:1;overflow-y:auto;min-height:0;scrollbar-width:none;padding-top:12px}
+.roll::-webkit-scrollbar{display:none}
+.app[data-appfor="dial"]{padding-bottom:120px}
+.app[data-appfor="keyboard"]{padding-bottom:352px}
 
-  .task{background:var(--card);border:1px solid var(--line);border-radius:14px;
-    padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
-  .task .co{display:flex;align-items:center;gap:9px;margin-bottom:8px}
-  .task .co .logo{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
-    justify-content:center;font-size:15px;color:#fff;flex:0 0 auto}
-  .task .co small{color:var(--dim);display:block;font-size:11.5px}
-  .task label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;
-    color:var(--dim);font-weight:700;margin:10px 0 4px}
-  .task label:first-of-type{margin-top:0}
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media (max-width:460px){.two{grid-template-columns:1fr}}
-  input[type=text],textarea{width:100%;background:var(--field);border:1.5px solid var(--field-line);
-    border-radius:9px;padding:9px 11px;font:inherit;color:var(--ink);resize:vertical}
-  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
-  .flash{animation:flash .8s}
-  @keyframes flash{0%{box-shadow:0 0 0 3px var(--accent-soft);border-color:var(--accent)}100%{box-shadow:none}}
-  .pulse{animation:pulse 1s 2}
-  @keyframes pulse{50%{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}}
-  @media (prefers-reduced-motion: reduce){.flash,.pulse{animation:none}}
+/* the Fold's crease is physical — in front of every UI layer, deliberately faint */
+body.device-fold .phone{max-width:566px;height:auto;min-height:0;max-height:none;aspect-ratio:673/841;border-radius:20px}
+body.device-fold .phone::after{content:"";position:absolute;top:0;bottom:0;left:calc(50% - .5px);width:1px;
+  z-index:90;pointer-events:none;
+  background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--ink) 14%,transparent) 9%,
+    color-mix(in srgb,var(--ink) 14%,transparent) 91%,transparent)}
+body.device-tablet .phone,body.device-ipad .phone{max-width:960px;height:auto;min-height:0;max-height:none;
+  aspect-ratio:4/3;border-radius:22px}
 
-  .drop{border:1.5px dashed var(--field-line);border-radius:10px;background:var(--field);
-    min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px;
-    color:var(--dim);font-size:13px;cursor:pointer;padding:9px;transition:.15s;text-align:center}
-  .drop.armed{border-color:var(--accent);border-style:solid;background:var(--accent-soft);color:var(--ink)}
-  .drop .chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
-    border-radius:8px;padding:6px 10px;color:var(--ink);font-size:13px}
-  .drop .chip .x{color:var(--dim);cursor:pointer;padding:0 2px;font-size:15px}
+.notes{padding:10px 16px 44px;max-width:620px;margin:0 auto}
+.foot{margin-top:26px;font-size:12px;color:var(--dim);text-align:center;line-height:1.7}
+@media (min-width:900px){
+  .wrap{max-width:none;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:0 36px;padding:0 28px 28px}
+  .stage{flex:0 0 auto;padding:18px 0 0}
+  .phone{width:376px;height:768px;min-height:0;max-height:none;border-radius:42px;border:9px solid #0B0C0E}
+  body.device-fold .phone{width:560px;height:700px;aspect-ratio:auto;border-radius:26px}
+  body.device-tablet .phone,body.device-ipad .phone{width:960px;height:720px;aspect-ratio:auto;border-radius:26px}
+  .notes{flex:0 0 360px;max-width:400px;margin:0;padding:18px 0 40px}
+  .foot{text-align:left}
+}
 
-  .chatlog{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
-  .bub{max-width:82%;padding:8px 12px;border-radius:14px;font-size:13.5px;
-    background:var(--field);border:1px solid var(--line);color:var(--ink)}
-  .tips{font-size:13px}
-  .tips table{width:100%;border-collapse:collapse}
-  .tips td{padding:5px 6px;border-top:1px solid var(--line);vertical-align:top}
-  .tips td:first-child{white-space:nowrap;font-weight:600;width:42%}
-  .muted{font-size:12px;color:var(--dim)}
-  .linkbtn{background:none;border:none;color:var(--accent);cursor:pointer;font:inherit;padding:0;text-decoration:underline}
-  .filebtn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;
-    border:none;border-radius:9px;padding:9px 14px;font:inherit;font-size:13.5px;cursor:pointer}
-  .filebtn:hover{filter:brightness(1.06)}
+/* ═══ notes cards: tips, lab, prose ═══ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.tips{font-size:13px}
+.tips table{width:100%;border-collapse:collapse}
+.tips td{padding:5px 6px;border-top:1px solid var(--line);vertical-align:top;color:var(--dim)}
+.tips td:first-child{white-space:nowrap;font-weight:600;width:42%;color:var(--ink)}
+.tips td b{color:var(--ink)}
+.muted{font-size:12px;color:var(--dim)}
+.linkbtn{background:none;border:none;color:var(--accent);cursor:pointer;font:inherit;padding:0;text-decoration:underline}
+.filebtn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);
+  border:none;border-radius:12px;padding:9px 14px;font:inherit;font-size:13.5px;cursor:pointer}
+.filebtn:hover{filter:brightness(1.06)}
+.permrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:12px 15px;margin-bottom:14px;color:var(--dim);font-size:13px;cursor:pointer}
+.permrow b{margin-left:auto;color:var(--ink);font-weight:600}
+.labrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px}
+.labrow:first-of-type{margin-top:0}
+.labrow>span{font-size:12.5px;font-weight:600;flex:0 0 auto;min-width:84px}
+.dseg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:99px;padding:2px}
+.dseg button{appearance:none;border:0;background:transparent;font:inherit;font-size:11.5px;font-weight:500;
+  color:var(--dim);padding:4px 11px;border-radius:99px;cursor:pointer;transition:.2s}
+.dseg button[data-on="1"]{background:var(--ink);color:var(--paper)}
+#segStyle button{padding:4px 9px}   /* five-up row: trimmed so it fits a phone */
+.labbtns{gap:8px}
+.labbtn{appearance:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
+  background:var(--field);border:1px solid var(--line);border-radius:10px;padding:8px 13px;cursor:pointer}
+.labbtn:hover{border-color:var(--dim)}
+.labbtn.ghost{color:var(--dim);font-weight:500}
 
-  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(80px);
-    background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;border-radius:12px;
-    padding:10px 16px;font-size:13.5px;z-index:60;transition:transform .25s;max-width:88vw;text-align:center}
-  #toast.show{transform:translateX(-50%) translateY(0)}
-  @media (prefers-reduced-motion: reduce){#toast{transition:none}}
+/* ═══ in-frame app screens ═══ */
+.task{background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:14px;margin:0 14px 12px;box-shadow:var(--shadow)}
+.task .co{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.task .co .logo{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:15px;color:#fff;flex:0 0 auto}
+.task .co b{font-size:14px}
+.task .co small{color:var(--dim);display:block;font-size:11.5px}
+.task label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--dim);font-weight:700;margin:10px 0 4px}
+.task label:first-of-type{margin-top:0}
+.two{display:grid;grid-template-columns:1fr;gap:10px}
+body.device-fold .two,body.device-tablet .two,body.device-ipad .two{grid-template-columns:1fr 1fr}
+input[type=text],input[type=password],textarea{width:100%;background:var(--field);border:1px solid var(--field-line);
+  border-radius:12px;padding:9px 11px;font:inherit;color:var(--ink);resize:vertical}
+input[type=text]:focus,input[type=password]:focus,textarea:focus{outline:none;border-color:var(--accent)}
+.flash{animation:flash .8s}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent-soft);border-color:var(--accent)}100%{box-shadow:none}}
+.pulse{animation:pulse 1s 2}
+@keyframes pulse{50%{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}}
+@media (prefers-reduced-motion: reduce){.flash,.pulse{animation:none}}
+.drop{border:1.5px dashed var(--field-line);border-radius:12px;background:var(--field);
+  min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px;
+  color:var(--dim);font-size:13px;cursor:pointer;padding:9px;transition:.15s;text-align:center}
+.drop.armed{border-color:var(--accent);border-style:solid;background:var(--accent-soft);color:var(--ink)}
+.drop .chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+  border-radius:8px;padding:6px 10px;color:var(--ink);font-size:13px}
+.drop .chip .x{color:var(--dim);cursor:pointer;padding:0 2px;font-size:15px}
+.chatlog{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.bub{max-width:82%;padding:8px 12px;border-radius:14px;font-size:13.5px;
+  background:var(--field);border:1px solid var(--line);color:var(--ink)}
+/* tablet-width frames: form cards flow two-column so the dial's insert visibly
+   crosses the screen to reach a far-side field */
+body.device-tablet .app .task,body.device-ipad .app .task{columns:2;column-gap:26px}
+body.device-tablet .app .task .co,body.device-ipad .app .task .co{column-span:all}
+body.device-tablet .app .task label,body.device-ipad .app .task label{break-after:avoid;page-break-after:avoid}
+body.device-tablet .app .task input,body.device-tablet .app .task textarea,body.device-tablet .app .task .drop,
+body.device-tablet .app .task .chatlog,body.device-ipad .app .task input,body.device-ipad .app .task textarea,
+body.device-ipad .app .task .drop,body.device-ipad .app .task .chatlog{break-inside:avoid;page-break-inside:avoid}
 
-  #savechip{position:absolute;z-index:55;background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;
-    border-radius:10px;padding:7px 12px;font-size:13px;cursor:pointer;display:none;user-select:none;
-    box-shadow:0 6px 18px rgba(0,0,0,.35)}
-  #savechip b{color:#7FE0D2}
+/* ═══ in-frame transient chrome ═══ */
+#toast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+  background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;border-radius:12px;
+  padding:10px 16px;font-size:13px;z-index:60;transition:transform .25s;max-width:88%;text-align:center;width:max-content}
+#toast.show{transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion: reduce){#toast{transition:none}}
+#savechip{position:fixed;z-index:70;background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;
+  border-radius:10px;padding:7px 12px;font-size:13px;cursor:pointer;display:none;user-select:none;
+  box-shadow:0 6px 18px rgba(0,0,0,.35)}
+#savechip b{color:#8FC6FF}
+#pastechip{position:absolute;z-index:56;display:none;background:var(--ink);color:var(--paper);
+  border:1.5px solid var(--accent);border-radius:99px;padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;
+  box-shadow:var(--shadow);user-select:none;white-space:nowrap}
+/* the chip pops ONCE when it lands — in honest mode this chip IS the paste
+   step, so its arrival cannot be missable (owner dogfood, 2026-08-06) */
+#pastechip.pop{animation:chippop .5s cubic-bezier(.2,.9,.3,1.35)}
+@keyframes chippop{0%{transform:scale(.72);box-shadow:0 0 0 0 var(--accent-soft),var(--shadow)}
+  60%{transform:scale(1.08);box-shadow:0 0 0 10px transparent,var(--shadow)}
+  100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){#pastechip.pop{animation:none}}
+#receipt{position:absolute;z-index:62;left:50%;transform:translateX(-50%) translateY(6px) scale(.92);
+  background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:99px;
+  padding:9px 16px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);
+  opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;max-width:88%;overflow:hidden;text-overflow:ellipsis}
+#receipt.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+#dialpulse{position:absolute;z-index:61;width:84px;height:84px;border-radius:50%;
+  border:2.5px solid var(--c-doc);pointer-events:none;opacity:0}
+#dialpulse.go{animation:dialpulse .55s ease-out}
+@keyframes dialpulse{0%{opacity:.85;transform:scale(.55)}100%{opacity:0;transform:scale(1.55)}}
+@media (prefers-reduced-motion: reduce){#dialpulse.go{animation:none}}
+#dialsvg{position:absolute;inset:0;width:100%;height:100%;z-index:50;pointer-events:none;touch-action:none}
+body.dialing #dialsvg{pointer-events:auto}
+#dialsvg text{font-family:var(--ui)}
+.glidechip{position:absolute;z-index:51;background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;
+  border-radius:10px;padding:6px 11px;font-size:12.5px;pointer-events:none;display:none}
 
-  #dialsvg{position:fixed;inset:0;width:100%;height:100%;z-index:50;pointer-events:none;touch-action:none}
-  body.dialing #dialsvg{pointer-events:auto}
-  .glidechip{position:fixed;z-index:51;background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;
-    border-radius:10px;padding:6px 11px;font-size:12.5px;pointer-events:none;display:none}
+/* ═══ the floating preview — pill glow, filmstrip peek — inside the frame ═══
+   The thumb is the input; the top of the phone's screen is the output. The
+   pill wears a GLOW, not a bar: layered type-colour shadows at low alpha plus
+   a 1px type-colour border, cross-fading on each detent. Sensitive items glow
+   neutral ink — deliberately colourless. */
+#dialprev{position:absolute;top:42px;left:50%;transform:translateX(-50%);z-index:58;
+  width:max-content;max-width:86%;pointer-events:none;display:none;
+  --gc:var(--dim);
+  background:var(--card);border:1px solid color-mix(in srgb,var(--gc) 35%,transparent);border-radius:19px;
+  box-shadow:0 10px 30px rgba(10,14,20,.16),
+    0 0 10px color-mix(in srgb,var(--gc) 18%,transparent),
+    0 0 26px color-mix(in srgb,var(--gc) 8%,transparent);
+  transition:box-shadow .16s linear,border-color .16s linear;
+  font-family:var(--ui);overflow:hidden}
+#dialprev.gl-txt{--gc:var(--c-txt)}#dialprev.gl-lnk{--gc:var(--c-lnk)}
+#dialprev.gl-img{--gc:var(--c-img)}#dialprev.gl-sens{--gc:var(--dim)}
+@media (prefers-color-scheme: dark){#dialprev{
+  box-shadow:0 10px 30px rgba(0,0,0,.38),
+    0 0 10px color-mix(in srgb,var(--gc) 30%,transparent),
+    0 0 26px color-mix(in srgb,var(--gc) 14%,transparent)}}
+:root[data-theme="dark"] #dialprev{
+  box-shadow:0 10px 30px rgba(0,0,0,.38),
+    0 0 10px color-mix(in srgb,var(--gc) 30%,transparent),
+    0 0 26px color-mix(in srgb,var(--gc) 14%,transparent)}
+:root[data-theme="light"] #dialprev{
+  box-shadow:0 10px 30px rgba(10,14,20,.16),
+    0 0 10px color-mix(in srgb,var(--gc) 18%,transparent),
+    0 0 26px color-mix(in srgb,var(--gc) 8%,transparent)}
+#dialprev.show{display:block;animation:dpin .22s cubic-bezier(.2,.9,.3,1.18)}
+#dialprev.out{animation:dpout .18s ease-in forwards}
+@keyframes dpin{from{transform:translateX(-50%) translateY(-24px);opacity:0}
+  to{transform:translateX(-50%) translateY(0);opacity:1}}
+@keyframes dpout{to{transform:translateX(-50%) translateY(-16px);opacity:0}}
+@media (prefers-reduced-motion: reduce){
+  #dialprev.show,#dialprev.out{animation:none}
+  #dialprev.out{display:none}
+  #dialprev .dp-layer{transition:none}}
+#dialprev .dp-stack{display:grid}
+#dialprev .dp-layer{grid-area:1/1;opacity:0;transition:opacity .12s linear}
+#dialprev .dp-layer.on{opacity:1}
+.dp-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px}
+.dp-row.center{align-items:center}
+.dp-row>div{min-width:0}
+/* Peek · Neighbors: the pill becomes a three-up filmstrip — prev | FOCUSED |
+   next. Sides ride dimmed and truncated; tapping one steps a detent (springy).
+   Masked items show dots here, never values. */
+.dp-strip{display:flex;align-items:center}
+.dp-strip .dp-mid{min-width:0}
+.dp-side{flex:0 0 auto;max-width:84px;padding:10px 9px;font-size:10px;line-height:1.35;
+  color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:auto;cursor:pointer;user-select:none;-webkit-user-select:none;
+  transition:transform .16s cubic-bezier(.34,1.56,.5,1)}
+.dp-side:active{transform:scale(.9)}
+.dp-side.prev{padding-left:13px}.dp-side.next{padding-right:13px}
+.dp-text{font-size:13.5px;line-height:1.45;color:var(--ink);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.dp-text.mono{font-family:var(--mono);font-size:12.5px}
+.dp-title{font-size:13.5px;font-weight:600;line-height:1.35;color:var(--ink);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.dp-url{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.dp-thumb{width:34px;height:34px;border-radius:9px;flex:0 0 auto}
+.dp-name{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dp-caplabel{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--dim);text-transform:uppercase}
+.dp-dots{font-size:13px;letter-spacing:.16em;color:var(--ink);margin-top:1px}
 
-  /* ═══ keyboard page: the iOS surface, in the current product language ═══
-     body.on-kb remaps the old var names exactly as body.on-dial does, so the
-     page chrome retunes to the app-mockup tokens. The keyboard itself wears
-     iOS-26-flavoured chrome — a translucent blurred deck, hairline top — and
-     the vault is ONE mixed strip of app-language tiles: pins first, newest
-     after, items the focused field can't take greyed, never hidden (round 4). */
-  body.on-kb{
-    --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
-    --accent:var(--c-doc); --accent-soft:#356BA622;
-    --field:#F6F6F7; --field-line:#DFE1E5;
-    --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
-    --spring:cubic-bezier(.34,1.56,.5,1);
-    font-family:var(--ui);
-    --kb-blur:rgba(243,244,246,.78); --kb-hair:rgba(20,22,26,.12);
-    --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
-    --kb-key:#FFFFFF; --kb-key-dim:#E4E6EB; --kb-key-shadow:0 1px 0 rgba(16,20,26,.22);
-    --sys-bg:rgba(206,210,217,.92); --sys-key:#FFF; --sys-key-dim:#AEB4BE;
-    --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A;
-  }
-  @media (prefers-color-scheme: dark){body.on-kb{
-    --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
-    --accent:var(--c-doc); --accent-soft:#8FC6FF26;
-    --field:#131519; --field-line:#2E333A;
-    --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.55);
-    --kb-blur:rgba(17,19,23,.72); --kb-hair:rgba(255,255,255,.08);
-    --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
-    --kb-key:#41464F; --kb-key-dim:#2B2F36; --kb-key-shadow:0 1px 0 rgba(0,0,0,.5);
-    --sys-bg:rgba(30,31,34,.9); --sys-key:#6B6B6F; --sys-key-dim:#464649;
-    --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6;
-  }}
-  :root[data-theme="dark"] body.on-kb{
-    --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
-    --accent:var(--c-doc); --accent-soft:#8FC6FF26;
-    --field:#131519; --field-line:#2E333A;
-    --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.55);
-    --kb-blur:rgba(17,19,23,.72); --kb-hair:rgba(255,255,255,.08);
-    --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
-    --kb-key:#41464F; --kb-key-dim:#2B2F36; --kb-key-shadow:0 1px 0 rgba(0,0,0,.5);
-    --sys-bg:rgba(30,31,34,.9); --sys-key:#6B6B6F; --sys-key-dim:#464649;
-    --sys-ink:#FFF; --sys-edge:rgba(0,0,0,.85); --sys-cap:#A6ACB6;
-  }
-  :root[data-theme="light"] body.on-kb{
-    --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
-    --accent:var(--c-doc); --accent-soft:#356BA622;
-    --field:#F6F6F7; --field-line:#DFE1E5;
-    --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
-    --kb-blur:rgba(243,244,246,.78); --kb-hair:rgba(20,22,26,.12);
-    --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
-    --kb-key:#FFFFFF; --kb-key-dim:#E4E6EB; --kb-key-shadow:0 1px 0 rgba(16,20,26,.22);
-    --sys-bg:rgba(206,210,217,.92); --sys-key:#FFF; --sys-key-dim:#AEB4BE;
-    --sys-ink:#0B0C0E; --sys-edge:rgba(70,75,85,.5); --sys-cap:#4A505A;
-  }
-  [data-page="keyboard"] h1{font-family:var(--display);font-weight:800;letter-spacing:-.035em}
-  [data-page="keyboard"] h2{font-family:var(--display);font-weight:700;letter-spacing:-.02em}
-  [data-page="keyboard"] .eyebrow{color:var(--ink-3,var(--dim))}
-  body.on-kb .card,body.on-kb .task,body.on-kb .navcard{border-radius:18px}
-  body.on-kb input[type=text],body.on-kb textarea{border-radius:12px;border-width:1px}
-  body.on-kb .filebtn{background:var(--ink);color:var(--paper);border-radius:12px}
-  body.on-kb #savechip b{color:#8FC6FF}
-  [data-page="keyboard"] input[type=password]{width:100%;background:var(--field);border:1px solid var(--field-line);
-    border-radius:12px;padding:9px 11px;font:inherit;color:var(--ink)}
-  [data-page="keyboard"] input[type=password]:focus{outline:none;border-color:var(--accent)}
+/* ═══ sheets inside the frame: permission, Full Access, attach picker ═══ */
+#perm{display:none;position:absolute;inset:0;z-index:64}
+.pm-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
+.pm-sheet{position:absolute;left:0;right:0;bottom:0;
+  background:var(--card);border-top:1px solid var(--line);border-radius:22px 22px 0 0;
+  padding:10px 18px 18px;box-shadow:var(--shadow);
+  animation:pkup .22s cubic-bezier(.2,.9,.3,1.05);font-family:var(--ui)}
+.pm-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 14px}
+.pm-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+.pm-copy{font-size:13.5px;color:var(--dim);line-height:1.55;margin:0 0 12px}
+.pm-mini{display:flex;justify-content:center;background:var(--field);border:1px solid var(--line);
+  border-radius:14px;padding:12px 0;margin-bottom:14px}
+.pm-mini .arcgrp{animation:pmdial 2.6s ease-in-out infinite}
+@keyframes pmdial{0%,100%{opacity:.3}45%,65%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.pm-mini .arcgrp{animation:none;opacity:1}}
+.pm-go{display:block;width:100%;height:48px;border:none;border-radius:14px;background:var(--ink);
+  color:var(--paper);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.pm-no{display:block;width:100%;padding:13px 0 2px;border:none;background:none;color:var(--dim);
+  font:inherit;font-size:13.5px;cursor:pointer}
+#kbperm{display:none;position:absolute;inset:0;z-index:64}
+.kp-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
+.kp-sheet{position:absolute;left:0;right:0;bottom:0;
+  background:var(--card);border-top:1px solid var(--line);border-radius:22px 22px 0 0;
+  padding:10px 18px 18px;box-shadow:var(--shadow);
+  animation:pkup .22s cubic-bezier(.2,.9,.3,1.05);font-family:var(--ui)}
+.kp-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 14px}
+.kp-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+.kp-copy{font-size:13.5px;color:var(--dim);line-height:1.55;margin:0 0 12px}
+.kp-mini{display:flex;justify-content:center;background:var(--field);border:1px solid var(--line);
+  border-radius:14px;padding:12px 0;margin-bottom:14px}
+.kp-go{display:block;width:100%;height:48px;border:none;border-radius:14px;background:var(--ink);
+  color:var(--paper);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.kp-no{display:block;width:100%;padding:13px 0 2px;border:none;background:none;color:var(--dim);
+  font:inherit;font-size:13.5px;cursor:pointer}
+#picker{display:none;position:absolute;inset:0;z-index:60}
+.pk-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
+.pk-sheet{position:absolute;left:0;right:0;bottom:0;
+  background:var(--card);border-top:1px solid var(--line);
+  border-radius:18px 18px 0 0;padding:8px 14px 14px;
+  box-shadow:var(--shadow);animation:pkup .22s cubic-bezier(.2,.9,.3,1.05)}
+@keyframes pkup{from{transform:translateY(26px);opacity:0}to{transform:none;opacity:1}}
+.pk-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 12px}
+.pk-head{font-weight:700;font-size:15px;display:flex;flex-direction:column;gap:1px;margin:0 4px 8px}
+.pk-sub{font-weight:500;font-size:12px;color:var(--dim)}
+.pk-row{display:flex;align-items:center;gap:10px;padding:11px 8px;border-radius:10px;cursor:pointer}
+.pk-row:hover{background:var(--field)}
+.pk-row:active{background:var(--accent-soft)}
+.pk-badge{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--accent);
+  border:1px solid var(--accent);border-radius:6px;padding:1px 6px;flex:0 0 auto}
+.pk-name{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-empty{color:var(--dim);font-size:13px;padding:8px 6px 10px}
+.pk-cancel{text-align:center;color:var(--dim);font-size:14px;padding:12px 0 2px;cursor:pointer;
+  border-top:1px solid var(--line);margin-top:8px}
 
-  #kb{position:fixed;left:0;right:0;bottom:0;z-index:50;font-family:var(--ui);
-    background:var(--kb-blur);backdrop-filter:blur(30px) saturate(1.6);-webkit-backdrop-filter:blur(30px) saturate(1.6);
-    border-top:1px solid var(--kb-hair);
-    padding:6px 8px calc(10px + env(safe-area-inset-bottom,0px));
-    transform:translateY(105%);transition:transform .26s cubic-bezier(.2,.85,.3,1);
-    display:flex;flex-direction:column;height:332px}
-  #kb.up{transform:translateY(0)}
-  @media (prefers-reduced-motion: reduce){#kb{transition:none}}
-  .kdots{display:flex;gap:6px;justify-content:center;padding:2px 0 6px;flex:0 0 auto}
-  .kdots span{width:6px;height:6px;border-radius:50%;background:var(--kb-key-dim);cursor:pointer;transition:.15s}
-  .kdots span.on{background:var(--ink-3);width:16px;border-radius:3px}
-  .kpager{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:0}
-  .kpager::-webkit-scrollbar{display:none}
-  .kpage{position:relative;flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-height:0;padding:0 2px}
-  .ksearch{height:38px;border-radius:12px;background:var(--kb-tile);border:1px solid var(--kb-tile-line);
-    display:flex;align-items:center;padding:0 12px;gap:8px;color:var(--ink-3);font-size:13px;
-    cursor:pointer;flex:0 0 auto;margin-bottom:8px}
-  .ksearch.off{opacity:.45}
-  .ksearch .q{color:var(--ink);white-space:pre}
-  .ksearch .caret{width:2px;height:16px;border-radius:1px;background:var(--accent);animation:kblink 1s step-end infinite}
-  @keyframes kblink{50%{opacity:0}}
-  .ksearch .x{margin-left:auto;color:var(--ink-3);padding:2px 6px}
-  /* ONE mixed strip: pins first, then newest — text, links, images together.
-     Square-ish app-language tiles; .off is the greyed (never hidden) state. */
-  #kb .grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-    grid-auto-rows:104px;align-content:start;min-height:0;padding:2px 2px 8px;scrollbar-width:none}
-  #kb .grid::-webkit-scrollbar{display:none}
-  #kb .it{position:relative;background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:16px;
-    padding:10px 11px;color:var(--ink);cursor:pointer;overflow:hidden;display:flex;
-    transition:transform .18s var(--spring),opacity .15s,filter .15s}
-  #kb .it:active{transform:scale(.96)}
-  #kb .it.off{opacity:.35;filter:saturate(.15)}
-  #kb .it .pv{margin:auto 0;width:100%;font-size:11.5px;line-height:1.42;font-weight:450;word-break:break-word;
-    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-  #kb .it .pv.s1{font-size:15px;line-height:1.3;letter-spacing:-.015em;-webkit-line-clamp:3}
-  #kb .it .pv.s2{font-size:13px;line-height:1.38;letter-spacing:-.01em}
-  #kb .it .pv.code{font-family:var(--mono);font-size:10.5px}
-  #kb .it .pv.code.s1{font-size:14px}
-  #kb .it .tit{margin:auto 0;width:100%}
-  #kb .it .tit .t{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
-    font-size:11.5px;font-weight:600;line-height:1.35;word-break:break-word}
-  #kb .it .tit .d{display:block;font-size:10px;color:var(--c-lnk);font-weight:650;margin-top:3px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #kb .it.img{padding:0}
-  #kb .it.img .shot{position:absolute;inset:0}
-  #kb .it.img .cap{position:absolute;left:0;right:0;bottom:0;padding:18px 9px 8px;color:#fff;
-    font-size:10.5px;font-weight:600;letter-spacing:-.01em;background:linear-gradient(transparent,rgba(0,0,0,.62))}
-  #kb .it .pin{position:absolute;top:8px;right:8px;color:var(--ink-3);opacity:.6;display:flex}
-  #kb .it.img .pin{color:#fff;opacity:.92}
-  #kb .it .b{position:absolute;right:8px;bottom:7px;font-size:9px;font-weight:600;color:var(--accent);
-    background:var(--accent-soft);border-radius:99px;padding:2px 7px}
-  #kb .it .lock{margin:auto 0;width:100%}
-  #kb .it .lock .lab{display:block;font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
-  #kb .it .lock .dots{display:block;font-size:13px;letter-spacing:.16em;color:var(--ink);margin-top:3px}
-  #kb .kempty{grid-column:1/-1;color:var(--ink-3);font-size:12.5px;padding:14px;text-align:center}
-  .kresults{display:flex;gap:7px;overflow-x:auto;flex:0 0 52px;margin-bottom:8px;scrollbar-width:none}
-  .kresults::-webkit-scrollbar{display:none}
-  .kresults .rit{flex:0 0 auto;max-width:150px;display:flex;align-items:center;gap:7px;
-    background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:12px;padding:7px 11px;
-    font-size:11.5px;color:var(--ink);cursor:pointer;overflow:hidden}
-  .kresults .rit.off{opacity:.35;filter:saturate(.15)}
-  .kresults .rit .rp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .kresults .rit .rthumb{width:26px;height:26px;border-radius:8px;flex:0 0 auto}
-  .kresults .rnone{color:var(--ink-3);font-size:12px;padding:12px;align-self:center}
-  /* Full Access off: the keyboard still stands, the vault is honestly out of
-     reach — ghost tiles where the strip would be, one quiet enable row. */
-  .klocked{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-  .kghosts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(74%,300px)}
-  .kghosts span{aspect-ratio:1.35;border-radius:14px;border:1.5px dashed var(--kb-tile-line)}
-  .kenable{display:flex;align-items:center;gap:12px;max-width:94%;background:var(--kb-tile);
-    border:1px solid var(--kb-tile-line);border-radius:12px;padding:9px 9px 9px 13px;
-    font-size:12px;color:var(--dim);line-height:1.4}
-  .kenable button{flex:0 0 auto;appearance:none;border:none;border-radius:9px;background:var(--ink);
-    color:var(--paper);font:600 12px var(--ui);padding:8px 13px;cursor:pointer}
-  /* the exit, labelled honestly: iOS resurfaces the last-used keyboard, so the
-     globe is a promise — one tap and you're back on yours */
-  .kfoot{display:flex;align-items:center;gap:10px;flex:0 0 auto;padding:8px 2px 0;color:var(--ink-3);font-size:11px}
-  .kexit{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 15px;border-radius:12px;
-    background:var(--kb-key);border:1px solid var(--kb-tile-line);box-shadow:var(--kb-key-shadow);
-    color:var(--ink);font:600 12.5px var(--ui);cursor:pointer}
-  .kexit:active{filter:brightness(.94)}
-  .kfoot .hint{margin-left:auto;text-align:right}
-  /* quiet inline hints: the greyed-tile teach + the once-only exit teach */
-  .khint{position:absolute;left:50%;bottom:56px;transform:translateX(-50%) translateY(6px);opacity:0;
-    background:var(--card);border:1px solid var(--line);border-radius:99px;color:var(--ink);
-    font:500 12px var(--ui);padding:7px 14px;pointer-events:none;transition:.22s;white-space:nowrap;
-    max-width:94%;overflow:hidden;text-overflow:ellipsis;z-index:5;box-shadow:var(--shadow)}
-  .khint.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  @media (prefers-reduced-motion: reduce){.khint{transition:none}}
-  .krows{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:flex-end;min-height:0;padding:0 2px 2px}
-  .krow{display:flex;gap:5px}
-  .key{flex:1;height:40px;border-radius:8px;background:var(--kb-key);color:var(--ink);
-    box-shadow:var(--kb-key-shadow);display:flex;align-items:center;justify-content:center;
-    font:15.5px/1 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
-    cursor:pointer;user-select:none;-webkit-user-select:none}
-  .key:active{filter:brightness(.92)}
-  .key.dim{background:var(--kb-key-dim);font-size:13px}
-  .key.act{background:var(--ink);color:var(--paper);font-weight:600;font-size:13.5px}
-  .key.sp{flex:3.2;font-size:12.5px;color:var(--ink-3)}
-  .fillov{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;padding:10px 10px 12px;
-    background:var(--kb-blur);backdrop-filter:blur(30px) saturate(1.6);-webkit-backdrop-filter:blur(30px) saturate(1.6)}
-  .fillov .flab{font-size:11px;color:var(--ink-3);margin-bottom:6px}
-  .fprev{flex:0 0 auto;background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:12px;
-    padding:10px 12px;font-size:12.5px;color:var(--ink);margin-bottom:8px;max-height:74px;overflow-y:auto;line-height:1.5}
-  .fprev .blank{background:var(--accent-soft);border-bottom:2px solid var(--accent);color:var(--ink);
-    border-radius:3px;padding:0 3px;white-space:pre}
-  /* password truth: iOS force-switches secure fields to Apple's keyboard —
-     this mock system deck replaces ours entirely while a password is focused */
-  .syskb{position:absolute;inset:0;z-index:7;display:flex;flex-direction:column;
-    background:var(--sys-bg);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
-    padding:6px 6px calc(10px + env(safe-area-inset-bottom,0px));
-    font-family:ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif}
-  .syscap{flex:0 0 auto;text-align:center;font-size:11.5px;color:var(--sys-cap);padding:5px 14px 8px;font-family:var(--ui)}
-  .syscap.pulse{animation:syspulse .8s 2}
-  @keyframes syspulse{50%{opacity:.35}}
-  @media (prefers-reduced-motion: reduce){.syscap.pulse{animation:none}}
-  .sysrows{flex:1;display:flex;flex-direction:column;gap:7px;justify-content:flex-end}
-  .srow{display:flex;gap:5px}
-  .srow.mid{padding:0 5%}
-  .skey{flex:1;height:41px;border-radius:5.5px;background:var(--sys-key);color:var(--sys-ink);
-    box-shadow:0 1px 0 var(--sys-edge);display:flex;align-items:center;justify-content:center;
-    font-size:17px;cursor:pointer;user-select:none;-webkit-user-select:none}
-  .skey:active{filter:brightness(.9)}
-  .skey.dim{background:var(--sys-key-dim);font-size:14px}
-  .skey.w15{flex:1.6}
-  .skey.spc{flex:4.4;font-size:13px}
-  #kbfab{position:fixed;right:16px;bottom:18px;z-index:49;width:50px;height:50px;border-radius:15px;
-    background:var(--card);color:var(--ink);border:1px solid var(--line);display:flex;align-items:center;
-    justify-content:center;cursor:pointer;box-shadow:var(--shadow)}
-  /* the Full Access moment — our words before the system alert; zero-network
-     is said in the ask because it is the product's badge */
-  #kbperm{display:none;position:fixed;inset:0;z-index:64}
-  .kp-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
-  .kp-sheet{position:absolute;left:0;right:0;bottom:0;max-width:580px;margin:0 auto;
-    background:var(--card);border:1px solid var(--line);border-bottom:none;border-radius:22px 22px 0 0;
-    padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow);
-    animation:pkup .22s cubic-bezier(.2,.9,.3,1.05);font-family:var(--ui)}
-  .kp-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 14px}
-  .kp-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
-  .kp-copy{font-size:13.5px;color:var(--dim);line-height:1.55;margin:0 0 12px}
-  .kp-mini{display:flex;justify-content:center;background:var(--field);border:1px solid var(--line);
-    border-radius:14px;padding:12px 0;margin-bottom:14px}
-  .kp-go{display:block;width:100%;height:48px;border:none;border-radius:14px;background:var(--ink);
-    color:var(--paper);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
-  .kp-no{display:block;width:100%;padding:13px 0 2px;border:none;background:none;color:var(--dim);
-    font:inherit;font-size:13.5px;cursor:pointer}
-  /* Fold/Tablet frames are Android hardware and the keyboard is iOS-only:
-     those views state the platform truth (honest card, no fake demo) and the
-     dial carries retrieval there. Phone reads as the iPhone; iPad keeps the
-     full demo — the keyboard path IS the iPad story. */
-  #androidKbCard{display:none}
-  body.device-fold [data-page="keyboard"] #androidKbCard,
-  body.device-tablet [data-page="keyboard"] #androidKbCard{display:block}
-  body.device-fold [data-page="keyboard"] #kbintro,body.device-tablet [data-page="keyboard"] #kbintro,
-  body.device-fold [data-page="keyboard"] .tips,body.device-tablet [data-page="keyboard"] .tips,
-  body.device-fold [data-page="keyboard"] #kblab,body.device-tablet [data-page="keyboard"] #kblab,
-  body.device-fold [data-page="keyboard"] .task,body.device-tablet [data-page="keyboard"] .task{display:none}
-  body.device-fold #kbfab,body.device-tablet #kbfab{display:none}
+/* ═══ the keyboard deck — absolute at the frame's foot now ═══
+   iOS-26-flavoured chrome: translucent blurred deck, hairline top. The vault
+   is ONE mixed strip of app-language tiles: pins first, newest after, items
+   the focused field can't take greyed, never hidden. */
+#kb{position:absolute;left:0;right:0;bottom:0;z-index:50;font-family:var(--ui);
+  background:var(--kb-blur);backdrop-filter:blur(30px) saturate(1.6);-webkit-backdrop-filter:blur(30px) saturate(1.6);
+  border-top:1px solid var(--kb-hair);
+  padding:6px 8px 10px;
+  transform:translateY(105%);transition:transform .26s cubic-bezier(.2,.85,.3,1);
+  display:flex;flex-direction:column;height:332px}
+#kb.up{transform:translateY(0)}
+@media (prefers-reduced-motion: reduce){#kb{transition:none}}
+body.device-ipad #kb{border-radius:18px 18px 0 0;border:1px solid var(--kb-hair);border-bottom:none;overflow:hidden}
+body.device-ipad #kb .grid{grid-template-columns:repeat(5,1fr)}
+.kdots{display:flex;gap:6px;justify-content:center;padding:2px 0 6px;flex:0 0 auto}
+.kdots span{width:6px;height:6px;border-radius:50%;background:var(--kb-key-dim);cursor:pointer;transition:.15s}
+.kdots span.on{background:var(--ink-3);width:16px;border-radius:3px}
+.kpager{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:0}
+.kpager::-webkit-scrollbar{display:none}
+.kpage{position:relative;flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-height:0;padding:0 2px}
+.ksearch{height:38px;border-radius:12px;background:var(--kb-tile);border:1px solid var(--kb-tile-line);
+  display:flex;align-items:center;padding:0 12px;gap:8px;color:var(--ink-3);font-size:13px;
+  cursor:pointer;flex:0 0 auto;margin-bottom:8px}
+.ksearch.off{opacity:.45}
+.ksearch .q{color:var(--ink);white-space:pre}
+.ksearch .caret{width:2px;height:16px;border-radius:1px;background:var(--accent);animation:kblink 1s step-end infinite}
+@keyframes kblink{50%{opacity:0}}
+.ksearch .x{margin-left:auto;color:var(--ink-3);padding:2px 6px}
+#kb .grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  grid-auto-rows:104px;align-content:start;min-height:0;padding:2px 2px 8px;scrollbar-width:none}
+#kb .grid::-webkit-scrollbar{display:none}
+#kb .it{position:relative;background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:16px;
+  padding:10px 11px;color:var(--ink);cursor:pointer;overflow:hidden;display:flex;
+  transition:transform .18s var(--spring),opacity .15s,filter .15s}
+#kb .it:active{transform:scale(.96)}
+#kb .it.off{opacity:.35;filter:saturate(.15)}
+#kb .it .pv{margin:auto 0;width:100%;font-size:11.5px;line-height:1.42;font-weight:450;word-break:break-word;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+#kb .it .pv.s1{font-size:15px;line-height:1.3;letter-spacing:-.015em;-webkit-line-clamp:3}
+#kb .it .pv.s2{font-size:13px;line-height:1.38;letter-spacing:-.01em}
+#kb .it .pv.code{font-family:var(--mono);font-size:10.5px}
+#kb .it .pv.code.s1{font-size:14px}
+#kb .it .tit{margin:auto 0;width:100%}
+#kb .it .tit .t{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:11.5px;font-weight:600;line-height:1.35;word-break:break-word}
+#kb .it .tit .d{display:block;font-size:10px;color:var(--c-lnk);font-weight:650;margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#kb .it.img{padding:0}
+#kb .it.img .shot{position:absolute;inset:0}
+#kb .it.img .cap{position:absolute;left:0;right:0;bottom:0;padding:18px 9px 8px;color:#fff;
+  font-size:10.5px;font-weight:600;letter-spacing:-.01em;background:linear-gradient(transparent,rgba(0,0,0,.62))}
+#kb .it .pin{position:absolute;top:8px;right:8px;color:var(--ink-3);opacity:.6;display:flex}
+#kb .it.img .pin{color:#fff;opacity:.92}
+#kb .it .b{position:absolute;right:8px;bottom:7px;font-size:9px;font-weight:600;color:var(--accent);
+  background:var(--accent-soft);border-radius:99px;padding:2px 7px}
+#kb .it .lock{margin:auto 0;width:100%}
+#kb .it .lock .lab{display:block;font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
+#kb .it .lock .dots{display:block;font-size:13px;letter-spacing:.16em;color:var(--ink);margin-top:3px}
+#kb .kempty{grid-column:1/-1;color:var(--ink-3);font-size:12.5px;padding:14px;text-align:center}
+.kresults{display:flex;gap:7px;overflow-x:auto;flex:0 0 52px;margin-bottom:8px;scrollbar-width:none}
+.kresults::-webkit-scrollbar{display:none}
+.kresults .rit{flex:0 0 auto;max-width:150px;display:flex;align-items:center;gap:7px;
+  background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:12px;padding:7px 11px;
+  font-size:11.5px;color:var(--ink);cursor:pointer;overflow:hidden}
+.kresults .rit.off{opacity:.35;filter:saturate(.15)}
+.kresults .rit .rp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kresults .rit .rthumb{width:26px;height:26px;border-radius:8px;flex:0 0 auto}
+.kresults .rnone{color:var(--ink-3);font-size:12px;padding:12px;align-self:center}
+/* Full Access off: the keyboard still stands, the vault is honestly out of
+   reach — ghost tiles where the strip would be, one quiet enable row. */
+.klocked{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.kghosts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(74%,300px)}
+.kghosts span{aspect-ratio:1.35;border-radius:14px;border:1.5px dashed var(--kb-tile-line)}
+.kenable{display:flex;align-items:center;gap:12px;max-width:94%;background:var(--kb-tile);
+  border:1px solid var(--kb-tile-line);border-radius:12px;padding:9px 9px 9px 13px;
+  font-size:12px;color:var(--dim);line-height:1.4}
+.kenable button{flex:0 0 auto;appearance:none;border:none;border-radius:9px;background:var(--ink);
+  color:var(--paper);font:600 12px var(--ui);padding:8px 13px;cursor:pointer}
+.kfoot{display:flex;align-items:center;gap:10px;flex:0 0 auto;padding:8px 2px 0;color:var(--ink-3);font-size:11px}
+.kexit{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 15px;border-radius:12px;
+  background:var(--kb-key);border:1px solid var(--kb-tile-line);box-shadow:var(--kb-key-shadow);
+  color:var(--ink);font:600 12.5px var(--ui);cursor:pointer}
+.kexit:active{filter:brightness(.94)}
+.kfoot .hint{margin-left:auto;text-align:right}
+.khint{position:absolute;left:50%;bottom:56px;transform:translateX(-50%) translateY(6px);opacity:0;
+  background:var(--card);border:1px solid var(--line);border-radius:99px;color:var(--ink);
+  font:500 12px var(--ui);padding:7px 14px;pointer-events:none;transition:.22s;white-space:nowrap;
+  max-width:94%;overflow:hidden;text-overflow:ellipsis;z-index:5;box-shadow:var(--shadow)}
+.khint.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion: reduce){.khint{transition:none}}
+.krows{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:flex-end;min-height:0;padding:0 2px 2px}
+.krow{display:flex;gap:5px}
+.key{flex:1;height:40px;border-radius:8px;background:var(--kb-key);color:var(--ink);
+  box-shadow:var(--kb-key-shadow);display:flex;align-items:center;justify-content:center;
+  font:15.5px/1 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
+  cursor:pointer;user-select:none;-webkit-user-select:none}
+.key:active{filter:brightness(.92)}
+.key.dim{background:var(--kb-key-dim);font-size:13px}
+.key.act{background:var(--ink);color:var(--paper);font-weight:600;font-size:13.5px}
+.key.sp{flex:3.2;font-size:12.5px;color:var(--ink-3)}
+.fillov{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;padding:10px 10px 12px;
+  background:var(--kb-blur);backdrop-filter:blur(30px) saturate(1.6);-webkit-backdrop-filter:blur(30px) saturate(1.6)}
+.fillov .flab{font-size:11px;color:var(--ink-3);margin-bottom:6px}
+.fprev{flex:0 0 auto;background:var(--kb-tile);border:1px solid var(--kb-tile-line);border-radius:12px;
+  padding:10px 12px;font-size:12.5px;color:var(--ink);margin-bottom:8px;max-height:74px;overflow-y:auto;line-height:1.5}
+.fprev .blank{background:var(--accent-soft);border-bottom:2px solid var(--accent);color:var(--ink);
+  border-radius:3px;padding:0 3px;white-space:pre}
+/* password truth: iOS force-switches secure fields to Apple's keyboard —
+   this mock system deck replaces ours entirely while a password is focused */
+.syskb{position:absolute;inset:0;z-index:7;display:flex;flex-direction:column;
+  background:var(--sys-bg);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+  padding:6px 6px 10px;
+  font-family:ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif}
+.syscap{flex:0 0 auto;text-align:center;font-size:11.5px;color:var(--sys-cap);padding:5px 14px 8px;font-family:var(--ui)}
+.syscap.pulse{animation:syspulse .8s 2}
+@keyframes syspulse{50%{opacity:.35}}
+@media (prefers-reduced-motion: reduce){.syscap.pulse{animation:none}}
+.sysrows{flex:1;display:flex;flex-direction:column;gap:7px;justify-content:flex-end}
+.srow{display:flex;gap:5px}
+.srow.mid{padding:0 5%}
+.skey{flex:1;height:41px;border-radius:5.5px;background:var(--sys-key);color:var(--sys-ink);
+  box-shadow:0 1px 0 var(--sys-edge);display:flex;align-items:center;justify-content:center;
+  font-size:17px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.skey:active{filter:brightness(.9)}
+.skey.dim{background:var(--sys-key-dim);font-size:14px}
+.skey.w15{flex:1.6}
+.skey.spc{flex:4.4;font-size:13px}
+#kbfab{position:absolute;right:14px;bottom:16px;z-index:49;width:50px;height:50px;border-radius:15px;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;box-shadow:var(--shadow)}
 
-  /* attach picker — the File-Provider sheet: Reel appearing as a source inside a host app */
-  #picker{display:none;position:fixed;inset:0;z-index:60}
-  .pk-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
-  .pk-sheet{position:absolute;left:0;right:0;bottom:0;max-width:580px;margin:0 auto;
-    background:var(--card);border:1px solid var(--line);border-bottom:none;
-    border-radius:18px 18px 0 0;padding:8px 14px calc(14px + env(safe-area-inset-bottom,0px));
-    box-shadow:var(--shadow);animation:pkup .22s cubic-bezier(.2,.9,.3,1.05)}
-  @keyframes pkup{from{transform:translateY(26px);opacity:0}to{transform:none;opacity:1}}
-  .pk-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 12px}
-  .pk-head{font-weight:700;font-size:15px;display:flex;flex-direction:column;gap:1px;margin:0 4px 8px}
-  .pk-sub{font-weight:500;font-size:12px;color:var(--dim)}
-  .pk-row{display:flex;align-items:center;gap:10px;padding:11px 8px;border-radius:10px;cursor:pointer}
-  .pk-row:hover{background:var(--field)}
-  .pk-row:active{background:var(--accent-soft)}
-  .pk-badge{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--accent);
-    border:1px solid var(--accent);border-radius:6px;padding:1px 6px;flex:0 0 auto}
-  .pk-name{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .pk-empty{color:var(--dim);font-size:13px;padding:8px 6px 10px}
-  .pk-cancel{text-align:center;color:var(--dim);font-size:14px;padding:12px 0 2px;cursor:pointer;
-    border-top:1px solid var(--line);margin-top:8px}
+/* ═══ platform truth per device view ═══
+   Fold/Tablet frames are Android hardware and the keyboard is iOS-only: on the
+   keyboard page those views hide the frame and state the truth (honest card,
+   no fake demo). iPad has no overlay API, so the dial page does the same in
+   mirror: honest card, no frame. Phone reads as both; iPad keeps the full
+   keyboard demo — that path IS the iPad story. */
+#androidKbCard{display:none}
+body.device-fold [data-page="keyboard"] #androidKbCard,
+body.device-tablet [data-page="keyboard"] #androidKbCard{display:block}
+body.device-fold [data-page="keyboard"] #kbintro,body.device-tablet [data-page="keyboard"] #kbintro,
+body.device-fold [data-page="keyboard"] .tips,body.device-tablet [data-page="keyboard"] .tips,
+body.device-fold [data-page="keyboard"] #kblab,body.device-tablet [data-page="keyboard"] #kblab{display:none}
+body.on-kb.device-fold .stage,body.on-kb.device-tablet .stage{display:none}
+body.device-fold #kbfab,body.device-tablet #kbfab{display:none}
+body.device-ipad [data-page="dial"] .pintro,
+body.device-ipad [data-page="dial"] .tips,
+body.device-ipad [data-page="dial"] #diallab,
+body.device-ipad [data-page="dial"] .permrow,
+body.device-ipad [data-page="dial"] #makeyours{display:none}
+body.on-dial.device-ipad .stage{display:none}
 
-  /* ═══ device form-factor views ═══
-     Header seg (visually matched to app-mockup.html's pill segs) sets one body
-     class — device-phone/fold/tablet/ipad. Phone adds no overrides at all:
-     today's view, untouched. Frame widths stand in for dp: Fold inner 673
-     (MEDIUM per docs/design-decisions.md — not a tablet), tablet/iPad 1024. */
-  .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px;margin-left:auto}
-  .seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;
-    color:var(--dim);padding:5px 11px;border-radius:99px;cursor:pointer;transition:.2s}
-  .seg button[data-on="1"]{background:var(--ink);color:var(--paper)}
-
-  #devframe{display:none;position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);
-    pointer-events:none;z-index:44;border-left:1px solid var(--line);border-right:1px solid var(--line)}
-  body.device-fold #devframe{display:block;width:min(673px,100vw)}
-  body.device-tablet #devframe,body.device-ipad #devframe{display:block;width:min(1024px,100vw)}
-  /* the Fold's crease is physical — in front of every UI layer, deliberately faint */
-  #hinge{display:none;position:fixed;top:0;bottom:0;left:50%;width:10px;transform:translateX(-50%);
-    pointer-events:none;z-index:90;background:
-    linear-gradient(90deg,transparent,rgba(128,138,150,.14) 50%,transparent),
-    linear-gradient(90deg,transparent calc(50% - 1px),rgba(128,138,150,.38) 50%,transparent calc(50% + 1px))}
-  body.device-fold #hinge{display:block}
-
-  /* iPad: the keyboard deck spans the 1024 frame with rounded shoulders and
-     five tiles across (expanded class per the app's grid rule). Fold/Tablet
-     get no deck at all — Android hardware is dial territory; the honest card
-     on the keyboard page replaces the demo there (rules live with the
-     keyboard CSS above). */
-  body.device-ipad #kb{left:50%;right:auto;width:min(1024px,100vw);transform:translateX(-50%) translateY(105%);
-    border-radius:18px 18px 0 0;border:1px solid var(--kb-hair);border-bottom:none;overflow:hidden}
-  body.device-ipad #kb.up{transform:translateX(-50%) translateY(0)}
-  body.device-ipad #kb .grid{grid-template-columns:repeat(5,1fr)}
-
-  /* Tablet landscape (~1024): Android frame — no keyboard deck (see above).
-     Form cards still flow two-column so the dial's insert visibly crosses the
-     screen to reach a far-side field. */
-  body.device-ipad #kbfab{right:max(16px,calc(50vw - 496px))}
-  body.device-tablet main,body.device-ipad main{max-width:952px}
-  body.device-tablet .task,body.device-ipad .task{columns:2;column-gap:30px}
-  body.device-tablet .task .co,body.device-ipad .task .co{column-span:all}
-  body.device-tablet .task label,body.device-ipad .task label{break-after:avoid;page-break-after:avoid}
-  body.device-tablet .task input,body.device-tablet .task textarea,body.device-tablet .task .drop,
-  body.device-tablet .task .chatlog,body.device-ipad .task input,body.device-ipad .task textarea,
-  body.device-ipad .task .drop,body.device-ipad .task .chatlog{break-inside:avoid;page-break-inside:avoid}
-
-  /* iPad: keyboard path only — the deck's iOS chrome (blur, radii) is its base
-     coat on every frame now. The dial page swaps its demo for the honest
-     no-overlay card (#ipadDialCard). */
-  body.device-ipad .card,body.device-ipad .task,body.device-ipad .navcard{border-radius:18px}
-  body.device-ipad [data-page="dial"] h1 + p,
-  body.device-ipad [data-page="dial"] .tips,
-  body.device-ipad [data-page="dial"] #diallab,
-  body.device-ipad [data-page="dial"] .permrow,
-  body.device-ipad [data-page="dial"] .task{display:none}
-
-  /* ═══ dial page in the current language ═══ */
-  [data-page="dial"] h1{font-family:var(--display);font-weight:800;letter-spacing:-.035em}
-  [data-page="dial"] h2{font-family:var(--display);font-weight:700;letter-spacing:-.02em}
-  [data-page="dial"] .eyebrow{color:var(--ink-3,var(--dim))}
-  body.on-dial .card,body.on-dial .task,body.on-dial .navcard{border-radius:22px}
-  body.on-dial input[type=text],body.on-dial textarea{border-radius:12px;border-width:1px}
-  body.on-dial .filebtn{background:var(--ink);color:var(--paper);border-radius:12px}
-  body.on-dial #savechip b{color:#8FC6FF}
-  #dialsvg text{font-family:var(--ui)}
-  .labrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px}
-  .labrow:first-of-type{margin-top:0}
-  .labrow>span{font-size:12.5px;font-weight:600;flex:0 0 auto;min-width:84px}
-  .dseg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:99px;padding:2px}
-  .dseg button{appearance:none;border:0;background:transparent;font:inherit;font-size:11.5px;font-weight:500;
-    color:var(--dim);padding:4px 11px;border-radius:99px;cursor:pointer;transition:.2s}
-  .dseg button[data-on="1"]{background:var(--ink);color:var(--paper)}
-  #segStyle button{padding:4px 9px}   /* five-up row: trimmed so it fits a phone */
-  .labbtns{gap:8px}
-  .stage{appearance:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
-    background:var(--field);border:1px solid var(--line);border-radius:10px;padding:8px 13px;cursor:pointer}
-  .stage:hover{border-color:var(--dim)}
-  .stage.ghost{color:var(--dim);font-weight:500}
-  .permrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
-    border-radius:14px;padding:12px 15px;margin-bottom:14px;color:var(--dim);font-size:13px;cursor:pointer}
-  .permrow b{margin-left:auto;color:var(--ink);font-weight:600}
-  #receipt{position:fixed;z-index:62;left:50%;transform:translateX(-50%) translateY(6px) scale(.92);
-    background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:99px;
-    padding:9px 16px;font-family:var(--ui);font-size:12.5px;font-weight:600;box-shadow:var(--shadow);
-    opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
-  #receipt.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
-  #pastechip{position:absolute;z-index:56;display:none;background:var(--ink);color:var(--paper);
-    border:1.5px solid var(--accent);border-radius:99px;padding:8px 14px;font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer;
-    box-shadow:var(--shadow);user-select:none;white-space:nowrap}
-  /* the chip pops ONCE when it lands — in honest mode this chip IS the paste
-     step, so its arrival cannot be missable (owner dogfood, 2026-08-06) */
-  #pastechip.pop{animation:chippop .5s cubic-bezier(.2,.9,.3,1.35)}
-  @keyframes chippop{0%{transform:scale(.72);box-shadow:0 0 0 0 var(--accent-soft),var(--shadow)}
-    60%{transform:scale(1.08);box-shadow:0 0 0 10px transparent,var(--shadow)}
-    100%{transform:scale(1)}}
-  @media (prefers-reduced-motion: reduce){#pastechip.pop{animation:none}}
-  #dialpulse{position:fixed;z-index:61;width:84px;height:84px;border-radius:50%;
-    border:2.5px solid var(--c-doc);pointer-events:none;opacity:0}
-  #dialpulse.go{animation:dialpulse .55s ease-out}
-  @keyframes dialpulse{0%{opacity:.85;transform:scale(.55)}100%{opacity:0;transform:scale(1.55)}}
-  @media (prefers-reduced-motion: reduce){#dialpulse.go{animation:none}}
-  /* ═══ floating preview (owner idea, 2026-08-05) ═══
-     The thumb is the input; the top of the screen is the output. The dial spins
-     under the hand and the thing that WOULD be pasted reads up here — Dynamic
-     Island placement, but Android has none, so it floats. Solid surface on
-     purpose: legibility over whatever app is underneath beats translucency. */
-  /* the pill wears a GLOW, not a bar (owner ruling, 2026-08-06): type identity
-     is an ambient aura — layered type-colour shadows at low alpha plus a 1px
-     type-colour border at ~.35 — cross-fading with the content on each detent.
-     Sensitive items glow neutral ink: deliberately colourless. */
-  #dialprev{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:58;
-    width:max-content;max-width:86vw;pointer-events:none;display:none;
-    --gc:var(--dim);
-    background:var(--card);border:1px solid color-mix(in srgb,var(--gc) 35%,transparent);border-radius:19px;
-    box-shadow:0 10px 30px rgba(10,14,20,.16),
-      0 0 10px color-mix(in srgb,var(--gc) 18%,transparent),
-      0 0 26px color-mix(in srgb,var(--gc) 8%,transparent);
-    transition:box-shadow .16s linear,border-color .16s linear;
-    font-family:var(--ui);overflow:hidden}
-  #dialprev.gl-txt{--gc:var(--c-txt)}#dialprev.gl-lnk{--gc:var(--c-lnk)}
-  #dialprev.gl-img{--gc:var(--c-img)}#dialprev.gl-sens{--gc:var(--dim)}
-  @media (prefers-color-scheme: dark){#dialprev{
-    box-shadow:0 10px 30px rgba(0,0,0,.38),
-      0 0 10px color-mix(in srgb,var(--gc) 30%,transparent),
-      0 0 26px color-mix(in srgb,var(--gc) 14%,transparent)}}
-  :root[data-theme="dark"] #dialprev{
-    box-shadow:0 10px 30px rgba(0,0,0,.38),
-      0 0 10px color-mix(in srgb,var(--gc) 30%,transparent),
-      0 0 26px color-mix(in srgb,var(--gc) 14%,transparent)}
-  :root[data-theme="light"] #dialprev{
-    box-shadow:0 10px 30px rgba(10,14,20,.16),
-      0 0 10px color-mix(in srgb,var(--gc) 18%,transparent),
-      0 0 26px color-mix(in srgb,var(--gc) 8%,transparent)}
-  body.device-fold #dialprev{max-width:min(579px,86vw)}    /* 86% of the 673 frame */
-  body.device-tablet #dialprev{max-width:min(560px,86vw)}  /* top-centred, never dial-hugging */
-  #dialprev.show{display:block;animation:dpin .22s cubic-bezier(.2,.9,.3,1.18)}
-  #dialprev.out{animation:dpout .18s ease-in forwards}
-  @keyframes dpin{from{transform:translateX(-50%) translateY(-24px);opacity:0}
-    to{transform:translateX(-50%) translateY(0);opacity:1}}
-  @keyframes dpout{to{transform:translateX(-50%) translateY(-16px);opacity:0}}
-  @media (prefers-reduced-motion: reduce){
-    #dialprev.show,#dialprev.out{animation:none}
-    #dialprev.out{display:none}
-    #dialprev .dp-layer{transition:none}}
-  #dialprev .dp-stack{display:grid}
-  #dialprev .dp-layer{grid-area:1/1;opacity:0;transition:opacity .12s linear}
-  #dialprev .dp-layer.on{opacity:1}
-  .dp-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px}
-  .dp-row.center{align-items:center}
-  .dp-row>div{min-width:0}
-  /* Peek · Neighbors: the pill becomes a three-up filmstrip — prev | FOCUSED |
-     next. Sides ride at ~72% scale, heavy-dimmed, truncated hard; tapping one
-     steps a detent (springy). Masked items show dots here, never values. */
-  .dp-strip{display:flex;align-items:center}
-  .dp-strip .dp-mid{min-width:0}
-  .dp-side{flex:0 0 auto;max-width:84px;padding:10px 9px;font-size:10px;line-height:1.35;
-    color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    pointer-events:auto;cursor:pointer;user-select:none;-webkit-user-select:none;
-    transition:transform .16s cubic-bezier(.34,1.56,.5,1)}
-  .dp-side:active{transform:scale(.9)}
-  .dp-side.prev{padding-left:13px}.dp-side.next{padding-right:13px}
-  .dp-text{font-size:13.5px;line-height:1.45;color:var(--ink);
-    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-  .dp-text.mono{font-family:var(--mono);font-size:12.5px}
-  .dp-title{font-size:13.5px;font-weight:600;line-height:1.35;color:var(--ink);
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-  .dp-url{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-  .dp-thumb{width:34px;height:34px;border-radius:9px;flex:0 0 auto}
-  .dp-name{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .dp-caplabel{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--dim);text-transform:uppercase}
-  .dp-dots{font-size:13px;letter-spacing:.16em;color:var(--ink);margin-top:1px}
-  /* permission moment — a sheet, not a cold interrupt */
-  #perm{display:none;position:fixed;inset:0;z-index:64}
-  .pm-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
-  .pm-sheet{position:absolute;left:0;right:0;bottom:0;max-width:580px;margin:0 auto;
-    background:var(--card);border:1px solid var(--line);border-bottom:none;border-radius:22px 22px 0 0;
-    padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow);
-    animation:pkup .22s cubic-bezier(.2,.9,.3,1.05);font-family:var(--ui)}
-  .pm-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 14px}
-  .pm-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
-  .pm-copy{font-size:13.5px;color:var(--dim);line-height:1.55;margin:0 0 12px}
-  .pm-mini{display:flex;justify-content:center;background:var(--field);border:1px solid var(--line);
-    border-radius:14px;padding:12px 0;margin-bottom:14px}
-  .pm-mini .arcgrp{animation:pmdial 2.6s ease-in-out infinite}
-  @keyframes pmdial{0%,100%{opacity:.3}45%,65%{opacity:1}}
-  @media (prefers-reduced-motion: reduce){.pm-mini .arcgrp{animation:none;opacity:1}}
-  .pm-go{display:block;width:100%;height:48px;border:none;border-radius:14px;background:var(--ink);
-    color:var(--paper);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
-  .pm-no{display:block;width:100%;padding:13px 0 2px;border:none;background:none;color:var(--dim);
-    font:inherit;font-size:13.5px;cursor:pointer}
-
-  [hidden]{display:none !important}
-  footer{margin-top:26px;font-size:12px;color:var(--dim);text-align:center;line-height:1.7}
-  button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none !important}
+button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
+</head>
+<body class="on-dial device-phone">
 
-<main>
-  <div class="wordmark"><div class="knob"></div><div><b>reel</b> <span>· prototype</span></div>
-    <!-- Phone | Fold | Tablet | iPad. No Flip view on purpose: the extensions need an
-         open screen (the dial floats over one) and a keyboard (something to type with) —
-         a closed Flip has neither, and faking a cover-screen dial would claim support
-         the platform can't deliver. The Flip story lives in the app mockup, not here. -->
-    <div class="seg" id="devseg" aria-label="Device"></div></div>
-
-  <!-- ============ HOME ============ -->
-  <section data-page="home">
-    <div class="eyebrow">A 3-minute test</div>
-    <h1>Job applications ask for the same seven things. Every. Single. Time.</h1>
-    <p>Name, email, portfolio link, "why us?", resume, headshot, phone. Reel is a phone app that keeps everything you reuse one gesture away — inside whatever app you're filling. This page fakes two job applications so you can feel it.</p>
-    <div class="navcards">
-      <a class="navcard" href="#dial"><span class="big"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M21 12h-3"/></svg></span><b>The dial</b><small>A control docked to the screen edge — the Android experience. One-finger gestures, clicks you can feel.</small></a>
-      <a class="navcard" href="#keyboard"><span class="big"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2.6" y="6.4" width="18.8" height="11.2" rx="2.4"/><path d="M6.4 10h.01M9.8 10h.01M13.2 10h.01M16.6 10h.01M6.4 13.4h.01M9.8 13.4h.01M13.2 13.4h.01M16.6 13.4h.01M9 16.4h6"/></svg></span><b>The keyboard</b><small>Your stuff inside the keyboard — the iPhone experience. Search and tap.</small></a>
+<header>
+  <div class="hrow">
+    <h1 class="pt">Reel</h1><span class="ptag">extensions prototype</span>
+    <div class="ctrls">
+      <div class="crow"><div class="seg" id="pageseg" aria-label="Page"></div><div class="seg" id="themeseg" aria-label="Theme"></div></div>
+      <div class="crow"><div class="seg" id="devseg" aria-label="Device"></div></div>
     </div>
-    <div class="card" style="margin-top:14px">
-      <h2>Before you start</h2>
-      <p style="margin-bottom:6px">The vault comes preloaded as <b>Alex Rivera</b>, a demo applicant. Anything you add stays in <b>this browser only</b> — nothing uploads, nothing leaves your device.</p>
-      <p style="margin-bottom:0">The real product inserts into <i>other apps</i> — Safari forms, Gmail, LinkedIn. A webpage can't reach outside itself, so judge the speed and the feel here, not the reach. <button class="linkbtn" id="resetbtn">Reset demo data</button></p>
-    </div>
-  </section>
+  </div>
+  <p class="lede">Both extensions on simulated glass. The phone below is inside some other app — a job form, a recruiter thread — and Reel rides over it: the <b>dial</b> on Android, the <b>keyboard</b> on iOS. The vault comes preloaded as <b>Alex Rivera</b>, a demo applicant; anything you add stays in <b>this browser only</b>. A webpage can't reach into real apps, so judge the speed and the feel here, not the reach.</p>
+</header>
 
-  <!-- ============ DIAL PAGE ============ -->
-  <section data-page="dial" hidden>
-    <div class="eyebrow">Test 1 · the dial</div>
-    <h1>Apply to Northbeam using only the dial →</h1>
-    <p style="margin:-2px 0 10px">The round button on the screen edge is Reel. It floats over whatever you're doing — fill the form below without ever leaving it.</p>
+<div class="wrap">
+<div class="stage" id="stage">
+ <div class="phone" id="phone">
+  <div class="scr" id="scr">
+    <div class="sbar"><span>9:41</span><span>5G</span></div>
+    <div class="appbar" data-appbar="dial">
+      <span class="alogo" style="background:#31589E">N</span>
+      <div class="atxt"><b>Northbeam Careers</b><small>Product Design Intern · Application</small></div>
+      <span class="amenu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5.6h.01M12 12h.01M12 18.4h.01"/></svg></span>
+    </div>
+    <div class="appbar" data-appbar="keyboard" hidden>
+      <span class="alogo" style="background:#B0632F">F</span>
+      <div class="atxt"><b>Fielder &amp; Co</b><small>Junior Product Designer · Quick apply</small></div>
+      <span class="amenu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5.6h.01M12 12h.01M12 18.4h.01"/></svg></span>
+    </div>
+    <div class="roll" id="roll">
+      <!-- ============ DIAL ERRAND: the jobs-app screen + the day's other stops ============ -->
+      <div class="app" data-appfor="dial">
+        <div class="task">
+          <div class="two">
+            <div><label>Full name</label><input type="text" placeholder="Full name — it's on the dial"></div>
+            <div><label>Phone</label><input type="text" placeholder="Phone — on the dial"></div>
+          </div>
+          <label>Email</label><input type="text" placeholder="Email — it's pinned on the dial">
+          <label>Portfolio URL</label><input type="text" placeholder="Portfolio — the link is on the dial">
+          <label>Why Northbeam?</label><textarea rows="3" placeholder="There's an opener for this on the dial…"></textarea>
+          <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
+          <label>Headshot — optional (image)</label><div class="drop" data-accept="img" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/></svg> Tap to attach — Reel shows up as a source</div>
+        </div>
+        <div class="task">
+          <div class="co"><div class="logo" style="background:#7A4BC9">R</div>
+            <div><b>Riya · Northbeam recruiting</b><small>replied 2m ago</small></div></div>
+          <div class="chatlog">
+            <div class="bub">Strong application, Alex! Can you send your LinkedIn and a couple of times to talk this week?</div>
+          </div>
+          <label>Reply</label><input type="text" placeholder="The dial has both of those…">
+        </div>
+        <div class="task">
+          <div class="co"><div class="logo" style="background:#3E7C4F">W</div>
+            <div><b>Guests at the door</b><small>via text</small></div></div>
+          <div class="chatlog"><div class="bub">we're outside!! what's the wifi??</div></div>
+          <label>Reply</label><input type="text" placeholder="Wifi password — on the dial">
+        </div>
+        <div class="task">
+          <div class="co"><div class="logo" style="background:#8A5A2B">B</div>
+            <div><b>Split the deposit</b><small>bank transfer form</small></div></div>
+          <label>Recipient IBAN</label><input type="text" placeholder="IBAN — masked on the ring">
+          <label>Reference</label><input type="text" placeholder="e.g. Maple Grove deposit">
+        </div>
+      </div>
+      <!-- ============ KEYBOARD ERRAND: the second application, on the iPhone ============ -->
+      <div class="app" data-appfor="keyboard" hidden>
+        <div class="task">
+          <div class="two">
+            <div><label>Full name</label><input type="text" placeholder="Same name, again…"></div>
+            <div><label>Email</label><input type="text" placeholder="Same email, again…"></div>
+          </div>
+          <label>Create a password</label><input type="password" placeholder="Quick apply wants an account, of course">
+          <label>Tell us about something you shipped</label><textarea rows="3" placeholder="Saved a line on the dial page? It's in the strip."></textarea>
+          <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
+        </div>
+        <div class="task">
+          <div class="co"><div class="logo" style="background:#2E7D6B">M</div>
+            <div><b>Marcus · Fielder talent</b><small>via DM</small></div></div>
+          <div class="chatlog">
+            <div class="bub">hey! before the call — portfolio link + best phone number?</div>
+          </div>
+          <label>Reply</label><input type="text" placeholder="Two items, one keyboard…">
+        </div>
+        <div class="task">
+          <div class="co"><div class="logo" style="background:#5A4FB3">S</div>
+            <div><b>Set up the call</b><small>Riya · scheduling</small></div></div>
+          <div class="chatlog"><div class="bub">what times work for you this week?</div></div>
+          <label>Reply</label><input type="text" placeholder="Search 'ava' — or scroll, it's all one strip"></div>
+      </div>
+      <div id="pastechip" role="button"></div>
+    </div>
+    <svg id="dialsvg" aria-hidden="true"></svg>
+    <div class="glidechip" id="glidechip">release to paste</div>
+    <div id="dialprev" aria-hidden="true"><div class="dp-stack"><div class="dp-layer on"></div><div class="dp-layer"></div></div></div>
+    <div id="dialpulse" aria-hidden="true"></div>
+    <div id="receipt" role="status"></div>
+    <button id="kbfab" hidden aria-label="Open vault keyboard"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.6" y="6.4" width="18.8" height="11.2" rx="2.4"/><path d="M6.4 10h.01M9.8 10h.01M13.2 10h.01M16.6 10h.01M9 13.8h6"/></svg></button>
+    <div id="kb" aria-label="Vault keyboard">
+      <div class="kdots" id="kdots"><span class="on"></span><span></span></div>
+      <div class="kpager" id="kpager">
+        <div class="kpage" id="kpageVault">
+          <div class="ksearch" id="ksearch"></div>
+          <div class="grid" id="kbgrid"></div>
+          <div class="klocked" id="klocked" style="display:none">
+            <div class="kghosts" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="kenable"><span>Full Access is off — the vault can't reach this keyboard.</span>
+              <button type="button" id="kballow">Allow</button></div>
+          </div>
+          <div class="kresults" id="kresults" style="display:none"></div>
+          <div class="krows" id="ksrows" style="display:none"></div>
+          <div class="kfoot" id="kfootV">
+            <button class="kexit" type="button" aria-label="Back to your keyboard"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/></svg> back to your keyboard</button>
+            <span class="hint">swipe left for keys →</span>
+          </div>
+          <div class="khint" id="khint" role="status"></div>
+        </div>
+        <div class="kpage" id="kpageKeys">
+          <div class="krows" id="ktyperows"></div>
+        </div>
+      </div>
+      <div class="fillov" id="fillov" style="display:none"></div>
+      <div class="syskb" id="syskb" style="display:none" aria-label="System keyboard"></div>
+    </div>
+    <div id="toast" role="status"></div>
+    <div id="picker"></div>
+    <div id="perm"></div>
+    <div id="kbperm"></div>
+  </div>
+ </div>
+</div>
+
+<aside class="notes" id="notes">
+  <!-- ============ DIAL NOTES ============ -->
+  <section data-page="dial">
+    <div class="eyebrow">Test 1 · the dial · Android</div>
+    <h2 class="lead" id="dialLead">Apply to Northbeam using only the dial</h2>
+    <p class="pintro">The phone is inside Northbeam's careers app. The round button on its edge is Reel — it floats over whatever app you're in. Fill the whole application without ever leaving the form.</p>
     <!-- iPad only: iOS has no overlay API — no AccessibilityService, no
          SYSTEM_ALERT_WINDOW equivalent — so a floating dial cannot exist there.
-         This card replaces the dial demo. A statement, not an apology; link nothing. -->
+         This card replaces the frame and the demo. A statement, not an apology. -->
     <div class="card" id="ipadDialCard" hidden>
       <p style="margin:0">No overlays on iOS — the dial is Android's. On iPad the vault rides the keyboard, the share sheet, and the Files app instead.</p>
     </div>
     <div class="card tips">
       <h2>The moves</h2>
       <table>
-        <tr><td>Tap the round button</td><td>Opens and stays. Copied something just before? The dial catches it — or offers to, depending on the catch switch below. Spin the ring: it steps one item at a time and settles; the item at the <b>index mark</b> is up. Tap it — copied, receipt, and the box you were in grows a <b>Paste</b> chip: tap that and the job is done. Tap the glass centre to put the dial away.</td></tr>
+        <tr><td>Tap the round button</td><td>Opens and stays. Copied something just before? The dial catches it — or offers to, depending on the catch switch below. Spin the ring: it steps one item at a time and settles — a fast flick carries a few extra clicks; the item at the <b>index mark</b> is up. Tap it — copied, receipt, and the box you were in grows a <b>Paste</b> chip: tap that and the job is done. Tap the glass centre to put the dial away.</td></tr>
         <tr><td>One ring, everything on it</td><td>Your two <b>pinned items hold the edge slots</b> — same place forever, tap to use — and everything else follows, <b>newest first</b>, all types together. Colour says the type: <b style="color:var(--c-txt)">amber</b> is text, <b style="color:var(--c-lnk)">rust</b> is a link, <b style="color:var(--c-img)">violet</b> is an image.</td></tr>
         <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button and slide <b>out</b> onto the ring, then arc your finger to spin it. Release on an item to take it and put the dial away.</td></tr>
-        <tr><td>Hold · drag</td><td>Drag the button anywhere and let go — it <b>clings to the nearest edge, at the height you left it</b>, and stays there.</td></tr>
+        <tr><td>Hold · drag</td><td>Drag the button anywhere and let go — it <b>clings to the nearest frame edge, at the height you left it</b>, and stays there.</td></tr>
         <tr><td>Double-tap the button</td><td>Your most recent item, instantly. No dial.</td></tr>
-        <tr><td>Slow-cycle</td><td>Hold a finger on any off-center item and the ring <b>cycles slowly</b> until you let go.</td></tr>
+        <tr><td>Hold — it comes to you</td><td><b>Hold, and the ring comes to you.</b> Hold an off-center item and the ring walks it to the index mark, then stops. Hold either <b>end of the arc</b> — or drag past it and stay — and the ring keeps cruising from that end, gathering speed, until you let go.</td></tr>
       </table>
       <p class="muted" style="margin:8px 0 0">The switches below — <b>Catch style</b>, <b>Egress</b>, <b>Preview</b> and <b>Peek</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
-      <p class="muted" style="margin:6px 0 0"><b>Preview</b>: what's up shows at the top of the screen, so your eyes can stay up there while your thumb spins down here.</p>
+      <p class="muted" style="margin:6px 0 0"><b>Preview</b>: what's up shows at the top of the phone's screen, so your eyes can stay up there while your thumb spins down here.</p>
       <p class="muted" style="margin:6px 0 0"><b>Style</b> tries five ways the ring can mark what it holds — today's chips down to bare dots. Same metal, same moves; rule by eye.</p>
       <p class="muted" style="margin:6px 0 0"><b>Peek</b> answers "what's coming": <b>Neighbors</b> sits the previous and next item beside the floating preview — tap one to step; <b>Fan</b> flashes every visible label outward the moment the dial opens. Rule by feel.</p>
     </div>
-
     <div class="permrow" id="permrow" hidden>The edge handle is off<b>Turn it on</b></div>
-
     <div class="card" id="diallab">
       <div class="labrow"><span>Catch style</span>
         <div class="dseg" id="segCatch"><button type="button" data-v="auto">Automatic</button><button type="button" data-v="ask">Ask</button></div></div>
@@ -674,62 +718,23 @@
       <div class="labrow"><span>Peek</span>
         <div class="dseg" id="segPeek"><button type="button" data-v="off">Off</button><button type="button" data-v="neighbors">Neighbors</button><button type="button" data-v="fan">Fan</button></div>
         <span class="muted" id="peeknote" style="color:var(--ink-3)" hidden>needs the floating preview</span></div>
-      <div class="labrow labbtns"><button type="button" class="stage" id="stagebtn">Copy something in another app</button><button type="button" class="stage ghost" id="firstrunbtn">Replay first run</button></div>
+      <div class="labrow labbtns"><button type="button" class="labbtn" id="stagebtn">Copy something in another app</button><button type="button" class="labbtn ghost" id="firstrunbtn">Replay first run</button></div>
     </div>
-
-    <div class="task">
-      <div class="co"><div class="logo" style="background:#31589E">N</div>
-        <div><b>Northbeam Careers</b><small>Product Design Intern · Application form</small></div></div>
-      <div class="two">
-        <div><label>Full name</label><input type="text" placeholder="Full name — it's on the dial"></div>
-        <div><label>Phone</label><input type="text" placeholder="Phone — on the dial"></div>
-      </div>
-      <label>Email</label><input type="text" placeholder="Email — it's pinned on the dial">
-      <label>Portfolio URL</label><input type="text" placeholder="Portfolio — the link is on the dial">
-      <label>Why Northbeam?</label><textarea rows="3" placeholder="There's an opener for this on the dial…"></textarea>
-      <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
-      <label>Headshot — optional (image)</label><div class="drop" data-accept="img" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/></svg> Tap to attach — Reel shows up as a source</div>
-    </div>
-
-    <div class="task">
-      <div class="co"><div class="logo" style="background:#7A4BC9">R</div>
-        <div><b>Riya · Northbeam recruiting</b><small>replied 2m ago</small></div></div>
-      <div class="chatlog">
-        <div class="bub">Strong application, Alex! Can you send your LinkedIn and a couple of times to talk this week?</div>
-      </div>
-      <label>Reply</label><input type="text" placeholder="The dial has both of those…">
-    </div>
-
-    <div class="task">
-      <div class="co"><div class="logo" style="background:#3E7C4F">W</div>
-        <div><b>Guests at the door</b><small>via text</small></div></div>
-      <div class="chatlog"><div class="bub">we're outside!! what's the wifi??</div></div>
-      <label>Reply</label><input type="text" placeholder="Wifi password — on the dial">
-    </div>
-
-    <div class="task">
-      <div class="co"><div class="logo" style="background:#8A5A2B">B</div>
-        <div><b>Split the deposit</b><small>bank transfer form</small></div></div>
-      <label>Recipient IBAN</label><input type="text" placeholder="IBAN — masked on the ring">
-      <label>Reference</label><input type="text" placeholder="e.g. Maple Grove deposit">
-    </div>
-
-    <div class="task">
+    <div class="card" id="makeyours">
       <h2>＋ Make it yours</h2>
-      <p class="muted" style="margin-bottom:10px">Add your <b>own</b> resume or a photo — a photo joins the dial, a document shows up when you attach above. The file never uploads; only its name is remembered, in your browser.</p>
+      <p class="muted" style="margin-bottom:10px">Add your <b>own</b> resume or a photo — a photo joins the dial, a document shows up when you attach inside the form. The file never uploads; only its name is remembered, in your browser.</p>
       <button class="filebtn" id="addfile1"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Add a file to the vault</button>
       <p class="muted" style="margin:10px 0 0">Also: select any text on this page and a <b>Save to Reel</b> chip appears — write one line of your own cover letter, select it, save it, reuse it on the keyboard page.</p>
     </div>
   </section>
-
-  <!-- ============ KEYBOARD PAGE — the iOS surface ============ -->
+  <!-- ============ KEYBOARD NOTES ============ -->
   <section data-page="keyboard" hidden>
     <div class="eyebrow">Test 2 · the keyboard · iOS</div>
-    <h1>Second application of the day — this time on the iPhone</h1>
-    <p id="kbintro">This is the iOS surface: your stuff rides the keyboard. Nobody switches keyboards to type — you drop in, take what you came for, and leave. On Android the dial carries this job instead.</p>
+    <h2 class="lead">Second application of the day — this time on the iPhone</h2>
+    <p class="pintro" id="kbintro">This is the iOS surface: your stuff rides the keyboard. Tap into any box on the phone and the vault comes up first — you drop in, take what you came for, and leave. On Android the dial carries this job instead.</p>
     <!-- Fold/Tablet frames only: Android hardware gets the truth, not a fake demo -->
     <div class="card" id="androidKbCard">
-      <p style="margin:0">This keyboard is iPhone and iPad. The frame you're looking at is Android hardware — there, the <a href="#dial">dial</a> is how the vault travels.</p>
+      <p style="margin:0">This keyboard is iPhone and iPad. The frame you picked is Android hardware — there, the <a href="#dial">dial</a> is how the vault travels.</p>
     </div>
     <div class="card tips">
       <h2>Three things to try</h2>
@@ -740,88 +745,27 @@
       </table>
       <p class="muted" style="margin:8px 0 0">Also here: search runs on our own keys (a keyboard can't summon a keyboard), and the <b>Interview thanks</b> tile asks you to fill a blank before it inserts. <b>Replay first run</b> below shows the one-time Full Access moment — try both answers.</p>
     </div>
-
     <div class="card" id="kblab">
-      <div class="labrow labbtns"><button type="button" class="stage ghost" id="kbfirstrun">Replay first run</button></div>
-    </div>
-
-    <div class="task">
-      <div class="co"><div class="logo" style="background:#B0632F">F</div>
-        <div><b>Fielder &amp; Co</b><small>Junior Product Designer · Quick apply</small></div></div>
-      <div class="two">
-        <div><label>Full name</label><input type="text" placeholder="Same name, again…"></div>
-        <div><label>Email</label><input type="text" placeholder="Same email, again…"></div>
-      </div>
-      <label>Create a password</label><input type="password" placeholder="Quick apply wants an account, of course">
-      <label>Tell us about something you shipped</label><textarea rows="3" placeholder="Saved a line on the dial page? It's in the strip."></textarea>
-      <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
-    </div>
-
-    <div class="task">
-      <div class="co"><div class="logo" style="background:#2E7D6B">M</div>
-        <div><b>Marcus · Fielder talent</b><small>via DM</small></div></div>
-      <div class="chatlog">
-        <div class="bub">hey! before the call — portfolio link + best phone number?</div>
-      </div>
-      <label>Reply</label><input type="text" placeholder="Two items, one keyboard…">
-      <p class="muted" style="margin:10px 0 0"><button class="filebtn" id="addfile2" style="background:var(--card);color:var(--accent);border:1.5px solid var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Add your own file</button></p>
-    </div>
-
-    <div class="task">
-      <div class="co"><div class="logo" style="background:#5A4FB3">S</div>
-        <div><b>Set up the call</b><small>Riya · scheduling</small></div></div>
-      <div class="chatlog"><div class="bub">what times work for you this week?</div></div>
-      <label>Reply</label><input type="text" placeholder="Search 'ava' — or scroll, it's all one strip">
+      <div class="labrow labbtns"><button type="button" class="labbtn ghost" id="kbfirstrun">Replay first run</button><button type="button" class="labbtn" id="addfile2">Add your own file</button></div>
+      <p class="muted" style="margin:10px 0 0">A photo you add joins the strip; a document shows up when you attach inside the form. Nothing uploads — only the name is remembered.</p>
     </div>
   </section>
-
-  <footer>reel · prototype v0.5 · everything stays in this browser<br>a Shipaton 2026 project, built in public · <a href="#home">start over</a></footer>
-</main>
+  <div class="foot">reel · prototype v0.6 · everything stays in this browser<br>a Shipaton 2026 project, built in public · <button class="linkbtn" id="resetbtn">Reset demo data</button></div>
+</aside>
+</div>
 
 <input type="file" id="filepick" multiple hidden>
-<div id="devframe" aria-hidden="true"></div>
-<div id="hinge" aria-hidden="true"></div>
-<svg id="dialsvg" aria-hidden="true"></svg>
-<div class="glidechip" id="glidechip">release to paste</div>
-<button id="kbfab" hidden aria-label="Open vault keyboard"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.6" y="6.4" width="18.8" height="11.2" rx="2.4"/><path d="M6.4 10h.01M9.8 10h.01M13.2 10h.01M16.6 10h.01M9 13.8h6"/></svg></button>
-<div id="kb" aria-label="Vault keyboard">
-  <div class="kdots" id="kdots"><span class="on"></span><span></span></div>
-  <div class="kpager" id="kpager">
-    <div class="kpage" id="kpageVault">
-      <div class="ksearch" id="ksearch"></div>
-      <div class="grid" id="kbgrid"></div>
-      <div class="klocked" id="klocked" style="display:none">
-        <div class="kghosts" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div class="kenable"><span>Full Access is off — the vault can't reach this keyboard.</span>
-          <button type="button" id="kballow">Allow</button></div>
-      </div>
-      <div class="kresults" id="kresults" style="display:none"></div>
-      <div class="krows" id="ksrows" style="display:none"></div>
-      <div class="kfoot" id="kfootV">
-        <button class="kexit" type="button" aria-label="Back to your keyboard"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/></svg> back to your keyboard</button>
-        <span class="hint">swipe left for keys →</span>
-      </div>
-      <div class="khint" id="khint" role="status"></div>
-    </div>
-    <div class="kpage" id="kpageKeys">
-      <div class="krows" id="ktyperows"></div>
-    </div>
-  </div>
-  <div class="fillov" id="fillov" style="display:none"></div>
-  <div class="syskb" id="syskb" style="display:none" aria-label="System keyboard"></div>
-</div>
 <div id="savechip"><b>＋</b> Save to Reel</div>
-<div id="toast" role="status"></div>
-<div id="picker"></div>
-<div id="receipt" role="status"></div>
-<div id="dialprev" aria-hidden="true"><div class="dp-stack"><div class="dp-layer on"></div><div class="dp-layer"></div></div></div>
-<div id="pastechip" role="button"></div>
-<div id="dialpulse" aria-hidden="true"></div>
-<div id="perm"></div>
-<div id="kbperm"></div>
 
 <script>
 'use strict';
+/* ================= the frame ================= */
+/* Chassis rule: the phone frame IS the device. Every overlay — dial, pill,
+   keyboard, sheets, toasts — positions inside .scr, and all dial geometry is
+   frame-local. The page around the frame is presentation, not device. */
+const scrEl=document.getElementById('scr');
+const roll=document.getElementById('roll');
+
 /* ================= vault ================= */
 /* Three types on the rings. Documents deliberately are NOT here — a dial slot
    holding a PDF you cannot insert is a dead end. Docs live in the upload picker
@@ -932,10 +876,10 @@ function tick(){
 const CATCHKEY='reel.dial.catch.v1',EGRESSKEY='reel.dial.egress.v2',
       PERMKEY='reel.perm.v1',DOCKKEY='reel.dock.v1';
 let CATCH=(()=>{try{const v=localStorage.getItem(CATCHKEY);return v==='auto'||v==='ask'?v:'ask'}catch(_){return 'ask'}})();
-/* Demo default is INSERT (NF ruling 2026-08-06: "it shouldn't be that way in the
-   demo" - releasing on an item should paste it, so the demo demonstrates the
-   outcome). The Copy (honest) mode stays one toggle away for feeling the real
-   overlay contract; the native build's contract is unchanged (copy + receipt). */
+/* Demo default is INSERT (NF ruling 2026-08-06: releasing on an item should paste
+   it - the demo demonstrates the outcome). Copy (honest) stays one toggle away;
+   the native contract (copy + receipt) is unchanged. Key is v2 so devices that
+   stored the old default land on the new one. */
 let EGRESS=(()=>{try{const v=localStorage.getItem(EGRESSKEY);return v==='insert'||v==='copy'?v:'insert'}catch(_){return 'insert'}})();
 /* Preview: where you READ what the dial has up. 'top' is the idea under test —
    the thumb is the input, the top of the screen is the output — so it defaults on. */
@@ -971,6 +915,24 @@ const DOCKS=(()=>{
   }catch(_){}
   return def})();
 function persist(k,v){try{localStorage.setItem(k,v)}catch(_){}}
+/* ═══ theme: the explicit Light|Dark seg (chassis pattern, 2026-08-06) ═══
+   data-theme on <html> overrides the media query everywhere — every token
+   block already carries [data-theme] variants — so the flip is instant and
+   the whole presentation (page, frame, dial, pill, keyboard) turns together.
+   First visit follows the system; a tap pins the choice, persisted. */
+const THEMEKEY='reel.proto.theme.v1';
+let THEME=(()=>{try{const t=localStorage.getItem(THEMEKEY);if(t==='light'||t==='dark')return t}catch(_){}
+  return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'})();
+const themeseg=document.getElementById('themeseg');
+themeseg.innerHTML='<button type="button" data-t="light">Light</button><button type="button" data-t="dark">Dark</button>';
+[...themeseg.children].forEach(b=>b.onclick=()=>{
+  if(THEME===b.dataset.t)return;
+  THEME=b.dataset.t;persist(THEMEKEY,THEME);applyTheme();});
+function applyTheme(){
+  document.documentElement.dataset.theme=THEME;
+  [...themeseg.children].forEach(b=>b.dataset.on=b.dataset.t===THEME?'1':'0');
+  drawDial();
+}
 /* the ring is always a dark instrument, so it speaks the dark palette's type
    colours regardless of page theme (app-mockup.html is canonical for the hues) */
 const TYPEC={txt:'#FFC978',url:'#FFA184',img:'#C6A8FF'};
@@ -1008,7 +970,7 @@ function catchOnOpen(){
   else DIAL.offer=stagedClip;          // center offer; ignoring it drops it
 }
 
-/* receipt chip — the one-line proof a copy or a catch happened */
+/* receipt chip — the one-line proof a copy or a catch happened (frame-local) */
 const receiptEl=document.getElementById('receipt');let receiptT;
 function receipt(msg){
   receiptEl.textContent=msg;
@@ -1024,18 +986,18 @@ function dialPulse(color){
   pulseEl.classList.remove('go');void pulseEl.offsetWidth;pulseEl.classList.add('go');
 }
 /* the paste affordance — after an honest copy, the errand still completes.
-   Dogfood truth (2026-08-06): the machinery worked; nothing SAID so. The chip
-   is the paste step, so it lands with a one-shot pop every time it appears —
-   whether the copy found the field focused or the focus came after. */
+   The chip is the paste step, so it lands with a one-shot pop every time it
+   appears. It anchors to the field INSIDE the frame's scroller now, so it
+   rides along when the fake app scrolls. */
 const pastechip=document.getElementById('pastechip');
 let pendingPaste=null;
 function showPasteChip(){
   if(!pendingPaste||!T.field||!visibleSection().contains(T.field)){pastechip.style.display='none';return;}
-  const r=T.field.getBoundingClientRect();
+  const r=T.field.getBoundingClientRect(),rr=roll.getBoundingClientRect();
   pastechip.textContent='Paste · '+pendingPaste.label.slice(0,16);
   pastechip.style.display='block';
-  pastechip.style.left=Math.max(8,r.right+scrollX-pastechip.offsetWidth)+'px';
-  pastechip.style.top=(r.top+scrollY-42)+'px';
+  pastechip.style.left=Math.max(8,r.right-rr.left+roll.scrollLeft-pastechip.offsetWidth)+'px';
+  pastechip.style.top=(r.top-rr.top+roll.scrollTop-42)+'px';
   pastechip.classList.remove('pop');void pastechip.offsetWidth;pastechip.classList.add('pop');
 }
 function clearPaste(){pendingPaste=null;pastechip.style.display='none';}
@@ -1094,7 +1056,7 @@ function openPerm(){
 }
 function closePerm(){permEl.style.display='none';permEl.innerHTML='';}
 
-/* lab wiring: the two feel toggles + staging + first-run replay */
+/* lab wiring: the feel toggles + staging + first-run replay */
 function bindSeg(id,get,set){
   const el=document.getElementById(id);
   const sync=()=>[...el.children].forEach(b=>b.dataset.on=b.dataset.v===get()?'1':'0');
@@ -1150,7 +1112,7 @@ function openPicker(drop){
     ${items.length?items.map(i=>`<div class="pk-row" data-id="${i.id}">
       <span class="pk-badge">${t==='doc'?'PDF':'IMG'}</span>
       <span class="pk-name">${i.label}</span></div>`).join('')
-     :`<div class="pk-empty">Nothing saved yet — add one with the button below the form.</div>`}
+     :`<div class="pk-empty">Nothing saved yet — add one with the button in the notes.</div>`}
     <div class="pk-cancel">Cancel</div>
    </div>`;
   p.style.display='block';
@@ -1173,7 +1135,8 @@ function insertAtCursor(el,text){
   el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
 }
 function pulse(sel){document.querySelectorAll(sel).forEach(el=>{el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');})}
-function visibleSection(){return document.querySelector('section:not([hidden])')}
+/* the visible SIMULATED APP inside the frame — the router hides the other one */
+function visibleSection(){return document.querySelector('.app[data-appfor]:not([hidden])')}
 function useItem(it,via){
   if(!it)return false;
   if(it.type==='txt'||it.type==='url'){
@@ -1186,7 +1149,7 @@ function useItem(it,via){
       if(via==='dial')dialPulse(TYPEC[it.type]);
       tick();setTimeout(tick,70);return true;
     }
-    pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');
+    pulse('.app:not([hidden]) input[type=text],.app:not([hidden]) textarea');
     toast('Tap a text box first, then summon');return false;
   }
   if(it.type==='img'){
@@ -1197,10 +1160,9 @@ function useItem(it,via){
   }
   return false;   // docs never reach the rings; the upload picker is their surface
 }
-/* double-tap = the most recent thing, no dial. Its effect must be LEGIBLE
-   (owner dogfood, 2026-08-06): the receipt names the item every time, and in
-   honest mode the paste chip pops on the focused box — something visibly
-   happened, whichever switch is set. */
+/* double-tap = the most recent thing, no dial. Its effect must be LEGIBLE:
+   the receipt names the item every time, and in honest mode the paste chip
+   pops on the focused box — something visibly happened, whichever switch. */
 function pasteLast(){
   const it=lastUsed();
   if(!it)return;
@@ -1211,6 +1173,8 @@ function pasteLast(){
 }
 
 /* ================= selection capture ================= */
+/* The chip is viewport-fixed now (the page and the frame scroll separately);
+   any scroll hides it rather than letting it drift off its selection. */
 const chip=document.getElementById('savechip');let selText='';
 document.addEventListener('selectionchange',()=>{
   clearTimeout(chip._t);chip._t=setTimeout(()=>{
@@ -1219,14 +1183,16 @@ document.addEventListener('selectionchange',()=>{
     const txt=sel.toString().trim();
     if(txt.length<3||txt.length>400){chip.style.display='none';return;}
     const n=sel.anchorNode&&sel.anchorNode.parentElement;
-    if(!n||!n.closest('main')||n.closest('#kb')){chip.style.display='none';return;}
+    if(!n||!n.closest('.notes,.roll')||n.closest('#kb')){chip.style.display='none';return;}
     const r=sel.getRangeAt(0).getBoundingClientRect();
     selText=txt;
     chip.style.display='block';
-    chip.style.left=Math.max(8,Math.min(innerWidth-150,r.left+scrollX))+'px';
-    chip.style.top=(r.top+scrollY-42)+'px';
+    chip.style.left=Math.max(8,Math.min(innerWidth-150,r.left))+'px';
+    chip.style.top=Math.max(8,r.top-42)+'px';
   },220);
 });
+addEventListener('scroll',()=>{chip.style.display='none'},{passive:true});
+roll.addEventListener('scroll',()=>{chip.style.display='none'},{passive:true});
 chip.addEventListener('pointerdown',e=>{
   e.preventDefault();
   const now=Date.now();
@@ -1238,9 +1204,9 @@ chip.addEventListener('pointerdown',e=>{
 });
 
 /* ================= device form-factor views ================= */
-/* One body class + one frame anchor; the dial and keyboard reflow to tell each
-   platform's truth. Selection persists like everything else here: a versioned
-   key that self-heals to 'phone' on any unknown value. */
+/* One body class; the FRAME resizes (chassis rule) and the dial and keyboard
+   reflow to tell each platform's truth. Selection persists like everything
+   else here: a versioned key that self-heals to 'phone' on any unknown value. */
 const DKEY='reel.device.v1';
 const DEVICES=[['phone','Phone'],['fold','Fold'],['tablet','Tablet'],['ipad','iPad']];
 let DEV=(()=>{try{const d=localStorage.getItem(DKEY);return DEVICES.some(x=>x[0]===d)?d:'phone'}
@@ -1251,8 +1217,8 @@ devseg.innerHTML=DEVICES.map(d=>`<button type="button" data-d="${d[0]}">${d[1]}<
   if(DEV===b.dataset.d)return;
   DEV=b.dataset.d;kbHide();closePicker();applyDevice();
 });
-const dialH1=document.querySelector('[data-page="dial"] h1');
-const DIAL_H1=dialH1.textContent;
+const dialLead=document.getElementById('dialLead');
+const DIAL_H1=dialLead.textContent;
 function applyDevice(){
   for(const d of DEVICES)document.body.classList.remove('device-'+d[0]);
   document.body.classList.add('device-'+DEV);
@@ -1262,24 +1228,34 @@ function applyDevice(){
      card; the keyboard path is the whole iPad story */
   const ipad=DEV==='ipad';
   document.getElementById('ipadDialCard').hidden=!ipad;
-  dialH1.textContent=ipad?'There is no dial on iPad':DIAL_H1;
+  dialLead.textContent=ipad?'There is no dial on iPad':DIAL_H1;
   sizes();route();
 }
 
 /* ================= router ================= */
-const PAGES=['home','dial','keyboard'];
+/* Two pages now — the home page folded into the header lede and the notes
+   foot when the chassis landed; the seg is the navigation. Old #home links
+   fall through to the dial. */
+const PAGES=['dial','keyboard'];
+const pageseg=document.getElementById('pageseg');
+pageseg.innerHTML='<button type="button" data-pg="dial">Dial</button><button type="button" data-pg="keyboard">Keyboard</button>';
+[...pageseg.children].forEach(b=>b.onclick=()=>{location.hash='#'+b.dataset.pg;});
 function route(){
-  const h=(location.hash||'#home').slice(1);
-  const page=PAGES.includes(h)?h:'home';
-  document.querySelectorAll('[data-page]').forEach(s=>s.hidden=s.dataset.page!==page);
+  const h=(location.hash||'#dial').slice(1);
+  const page=PAGES.includes(h)?h:'dial';
+  document.querySelectorAll('.notes [data-page]').forEach(s=>s.hidden=s.dataset.page!==page);
+  document.querySelectorAll('.app[data-appfor]').forEach(a=>a.hidden=a.dataset.appfor!==page);
+  document.querySelectorAll('.appbar[data-appbar]').forEach(a=>a.hidden=a.dataset.appbar!==page);
+  [...pageseg.children].forEach(b=>b.dataset.on=b.dataset.pg===page?'1':'0');
   document.getElementById('kbfab').hidden=page!=='keyboard';
-  document.body.classList.toggle('on-dial',page==='dial');   // dial page wears the current tokens
-  document.body.classList.toggle('on-kb',page==='keyboard'); // so does the keyboard page, its own way
+  document.body.classList.toggle('on-dial',page==='dial');   // dial page wears its chrome class
+  document.body.classList.toggle('on-kb',page==='keyboard'); // keyboard page carries the deck tokens
   if(page!=='keyboard')kbHide();
   DIAL.enabled=page==='dial'&&DEV!=='ipad';   // iOS: no overlay API, no dial
-  if(!DIAL.enabled){DIAL.mode='closed';DIAL.open=0;DIAL.openT=0;DIAL.offer=null;document.body.classList.remove('dialing');}
+  if(!DIAL.enabled){DIAL.mode='closed';DIAL.open=0;DIAL.openT=0;DIAL.offer=null;
+    cruiseStop();flickStop();DIAL.cruised=false;document.body.classList.remove('dialing');}
   T.field=null;T.drop=null;clearPaste();closePerm();
-  scrollTo(0,0);drawDial();
+  roll.scrollTop=0;scrollTo(0,0);sizes();drawDial();
 }
 addEventListener('hashchange',route);
 
@@ -1287,7 +1263,7 @@ addEventListener('hashchange',route);
 /* Nobody switches keyboards to type; they visit for the vault. So the strip is
    the whole opening view, the exit is labelled and generous, and the two iOS
    platform truths (password force-switch, Full Access) are staged as designed
-   moments instead of footnotes. */
+   moments instead of footnotes. The deck rises INSIDE the frame now. */
 const kb=document.getElementById('kb');
 const kpager=document.getElementById('kpager');
 const KB={q:'',mode:'browse',fillItem:null,fillBuf:'',fillFrom:'browse'};
@@ -1302,16 +1278,24 @@ function kbHide(){kb.classList.remove('up');
   exitSearch();hideSysKb();closeKbAccess();}
 function kbExit(){kbHide();toast('Back on your keyboard');}
 document.getElementById('kbfab').onclick=()=>kb.classList.contains('up')?kbHide():(refreshKb(),kbShow(0));
+/* the deck covers the frame's foot — nudge the focused field's card above it */
+function revealField(){
+  const f=T.field||PW.field;
+  if(!f||!kb.classList.contains('up'))return;
+  const fr=f.getBoundingClientRect(),sr=scrEl.getBoundingClientRect();
+  const kbTop=sr.bottom-332-10;
+  if(fr.bottom>kbTop)roll.scrollTop+=fr.bottom-kbTop;
+}
 /* focus decides the deck: password fields swap to the system keyboard (iOS
    truth — custom keyboards never see secure fields); everything else raises
    the vault, re-rendered so field acceptance greys the right tiles */
 document.addEventListener('focusin',e=>{
-  if(document.querySelector('[data-page=keyboard]').hidden)return;
+  if(document.querySelector('.app[data-appfor=keyboard]').hidden)return;
   if(!e.target.closest('.task'))return;
-  if(e.target.matches('input[type=password]')){PW.field=e.target;showSysKb();return;}
+  if(e.target.matches('input[type=password]')){PW.field=e.target;showSysKb();setTimeout(revealField,90);return;}
   if(e.target.matches('input[type=text],textarea')){
     if(KB.mode==='fill'){KB.fillFrom='browse';exitFill();}
-    exitSearch();hideSysKb();refreshKb();kbShow(0);}
+    exitSearch();hideSysKb();refreshKb();kbShow(0);setTimeout(revealField,90);}
 });
 
 /* pager dots */
@@ -1380,7 +1364,7 @@ function typeChar(ch){
   else if(KB.mode==='fill'){KB.fillBuf+=ch;renderFill();}
   else{ // the no-paste-step path: keys type straight into the page's field
     if(T.field&&visibleSection().contains(T.field))insertAtCursor(T.field,ch);
-    else{pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');toast('Tap a text box first');}
+    else{pulse('.app:not([hidden]) input[type=text],.app:not([hidden]) textarea');toast('Tap a text box first');}
   }
 }
 function handleKx(kx){
@@ -1462,7 +1446,7 @@ function commitFill(){
     insertAtCursor(T.field,text);touch(it);
     toast(`Inserted · ${it.label}`);tick();setTimeout(tick,70);
     refreshKb();exitHintOnce();
-  }else{pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');toast('Tap a text box first');}
+  }else{pulse('.app:not([hidden]) input[type=text],.app:not([hidden]) textarea');toast('Tap a text box first');}
 }
 
 /* --- browse (default): ONE mixed strip — pins first, then newest, no tabs --- */
@@ -1602,7 +1586,8 @@ const glidechip=document.getElementById('glidechip');
 const DIAL={enabled:false,mode:'closed',open:0,openT:0,
   sOut:0,tOut:0,rawOut:0,grab:null,downBand:null,
   lastA:0,moved:0,downT:0,tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null,
-  offer:null,dockX:0,dockY:0};
+  offer:null,dockX:0,dockY:0,
+  cru:null,cruT:null,cruZone:null,cruised:false,vel:null,fliT:null};
 const DEADBAND=0.55;                                   // >0.5 so it can't flicker on the boundary
 const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
 const BTN_R=27;                                        // round logo button (primary affordance)
@@ -1613,6 +1598,18 @@ function turn(ring,deltaDeg){
 }
 function settle(ring){const D=DIAL;D['raw'+ring]=D['t'+ring];}
 const STEP_OUT=33,WIN_OUT=70;
+/* ═══ cruise + flick tuning (2026-08-06) — the native build mirrors these ═══ */
+const ARC_END=WIN_OUT+16;               // 86°: the visible arc's half-span (A0/A1 in drawDial)
+const CRUISE={
+  EDGE_FRAC:.18,                        // end zone = the last 18% of the whole arc, at each end
+  DELAY:250,                            // ms in the end zone (dragging or holding) before the first step
+  PIN_DELAY:400,                        // fresh press ON a pin slot waits out the tap window — a slow pin-tap stays a tap
+  HOLD:350,                             // item-zone hold threshold (the old slow-cycle's, kept)
+  ITEM_A0:12,                           // item zone starts here — nearer belongs to the center
+  V0:2,V1:6,RAMP:1500,                  // detents/s: start → cap, linear over RAMP ms
+};
+const EDGE_A0=ARC_END-2*ARC_END*CRUISE.EDGE_FRAC;   // ≈55°: where the end zone begins
+const FLICK={VMIN:1.5,VGAIN:1.4,CAP:8,IV0:125,DECAY:1.35,IVMAX:400};
 /* De-red ruling (2026-08-06): real lens index marks are white — the red was
    grabbing attention the instrument doesn't want. RED_INDEX is the one-line
    restore if a future logo asks for the red back. */
@@ -1632,36 +1629,30 @@ const LENS={
   indexRim:'#3A0D0A',                    // the dark rim stays — the crispness lives there
   glass:['#10151C','#080B0F','#05070A'], // hub lens element, centre → edge
 };
-let VW=innerWidth,VH=innerHeight,FW=innerWidth,AX=innerWidth,R=0,HUB=0,OUT0=0,OUT1=0,CY=0,DYMIN=0,DYMAX=0;
+/* ═══ frame-local geometry (chassis conversion) ═══
+   VW/VH are the FRAME's inner dimensions, FW===VW (the frame IS the device),
+   and AX sits on the frame's own left or right wall. The SVG overlays the
+   frame exactly, so every constant below reads in frame pixels. FRX/FRY
+   translate pointer events from viewport space into this space. */
+let VW=0,VH=0,FW=0,AX=0,R=0,HUB=0,OUT0=0,OUT1=0,CY=0,DYMIN=0,DYMAX=0;
+let FRX=0,FRY=0;
+function syncFrameRect(){const r=svg.getBoundingClientRect();FRX=r.left;FRY=r.top;}
 /* either-edge docking: DOCK is per-device, persisted; CA is the arc's center
    angle (270 opens leftward from the right edge, 90 mirrors it) */
 let DOCK='right',EDGE=1,CA=270;
 function sizes(){
-  /* scrollingElement.clientWidth, not innerWidth: CSS left:50% (frame, hinge,
-     keyboard) resolves against the layout viewport, which excludes a classic
-     scrollbar — the JS anchor must use the same reference or the dial drifts
-     half a scrollbar off the frame edge. scrollingElement, not documentElement:
-     this file has no doctype, and in quirks mode documentElement.clientHeight
-     is the document height, not the viewport. On phones (overlay scrollbars)
-     all of these equal innerWidth/Height. */
-  const SE=document.scrollingElement||document.documentElement;
-  VW=SE.clientWidth||innerWidth;
-  VH=SE.clientHeight||innerHeight;
-  /* The device frame: widths stand in for dp (Fold inner 673 = MEDIUM, not a
-     tablet; tablet/iPad landscape 1024). The dial anchors to the FRAME's right
-     edge (AX), not the browser's, so each view keeps its proportions on any
-     monitor. Phone: FW=VW and AX=VW — exactly the old math, zero drift. */
-  FW=DEV==='fold'?Math.min(673,VW):(DEV==='tablet'||DEV==='ipad')?Math.min(1024,VW):VW;
+  VW=scrEl.clientWidth||1;
+  VH=scrEl.clientHeight||1;
+  FW=VW;
   const dk=DOCKS[DEV]||{edge:'right',y:.56};
   DOCK=dk.edge;EDGE=DOCK==='right'?1:-1;CA=DOCK==='right'?270:90;
-  AX=DOCK==='right'?(VW+FW)/2:(VW-FW)/2;
+  AX=DOCK==='right'?VW:0;
   R=Math.min(FW*0.46,205);
   HUB=R*.20;OUT0=R*.40;OUT1=R*.84;   // one wide band; the knurling rides outside OUT1
-  /* The handle slides freely along its edge (2026-08-06): CY comes from the
-     persisted per-device y-fraction, clamped to the safe rail — below the
-     floating-pill zone, above the bottom inset, and never so far that the
-     open ring falls off-screen. (Tablet's old lower-third default lives on
-     as its default y.) */
+  /* The handle slides freely along its edge: CY comes from the persisted
+     per-device y-fraction, clamped to the safe rail — below the floating-pill
+     zone, above the bottom inset, and never so far that the open ring falls
+     off the frame. (Tablet's lower-third default lives on as its default y.) */
   const ringExt=OUT1+LENS.knGap+LENS.knDepth+26;
   DYMIN=Math.max(96,ringExt+8);
   DYMAX=VH-Math.max(34,ringExt+8);
@@ -1671,6 +1662,7 @@ function sizes(){
   svg.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
 }
 sizes();addEventListener('resize',()=>{sizes();drawDial();});
+if(window.ResizeObserver)new ResizeObserver(()=>{sizes();drawDial();}).observe(scrEl);
 const rad=d=>(d-90)*Math.PI/180;
 const P=(r,deg)=>({x:AX+r*Math.cos(rad(deg)),y:CY+r*Math.sin(rad(deg))});
 const P2=(cx,cy,r,deg)=>({x:cx+r*Math.cos(rad(deg)),y:cy+r*Math.sin(rad(deg))});
@@ -1714,9 +1706,9 @@ function focusedItem(){const its=dialItems();return its.length?its[mod(DIAL.tOut
 
 /* ═══ the floating preview ═══
    The item at the index mark, rendered where the eyes are — the top of the
-   screen — while the thumb works the ring it can feel. On an iPhone this would
-   be the Dynamic Island; Android has none, so it floats. Appears with the dial,
-   cross-fades on every detent, leaves with the close/copy/insert. */
+   frame's screen — while the thumb works the ring it can feel. On an iPhone
+   this would be the Dynamic Island; Android has none, so it floats. Appears
+   with the dial, cross-fades on every detent, leaves with the close/copy/insert. */
 const prevEl=document.getElementById('dialprev');
 let prevLayer=0,prevShown=false,prevKey='',prevHideT=null;
 const looksLikeCode=s=>/\d/.test(s)&&!/[a-z]{3,}/.test(s);   // IBANs, tracking numbers, gates
@@ -1840,7 +1832,7 @@ function drawDial(){
        the slide range the magnet allows (below the pill zone, above the
        bottom inset) — edge-crossing and height-setting share one gesture */
     const tEdge=DIAL.dockX<VW/2?'left':'right';
-    const tAX=tEdge==='right'?(VW+FW)/2:(VW-FW)/2,tE=tEdge==='right'?1:-1;
+    const tAX=tEdge==='right'?VW:0,tE=tEdge==='right'?1:-1;
     const ty=Math.max(DYMIN,Math.min(DYMAX,DIAL.dockY));
     const railX=tAX-tE*3;
     h+=`<line x1="${railX}" y1="${DYMIN}" x2="${railX}" y2="${DYMAX}" stroke="#39424F" stroke-width="1.5" stroke-dasharray="2 7" opacity=".45"/>`;
@@ -1857,7 +1849,7 @@ function drawDial(){
     h+=`<g opacity="${off?.28:1}">`+handleSVG(bx,by)+`</g>`;
     if(!off){
       /* drag-dots: the re-dock affordance, real on every device view —
-         hold and drag across the midline to dock the other edge */
+         hold and drag across the frame's midline to dock the other edge */
       for(const dy of [-7,0,7])for(const dx of [-2.6,2.6])
         h+=`<circle cx="${bx-EDGE*(BTN_R+8)+dx}" cy="${by+dy}" r="1.3" fill="#8A94A0"/>`;
       if(DEV==='fold'){
@@ -2082,6 +2074,21 @@ function drawDial(){
   const m1=P(kn1+2,CA),m2=P(kn1+10,CA);
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="${LENS.indexRim}" stroke-width="4.6" stroke-linecap="round" opacity="${f}"/>`;
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="${LENS.index}" stroke-width="2.8" stroke-linecap="round" opacity="${f}"/>`;
+  /* ═══ end-zone chevrons (edge cruise, 2026-08-06) ═══
+     While a finger works the ring, both arc ends whisper an engraved chevron —
+     "more past here", right where the thumb runs out of arc. The end the ring
+     is cruising from glows. Angles are CA-relative, so either dock mirrors free. */
+  {const touching=(!!DIAL.grab&&!!DIAL.downBand)||(DIAL.mode==='glide'&&!!DIAL.glideZone);
+   const cruDir=DIAL.cru&&DIAL.cru.kind==='edge'?DIAL.cru.dir:0;
+   if(touching||cruDir)for(const sgn of [-1,1]){
+     const on=cruDir===sgn;
+     if(!on&&!touching)continue;
+     const q1=P(midO-6.5,CA+sgn*(ARC_END-13)),q2=P(midO,CA+sgn*(ARC_END-5)),q3=P(midO+6.5,CA+sgn*(ARC_END-13));
+     const pth=`M${q1.x} ${q1.y}L${q2.x} ${q2.y}L${q3.x} ${q3.y}`;
+     if(on)h+=`<path d="${pth}" fill="none" stroke="${LENS.index}" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" opacity="${.22*f}"/>`;
+     h+=`<path d="${pth}" fill="none" transform="translate(0,-.7)" stroke="${LENS.engraveShadow}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="${(on?.9:.5)*f}"/>`;
+     h+=`<path d="${pth}" fill="none" stroke="${on?LENS.index:LENS.engraveDim}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${(on?1:.35)*f}"/>`;
+   }}
   if(FAN.t0&&PEEK==='fan'){
     /* the fan sweep: labels bloom from the index outward, ride just past the
        knurl, hold, and fade — masked items flash dots, never values */
@@ -2154,28 +2161,100 @@ let prevOut=0;
   requestAnimationFrame(loop);
 })();
 
-/* gestures — window-level, coordinate hit-testing, no pointer capture */
+/* ═══ cruise — "hold, and the ring comes to you" (owner gripe, 2026-08-06) ═══
+   One direction rule, dock-agnostic: dir = sign(rel). Two zones:
+   · item zone (12°..~55° off the index): a stationary hold walks the held slot
+     to the index — one detent per beat — and stops when it arrives. The old
+     slow-cycle, unified, with an honest stop.
+   · end zone (|rel| ≥ ~55°, or anywhere past the arc end while on the band):
+     dwell 250ms — dragging or holding — and the ring cruises detent-by-detent
+     from that end, 2/s easing up to 6/s by 1.5s. Leave the zone or lift and it
+     stops on the spot. Every step is a committed detent riding the loop's own
+     easing + click — a cruise is a run of real clicks, never a free spin. */
+function cruiseStop(){const D=DIAL;clearTimeout(D.cruT);D.cruT=null;D.cru=null;D.cruZone=null;}
+function cruiseZoneAt(rel){const ar=Math.abs(rel);
+  return ar>=EDGE_A0?'edge':ar>=CRUISE.ITEM_A0?'item':null;}
+function cruiseStep(){
+  const D=DIAL,c=D.cru;
+  if(!c||!D.enabled||D.openT===0){cruiseStop();return;}
+  D.tOut+=c.dir;D.rawOut=D.tOut;D.cruised=true;
+  if(c.kind==='item'){
+    if(--c.left<=0){D.cru=null;D.cruT=null;return;}   // arrived — the hold rests (cruZone stays, so it won't re-arm)
+    D.cruT=setTimeout(cruiseStep,1000/CRUISE.V0);
+  }else{
+    const v=CRUISE.V0+(CRUISE.V1-CRUISE.V0)*Math.min(1,(performance.now()-c.t0)/CRUISE.RAMP);
+    D.cruT=setTimeout(cruiseStep,1000/v);
+  }
+}
+/* zone bookkeeping — called from pointerdown (fresh=true) and from every move
+   while the pointer owns the ring. Item cruise only arms from a fresh press (a
+   drag that stops over an item is browsing, not summoning); the end zone arms
+   both ways, and flipping ends re-arms the dwell. */
+function cruiseTrack(rel,onRing,fresh){
+  const D=DIAL;
+  const z=onRing?cruiseZoneAt(rel):null;
+  const zk=!z?null:z==='edge'?(rel>0?'e+':'e-'):'item';
+  if(zk===D.cruZone)return;
+  cruiseStop();
+  if(!zk||(zk==='item'&&!fresh))return;
+  D.cruZone=zk;
+  const dir=rel>0?1:-1;
+  if(zk==='item'){
+    const left=Math.max(1,Math.abs(Math.round(rel/STEP_OUT)));
+    D.cruT=setTimeout(()=>{D.cru={kind:'item',dir,left};cruiseStep();},CRUISE.HOLD);
+  }else{
+    const onPin=fresh&&Math.abs(Math.abs(rel)-PIN_OFF)<13;
+    D.cruT=setTimeout(()=>{D.cru={kind:'edge',dir,left:1/0,t0:performance.now()};cruiseStep();},
+      onPin?CRUISE.PIN_DELAY:CRUISE.DELAY);
+  }
+}
+/* ═══ flick — a fast release carries momentum (the parked PRD lever) ═══
+   Release velocity from the last ~120ms of drag; below VMIN it is just a drag
+   (a lazy swipe moves exactly its dragged detents). Above, extra detents ride
+   out on a decaying beat, each a committed step with its click, settling
+   honestly. A new touch on the dial catches the ring dead. */
+function flickStop(){const D=DIAL;if(D.fliT){clearTimeout(D.fliT);D.fliT=null;}}
+function flickVel(){
+  const D=DIAL,now=performance.now();
+  const b=(D.vel||[]).filter(s=>now-s.t<=120);
+  if(b.length<3||now-b[0].t<40)return 0;
+  return b.reduce((a,s)=>a+s.d,0)/((now-b[0].t)/1000);
+}
+function flickLaunch(){
+  const D=DIAL,v=flickVel();D.vel=null;
+  if(Math.abs(v)<FLICK.VMIN)return;
+  let left=Math.min(FLICK.CAP,Math.ceil((Math.abs(v)-FLICK.VMIN)/FLICK.VGAIN));
+  if(left<1)return;
+  const dir=v>0?1:-1;
+  let iv=Math.max(FLICK.IV0,1000/Math.min(Math.abs(v),8));
+  const step=()=>{
+    D.fliT=null;
+    if(!D.enabled||D.openT===0)return;
+    D.tOut+=dir;D.rawOut=D.tOut;
+    if(--left>0){iv=Math.min(FLICK.IVMAX,iv*FLICK.DECAY);D.fliT=setTimeout(step,iv);}
+  };
+  D.fliT=setTimeout(step,iv);
+}
+
+/* gestures — window-level listeners, coordinate hit-testing translated into
+   FRAME space (FRX/FRY), no pointer capture. The frame cannot move mid-gesture
+   (drags preventDefault all scrolling), so the rect is cached at pointerdown. */
 let PTR=null;
 addEventListener('pointerdown',e=>{
   const D=DIAL;if(!D.enabled)return;
   if(PERM!=='granted')return;                          // no permission, no handle
-  const d=dist(e.clientX,e.clientY);
-  const onHandle=D.openT===0&&onLogoBtn(e.clientX,e.clientY);
+  syncFrameRect();
+  const px=e.clientX-FRX,py=e.clientY-FRY;
+  const d=dist(px,py);
+  const onHandle=D.openT===0&&onLogoBtn(px,py);
   if(D.openT===0&&!onHandle)return;
-  PTR=e.pointerId;D.moved=0;D.downT=Date.now();D.lastA=ang(e.clientX,e.clientY);
-  D.glideY=e.clientY;D.downBand=band(d);
-  /* hold on an off-center rotating slot ⇒ slow auto-cycle toward that side */
-  if(D.openT>0&&D.downBand){
-    const rel=wrapDeg(ang(e.clientX,e.clientY)-CA),ar=Math.abs(rel);
-    const zone=ar>=12&&ar<=48;
-    if(zone){
-      D.cycT=setTimeout(()=>{D.cycOn=true;
-        const ring=D.downBand,dir=Math.sign(rel);
-        const step=()=>{D['t'+ring]+=dir;D['raw'+ring]=D['t'+ring];};
-        step();D.cycInt=setInterval(step,480);
-      },350);
-    }
-  }
+  flickStop();                                         // a touch catches a coasting ring
+  PTR=e.pointerId;D.moved=0;D.downT=Date.now();D.lastA=ang(px,py);
+  D.glideY=py;D.downBand=band(d);
+  D.vel=[];D.cruised=false;
+  /* "hold, and the ring comes to you": a fresh press on the ring arms the
+     cruise — item zone walks the held slot to the index; end zone streams */
+  if(D.openT>0&&D.downBand)cruiseTrack(wrapDeg(D.lastA-CA),true,true);
   if(onHandle){
     clearTimeout(D.holdTimer);
     D.holdTimer=setTimeout(()=>{
@@ -2183,8 +2262,8 @@ addEventListener('pointerdown',e=>{
       clearTimeout(D.tapTimer);D.tapTimer=null;
       D.mode='glide';D.glideZone=null;D.openT=1;tick();catchOnOpen();fanStart();
       glidechip.style.display='block';glidechip.textContent='slide out to the ring';
-      if(DOCK==='right'){glidechip.style.left='auto';glidechip.style.right=((VW-AX)+R+40)+'px';}
-      else{glidechip.style.right='auto';glidechip.style.left=(AX+R+40)+'px';}
+      if(DOCK==='right'){glidechip.style.left='auto';glidechip.style.right=(R+40)+'px';}
+      else{glidechip.style.right='auto';glidechip.style.left=(R+40)+'px';}
       glidechip.style.top=(CY-34)+'px';
     },350);
     e.preventDefault();return;
@@ -2194,28 +2273,30 @@ addEventListener('pointerdown',e=>{
 
 addEventListener('pointermove',e=>{
   const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;
+  const px=e.clientX-FRX,py=e.clientY-FRY;
   if(D.mode==='dock'){
-    D.dockX=e.clientX;D.dockY=e.clientY;
-    /* release ALWAYS docks now — nearest edge, at this height */
-    glidechip.textContent='release to dock '+(e.clientX<VW/2?'left':'right');
+    D.dockX=px;D.dockY=py;
+    /* release ALWAYS docks now — nearest frame edge, at this height */
+    glidechip.textContent='release to dock '+(px<VW/2?'left':'right');
     glidechip.style.right='auto';
-    glidechip.style.left=Math.max(8,Math.min(VW-140,e.clientX-60))+'px';
-    glidechip.style.top=(Math.max(12,e.clientY-52))+'px';
+    glidechip.style.left=Math.max(8,Math.min(VW-140,px-60))+'px';
+    glidechip.style.top=(Math.max(12,py-52))+'px';
     e.preventDefault();return;
   }
   if(D.mode==='glide'){
-    /* long-press-drag past the ring (or across the midline) ⇒ the handle
-       comes off the wall (2026-08-06): move it anywhere, release to cling.
-       The radial escape only fires OUTSIDE the item window, so overshooting
-       the knurl while selecting never ejects the ring from under the finger. */
-    const rr=dist(e.clientX,e.clientY),ra=Math.abs(wrapDeg(ang(e.clientX,e.clientY)-CA));
-    if((DOCK==='right'&&e.clientX<VW/2-12)||(DOCK==='left'&&e.clientX>VW/2+12)
+    /* long-press-drag past the ring (or across the frame's midline) ⇒ the
+       handle comes off the wall: move it anywhere, release to cling. The
+       radial escape only fires OUTSIDE the item window, so overshooting the
+       knurl while selecting never ejects the ring from under the finger. */
+    const rr=dist(px,py),ra=Math.abs(wrapDeg(ang(px,py)-CA));
+    if((DOCK==='right'&&px<VW/2-12)||(DOCK==='left'&&px>VW/2+12)
        ||(rr>OUT1+LENS.knGap+LENS.knDepth+30&&ra>WIN_OUT+16)){
+      cruiseStop();
       D.mode='dock';D.glideZone=null;D.openT=0;
-      D.dockX=e.clientX;D.dockY=e.clientY;
+      D.dockX=px;D.dockY=py;
       e.preventDefault();return;
     }
-    const r=dist(e.clientX,e.clientY),a=ang(e.clientX,e.clientY);
+    const r=dist(px,py),a=ang(px,py);
     const z=zoneFor(r,D.glideZone);
     if(z!==D.glideZone){
       D.glideZone=z;D.lastA=a;                        // re-baseline so switching rings doesn't jump
@@ -2227,41 +2308,42 @@ addEventListener('pointermove',e=>{
       turn(D.glideZone,delta);
       D.moved+=Math.abs(delta);
     }
+    cruiseTrack(wrapDeg(a-CA),D.glideZone==='Out',false);   // the end zone cruises mid-glide too
     D.lastA=a;
-    glidechip.style.top=(Math.max(12,Math.min(VH-40,e.clientY-34)))+'px';
+    glidechip.style.top=(Math.max(12,Math.min(VH-40,py-34)))+'px';
     e.preventDefault();return;
   }
   if(D.holdTimer&&D.moved+Math.abs(e.movementX||0)+Math.abs(e.movementY||0)>12){
     clearTimeout(D.holdTimer);D.holdTimer=null;
   }
-  if(D.moved>6){clearTimeout(D.cycT);D.cycT=null;
-    if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}}
+  if(D.moved>6&&D.cruZone==='item')cruiseStop();   // a real drag takes over from an item-hold
   if(!D.grab)return;
-  const a=ang(e.clientX,e.clientY),delta=wrapDeg(a-D.lastA);D.lastA=a;
+  const a=ang(px,py),delta=wrapDeg(a-D.lastA);D.lastA=a;
   D.moved+=Math.abs(delta);
   turn(D.grab,delta);
+  (D.vel||(D.vel=[])).push({t:performance.now(),d:-EDGE*delta/STEP_OUT});
+  if(D.vel.length>24)D.vel.shift();
+  cruiseTrack(wrapDeg(a-CA),band(dist(px,py))!=null,false);
   e.preventDefault();
 },{passive:false});
 
 addEventListener('pointerup',e=>{
   const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;PTR=null;
   clearTimeout(D.holdTimer);D.holdTimer=null;
-  clearTimeout(D.cycT);D.cycT=null;
-  if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}
+  const cruised=D.cruised;D.cruised=false;
+  cruiseStop();               // lifting stops a cruise on the spot — already on a whole detent
+  const px=e.clientX-FRX,py=e.clientY-FRY;
   if(D.mode==='dock'){
     D.mode='closed';glidechip.style.display='none';
-    /* the magnet: cling to the NEAREST side wall, at the height you left it —
+    /* the magnet: cling to the NEAREST frame wall, at the height you left it —
        edge + y-fraction persist per device, self-healing on load */
-    const edge=e.clientX<VW/2?'left':'right';
-    const y=Math.max(DYMIN,Math.min(DYMAX,e.clientY))/VH;
+    const edge=px<VW/2?'left':'right';
+    const y=Math.max(DYMIN,Math.min(DYMAX,py))/VH;
     DOCKS[DEV]={edge,y:Math.round(y*1000)/1000};
     try{localStorage.setItem(DOCKKEY,JSON.stringify(DOCKS))}catch(_){}
     sizes();tick();receipt('Docked '+edge);
     D.downBand=null;drawDial();return;
   }
-  if(D.cycOn){D.cycOn=false;                     // a cycle-hold is not a tap
-    if(D.grab){settle(D.grab);D.grab=null;}
-    D.downBand=null;return;}
   if(D.mode==='glide'){
     const z=D.glideZone;
     D.mode='closed';D.glideZone=null;glidechip.style.display='none';
@@ -2270,10 +2352,13 @@ addEventListener('pointerup',e=>{
     else{D.openT=1;}                                  // released short of the ring: stay open to browse
     return;
   }
-  const d=dist(e.clientX,e.clientY),a=ang(e.clientX,e.clientY);
+  if(cruised){                                   // a cruise-hold is not a tap
+    if(D.grab){settle(D.grab);D.grab=null;}
+    D.downBand=null;return;}
+  const d=dist(px,py),a=ang(px,py);
   const wasTap=D.moved<4&&Date.now()-D.downT<400;
   if(D.grab){settle(D.grab);D.grab=null;}
-  if(!wasTap){D.downBand=null;return;}
+  if(!wasTap){D.downBand=null;flickLaunch();return;}   // a real drag release may carry momentum
 
   if(D.openT===0){
     const now=Date.now();
@@ -2304,34 +2389,43 @@ addEventListener('pointerup',e=>{
 });
 addEventListener('wheel',e=>{                          // desktop: one notch = one whole detent
   const D=DIAL;if(!D.enabled||D.openT===0)return;
-  if(!band(dist(e.clientX,e.clientY)))return;
-  e.preventDefault();
+  const r=svg.getBoundingClientRect();
+  if(!band(dist(e.clientX-r.left,e.clientY-r.top)))return;
+  e.preventDefault();flickStop();
   D.tOut+=Math.sign(e.deltaY);D.rawOut=D.tOut;
 },{passive:false});
 
 addEventListener('pointercancel',e=>{
   const D=DIAL;if(e.pointerId!==PTR)return;
   PTR=null;clearTimeout(D.holdTimer);D.holdTimer=null;
-  clearTimeout(D.cycT);D.cycT=null;D.cycOn=false;
-  if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}
+  D.cruised=false;cruiseStop();flickStop();
   if(D.mode==='glide'||D.mode==='dock'){D.mode='closed';D.glideZone=null;glidechip.style.display='none';D.openT=0;}
   if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
 });
 
-/* first-visit coach — not on iPad: there is no handle there */
-addEventListener('hashchange',()=>{
-  if(location.hash==='#dial'&&DEV!=='ipad'&&!localStorage.getItem('reel.coach.dial')){
-    setTimeout(()=>toast('Tap the round handle at the screen edge — tap the glass to close'),500);
-    localStorage.setItem('reel.coach.dial','1');
+/* first-visit coach — not on iPad: there is no handle there. Two lines, each
+   once: the handle line, then the cruise line under its own guard — so the
+   cruise teach still reaches anyone who saw the old coach before it existed.
+   (Chassis note: no hash means the dial, the router's default.) */
+function dialCoach(){
+  if((location.hash||'#dial')!=='#dial'||DEV==='ipad')return;
+  let wait=600;
+  if(!localStorage.getItem('reel.coach.dial')){
+    setTimeout(()=>toast('Tap the round handle at the phone’s edge — tap the glass to close'),wait);
+    localStorage.setItem('reel.coach.dial','1');wait+=3300;
   }
-});
-if(location.hash==='#dial'&&DEV!=='ipad'&&!localStorage.getItem('reel.coach.dial')){
-  setTimeout(()=>toast('Tap the round handle at the screen edge — tap the glass to close'),600);
-  localStorage.setItem('reel.coach.dial','1');
+  if(!localStorage.getItem('reel.coach.cruise')){
+    setTimeout(()=>toast('Hold the ring’s edge and it comes to you'),wait);
+    localStorage.setItem('reel.coach.cruise','1');
+  }
 }
+addEventListener('hashchange',dialCoach);
+dialCoach();
 
-refreshKb();applyDevice();permApply();
+applyTheme();refreshKb();applyDevice();permApply();
 </script>
+</body>
+</html>
 
 </body>
 </html>

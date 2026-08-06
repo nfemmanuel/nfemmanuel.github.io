@@ -4,38 +4,61 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Action Button → Dynamic Island — a feel demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* ═══ product token family (app-mockup.html is canonical) ═══
+     Values are copied, never invented — one palette across /reel/.
+     Page accent is --c-txt, the tint the hub already gives this exhibit.
+     The simulated phone (wallpaper, Action Button, the island itself) is
+     depicted Apple hardware and keeps its own colours in both themes. */
   :root{
-    --paper:#F2F1EC; --panel:#FFFFFF; --ink:#1D2126; --dim:#6B7280; --line:#E2DED4;
-    --accent:#0E8C7F; --accent-soft:#0E8C7F1A; --shadow:0 10px 28px rgba(28,32,38,.12);
+    color-scheme:light dark;
+    --ground:#F6F6F7; --surf:#FFFFFF; --ink:#14161A; --ink-2:#5C636D; --ink-3:#8B929C; --hair:#E7E8EB;
+    --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
+    --accent:var(--c-txt); --accent-soft:#B4761C22;
+    --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+    --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
+    --display:"Bricolage Grotesque",system-ui,sans-serif;
+    --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
   }
   @media (prefers-color-scheme:dark){:root{
-    --paper:#0F1216; --panel:#171C22; --ink:#E9EDF2; --dim:#8B95A1; --line:#242B33;
-    --accent:#2FB9A9; --accent-soft:#2FB9A924; --shadow:0 10px 28px rgba(0,0,0,.5);
+    --ground:#0E1013; --surf:#181B20; --ink:#F0F1F3; --ink-2:#A2A9B3; --ink-3:#767D87; --hair:#272B31;
+    --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
+    --accent-soft:#FFC97826;
+    --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
   }}
   :root[data-theme="dark"]{
-    --paper:#0F1216; --panel:#171C22; --ink:#E9EDF2; --dim:#8B95A1; --line:#242B33;
-    --accent:#2FB9A9; --accent-soft:#2FB9A924; --shadow:0 10px 28px rgba(0,0,0,.5);
+    color-scheme:dark;
+    --ground:#0E1013; --surf:#181B20; --ink:#F0F1F3; --ink-2:#A2A9B3; --ink-3:#767D87; --hair:#272B31;
+    --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
+    --accent-soft:#FFC97826;
+    --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
   }
   :root[data-theme="light"]{
-    --paper:#F2F1EC; --panel:#FFFFFF; --ink:#1D2126; --dim:#6B7280; --line:#E2DED4;
-    --accent:#0E8C7F; --accent-soft:#0E8C7F1A; --shadow:0 10px 28px rgba(28,32,38,.12);
+    color-scheme:light;
+    --ground:#F6F6F7; --surf:#FFFFFF; --ink:#14161A; --ink-2:#5C636D; --ink-3:#8B929C; --hair:#E7E8EB;
+    --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
+    --accent-soft:#B4761C22;
+    --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+    --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);
-    font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font:15px/1.5 var(--ui);
     max-width:520px;margin-inline:auto;padding:14px 14px calc(20px + env(safe-area-inset-bottom))}
-  h1{font-size:16.5px;margin:0 0 3px;letter-spacing:-.01em}
-  .sub{font-size:12.5px;color:var(--dim);margin:0 0 12px}
+  h1{font-family:var(--display);font-weight:700;font-size:16.5px;margin:0 0 3px;letter-spacing:-.025em}
+  .sub{font-size:12.5px;color:var(--ink-2);margin:0 0 12px}
   .row{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
-  .chipb{border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;
+  .chipb{border:1.5px solid var(--hair);background:var(--surf);color:var(--ink);border-radius:999px;
     padding:7px 14px;font:inherit;font-size:12.5px;cursor:pointer}
   .chipb[data-on="1"]{border-color:var(--accent);background:var(--accent-soft)}
 
   /* ---------- the simulated phone surface ---------- */
   .sim{position:relative;height:min(66dvh,560px);border-radius:26px;overflow:hidden;
     background:linear-gradient(160deg,#20303c 0%,#131a22 55%,#0d1116 100%);
-    box-shadow:var(--shadow);border:1px solid var(--line);user-select:none;-webkit-user-select:none}
+    box-shadow:var(--shadow-m);border:1px solid var(--hair);user-select:none;-webkit-user-select:none}
   .clock{position:absolute;top:70px;left:0;right:0;text-align:center;color:#E7ECF2;
     font-size:56px;font-weight:250;letter-spacing:-.03em;opacity:.9;pointer-events:none}
   .date{position:absolute;top:56px;left:0;right:0;text-align:center;color:#B9C4CF;
@@ -43,7 +66,7 @@
   .grid{position:absolute;left:0;right:0;bottom:16px;display:grid;grid-template-columns:repeat(4,1fr);
     gap:14px;padding:0 22px;pointer-events:none}
   .app{aspect-ratio:1;border-radius:14px;background:rgba(255,255,255,.13);display:flex;
-    align-items:center;justify-content:center;font-size:22px;backdrop-filter:blur(4px)}
+    align-items:center;justify-content:center;font-size:22px;color:#DFE5EB;backdrop-filter:blur(4px)}
 
   /* action button — left edge like the hardware */
   .ab{position:absolute;left:0;top:112px;width:9px;height:62px;border-radius:0 5px 5px 0;
@@ -70,11 +93,11 @@
   .island.wide{width:min(340px,88%);height:64px}
   .island.panel{width:min(352px,92%);height:238px;border-radius:30px;cursor:default}
   .isl-dot{width:9px;height:9px;border-radius:50%;background:#2C2C2E;margin-left:auto}
-  .isl-ic{font-size:16px;flex:0 0 auto}
+  .isl-ic{font-size:16px;flex:0 0 auto;display:flex;align-items:center}
   .isl-tx{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .isl-tx b{font-size:13px}
   .isl-sub{font-size:10.5px;color:#9BA3AD}
-  .isl-cta{margin-left:auto;background:var(--accent);color:#fff;border-radius:999px;
+  .isl-cta{margin-left:auto;background:var(--accent);color:var(--ground);border-radius:999px;
     padding:5px 13px;font-size:12px;font-weight:600;flex:0 0 auto}
   .isl-n{margin-left:auto;font-size:11px;color:#9BA3AD;flex:0 0 auto}
   .plist{width:100%;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
@@ -85,17 +108,17 @@
   .pl-i[data-done="1"] .st{color:var(--accent)}
 
   #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(90px);
-    background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;border-radius:11px;
+    background:var(--ink);color:var(--ground);border-radius:11px;
     padding:9px 15px;font-size:13px;z-index:60;transition:transform .22s;max-width:86vw;text-align:center}
   #toast.show{transform:translateX(-50%) translateY(0)}
   @media (prefers-reduced-motion:reduce){#toast{transition:none}}
 
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
-    padding:15px;margin-top:13px;box-shadow:var(--shadow);font-size:13.5px}
-  .card h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:0 0 8px}
-  .card p{margin:0 0 8px;color:var(--dim)} .card p:last-child{margin-bottom:0}
+  .card{background:var(--surf);border:1px solid var(--hair);border-radius:14px;
+    padding:15px;margin-top:13px;box-shadow:var(--shadow-s);font-size:13.5px}
+  .card h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2);margin:0 0 8px}
+  .card p{margin:0 0 8px;color:var(--ink-2)} .card p:last-child{margin-bottom:0}
   .card b{color:var(--ink)}
-  .step{display:flex;gap:9px;margin-bottom:7px;color:var(--dim)}
+  .step{display:flex;gap:9px;margin-bottom:7px;color:var(--ink-2)}
   .step .n{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);
     color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
   button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -140,12 +163,30 @@
 
 <script>
 'use strict';
+/* Icon set: same stroke language as app-mockup.html (24-box, 1.7 stroke,
+   round caps). Shared names carry the exact same path data. Never emoji. */
+const I={
+  lnk:'<path d="M10.4 13.6a4.1 4.1 0 0 0 5.8 0l2.3-2.3a4.1 4.1 0 0 0-5.8-5.8l-1.2 1.2"/><path d="M13.6 10.4a4.1 4.1 0 0 0-5.8 0l-2.3 2.3a4.1 4.1 0 0 0 5.8 5.8l1.2-1.2"/>',
+  cog:'<circle cx="12" cy="12" r="3.1"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.4 5.4 7.2 7.2M16.8 16.8l1.8 1.8M18.6 5.4 16.8 7.2M7.2 16.8l-1.8 1.8"/>',
+  pencil:'<path d="M16.4 3.6a2.3 2.3 0 0 1 3.3 3.3L8.2 18.4l-4.3 1 1-4.3z"/><path d="m14.6 5.4 4 4"/>',
+  mail:'<rect x="3.4" y="5.4" width="17.2" height="13.2" rx="2.4"/><path d="m4.6 7.6 7.4 5.4 7.4-5.4"/>',
+  phone:'<rect x="7" y="2.8" width="10" height="18.4" rx="2.6"/><path d="M10.8 18.2h2.4"/>',
+  person:'<circle cx="12" cy="8.2" r="3.6"/><path d="M5.4 20.2a6.6 6.6 0 0 1 13.2 0"/>',
+  cal:'<rect x="3.6" y="5" width="16.8" height="15.2" rx="2.4"/><path d="M3.6 9.8h16.8M8.2 3v3.6M15.8 3v3.6"/>',
+  camera:'<rect x="3.4" y="6.8" width="17.2" height="12.4" rx="2.4"/><path d="M8.6 6.8 10.1 4.6h3.8l1.5 2.2"/><circle cx="12" cy="12.8" r="3.3"/>',
+  music:'<path d="M9.2 17.4V6.6l9-1.8v10.8"/><circle cx="6.8" cy="17.4" r="2.4"/><circle cx="15.8" cy="15.6" r="2.4"/>',
+  map:'<path d="m4 6.2 5-2 6 2 5-2v13.6l-5 2-6-2-5 2z"/><path d="M9 4.2v13.6M15 6.2v13.6"/>',
+  cloud:'<path d="M7.2 18.6a4.3 4.3 0 0 1-.7-8.5 5.5 5.5 0 0 1 10.8 1.1 3.7 3.7 0 0 1-.7 7.4z"/>',
+  chat:'<path d="M3.6 6a2 2 0 0 1 2-2h12.8a2 2 0 0 1 2 2v7.6a2 2 0 0 1-2 2H9.6L5 19.4v-3.8h.6a2 2 0 0 1-2-2z"/>',
+};
+const ic=(n,s,w)=>`<svg viewBox="0 0 24 24" width="${s||16}" height="${s||16}" fill="none" stroke="currentColor" stroke-width="${w||1.7}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+
 const ITEMS=[
- ['👤','Full name','Alex Rivera'],
- ['📧','Email','alex.rivera@example.com'],
- ['📱','Phone','+1 (614) 555-0164'],
- ['🌐','Portfolio','https://alexrivera.example.com'],
- ['✍️','Signature','Best,\nAlex Rivera'],
+ ['person','Full name','Alex Rivera'],
+ ['mail','Email','alex.rivera@example.com'],
+ ['phone','Phone','+1 (614) 555-0164'],
+ ['lnk','Portfolio','https://alexrivera.example.com'],
+ ['pencil','Signature','Best,\nAlex Rivera'],
 ];
 const S={mode:'idle',idx:0,done:new Set(),sound:true,holdT:null};
 
@@ -185,13 +226,13 @@ function render(){
       <span class="isl-tx"><b>Fill session</b><br><span class="isl-sub">Northbeam application · 5 items ready</span></span>
       <span class="isl-cta">Go</span>`);
   }else if(S.mode==='session'){
-    setIsland('compact',`<span class="isl-ic">${it[0]}</span>
+    setIsland('compact',`<span class="isl-ic">${ic(it[0],15)}</span>
       <span class="isl-tx">${it[1]}</span><span class="isl-n">${S.idx+1}/5</span>`);
   }else if(S.mode==='panel'){
     setIsland('panel',`<div class="plist">
       <div class="pl-h">◎ Fill session · tap anything to copy it</div>
       ${ITEMS.map((x,i)=>`<div class="pl-i" data-i="${i}" data-done="${S.done.has(i)?1:0}">
-        <span>${x[0]}</span><span>${x[1]}</span>
+        ${ic(x[0],15)}<span>${x[1]}</span>
         <span class="st">${S.done.has(i)?'copied ✓':'copy'}</span></div>`).join('')}
     </div>`);
     [...inner.querySelectorAll('.pl-i')].forEach(el=>el.onclick=e=>{e.stopPropagation();copyItem(+el.dataset.i,false)});
@@ -244,7 +285,7 @@ document.getElementById('reset').onclick=()=>{S.mode='idle';S.idx=0;S.done=new S
 
 /* fake app grid */
 document.querySelector('.grid').innerHTML=
-  ['✉️','🗓️','📷','🎵','🗺️','☁️','💬','⚙️'].map(g=>`<div class="app">${g}</div>`).join('');
+  ['mail','cal','camera','music','map','cloud','chat','cog'].map(g=>`<div class="app">${ic(g,20)}</div>`).join('');
 
 render();
 </script>

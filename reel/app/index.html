@@ -78,6 +78,14 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
   padding:0 20px;font-size:12px;font-weight:600}
 .roll{flex:1;overflow-y:auto;min-height:0;scrollbar-width:none;padding-bottom:28px}
 .roll::-webkit-scrollbar{display:none}
+/* The Vault's fixed head (owner ruling, mid-build): nothing from the search bar
+   up scrolls — title, pill and the chip row stay put, and only the region below
+   (Pinned, then the one stream) moves. A hairline fades in under the head once
+   the stream has scrolled, so the boundary reads as an edge, not a glitch. */
+.vhead{position:relative;flex:0 0 auto;padding-top:46px;z-index:3}
+.vhead::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:var(--hair);opacity:0;transition:opacity .25s}
+.vhead.scrolled::after{opacity:1}
 .big{font-family:var(--display);letter-spacing:-.04em;line-height:.95;margin:0;padding:6px 20px 0}
 .sub{color:var(--ink-3);font-size:13px;margin-top:6px;padding:0 20px}
 .sect{font-size:12px;font-weight:600;color:var(--ink-3);padding:20px 20px 10px}
@@ -175,14 +183,21 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .ocrtx{padding:8px 14px 12px;font-family:var(--mono);font-size:12.5px;line-height:1.55;
   white-space:pre-wrap;word-break:break-word;user-select:text;-webkit-user-select:text}
 .ocrtx.busy{color:var(--ink-3);animation:readpulse 1.1s ease-in-out infinite}
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:0 16px}
-.tile{padding:15px 14px 13px;cursor:pointer;position:relative;overflow:hidden;display:flex;
-  flex-direction:column;min-height:126px;transition:transform .34s var(--spring)}
-.tile:active{transform:scale(.965)}
-.md .tile{border-radius:26px} .ios .tile{border-radius:18px}
-.tile .glyph{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:11px}
-.tile .n{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.03em;margin-top:auto}
-.tile .c{font-size:12px;font-weight:500;opacity:.72;margin-top:2px}
+/* ── filter chips: types are lenses, not places (design-decisions 2026-08-06) ──
+   One row under the search pill; picking a lens narrows the one stream in place —
+   Pinned included — nothing navigates. A selected type chip wears the wash and
+   colour its tiles already carry; All selected is ink. Counts are the quiet part:
+   small, mono, never the accent — on a selected chip they take the chip's own
+   colour dimmed, which holds up in both themes. The rail scrolls sideways on the
+   narrowest frames rather than shrinking the type below legibility. */
+.lens{display:flex;gap:6px;padding:13px 16px 3px;overflow-x:auto;scrollbar-width:none}
+.lens::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:33px;padding:0 12px;
+  border-radius:99px;background:var(--surf);border:1px solid var(--hair);font-size:13px;
+  font-weight:600;color:var(--ink-2);cursor:pointer;transition:transform .25s var(--spring)}
+.chip:active{transform:scale(.93)}
+.chip .cnt{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink-3)}
+.chip.on .cnt{color:inherit;opacity:.62}
 
 .tbar{position:absolute;top:36px;left:0;right:0;height:46px;display:flex;align-items:center;
   justify-content:space-between;padding:0 14px;z-index:4}
@@ -326,13 +341,12 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
   z-index:30;pointer-events:none;
   background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--ink) 13%,transparent) 9%,
     color-mix(in srgb,var(--ink) 13%,transparent) 91%,transparent)}
-.device-fold .grid,.device-fold .grid.g3,.device-fold .tiles{grid-template-columns:repeat(4,1fr);padding:0 26px}
-.device-fold .sect{padding-left:26px;padding-right:26px}
+.device-fold .grid,.device-fold .grid.g3{grid-template-columns:repeat(4,1fr);padding:0 26px}
+.device-fold .sect,.device-fold .lens{padding-left:26px;padding-right:26px}
 .device-fold .big,.device-fold .sub{padding-left:30px;padding-right:30px}
 .device-fold .card,.device-fold .hunt,.device-fold .catch,.device-fold .gauge,.device-fold .set,
 .device-fold .note,.device-fold .ideasrow{margin-left:26px;margin-right:26px}
 .device-fold textarea.ed{width:calc(100% - 52px);margin-left:26px;margin-right:26px}
-.device-fold .hunt{position:sticky;top:50px;z-index:5}
 /* 4-across (fold) and in-pane 3-across (tablet) tiles sit at phone g3 width,
    so they wear the existing g3 type tiers — same tier system, not a new one */
 .device-fold .gc .tx,.device-tablet .gc .tx{font-size:11.5px}
@@ -489,7 +503,7 @@ let DEVICE='phone';
 const DEVICES_MD=[['phone','Phone'],['flip','Flip'],['fold','Fold'],['tablet','Tablet']];
 const DEVICES_IOS=[['phone','Phone'],['tablet','iPad']];
 let firstOpen=true;   /* the settle bounce plays once, on launch — not on every navigation */
-const st={view:'vault',arg:null,sheet:null,q:'',searching:false,toast:null,pinCap:2,
+const st={view:'vault',arg:null,filter:'all',sheet:null,q:'',searching:false,toast:null,pinCap:2,
   noteDismissed:false,tagEdit:false,watch:true,theme:'system',themePicker:false,perm:'unknown',
   flipFlash:null};
 const SEED=[
@@ -530,7 +544,7 @@ const ATTACH={v:'Receipt screenshot',g:'linear-gradient(135deg,#BA5138,#5E2A1D)'
    items forward instead of wiping them. v1 is this mockup's FIRST stored version
    (it kept nothing before), so there is nothing to carry yet — the shape is what
    matters. Holds: items (with tags), the watch preference (ON by default), the
-   theme choice, and the idea votes. */
+   theme choice, the chosen lens (the type filter), and the idea votes. */
 const KEY='reel.app.v1';
 const MOJIBAKE=/ðŸ|â€|Ã°|Ã¢/;   /* double-encoded UTF-8 fingerprints = corrupt store */
 let ITEMS=null,VOTES={};
@@ -543,6 +557,7 @@ try{
       st.watch=j.watch!==false;
       if(j.theme==='light'||j.theme==='dark')st.theme=j.theme;
       if(['phone','flip','fold','tablet'].includes(j.device))DEVICE=j.device;
+      if(j.filter==='all'||TYPE[j.filter])st.filter=j.filter;   /* junk heals to All */
       st.noteDismissed=j.noteDismissed===true;
     }}
 }catch(_){}
@@ -566,7 +581,7 @@ SEED.forEach(s=>{ if(!s.title)return;
   if(held)held.title=s.title; });
 function saveStore(){try{localStorage.setItem(KEY,
   JSON.stringify({v:1,items:ITEMS,watch:st.watch,theme:st.theme,device:DEVICE,votes:VOTES,
-    noteDismissed:st.noteDismissed}))}catch(_){}}
+    filter:st.filter,noteDismissed:st.noteDismissed}))}catch(_){}}
 /* ── inference: the app works out the type, it never asks ── */
 const isUrl=v=>/^(https?:\/\/|www\.)/i.test(v.trim())||/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v.trim());
 const isCode=v=>{const s=v.trim();
@@ -579,6 +594,14 @@ const nextPin=()=>{const u=pinned().map(p=>p.pin);for(let n=1;n<=99;n++)if(!u.in
 
 /* ── actions ── */
 function go(view,arg){st.view=view;st.arg=arg??null;st.sheet=null;st.themePicker=false;render();}
+/* Types are lenses, not places (design-decisions 2026-08-06): "landing in a type"
+   now means the Vault wearing that lens. Every former go('type',t) call site
+   routes here — the type screens themselves are gone. */
+function goVault(t){st.filter=t||'all';go('vault');}
+function setFilter(t){st.filter=t;st.searching?renderKeepFocus():render();}
+/* the fixed head grows its hairline only once the stream has actually moved */
+function vaultEdge(el){const h=document.getElementById('vhead');
+  if(h)h.classList.toggle('scrolled',el.scrollTop>2);}
 function openSearch(){st.searching=true;render();const el=document.getElementById('q');if(el)el.focus();}
 function closeSearch(){st.searching=false;st.q='';render();}
 function openSheet(id){st.sheet=id;st.tagEdit=false;render();}
@@ -602,9 +625,9 @@ function saveNew(){
   if(!v){toast('Nothing to save');return;}
   const t=isUrl(v)?'lnk':'txt';
   const dupe=findDupe(t,v);
-  if(dupe){go('vault');bumpItem(dupe);return;}   /* saving the same thing twice bumps — no twin */
+  if(dupe){goVault(dupe.t);bumpItem(dupe);return;}   /* saving the same thing twice bumps — no twin, and the lens shows it */
   ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1});
-  clearFresh(); toast('Saved to '+TYPE[t]); go('type',t);
+  clearFresh(); toast('Saved to '+TYPE[t]); goVault(t);
 }
 function saveEdit(){
   const el=document.getElementById('ed'); const it=find(st.arg);
@@ -614,7 +637,7 @@ function saveEdit(){
   const t=isUrl(v)?'lnk':it.t;
   if((it.t==='txt'||it.t==='lnk')&&t!==it.t){it.t=t;toast('Moved to '+TYPE[t]);}
   else toast('Saved');
-  go('type',it.t);
+  goVault(it.t);
 }
 function edit(id){st.sheet=null;go('edit',id);}
 /* Keep and Pin are different jobs, and conflating them would have meant a free
@@ -648,10 +671,10 @@ function bumpItem(it){
    goes through the duplicate catcher like every other capture path. */
 function attachSim(){
   const dupe=findDupe('img',ATTACH.v,ATTACH.fid);
-  if(dupe){go('vault');bumpItem(dupe);return;}
+  if(dupe){goVault(dupe.t);bumpItem(dupe);return;}
   const it={id:nextId(),t:'img',v:ATTACH.v,g:ATTACH.g,fid:ATTACH.fid,fresh:1,ocrPending:1};
   ITEMS.unshift(it);
-  toast('Saved to Images'); go('type','img'); clearFresh();
+  toast('Saved to Images'); goVault('img'); clearFresh();
   /* the beat while the picture is read — ML Kit on Android, Vision on iOS,
      both on-device, zero network */
   setTimeout(()=>{const l=find(it.id); if(!l||!l.ocrPending)return;
@@ -931,8 +954,11 @@ function vote(i,o){if(VOTES[i]===o)delete VOTES[i];else VOTES[i]=o;render();}
 
 /* ── screens ── */
 const V={
-vault:()=>{const q=st.q.trim().toLowerCase();
-  const res=q?ITEMS.filter(i=>i.v.toLowerCase().includes(q)||(i.tags||[]).some(t=>t.includes(q))
+vault:()=>{const q=st.q.trim().toLowerCase(),f=st.filter;
+  /* the lens narrows everything the Vault shows — the stream, Pinned, and what a
+     query searches over: filter and search compose as type AND text */
+  const lensed=f==='all'?ITEMS:ITEMS.filter(i=>i.t===f);
+  const res=q?lensed.filter(i=>i.v.toLowerCase().includes(q)||(i.tags||[]).some(t=>t.includes(q))
     ||(i.ocr||'').toLowerCase().includes(q)):[];
   const toolsRight=[
     '<span style="display:flex;align-items:center;gap:8px">',
@@ -940,31 +966,51 @@ vault:()=>{const q=st.q.trim().toLowerCase();
     '<span class="tbtn" onclick="go(&#39;you&#39;)">'+ic('cog',17)+'</span>',
     '</span>'
   ].join('');
+  const scope=f==='all'?'everything':TYPE[f].toLowerCase();
   const hunt=st.searching
     ?ic('find',20)
-      +'<input id="q" placeholder="Search everything" value="'+st.q.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"'
+      +'<input id="q" placeholder="Search '+scope+'" value="'+st.q.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"'
       +' oninput="st.q=this.value;renderKeepFocus()" autocomplete="off">'
       +'<span class="cancel" onclick="closeSearch()">Cancel</span>'
-    :ic('find',20)+'Search everything';
+    :ic('find',20)+'Search '+scope;
   const huntAttr=st.searching?'':' onclick="openSearch()"';
+  /* the lens row: single-select, All is the resting state. A selected type chip
+     wears the wash + colour its tiles already wear; counts are inventory, so they
+     sit on the type chips and move with adds, deletes and share-ins. */
+  const chips='<div class="lens">'+['all','txt','lnk','img','doc'].map(t=>{
+    const on=f===t;
+    const sty=on?(t==='all'?'background:var(--ink);border-color:var(--ink);color:var(--ground)'
+      :'background:var(--t-'+t+');border-color:color-mix(in srgb,var(--c-'+t+') 30%,transparent);color:var(--c-'+t+')'):'';
+    return '<div class="chip'+(on?' on':'')+(sty?'" style="'+sty:'')
+      +'" onclick="setFilter(&#39;'+t+'&#39;)">'+(t==='all'?'All':TYPE[t])
+      +(t==='all'?'':'<span class="cnt">'+byType(t).length+'</span>')+'</div>';
+  }).join('')+'</div>';
   const body=q
     ?(res.length?'<div class="sect">'+res.length+' result'+(res.length>1?'s':'')+'</div>'+grid(res)
-       :'<div class="empty"><div class="e1">No match</div><div class="e2">Nothing here contains &quot;'+esc(st.q)+'&quot;.</div></div>')
-    :(()=>{const recent=ITEMS.filter(i=>!i.pin).slice(0,4);
-      const pinnedBlock=pinned().length?'<div class="sect">Pinned</div>'+grid(pinned()):'';
-      const recentBlock=recent.length?'<div class="sect">'+(ITEMS.some(i=>i.fresh)?'Just arrived':'Recent')+'</div>'+grid(recent):'';
-      const typeTiles='<div class="sect">By type</div><div class="tiles">'
-        +Object.keys(TYPE).map(t=>'<div class="tile" style="background:var(--t-'+t+');color:var(--c-'+t+')" onclick="go(&#39;type&#39;,&#39;'+t+'&#39;)">'
-          +'<span class="glyph" style="background:color-mix(in srgb,var(--c-'+t+') 18%,transparent)">'+ic(t,19)+'</span>'
-          +'<span class="n">'+TYPE[t]+'</span><span class="c">'+byType(t).length+' saved</span></div>').join('')
-        +'</div>';
-      return pinnedBlock+recentBlock+typeTiles;
+       :'<div class="empty"><div class="e1">No match</div><div class="e2">'
+         +(f==='all'?'Nothing here contains':'Nothing in '+TYPE[f]+' contains')
+         +' &quot;'+esc(st.q)+'&quot;.</div></div>')
+    :(()=>{const pins=pinned().filter(i=>f==='all'||i.t===f);
+      const stream=lensed.filter(i=>!i.pin);   /* THE stream: full inventory, newest-first */
+      const pinnedBlock=pins.length?'<div class="sect">Pinned</div>'+grid(pins):'';
+      const streamBlock=stream.length
+        ?'<div class="sect">'+(stream.some(i=>i.fresh)?'Just arrived':'Recent')+'</div>'+grid(stream):'';
+      const emptyBlock=pins.length||stream.length?''
+        :'<div class="empty"><div class="e1">'+(f==='all'?'Nothing yet':'No '+TYPE[f].toLowerCase()+' yet')
+         +'</div><div class="e2">Things land here when you share or copy them from another app.</div></div>';
+      return pinnedBlock+streamBlock+emptyBlock;
     })();
+  /* the head is fixed (owner ruling): title, pill and chips never scroll — the
+     roll below is the only scroller and carries Pinned + the stream + the quiet
+     rows. The chip row rides in the head as control chrome attached to the pill. */
   return `${sbar()}${tbar('',null,toolsRight)}
-  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
+  <div class="vhead ${firstOpen?'settle':''}" id="vhead">
     <div><h1 class="big" style="font-size:34px">Everything<br>you reuse</h1>
       <div class="sub">${ITEMS.length} things · ${pinned().length} pinned</div></div>
     <div class="hunt${st.searching?' active':''}"${huntAttr}>${hunt}</div>
+    ${chips}
+  </div>
+  <div class="roll ${firstOpen?'settle':''}" onscroll="vaultEdge(this)">
     ${body}
     ${q?'':`<div class="catch${st.watch?'':' off'}" onclick="go('you')">
       <span class="live"></span><span class="slabel">${st.watch?'Watching':'Not watching'}</span>
@@ -974,18 +1020,6 @@ vault:()=>{const q=st.q.trim().toLowerCase();
       <span class="slabel">Share 5 files from another app</span>
       <span class="cntnum">sim</span></div>`}
     ${noteCard()}
-  </div>`},
-
-type:()=>{const t=st.arg,list=byType(t);
-  return `${sbar()}${tbar("go('vault')",TYPE[t],`<span class="tbtn" onclick="go('add')">${ic('add',17)}</span>`)}
-  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
-    <div><h1 class="big" style="font-size:33px;color:var(--c-${t})">${TYPE[t]}</h1>
-      <div class="sub">${list.length} saved</div></div>
-    ${list.length?'':`<div class="empty"><div class="e1">Nothing here yet</div>
-      <div class="e2">Things land here when you share or copy them from another app.</div></div>`}
-    ${list.filter(i=>i.pin).length?`<div class="sect">Pinned</div>${grid(list.filter(i=>i.pin))}`:''}
-    ${list.filter(i=>!i.pin).length?`<div class="sect">${list.some(i=>i.pin)?'Everything else':'All'}</div>
-      ${grid(list.filter(i=>!i.pin))}`:''}
   </div>`},
 
 item:()=>'',
@@ -1015,7 +1049,7 @@ add:()=>`${sbar()}${tbar("go('vault')",'New',
   </div>`,
 
 edit:()=>{const it=find(st.arg); if(!it)return V.vault();
-  return `${sbar()}${tbar("go('type','"+it.t+"')",'Edit',
+  return `${sbar()}${tbar("goVault('"+it.t+"')",'Edit',
     `<span class="tbtn wide" style="background:var(--c-${it.t});color:#fff;border:none"
       onclick="saveEdit()">Save</span>`)}
   <div class="roll" style="padding-top:52px">
@@ -1333,12 +1367,12 @@ function render(){
   [...document.getElementById('devSeg').children].forEach(b=>b.onclick=()=>{DEVICE=b.dataset.d;relaunch()});
   document.getElementById('notes').innerHTML=`
     <h3>Try these</h3>
-    <p>Tap a <b>type tile</b> to open it · tap any <b>card</b> for its sheet, then <b>Tags</b> · <b>Pin</b> and watch the Vault reorder · try pinning a <b>third</b> thing · tap the <b>search pill</b> and type "cal", "pdf" or a tag · the <b>gear</b> opens Settings.</p>
+    <p>Tap a <b>chip</b> to put a lens on the one stream — Pinned narrows too, nothing navigates · tap any <b>card</b> for its sheet, then <b>Tags</b> · <b>Pin</b> and watch the Vault reorder · try pinning a <b>third</b> thing · tap the <b>search pill</b> and type "cal", "pdf" or a tag — the lens keeps filtering while you search · the <b>gear</b> opens Settings.</p>
     <h3>One screen, search-first</h3>
-    <p><b>Vault:</b> home, inline search, the item sheet, manual add — no bottom nav. The clipboard watcher is on by default and sits at the bottom as a quiet gauge row; tapping it opens Settings, where the real switch lives.<br>
+    <p><b>Vault:</b> home, inline search, filter chips, the item sheet, manual add — no bottom nav. The head (title, pill, chips) stays fixed; only the stream scrolls. The clipboard watcher is on by default and sits at the bottom as a quiet gauge row; tapping it opens Settings, where the real switch lives.<br>
        <b>Settings</b> (gear, top-right): The everyday (Theme, clipboard watch) up top, everything else under More — and the <b>Ideas</b> page, ten proposals with yes / no / later votes that stick.</p>
     <h3>New in this build</h3>
-    <p>Search <b>"otter"</b> — a screenshot turns up because the words live <b>inside the picture</b>; open it for the found text and its own Copy. Save the <b>same text twice</b> from the plus, or attach the same picture twice: the original bumps to the top instead of duplicating.</p>
+    <p><b>Types are lenses now:</b> the By-type section is gone. Chips under the search pill narrow the full stream in place, the choice survives a relaunch, and All takes the lens off. Search <b>"otter"</b> — a screenshot turns up because the words live <b>inside the picture</b>; open it for the found text and its own Copy. Save the <b>same text twice</b> from the plus, or attach the same picture twice: the original bumps to the top instead of duplicating.</p>
     <h3>What the paywall does</h3>
     <p>Pinning a third thing doesn't error — it takes you to the upgrade page, in the moment the limit actually matters. Gate on scale, never on access.</p>
     <h3>Device views</h3>
@@ -1352,7 +1386,7 @@ function renderKeepFocus(){
   const n=document.getElementById('q');
   if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
 }
-Object.assign(window,{go,openSearch,closeSearch,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
+Object.assign(window,{go,goVault,setFilter,vaultEdge,openSearch,closeSearch,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
   saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch,dismissNote,attachSim,copyOcr,
   openThemePicker,closeThemePicker,setTheme,vote,openTags,closeTags,addTag,removeTag,flipCopy,
   simShareIn,closeShare});
