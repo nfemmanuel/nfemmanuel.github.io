@@ -401,6 +401,27 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
   .device-flip .stage{flex-basis:100%}
 }
 
+/* ── link titles ──
+   The URL stays primary (owner's constraint: soon after copying, the address is
+   what you recognise). The title sits UNDER it — smaller, ink-3, two lines at
+   most. The stack keeps the tile's centering behaviour; when a small tile cannot
+   hold both, overflow clips from the bottom, so the title is what gives way. */
+.gc .lstack{flex:1;min-width:0;margin-top:auto;margin-bottom:auto}
+.gc .ltitle{font-size:10.5px;line-height:1.35;font-weight:450;color:var(--ink-3);margin-top:5px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.gc .ltitle.pend{font-style:italic;opacity:.75}
+.gc .ltitle.in{animation:tfade .5s ease}
+@keyframes tfade{from{opacity:0}}
+/* ── share-in: a compact sheet ticking through files handed over at once ── */
+.shprog{padding:2px 20px 12px;font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.shrow{display:flex;align-items:center;gap:12px;padding:10px 20px;font-size:14px}
+.shrow+.shrow{border-top:1px solid var(--hair)}
+.shrow .sic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.shrow .snm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shrow.dim{opacity:.45}
+.shrow .sok{color:var(--c-doc);display:flex}
+.shrow .sno{color:var(--ink-3);font-size:12px;flex:0 0 auto}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 svg{display:block}
 </style>
@@ -485,9 +506,9 @@ const SEED=[
   {id:10,t:'doc',v:'Resume.pdf'},
   {id:11,t:'doc',v:'Cover-letter.docx'},
   {id:12,t:'doc',v:'Transcript.pdf'},
-  {id:13,t:'lnk',v:'alexrivera.example.com'},
-  {id:14,t:'lnk',v:'linkedin.example.com/in/alexrivera'},
-  {id:15,t:'lnk',v:'cal.example.com/alex/15min'},
+  {id:13,t:'lnk',v:'alexrivera.example.com',title:'Alex Rivera - Product Designer'},
+  {id:14,t:'lnk',v:'linkedin.example.com/in/alexrivera',title:'Alex Rivera | LinkedIn'},
+  {id:15,t:'lnk',v:'cal.example.com/alex/15min',title:'Book 15 minutes with Alex'},
   {id:16,t:'doc',v:'Portfolio.zip'},
   {id:17,t:'doc',v:'Rate-card.xlsx'},
   {id:18,t:'doc',v:'Case-study.pptx'},
@@ -526,7 +547,7 @@ try{
     }}
 }catch(_){}
 if(!ITEMS)ITEMS=SEED.map(i=>({...i,src:'seed'}));
-ITEMS.forEach(i=>i.fresh=0);
+ITEMS.forEach(i=>{i.fresh=0;i.titlePending=0;i.titleNew=0;});   /* transient flags never survive a reload */
 /* Stored vaults from before this build (same v1 key — no version bump) predate the
    found-text field and the wifi seed. Backfill seed images by id and add the missing
    seed if its id is free; user-made items are never touched, and items without the
@@ -539,6 +560,10 @@ if(ITEMS.some(i=>i.src==='seed')&&!ITEMS.some(i=>i.id===24||(i.t==='img'&&i.v===
 /* a Reading state must not survive a reload — settle it from the sim source */
 ITEMS.forEach(i=>{ if(i.ocrPending){ delete i.ocrPending;
   if(i.fid===ATTACH.fid&&!i.ocr)i.ocr=ATTACH.ocr; }});
+/* Same backfill for link titles: seed links gained titles in this build. */
+SEED.forEach(s=>{ if(!s.title)return;
+  const held=ITEMS.find(i=>i.id===s.id&&i.src==='seed'&&i.t==='lnk'&&!i.title);
+  if(held)held.title=s.title; });
 function saveStore(){try{localStorage.setItem(KEY,
   JSON.stringify({v:1,items:ITEMS,watch:st.watch,theme:st.theme,device:DEVICE,votes:VOTES,
     noteDismissed:st.noteDismissed}))}catch(_){}}
@@ -667,6 +692,22 @@ function pruneAuto(){
   return cold.length;
 }
 
+/* Capture sim only: a just-caught link "fetches" its page title — canned strings,
+   ~900ms, then a fade-in. IN THE REAL APP THIS IS A PRODUCT DECISION, NOT A DETAIL:
+   fetching a title means one network request to the link's own site at save time —
+   the first thing in this product that would ever touch the network, and it needs
+   the INTERNET permission the app deliberately lacks. Zero-network alternative:
+   Android share-ins often carry EXTRA_SUBJECT, which is the page title for free.
+   The link sheet states the trade-off so the owner sees it here, not in a review. */
+const CANNED_TITLES=['How to ask for a raise (and get one)','Getting started - Example Docs',
+  'Senior Product Designer - Careers','Pricing - Example Cloud'];
+let cannedIx=0;
+function simFetchTitle(id){
+  setTimeout(()=>{const li=find(id); if(!li||!li.titlePending)return;
+    li.titlePending=0; li.title=CANNED_TITLES[cannedIx++%CANNED_TITLES.length]; li.titleNew=1; render();
+    setTimeout(()=>{const l2=find(id); if(l2){l2.titleNew=0;render();}},800);
+  },900);
+}
 async function grabClip(manual){
   try{
     const txt=await navigator.clipboard.readText();
@@ -682,6 +723,7 @@ async function grabClip(manual){
       return true;
     }
     ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1,auto:1,uses:0,touch:++seq});
+    if(t==='lnk'){ITEMS[0].titlePending=1;simFetchTitle(ITEMS[0].id);}
     const dropped=pruneAuto();
     if(!manual&&st.view!=='edit'&&st.view!=='add'){st.view='vault';st.sheet=null;st.tagEdit=false;}
     render();
@@ -721,6 +763,82 @@ navigator.permissions?.query({name:'clipboard-read'}).then(p=>{
   if(p.state==='granted'&&st.watch&&!watchTimer){grabClip(false);beginPoll();}
   render();
 }).catch(()=>{});
+
+/* ── share-in: many files at once ──
+   Native path: ACTION_SEND_MULTIPLE delivers EXTRA_STREAM as a Uri array; each Uri
+   runs through the EXISTING single-file intake pipeline, one transaction per file,
+   so a failure mid-queue keeps everything already saved. The UI never says "queue"
+   or "stream" — it says "Saving 2 of 5". The free files+images cap (FILECAP) is
+   checked up front: what fits is saved, the rest is stated plainly with the
+   existing route to the plan page. */
+const FILECAP=20;
+const SHAREQ=[
+  [['doc','Writing-sample.pdf'],['doc','Certifications.pdf'],['doc','Salary-research.xlsx'],
+   ['img','Whiteboard sketch','linear-gradient(135deg,#37878A,#1D4547)'],
+   ['img','Office tour','linear-gradient(135deg,#C07524,#5E3A12)']],
+  [['doc','Reference-letter.pdf'],['doc','Availability.docx'],['doc','Project-brief.pptx'],
+   ['img','Conference badge','linear-gradient(135deg,#BA5138,#5C2213)'],
+   ['img','Desk setup','linear-gradient(135deg,#2C8A56,#123D25)']],
+];
+let shareIx=0;
+function simShareIn(){
+  if(st.shareSim)return;
+  const q=SHAREQ[shareIx++%SHAREQ.length].map(f=>({t:f[0],v:f[1],g:f[2]}));
+  const room=Math.max(0,FILECAP-(byType('img').length+byType('doc').length));
+  /* Files already held cost no room - they bump rather than land, so only the
+     genuinely new ones are measured against the cap. Otherwise re-sharing a
+     folder you already saved would claim things "did not fit" that were
+     already yours. */
+  const fresh=q.filter(f=>!findDupe(f.t,f.v,f.fid)).length;
+  st.shareSim={files:q,fits:q.length-Math.max(0,fresh-room),done:0,finished:false};
+  st.sheet=null;st.tagEdit=false;st.themePicker=false;
+  render(); tickShare();
+}
+function tickShare(){
+  const s=st.shareSim; if(!s)return;
+  if(s.done>=s.fits){s.finished=true;render();clearFresh();return;}
+  setTimeout(()=>{
+    const w=st.shareSim; if(!w)return;
+    const f=w.files[w.done];
+    /* Sharing in is a capture path like any other, so it answers to the duplicate
+       rule too: a file already held is bumped, never twinned. (Merge integration —
+       the two features were prototyped on separate branches, so this path and the
+       duplicate rule had never met.) */
+    const held=findDupe(f.t,f.v,f.fid);
+    if(held){ touchItem(held); held.fresh=1; ITEMS=[held,...ITEMS.filter(i=>i.id!==held.id)]; w.dupes=(w.dupes||0)+1; }
+    else ITEMS.unshift({id:nextId(),t:f.t,v:f.v,g:f.g,fresh:1,src:'share'});
+    w.done++;render();tickShare();
+  },650);
+}
+function closeShare(){st.shareSim=null;render();}
+function shareSheet(){
+  const s=st.shareSim; if(!s)return'';
+  const total=s.files.length;
+  const line=s.finished
+    ?(s.fits===total?`${total} saved`
+      :s.fits===0?`None of these fit - the free vault holds ${FILECAP} files`
+      :`${s.fits} saved - ${total-s.fits} did not fit`)
+    :`Saving ${s.done+1} of ${total}...`;
+  const rows=s.files.map((f,i)=>{
+    const saved=i<s.done, over=i>=s.fits, now=i===s.done&&!s.finished&&!over;
+    const k=f.t==='doc'?kindOf(f.v):null;
+    const icch=f.t==='doc'
+      ?`<span class="sic" style="color:${k.c};background:color-mix(in srgb,${k.c} 14%,transparent)">${ic(k.g,17,1.7)}</span>`
+      :`<span class="sic" style="color:#fff;background:${f.g}">${ic('img',16,1.8)}</span>`;
+    const right=saved?`<span class="sok">${ic('ok',16,2.2)}</span>`
+      :(s.finished&&over?'<span class="sno">did not fit</span>':'');
+    return `<div class="shrow${saved||now?'':' dim'}">${icch}<span class="snm">${esc(f.v)}</span>${right}</div>`;
+  }).join('');
+  return `<div class="scrim"${s.finished?' onclick="closeShare()"':''}></div>
+  <div class="sheet"><div class="grip"></div>
+    <div class="shprog">${line}</div>
+    ${rows}
+    ${s.finished&&s.fits<total?`<div class="opt" onclick="closeShare();go('plan')">
+      <span style="color:var(--ink-2)">${ic('img',19)}</span>
+      <span class="t">Make room - remove the limits</span>${ic('next',16)}</div>`:''}
+    ${s.finished?`<div class="act" style="background:var(--c-doc);margin-top:12px" onclick="closeShare()">Done</div>`:''}
+  </div>`;
+}
 
 /* ── chrome ── */
 const sbar=()=>`<div class="sbar"><span>9:41</span><span>5G</span></div>`;
@@ -775,8 +893,15 @@ const card=it=>{
   const body=it.t==='lnk'?domify(wbr(esc(it.v)))
                          :wbr(esc(it.v)).replace(/\n/g,'<br>');
   const n=it.v.length, size=n<=26?' s1':n<=58?' s2':'', ov=n>58?' ov':'';
+  /* A link's title rides UNDER the URL, never instead of it: the URL keeps its
+     exact size and accent, the title is the smaller grey line — and the part
+     that gets clipped when the tile cannot hold both. Items without a title
+     render exactly as before. */
+  const tline=it.t==='lnk'?(it.titlePending?'<div class="ltitle pend">Fetching title...</div>'
+    :it.title?`<div class="ltitle${it.titleNew?' in':''}">${esc(it.title)}</div>`:''):'';
+  const tx=`<div class="tx${it.code?' code':''}${size}${it.pin?' ind':''}">${body}</div>`;
   return `<div class="gc ${it.t}${fresh}${ov}" ${open}>
-    <div class="face"><div class="tx${it.code?' code':''}${size}${it.pin?' ind':''}">${body}</div></div>${pin}</div>`;
+    <div class="face">${tline?`<div class="lstack">${tx}${tline}</div>`:tx}</div>${pin}</div>`;
 };
 const grid=list=>{const g3=list.length&&list.every(i=>i.t==='txt'||i.t==='lnk')?' g3':'';
   return `<div class="grid${g3}">${list.map(card).join('')}</div>`;};
@@ -844,6 +969,10 @@ vault:()=>{const q=st.q.trim().toLowerCase();
     ${q?'':`<div class="catch${st.watch?'':' off'}" onclick="go('you')">
       <span class="live"></span><span class="slabel">${st.watch?'Watching':'Not watching'}</span>
       <span class="cntnum">${autoItems().length}/${AUTO_CAP}</span></div>`}
+    ${q?'':`<div class="catch" style="margin-top:11px" onclick="simShareIn()">
+      <span style="display:flex;color:var(--ink-3)">${ic('send',16)}</span>
+      <span class="slabel">Share 5 files from another app</span>
+      <span class="cntnum">sim</span></div>`}
     ${noteCard()}
   </div>`},
 
@@ -1041,6 +1170,10 @@ function sheetBody(it){
   return `<div style="padding:2px 20px 16px">
       <div style="font-size:${it.code?18:17}px;line-height:1.5;${it.code?'font-family:var(--mono);letter-spacing:-.02em':''}">
         ${it.g?`<div class="thumb" style="background:${it.g};margin:0 0 12px;height:104px"></div>`:''}${it.v.replace(/\n/g,'<br>')}</div>
+      ${it.t==='lnk'?`
+        ${it.titlePending?'<div style="font-size:13.5px;color:var(--ink-3);font-style:italic;margin-top:7px">Fetching title...</div>':''}
+        ${it.title?`<div style="font-size:13.5px;color:var(--ink-2);line-height:1.45;margin-top:7px">${esc(it.title)}</div>`:''}
+        <div style="font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:9px;opacity:.85">Titles are fetched from the page when you save - the first and only thing that goes online.</div>`:''}
     </div>
     ${it.t==='img'&&(it.ocr||it.ocrPending)?`<div class="ocrsec">
       <div class="ocrhead"><span class="t">Text found inside</span>
@@ -1171,14 +1304,21 @@ function render(){
     scrHTML=sbar()
       +`<div class="panes"><div class="pane-l">${(V[st.view]||V.vault)()}</div>`
       +`<div class="pane-r">${dock()}</div></div>`
-      +(st.themePicker?themeSheet():'')
+      +(st.themePicker?themeSheet():'')+(st.shareSim?shareSheet():'')
       +(st.toast?`<div class="toast">${st.toast}</div>`:'');
   }else{
     scrHTML=(V[st.view]||V.vault)()
       +(st.sheet?(st.tagEdit?tagSheet():sheet()):'')+(st.themePicker?themeSheet():'')
+      +(st.shareSim?shareSheet():'')
       +(st.toast?`<div class="toast">${st.toast}</div>`:'');
   }
   document.getElementById('scr').innerHTML=scrHTML;
+  /* a link tile whose URL+title stack genuinely overflows gets the existing bottom
+     fade, so the clipped title reads as "there is more", not "this broke" */
+  document.querySelectorAll('#scr .gc.lnk .lstack').forEach(s=>{
+    const f=s.parentElement,g=f&&f.closest('.gc');
+    if(g&&s.offsetHeight>f.clientHeight-20)g.classList.add('ov');
+  });
   document.getElementById('platSeg').innerHTML=[['md','Android'],['ios','iOS']]
     .map(p=>`<button data-p="${p[0]}" data-on="${PLAT===p[0]?1:0}">${p[1]}</button>`).join('');
   document.getElementById('themeSeg').innerHTML=[['light','Light'],['dark','Dark']]
@@ -1214,7 +1354,8 @@ function renderKeepFocus(){
 }
 Object.assign(window,{go,openSearch,closeSearch,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
   saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch,dismissNote,attachSim,copyOcr,
-  openThemePicker,closeThemePicker,setTheme,vote,openTags,closeTags,addTag,removeTag,flipCopy});
+  openThemePicker,closeThemePicker,setTheme,vote,openTags,closeTags,addTag,removeTag,flipCopy,
+  simShareIn,closeShare});
 render();
 /* let the bounce finish, then never again this session */
 setTimeout(()=>{firstOpen=false},600);
