@@ -14,6 +14,10 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%231A1F26%22 stroke=%22%23333B45%22 stroke-width=%228%22/><rect x=%2246%22 y=%228%22 width=%228%22 height=%2224%22 rx=%224%22 fill=%22%23FF4D4D%22/></svg>">
 </head>
 <body>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F6F4EF; --card:#FFFFFF; --ink:#23282E; --dim:#6E7681; --line:#E4E0D6;
@@ -38,6 +42,46 @@
     --accent:#0E8C7F; --accent-soft:#0E8C7F22;
     --field:#FBFAF7; --field-line:#D8D3C8;
     --shadow:0 10px 30px rgba(30,35,40,.10);
+  }
+
+  /* ═══ current product tokens (app-mockup.html is canonical) ═══
+     The dial page speaks this language; the keyboard page still wears the
+     teal-era coat (noted debt). body.on-dial remaps the old var names so the
+     whole page chrome retunes without touching keyboard-page CSS. */
+  :root{
+    --display:"Bricolage Grotesque",system-ui,sans-serif;
+    --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
+    --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
+  }}
+  :root[data-theme="dark"]{--c-txt:#FFC978;--c-img:#C6A8FF;--c-doc:#8FC6FF;--c-lnk:#FFA184}
+  :root[data-theme="light"]{--c-txt:#B4761C;--c-img:#7B55B4;--c-doc:#356BA6;--c-lnk:#BA5138}
+  body.on-dial{
+    --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
+    --accent:var(--c-doc); --accent-soft:#356BA622;
+    --field:#F6F6F7; --field-line:#DFE1E5;
+    --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+    font-family:var(--ui);
+  }
+  @media (prefers-color-scheme: dark){body.on-dial{
+    --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
+    --accent:var(--c-doc); --accent-soft:#8FC6FF26;
+    --field:#131519; --field-line:#2E333A;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.55);
+  }}
+  :root[data-theme="dark"] body.on-dial{
+    --paper:#0E1013; --card:#181B20; --ink:#F0F1F3; --dim:#A2A9B3; --ink-3:#767D87; --line:#272B31;
+    --accent:var(--c-doc); --accent-soft:#8FC6FF26;
+    --field:#131519; --field-line:#2E333A;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 36px rgba(0,0,0,.55);
+  }
+  :root[data-theme="light"] body.on-dial{
+    --paper:#F6F6F7; --card:#FFF; --ink:#14161A; --dim:#5C636D; --ink-3:#8B929C; --line:#E7E8EB;
+    --accent:var(--c-doc); --accent-soft:#356BA622;
+    --field:#F6F6F7; --field-line:#DFE1E5;
+    --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
   }
 
   *{box-sizing:border-box}
@@ -271,7 +315,66 @@
   body.device-ipad .card,body.device-ipad .task,body.device-ipad .navcard{border-radius:18px}
   body.device-ipad [data-page="dial"] h1 + p,
   body.device-ipad [data-page="dial"] .tips,
+  body.device-ipad [data-page="dial"] #diallab,
+  body.device-ipad [data-page="dial"] .permrow,
   body.device-ipad [data-page="dial"] .task{display:none}
+
+  /* ═══ dial page in the current language ═══ */
+  [data-page="dial"] h1{font-family:var(--display);font-weight:800;letter-spacing:-.035em}
+  [data-page="dial"] h2{font-family:var(--display);font-weight:700;letter-spacing:-.02em}
+  [data-page="dial"] .eyebrow{color:var(--ink-3,var(--dim))}
+  body.on-dial .card,body.on-dial .task,body.on-dial .navcard{border-radius:22px}
+  body.on-dial input[type=text],body.on-dial textarea{border-radius:12px;border-width:1px}
+  body.on-dial .filebtn{background:var(--ink);color:var(--paper);border-radius:12px}
+  body.on-dial #savechip b{color:#8FC6FF}
+  #dialsvg text{font-family:var(--ui)}
+  .labrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px}
+  .labrow:first-of-type{margin-top:0}
+  .labrow>span{font-size:12.5px;font-weight:600;flex:0 0 auto;min-width:84px}
+  .dseg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:99px;padding:2px}
+  .dseg button{appearance:none;border:0;background:transparent;font:inherit;font-size:11.5px;font-weight:500;
+    color:var(--dim);padding:4px 11px;border-radius:99px;cursor:pointer;transition:.2s}
+  .dseg button[data-on="1"]{background:var(--ink);color:var(--paper)}
+  .labbtns{gap:8px}
+  .stage{appearance:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
+    background:var(--field);border:1px solid var(--line);border-radius:10px;padding:8px 13px;cursor:pointer}
+  .stage:hover{border-color:var(--dim)}
+  .stage.ghost{color:var(--dim);font-weight:500}
+  .permrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:12px 15px;margin-bottom:14px;color:var(--dim);font-size:13px;cursor:pointer}
+  .permrow b{margin-left:auto;color:var(--ink);font-weight:600}
+  #receipt{position:fixed;z-index:62;left:50%;transform:translateX(-50%) translateY(6px) scale(.92);
+    background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:99px;
+    padding:9px 16px;font-family:var(--ui);font-size:12.5px;font-weight:600;box-shadow:var(--shadow);
+    opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
+  #receipt.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+  #pastechip{position:absolute;z-index:56;display:none;background:var(--ink);color:var(--paper);
+    border-radius:99px;padding:8px 14px;font-family:var(--ui);font-size:12.5px;font-weight:600;cursor:pointer;
+    box-shadow:var(--shadow);user-select:none;white-space:nowrap}
+  #dialpulse{position:fixed;z-index:61;width:84px;height:84px;border-radius:50%;
+    border:2.5px solid var(--c-doc);pointer-events:none;opacity:0}
+  #dialpulse.go{animation:dialpulse .55s ease-out}
+  @keyframes dialpulse{0%{opacity:.85;transform:scale(.55)}100%{opacity:0;transform:scale(1.55)}}
+  @media (prefers-reduced-motion: reduce){#dialpulse.go{animation:none}}
+  /* permission moment — a sheet, not a cold interrupt */
+  #perm{display:none;position:fixed;inset:0;z-index:64}
+  .pm-scrim{position:absolute;inset:0;background:rgba(8,10,13,.45)}
+  .pm-sheet{position:absolute;left:0;right:0;bottom:0;max-width:580px;margin:0 auto;
+    background:var(--card);border:1px solid var(--line);border-bottom:none;border-radius:22px 22px 0 0;
+    padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow);
+    animation:pkup .22s cubic-bezier(.2,.9,.3,1.05);font-family:var(--ui)}
+  .pm-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 14px}
+  .pm-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+  .pm-copy{font-size:13.5px;color:var(--dim);line-height:1.55;margin:0 0 12px}
+  .pm-mini{display:flex;justify-content:center;background:var(--field);border:1px solid var(--line);
+    border-radius:14px;padding:12px 0;margin-bottom:14px}
+  .pm-mini .arcgrp{animation:pmdial 2.6s ease-in-out infinite}
+  @keyframes pmdial{0%,100%{opacity:.3}45%,65%{opacity:1}}
+  @media (prefers-reduced-motion: reduce){.pm-mini .arcgrp{animation:none;opacity:1}}
+  .pm-go{display:block;width:100%;height:48px;border:none;border-radius:14px;background:var(--ink);
+    color:var(--paper);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+  .pm-no{display:block;width:100%;padding:13px 0 2px;border:none;background:none;color:var(--dim);
+    font:inherit;font-size:13.5px;cursor:pointer}
 
   [hidden]{display:none !important}
   footer{margin-top:26px;font-size:12px;color:var(--dim);text-align:center;line-height:1.7}
@@ -306,7 +409,7 @@
   <section data-page="dial" hidden>
     <div class="eyebrow">Test 1 · the dial</div>
     <h1>Apply to Northbeam using only the dial →</h1>
-    <p style="margin:-2px 0 10px">The round button on the right edge is the app. It floats over whatever you're doing.</p>
+    <p style="margin:-2px 0 10px">The round button on the screen edge is Reel. It floats over whatever you're doing — fill the form below without ever leaving it.</p>
     <!-- iPad only: iOS has no overlay API — no AccessibilityService, no
          SYSTEM_ALERT_WINDOW equivalent — so a floating dial cannot exist there.
          This card replaces the dial demo. A statement, not an apology; link nothing. -->
@@ -314,14 +417,25 @@
       <p style="margin:0">No overlays on iOS — the dial is Android's. On iPad the vault rides the keyboard, the share sheet, and the Files app instead.</p>
     </div>
     <div class="card tips">
-      <h2>Three moves</h2>
+      <h2>The moves</h2>
       <table>
-        <tr><td>Tap the round button</td><td>Opens and stays. Spin a ring — it steps one item at a time and settles; the item at the <b style="color:#FF4D4D">red mark</b> is selected. Tap it to insert into the box you last touched.</td></tr>
-        <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button, then slide <b>out</b>: a little reaches the <b>inner</b> ring (collections), further reaches the <b>outer</b> ring (items). Arc your finger to spin whichever you're on — the lit ring is the one you're holding. Release on the outer ring to insert and put it away.</td></tr>
-        <tr><td>Double-tap the button</td><td>Pastes your most recent item instantly. No dial.</td></tr>
-        <tr><td>Pins &amp; slow-cycle</td><td>The two <b>edge slots are pinned</b> — same place forever, tap to use. Hold a finger on any off-center item and the ring <b>cycles slowly</b> on its own until you let go.</td></tr>
+        <tr><td>Tap the round button</td><td>Opens and stays. Copied something just before? The dial catches it — or offers to, depending on the catch switch below. Spin a ring: it steps one item at a time and settles; the item at the <b style="color:#FF4D4D">red mark</b> is up. Tap it — copied, receipt, and the dial slips away. One paste finishes the job.</td></tr>
+        <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button, slide <b>out</b>: a little reaches the <b>inner</b> ring (types), further reaches the <b>outer</b> ring (items). Arc your finger to spin whichever you're on. Release on the outer ring to take the item and put the dial away.</td></tr>
+        <tr><td>Hold · drag across</td><td>Drag the button past the middle of the screen and let go — it <b>docks to the other edge</b> and stays there.</td></tr>
+        <tr><td>Double-tap the button</td><td>Your most recent item, instantly. No dial.</td></tr>
+        <tr><td>Pins &amp; slow-cycle</td><td>The two <b>edge slots are pinned</b> — same place forever, tap to use. Hold a finger on any off-center item and the ring <b>cycles slowly</b> until you let go.</td></tr>
       </table>
-      <p class="muted" style="margin:8px 0 0">Inner ring = your three types. Outer ring = what's inside. The rings step and settle — no half-turns. Turn sound on for the clicks.</p>
+      <p class="muted" style="margin:8px 0 0">Two switches below — <b>Catch style</b> and <b>Egress</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
+    </div>
+
+    <div class="permrow" id="permrow" hidden>The edge handle is off<b>Turn it on</b></div>
+
+    <div class="card" id="diallab">
+      <div class="labrow"><span>Catch style</span>
+        <div class="dseg" id="segCatch"><button type="button" data-v="auto">Automatic</button><button type="button" data-v="ask">Ask</button></div></div>
+      <div class="labrow"><span>Egress</span>
+        <div class="dseg" id="segEgress"><button type="button" data-v="insert">Insert (demo magic)</button><button type="button" data-v="copy">Copy (honest)</button></div></div>
+      <div class="labrow labbtns"><button type="button" class="stage" id="stagebtn">Copy something in another app</button><button type="button" class="stage ghost" id="firstrunbtn">Replay first run</button></div>
     </div>
 
     <div class="task">
@@ -329,9 +443,9 @@
         <div><b>Northbeam Careers</b><small>Product Design Intern · Application form</small></div></div>
       <div class="two">
         <div><label>Full name</label><input type="text" placeholder="Text → Full name"></div>
-        <div><label>Phone</label><input type="text" placeholder="Clipboard → Phone"></div>
+        <div><label>Phone</label><input type="text" placeholder="Text → Phone"></div>
       </div>
-      <label>Email</label><input type="text" placeholder="Clipboard → Email">
+      <label>Email</label><input type="text" placeholder="Text → Email (it's pinned)">
       <label>Portfolio URL</label><input type="text" placeholder="Links → Portfolio">
       <label>Why Northbeam?</label><textarea rows="3" placeholder="There's an opener for this in Text…"></textarea>
       <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
@@ -351,19 +465,19 @@
       <div class="co"><div class="logo" style="background:#3E7C4F">W</div>
         <div><b>Guests at the door</b><small>via text</small></div></div>
       <div class="chatlog"><div class="bub">we're outside!! what's the wifi??</div></div>
-      <label>Reply</label><input type="text" placeholder="Clipboard → Wifi password">
+      <label>Reply</label><input type="text" placeholder="Text → Wifi password">
     </div>
 
     <div class="task">
       <div class="co"><div class="logo" style="background:#8A5A2B">B</div>
         <div><b>Split the deposit</b><small>bank transfer form</small></div></div>
-      <label>Recipient IBAN</label><input type="text" placeholder="Clipboard → IBAN (watch the toast)">
+      <label>Recipient IBAN</label><input type="text" placeholder="Text → IBAN (it's masked on the ring)">
       <label>Reference</label><input type="text" placeholder="e.g. Maple Grove deposit">
     </div>
 
     <div class="task">
       <h2>＋ Make it yours</h2>
-      <p class="muted" style="margin-bottom:10px">Add your <b>own</b> resume or a photo — it appears in the dial's Docs/Images and you can attach it above. The file never uploads; only its name is remembered, in your browser.</p>
+      <p class="muted" style="margin-bottom:10px">Add your <b>own</b> resume or a photo — a photo joins the dial's Images, a document shows up when you attach above. The file never uploads; only its name is remembered, in your browser.</p>
       <button class="filebtn" id="addfile1"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Add a file to the vault</button>
       <p class="muted" style="margin:10px 0 0">Also: select any text on this page and a <b>Save to Reel</b> chip appears — write one line of your own cover letter, select it, save it, reuse it on the keyboard page.</p>
     </div>
@@ -437,6 +551,10 @@
 <div id="savechip"><b>＋</b> Save to Reel</div>
 <div id="toast" role="status"></div>
 <div id="picker"></div>
+<div id="receipt" role="status"></div>
+<div id="pastechip" role="button"></div>
+<div id="dialpulse" aria-hidden="true"></div>
+<div id="perm"></div>
 
 <script>
 'use strict';
@@ -545,12 +663,156 @@ function tick(){
     o.connect(g).connect(AC.destination);o.start(t);o.stop(t+.02);}catch(_){}
 }
 
+/* ============ dial-page state: catch style, egress, permission, docking ============ */
+/* All persisted, all self-healing to a default on any unknown value. */
+const CATCHKEY='reel.dial.catch.v1',EGRESSKEY='reel.dial.egress.v1',
+      PERMKEY='reel.perm.v1',DOCKKEY='reel.dock.v1';
+let CATCH=(()=>{try{const v=localStorage.getItem(CATCHKEY);return v==='auto'||v==='ask'?v:'ask'}catch(_){return 'ask'}})();
+let EGRESS=(()=>{try{const v=localStorage.getItem(EGRESSKEY);return v==='insert'||v==='copy'?v:'copy'}catch(_){return 'copy'}})();
+let PERM=(()=>{try{return localStorage.getItem(PERMKEY)==='denied'?'denied':'granted'}catch(_){return 'granted'}})();
+const DOCKS=(()=>{const def={phone:'right',fold:'right',tablet:'right',ipad:'right'};
+  try{const j=JSON.parse(localStorage.getItem(DOCKKEY));
+    if(j&&typeof j==='object')for(const k in def)if(j[k]==='left'||j[k]==='right')def[k]=j[k];
+  }catch(_){}
+  return def})();
+function persist(k,v){try{localStorage.setItem(k,v)}catch(_){}}
+/* the ring is always a dark instrument, so it speaks the dark palette's type
+   colours regardless of page theme (app-mockup.html is canonical for the hues) */
+const TYPEC={txt:'#FFC978',url:'#FFA184',img:'#C6A8FF'};
+
+/* a fake clip, primed by "Copy something in another app" */
+let stagedClip=null,stageIdx=0;
+const STAGE_SAMPLES=[
+  '1Z 999 AA1 01 2345 6784',
+  'Can you resend the invoice before Friday?',
+  'https://maps.example.com/pin/golden-hour',
+  'Gate B22, boarding 18:40',
+];
+function stageClip(){
+  stagedClip=STAGE_SAMPLES[stageIdx++%STAGE_SAMPLES.length];
+  toast('Copied in another app — now open the dial');
+}
+function doCatch(content){
+  const now=Date.now();
+  const type=/^https?:\/\//.test(content)?'url':'txt';
+  vault.push({id:'c'+now,type,label:content.slice(0,24)+(content.length>24?'…':''),content,
+    use_count:0,last_used_at:0,captured_at:now,source:'catch',pin_order:null,is_sensitive:0});
+  save(vault);refreshKb();
+  const idx=COLS.findIndex(c=>c[1]===type);
+  let d0=mod(idx-DIAL.tIn,COLS.length);if(d0>COLS.length/2)d0-=COLS.length;
+  DIAL.tIn+=d0;DIAL.rawIn=DIAL.tIn;   // ring turns to the caught type with a click
+  DIAL.tOut=0;DIAL.rawOut=0;          // fresh item lands at the index mark
+  DIAL.offer=null;stagedClip=null;
+  receipt('Caught');
+}
+function catchOnOpen(){
+  if(!stagedClip)return;
+  if(CATCH==='auto')doCatch(stagedClip);
+  else DIAL.offer=stagedClip;          // center offer; ignoring it drops it
+}
+
+/* receipt chip — the one-line proof a copy or a catch happened */
+const receiptEl=document.getElementById('receipt');let receiptT;
+function receipt(msg){
+  receiptEl.textContent=msg;
+  receiptEl.style.top=Math.max(64,CY-R-46)+'px';
+  receiptEl.classList.add('show');
+  clearTimeout(receiptT);receiptT=setTimeout(()=>receiptEl.classList.remove('show'),1800);
+}
+/* one haptic-styled tick: the click plus this visual pulse at the dial's hub */
+const pulseEl=document.getElementById('dialpulse');
+function dialPulse(color){
+  pulseEl.style.borderColor=color||'';
+  pulseEl.style.left=(AX-42)+'px';pulseEl.style.top=(CY-42)+'px';
+  pulseEl.classList.remove('go');void pulseEl.offsetWidth;pulseEl.classList.add('go');
+}
+/* the paste affordance — after an honest copy, the errand still completes */
+const pastechip=document.getElementById('pastechip');
+let pendingPaste=null;
+function showPasteChip(){
+  if(!pendingPaste||!T.field||!visibleSection().contains(T.field)){pastechip.style.display='none';return;}
+  const r=T.field.getBoundingClientRect();
+  pastechip.textContent='Paste · '+pendingPaste.label.slice(0,16);
+  pastechip.style.display='block';
+  pastechip.style.left=Math.max(8,r.right+scrollX-pastechip.offsetWidth)+'px';
+  pastechip.style.top=(r.top+scrollY-42)+'px';
+}
+function clearPaste(){pendingPaste=null;pastechip.style.display='none';}
+pastechip.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  if(pendingPaste&&T.field&&visibleSection().contains(T.field)){
+    insertAtCursor(T.field,pendingPaste.text);tick();
+  }
+  clearPaste();
+});
+function copyEgress(it){
+  touch(it);
+  const txt=it.content||it.label;
+  try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).catch(()=>{});}catch(_){}
+  if(it.type==='txt'||it.type==='url')pendingPaste={text:txt,label:it.label};
+  receipt('Copied — paste where you were');
+  dialPulse(TYPEC[it.type]);tick();
+  showPasteChip();
+  return true;
+}
+
+/* the permission moment — designed, previewed, never a cold interrupt */
+const permEl=document.getElementById('perm');
+function permApply(){
+  document.getElementById('permrow').hidden=PERM==='granted';
+  drawDial();
+}
+function openPerm(){
+  permEl.innerHTML=`<div class="pm-scrim"></div>
+   <div class="pm-sheet">
+    <div class="pm-grip"></div>
+    <div class="pm-title">Let Reel float</div>
+    <p class="pm-copy">Reel draws a small handle over other apps. Android will ask you to allow it.</p>
+    <div class="pm-mini"><svg width="230" height="120" viewBox="0 0 230 120" aria-hidden="true">
+      <rect x="60" y="6" width="110" height="108" rx="12" fill="none" stroke="var(--line)" stroke-width="2"/>
+      <rect x="76" y="22" width="74" height="7" rx="3.5" fill="var(--line)"/>
+      <rect x="76" y="36" width="52" height="7" rx="3.5" fill="var(--line)"/>
+      <rect x="76" y="50" width="64" height="7" rx="3.5" fill="var(--line)"/>
+      <g class="arcgrp">
+        <path d="M164 28 A32 32 0 0 0 164 92" fill="none" stroke="#2A323D" stroke-width="9"/>
+        <path d="M164 40 A20 20 0 0 0 164 80" fill="none" stroke="#39424F" stroke-width="7"/>
+      </g>
+      <circle cx="170" cy="60" r="12" fill="#151A21" stroke="#39424F" stroke-width="2"/>
+      <line x1="170" y1="50" x2="170" y2="54" stroke="#FF4D4D" stroke-width="2.4" stroke-linecap="round"/>
+    </svg></div>
+    <button type="button" class="pm-go">Continue</button>
+    <button type="button" class="pm-no">Not now</button>
+   </div>`;
+  permEl.style.display='block';
+  permEl.querySelector('.pm-scrim').onclick=closePerm;
+  permEl.querySelector('.pm-go').onclick=()=>{
+    PERM='granted';persist(PERMKEY,PERM);closePerm();permApply();
+    toast('The handle is on — look at the edge');};
+  permEl.querySelector('.pm-no').onclick=()=>{
+    PERM='denied';persist(PERMKEY,PERM);closePerm();permApply();};
+}
+function closePerm(){permEl.style.display='none';permEl.innerHTML='';}
+
+/* lab wiring: the two feel toggles + staging + first-run replay */
+function bindSeg(id,get,set){
+  const el=document.getElementById(id);
+  const sync=()=>[...el.children].forEach(b=>b.dataset.on=b.dataset.v===get()?'1':'0');
+  [...el.children].forEach(b=>b.onclick=()=>{set(b.dataset.v);sync();});
+  sync();
+}
+bindSeg('segCatch',()=>CATCH,v=>{CATCH=v;persist(CATCHKEY,v);});
+bindSeg('segEgress',()=>EGRESS,v=>{EGRESS=v;persist(EGRESSKEY,v);});
+document.getElementById('stagebtn').onclick=stageClip;
+document.getElementById('firstrunbtn').onclick=openPerm;
+document.getElementById('permrow').onclick=openPerm;
+
 /* ================= targets + insert engine ================= */
 const T={field:null,drop:null};
 document.addEventListener('focusin',e=>{
   const el=e.target;
   if(el.closest('#kb'))return;
-  if((el.matches('input[type=text],textarea'))&&el.closest('.task')){T.field=el;}
+  if((el.matches('input[type=text],textarea'))&&el.closest('.task')){T.field=el;
+    if(pendingPaste)showPasteChip();}
 });
 /* Upload spots open a picker where Reel appears as a SOURCE — the Files-provider
    mechanic, simulated honestly. Documents never ride the dial or the keyboard:
@@ -604,28 +866,35 @@ function insertAtCursor(el,text){
 }
 function pulse(sel){document.querySelectorAll(sel).forEach(el=>{el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');})}
 function visibleSection(){return document.querySelector('section:not([hidden])')}
-function useItem(it){
+function useItem(it,via){
   if(!it)return false;
   if(it.type==='txt'||it.type==='url'){
     if(kb.classList.contains('up')&&(it.content||'').includes('___')){enterFill(it);return true;}
+    /* the dial's honest contract: copy + receipt + auto-close; one paste finishes */
+    if(via==='dial'&&EGRESS==='copy')return copyEgress(it);
     if(T.field&&visibleSection().contains(T.field)){
       insertAtCursor(T.field,it.content||it.label);touch(it);
       toast(it.is_sensitive?`${it.label} inserted — auto-clears from clipboard in 60s`:`Inserted · ${it.label}`);
+      if(via==='dial')dialPulse(TYPEC[it.type]);
       tick();setTimeout(tick,70);return true;
     }
     pulse('section:not([hidden]) input[type=text],section:not([hidden]) textarea');
     toast('Tap a text box first, then summon');return false;
   }
   if(it.type==='img'){
-    touch(it);toast(`${it.label} copied — paste it where you need it`);
-    tick();setTimeout(tick,70);return true;   // images ride the clipboard, like the real app
+    touch(it);   // images ride the clipboard, like the real app — both egress modes agree
+    if(via==='dial'){receipt('Copied — paste where you were');dialPulse(TYPEC.img);tick();return true;}
+    toast(`${it.label} copied — paste it where you need it`);
+    tick();setTimeout(tick,70);return true;
   }
   return false;   // docs never reach the rings; the upload picker is their surface
 }
 function pasteLast(){
   const it=lastUsed();
-  if(it&&(it.type==='txt'||it.type==='url')){const r=useItem(it);if(r)toast(`Pasted last · ${it.label}`);}
-  else useItem(it);
+  if(!it)return;
+  if((it.type==='txt'||it.type==='url')&&EGRESS!=='copy'){
+    const r=useItem(it,'dial');if(r)toast(`Pasted last · ${it.label}`);
+  }else useItem(it,'dial');
 }
 
 /* ================= selection capture ================= */
@@ -651,7 +920,7 @@ chip.addEventListener('pointerdown',e=>{
   vault.push({id:'u'+now,type:'txt',label:selText.slice(0,26)+(selText.length>26?'…':''),
     content:selText,col:'Clipboard',use_count:0,last_used_at:now,captured_at:now,source:'selection'});
   save(vault);chip.style.display='none';
-  toast('Saved to Clipboard ✓ — now double-tap the dial handle');
+  toast('Saved to Text — double-tap the dial handle to use it');
   refreshKb();
 });
 
@@ -691,10 +960,11 @@ function route(){
   const page=PAGES.includes(h)?h:'home';
   document.querySelectorAll('[data-page]').forEach(s=>s.hidden=s.dataset.page!==page);
   document.getElementById('kbfab').hidden=page!=='keyboard';
+  document.body.classList.toggle('on-dial',page==='dial');   // dial page wears the current tokens
   if(page!=='keyboard')kbHide();
   DIAL.enabled=page==='dial'&&DEV!=='ipad';   // iOS: no overlay API, no dial
-  if(!DIAL.enabled){DIAL.mode='closed';DIAL.open=0;DIAL.openT=0;document.body.classList.remove('dialing');}
-  T.field=null;T.drop=null;
+  if(!DIAL.enabled){DIAL.mode='closed';DIAL.open=0;DIAL.openT=0;DIAL.offer=null;document.body.classList.remove('dialing');}
+  T.field=null;T.drop=null;clearPaste();closePerm();
   scrollTo(0,0);drawDial();
 }
 addEventListener('hashchange',route);
@@ -867,18 +1137,22 @@ const glidechip=document.getElementById('glidechip');
    somewhere to accumulate; it is never drawn. */
 const DIAL={enabled:false,mode:'closed',open:0,openT:0,
   sIn:0,tIn:0,rawIn:0,sOut:0,tOut:0,rawOut:0,cat:0,grab:null,downBand:null,
-  lastA:0,moved:0,downT:0,tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null};
+  lastA:0,moved:0,downT:0,tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null,
+  offer:null,dockX:0,dockY:0};
 const DEADBAND=0.55;                                   // >0.5 so it can't flicker on the boundary
 const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
 const BTN_R=27;                                        // round logo button (primary affordance)
 function turn(ring,deltaDeg){
   const D=DIAL,step=ring==='In'?STEP_IN:STEP_OUT;
-  D['raw'+ring]+=-deltaDeg/step;
+  D['raw'+ring]+=-EDGE*deltaDeg/step;                  // EDGE keeps drag-down = next on either edge
   D['t'+ring]=detent(D['raw'+ring],D['t'+ring]);
 }
 function settle(ring){const D=DIAL;D['raw'+ring]=D['t'+ring];}
 const STEP_IN=42,STEP_OUT=33,WIN_IN=46,WIN_OUT=70;
 let VW=innerWidth,VH=innerHeight,FW=innerWidth,AX=innerWidth,R=0,HUB=0,IN0=0,IN1=0,OUT0=0,OUT1=0,CY=0;
+/* either-edge docking: DOCK is per-device, persisted; CA is the arc's center
+   angle (270 opens leftward from the right edge, 90 mirrors it) */
+let DOCK='right',EDGE=1,CA=270;
 function sizes(){
   /* scrollingElement.clientWidth, not innerWidth: CSS left:50% (frame, hinge,
      keyboard) resolves against the layout viewport, which excludes a classic
@@ -895,7 +1169,8 @@ function sizes(){
      edge (AX), not the browser's, so each view keeps its proportions on any
      monitor. Phone: FW=VW and AX=VW — exactly the old math, zero drift. */
   FW=DEV==='fold'?Math.min(673,VW):(DEV==='tablet'||DEV==='ipad')?Math.min(1024,VW):VW;
-  AX=(VW+FW)/2;
+  DOCK=DOCKS[DEV]||'right';EDGE=DOCK==='right'?1:-1;CA=DOCK==='right'?270:90;
+  AX=DOCK==='right'?(VW+FW)/2:(VW-FW)/2;
   R=Math.min(FW*0.46,205);
   HUB=R*.17;IN0=R*.25;IN1=R*.52;OUT0=R*.58;OUT1=R*.88;
   /* Tablet: the dial rides the LOWER third — where the thumb lands when a hand
@@ -908,7 +1183,7 @@ sizes();addEventListener('resize',()=>{sizes();drawDial();});
 const rad=d=>(d-90)*Math.PI/180;
 const P=(r,deg)=>({x:AX+r*Math.cos(rad(deg)),y:CY+r*Math.sin(rad(deg))});
 const P2=(cx,cy,r,deg)=>({x:cx+r*Math.cos(rad(deg)),y:cy+r*Math.sin(rad(deg))});
-const onLogoBtn=(x,y)=>Math.hypot(x-(AX-BTN_R),y-CY)<=BTN_R+11;
+const onLogoBtn=(x,y)=>Math.hypot(x-(AX-EDGE*BTN_R),y-CY)<=BTN_R+11;
 const wrapDeg=x=>((x+180)%360+360)%360-180;
 const mod=(a,n)=>((a%n)+n)%n;
 const dist=(x,y)=>Math.hypot(x-AX,y-CY);
@@ -941,45 +1216,60 @@ function dialItems(){const pins=new Set(pinnedItems().map(p=>p.id));
   return byType(COLS[DIAL.cat][1]).filter(i=>!pins.has(i.id))}
 function focusedItem(){const its=dialItems();return its.length?its[mod(Math.round(DIAL.sOut),its.length)]:null}
 
+function handleSVG(bx,by){
+  let s=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="#151A21" stroke="#39424F" stroke-width="2"/>`;
+  for(let a=-70;a<=70;a+=10){const p1=P2(bx,by,BTN_R-4,a),p2=P2(bx,by,BTN_R-1,a);
+    s+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#39424F" stroke-width="1.3" opacity=".8"/>`;}
+  s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-9}" fill="none" stroke="#4A5563" stroke-width="1.4"/>`;
+  s+=`<circle cx="${bx}" cy="${by}" r="6.5" fill="#5F6B79"/>`;
+  s+=`<line x1="${bx}" y1="${by-BTN_R+3}" x2="${bx}" y2="${by-BTN_R+10}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round"/>`;
+  return s;
+}
 function drawDial(){
   if(!DIAL.enabled){svg.innerHTML='';return;}
   const f=DIAL.open,o=x=>x*(0.55+0.45*f);
+  const catc=TYPEC[COLS[DIAL.cat][1]]||'#FFC978';    // the selected type lends its colour
   let h=`<defs><radialGradient id="brl" cx="100%" cy="56%" r="75%">
     <stop offset="55%" stop-color="#161B22"/><stop offset="82%" stop-color="#1D242E"/>
     <stop offset="100%" stop-color="#12161C"/></radialGradient>
     <radialGradient id="hb" cx="50%" cy="42%" r="70%">
     <stop offset="0%" stop-color="#2C3542"/><stop offset="100%" stop-color="#12161C"/></radialGradient>
     <linearGradient id="g0" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#3E5A72"/><stop offset="1" stop-color="#22303E"/></linearGradient>
+    <stop offset="0" stop-color="#584479"/><stop offset="1" stop-color="#2E2542"/></linearGradient>
     <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#5C4A6E"/><stop offset="1" stop-color="#2C2438"/></linearGradient></defs>`;
+    <stop offset="0" stop-color="#6E5694"/><stop offset="1" stop-color="#352A4E"/></linearGradient></defs>`;
+  if(DIAL.mode==='dock'){
+    /* the handle rides the finger; a dashed target waits at the other edge */
+    const oppAX=DOCK==='right'?(VW-FW)/2:(VW+FW)/2;
+    h+=`<circle cx="${oppAX+EDGE*BTN_R}" cy="${CY}" r="${BTN_R}" fill="none" stroke="#39424F" stroke-width="2" stroke-dasharray="5 6" opacity=".85"/>`;
+    h+=`<g opacity=".8">`+handleSVG(DIAL.dockX,DIAL.dockY)+`</g>`;
+    svg.innerHTML=h;return;
+  }
   if(f<.02){
-    const bx=AX-BTN_R,by=CY;
+    const bx=AX-EDGE*BTN_R,by=CY;
+    const off=PERM!=='granted';
     // secondary: the docked panel edge, a quiet hint that something lives here
-    h+=`<rect x="${AX-4}" y="${CY-52}" width="3" height="104" rx="1.5" fill="#3A4655" opacity=".45"/>`;
-    // primary: round logo button
-    h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="#151A21" stroke="#39424F" stroke-width="2"/>`;
-    for(let a=-70;a<=70;a+=10){const p1=P2(bx,by,BTN_R-4,a),p2=P2(bx,by,BTN_R-1,a);
-      h+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#39424F" stroke-width="1.3" opacity=".8"/>`;}
-    h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-9}" fill="none" stroke="#4A5563" stroke-width="1.4"/>`;
-    h+=`<circle cx="${bx}" cy="${by}" r="6.5" fill="#2FB9A9"/>`;
-    h+=`<line x1="${bx}" y1="${by-BTN_R+3}" x2="${bx}" y2="${by-BTN_R+10}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round"/>`;
-    if(DEV==='fold'){
-      /* Reach changes on a wide unfolded screen: the right edge is a long way
-         from a left thumb. Dock-either-edge is the design answer — the real
-         build lets the handle be dragged to whichever edge the holding hand
-         owns. Here: a drag-handle hint plus one line of truth. */
+    h+=`<rect x="${DOCK==='right'?AX-4:AX+1}" y="${CY-52}" width="3" height="104" rx="1.5" fill="#3A4655" opacity="${off?.18:.45}"/>`;
+    // primary: round logo button — dimmed and inert while the permission is off
+    h+=`<g opacity="${off?.28:1}">`+handleSVG(bx,by)+`</g>`;
+    if(!off){
+      /* drag-dots: the re-dock affordance, real on every device view —
+         hold and drag across the midline to dock the other edge */
       for(const dy of [-7,0,7])for(const dx of [-2.6,2.6])
-        h+=`<circle cx="${bx-BTN_R-8+dx}" cy="${by+dy}" r="1.3" fill="#8A94A0"/>`;
-      const cw=224,cx0=AX-12-cw,cy0=by+BTN_R+16;
-      h+=`<rect x="${cx0}" y="${cy0}" width="${cw}" height="24" rx="8" fill="rgba(10,13,17,.88)" stroke="#2B333D"/>`;
-      h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">Docks to either edge on the real thing</text>`;
+        h+=`<circle cx="${bx-EDGE*(BTN_R+8)+dx}" cy="${by+dy}" r="1.3" fill="#8A94A0"/>`;
+      if(DEV==='fold'){
+        /* Reach changes on a wide unfolded screen — the caption spells out
+           what the dots offer, on the device that needs it most. */
+        const cw=210,cx0=DOCK==='right'?AX-12-cw:AX+12,cy0=by+BTN_R+16;
+        h+=`<rect x="${cx0}" y="${cy0}" width="${cw}" height="24" rx="8" fill="rgba(10,13,17,.88)" stroke="#2B333D"/>`;
+        h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">Hold and drag across — docks either edge</text>`;
+      }
+      h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
     }
-    h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
     svg.innerHTML=h;return;
   }
   h+=`<circle cx="${AX}" cy="${CY}" r="${o(OUT1)+22}" fill="rgba(5,8,12,${.5*f})"/>`;
-  const A0=270-WIN_OUT-16,A1=270+WIN_OUT+16;
+  const A0=CA-WIN_OUT-16,A1=CA+WIN_OUT+16;
   h+=`<path d="${seg(o(IN0),o(IN1),A0,A1)}" fill="url(#brl)" stroke="#2A323D"/>`;
   h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="url(#brl)" stroke="#2A323D"/>`;
   const knurl=(r0,r1,s,st)=>{let k='';const sh=-(s*st)%7;
@@ -990,34 +1280,42 @@ function drawDial(){
   if(DIAL.mode==='glide'){                            // which ring the finger currently owns
     const z=DIAL.glideZone;
     if(z){const r0=z==='In'?o(IN0):o(OUT0),r1=z==='In'?o(IN1):o(OUT1);
-      h+=`<path d="${seg(r0,r1,A0,A1)}" fill="#2FB9A9" fill-opacity=".10" stroke="#2FB9A9" stroke-width="2"/>`;}
-    else{h+=`<path d="${seg(o(IN0),o(IN1),A0,A1)}" fill="none" stroke="#2FB9A9" stroke-width="1.5" stroke-dasharray="4 5" opacity=".5"/>`;}
+      h+=`<path d="${seg(r0,r1,A0,A1)}" fill="${catc}" fill-opacity=".10" stroke="${catc}" stroke-width="2"/>`;}
+    else{h+=`<path d="${seg(o(IN0),o(IN1),A0,A1)}" fill="none" stroke="${catc}" stroke-width="1.5" stroke-dasharray="4 5" opacity=".5"/>`;}
   }
-  h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,270-STEP_OUT/2,270+STEP_OUT/2)}" fill="#2FB9A9" opacity="${.14*f}"/>`;
-  h+=`<path d="${seg(o(IN0)+2,o(IN1)-2,270-STEP_IN/2,270+STEP_IN/2)}" fill="#2FB9A9" opacity="${.18*f}"/>`;
+  h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,CA-STEP_OUT/2,CA+STEP_OUT/2)}" fill="${catc}" opacity="${.14*f}"/>`;
+  h+=`<path d="${seg(o(IN0)+2,o(IN1)-2,CA-STEP_IN/2,CA+STEP_IN/2)}" fill="${catc}" opacity="${.18*f}"/>`;
   slots(COLS,DIAL.sIn,STEP_IN,WIN_IN).forEach(({i,off})=>{
-    const p=P(o((IN0+IN1)/2),270+off),foc=Math.abs(off)<STEP_IN*.45;
+    const p=P(o((IN0+IN1)/2),CA+off),foc=Math.abs(off)<STEP_IN*.45;
     const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_IN+10)/18))*f;
     h+=`<text x="${p.x}" y="${p.y}" font-size="${foc?11.5:9.5}" font-weight="${foc?700:500}" letter-spacing=".06em" text-anchor="middle" dominant-baseline="central" opacity="${op}" fill="#DFE6EE">${COLS[i][0].toUpperCase()}</text>`;});
   /* outer ring = Samsung-clipboard content cards: raw text, image thumbs, filenames.
-     No identity icons out here — the inner ring owns wayfinding; only the pin mark decorates. */
+     No identity icons out here — the inner ring owns wayfinding; only the pin mark decorates.
+     Card washes are the current type tints, dimmed for the dark instrument. */
   const midO=o((OUT0+OUT1)/2);
-  const TINT={txt:'#2B2A21',url:'#222A3A',doc:'#2A2430'};
+  const TINT={txt:'#33290F',url:'#3B2018',doc:'#2A2430'};
   const gpick=id=>'g'+(Math.abs([...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0))%2);
   const card=(it,ang,scale,op,pinned)=>{
     const c=P(midO,ang),w=58*scale,hh=40*scale;
     const isImg=it.type==='img';
     const fill=isImg?`url(#${gpick(it.id)})`:(TINT[it.type]||'#2A2F36');
+    const fresh=it.source==='catch'&&Date.now()-it.captured_at<6000;
+    const edge=pinned?(TYPEC[it.type]||'#3A424D'):fresh?'#8FC6FF':'#3A424D';
     let s=`<g opacity="${op}">`;
     s+=`<rect x="${c.x-w/2}" y="${c.y-hh/2}" width="${w}" height="${hh}" rx="7" fill="${fill}"
-        stroke="${pinned?'#2FB9A9':'#3A424D'}" stroke-width="${pinned?1.4:1}"/>`;
-    if(!isImg){
+        stroke="${edge}" stroke-width="${pinned||fresh?1.4:1}"/>`;
+    if(it.is_sensitive){
+      /* masked: the label says which thing, the dots say "not for shoulders" —
+         the real value still rides the copy */
+      s+=`<text x="${c.x}" y="${c.y-5}" font-size="${7.5*scale}" letter-spacing=".08em" text-anchor="middle" dominant-baseline="central" fill="#98A3B0">${escq(it.label.slice(0,14).toUpperCase())}</text>`;
+      s+=`<text x="${c.x}" y="${c.y+6.5*scale}" font-size="${9*scale}" letter-spacing=".14em" text-anchor="middle" dominant-baseline="central" fill="#D6DEE8">••••&#8202;••••</text>`;
+    }else if(!isImg){
       const raw=(it.type==='doc'?it.label:(it.content||it.label)).replace(/\s+/g,' ');
       const l1=raw.slice(0,12),l2=raw.slice(12,23)+(raw.length>23?'…':'');
       s+=`<text x="${c.x}" y="${c.y-(l2?5:0)}" font-size="${8.5*scale}" text-anchor="middle" dominant-baseline="central" fill="#D6DEE8">${escq(l1)}</text>`;
       if(l2)s+=`<text x="${c.x}" y="${c.y+6.5*scale}" font-size="${8.5*scale}" text-anchor="middle" dominant-baseline="central" fill="#98A3B0">${escq(l2)}</text>`;
     }
-    if(pinned)s+=`<g stroke="#2FB9A9" stroke-width="1.2" stroke-linecap="round" fill="none">
+    if(pinned)s+=`<g stroke="${TYPEC[it.type]||'#8A94A0'}" stroke-width="1.2" stroke-linecap="round" fill="none">
       <circle cx="${c.x+w/2-8}" cy="${c.y-hh/2+7}" r="2.4"/>
       <path d="M${c.x+w/2-8} ${c.y-hh/2+9.4}v3.2"/></g>`;
     return s+`</g>`;
@@ -1026,17 +1324,28 @@ function drawDial(){
   slots(its,DIAL.sOut,STEP_OUT,WIN_ROT).forEach(({i,off})=>{
     const foc=Math.abs(off)<STEP_OUT*.45;
     const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_ROT+8)/14))*f;
-    h+=card(its[i],270+off,foc?1.14:1,op,false);
+    h+=card(its[i],CA+off,foc?1.14:1,op,false);
   });
-  pinnedItems().forEach((pn,k)=>{h+=card(pn,270+(k===0?-PIN_OFF:PIN_OFF),1,f,true);});
-  const m1=P(o(OUT1)+9,270),m2=P(o(OUT1)+17,270);
+  pinnedItems().forEach((pn,k)=>{h+=card(pn,CA+(k===0?-PIN_OFF:PIN_OFF),1,f,true);});
+  const m1=P(o(OUT1)+9,CA),m2=P(o(OUT1)+17,CA);
   h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round" opacity="${f}"/>`;
-  h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#hb)" stroke="#39424F" stroke-width="1.5" opacity="${f}"/>`;
-  h+=`<text x="${AX-HUB*.45}" y="${CY}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#C9D3DF" opacity="${f}">✕</text>`;
+  if(DIAL.offer){
+    /* catch-on-open, "ask" style: the clipboard's newest thing waits at the
+       center; tapping it catches, anything else lets it go */
+    const HO=HUB+13,oc=TYPEC[/^https?:\/\//.test(DIAL.offer)?'url':'txt'];
+    const sn=DIAL.offer.replace(/\s+/g,' ').slice(0,11)+(DIAL.offer.length>11?'…':'');
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HO}" fill="url(#hb)" stroke="${oc}" stroke-width="2" opacity="${f}"/>`;
+    h+=`<text x="${AX-EDGE*HO*.48}" y="${CY-7}" font-size="11.5" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#F0F1F3" opacity="${f}">Catch?</text>`;
+    h+=`<text x="${AX-EDGE*HO*.48}" y="${CY+8}" font-size="8" text-anchor="middle" dominant-baseline="central" fill="#98A3B0" opacity="${f}">${escq(sn)}</text>`;
+  }else{
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#hb)" stroke="#39424F" stroke-width="1.5" opacity="${f}"/>`;
+    h+=`<text x="${AX-EDGE*HUB*.45}" y="${CY}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#C9D3DF" opacity="${f}">✕</text>`;
+  }
   if(DIAL.mode==='glide'){                 // glide keeps its one-line mode hint; browse needs none —
-    const cp=P(o(OUT1)+24,270);            // the cards show their own content now
-    h+=`<g opacity="${f}"><rect x="${cp.x-128}" y="${cp.y-12}" width="128" height="24" rx="8" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
-    <text x="${cp.x-64}" y="${cp.y+1}" font-size="9.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">${DIAL.glideZone==='Out'?'release to insert':DIAL.glideZone==='In'?'turning collections':'slide out to pick a ring'}</text></g>`;
+    const cp=P(o(OUT1)+24,CA);             // the cards show their own content now
+    const gx=DOCK==='right'?cp.x-128:cp.x;
+    h+=`<g opacity="${f}"><rect x="${gx}" y="${cp.y-12}" width="128" height="24" rx="8" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
+    <text x="${gx+64}" y="${cp.y+1}" font-size="9.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">${DIAL.glideZone==='Out'?(EGRESS==='copy'?'release to copy':'release to insert'):DIAL.glideZone==='In'?'turning types':'slide out to pick a ring'}</text></g>`;
   }
   svg.innerHTML=h;
 }
@@ -1059,7 +1368,9 @@ let prevIn=0,prevOut=0;
     const c=mod(D.tIn,COLS.length);
     if(c!==D.cat){D.cat=c;D.sOut=0;D.tOut=0;D.rawOut=0;prevOut=0;}}
   if(D.tOut!==prevOut){prevOut=D.tOut;tick();}
-  document.body.classList.toggle('dialing',D.enabled&&(D.openT>0||D.mode==='glide'));
+  // an unanswered center offer is dropped the moment the dial is fully away
+  if(D.open===0&&D.openT===0&&D.offer){D.offer=null;stagedClip=null;}
+  document.body.classList.toggle('dialing',D.enabled&&(D.openT>0||D.mode==='glide'||D.mode==='dock'));
   if(D.enabled)drawDial();
   requestAnimationFrame(loop);
 })();
@@ -1068,6 +1379,7 @@ let prevIn=0,prevOut=0;
 let PTR=null;
 addEventListener('pointerdown',e=>{
   const D=DIAL;if(!D.enabled)return;
+  if(PERM!=='granted')return;                          // no permission, no handle
   const d=dist(e.clientX,e.clientY);
   const onHandle=D.openT===0&&onLogoBtn(e.clientX,e.clientY);
   if(D.openT===0&&!onHandle)return;
@@ -1075,7 +1387,7 @@ addEventListener('pointerdown',e=>{
   D.glideY=e.clientY;D.downBand=band(d);
   /* hold on an off-center rotating slot ⇒ slow auto-cycle toward that side */
   if(D.openT>0&&D.downBand){
-    const rel=wrapDeg(ang(e.clientX,e.clientY)-270),ar=Math.abs(rel);
+    const rel=wrapDeg(ang(e.clientX,e.clientY)-CA),ar=Math.abs(rel);
     const zone=(D.downBand==='Out'&&ar>=12&&ar<=48)||(D.downBand==='In'&&ar>=15&&ar<=58);
     if(zone){
       D.cycT=setTimeout(()=>{D.cycOn=true;
@@ -1090,9 +1402,11 @@ addEventListener('pointerdown',e=>{
     D.holdTimer=setTimeout(()=>{
       D.holdTimer=null;
       clearTimeout(D.tapTimer);D.tapTimer=null;
-      D.mode='glide';D.glideZone=null;D.openT=1;tick();
+      D.mode='glide';D.glideZone=null;D.openT=1;tick();catchOnOpen();
       glidechip.style.display='block';glidechip.textContent='move out to pick a ring';
-      glidechip.style.right=((VW-AX)+R+40)+'px';glidechip.style.top=(CY-34)+'px';
+      if(DOCK==='right'){glidechip.style.left='auto';glidechip.style.right=((VW-AX)+R+40)+'px';}
+      else{glidechip.style.right='auto';glidechip.style.left=(AX+R+40)+'px';}
+      glidechip.style.top=(CY-34)+'px';
     },350);
     e.preventDefault();return;
   }
@@ -1101,13 +1415,28 @@ addEventListener('pointerdown',e=>{
 
 addEventListener('pointermove',e=>{
   const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;
+  if(D.mode==='dock'){
+    D.dockX=e.clientX;D.dockY=e.clientY;
+    const past=DOCK==='right'?e.clientX<VW/2:e.clientX>VW/2;
+    glidechip.textContent=past?('release to dock '+(DOCK==='right'?'left':'right')):'slide back to cancel';
+    glidechip.style.right='auto';
+    glidechip.style.left=Math.max(8,Math.min(VW-140,e.clientX-60))+'px';
+    glidechip.style.top=(Math.max(12,e.clientY-52))+'px';
+    e.preventDefault();return;
+  }
   if(D.mode==='glide'){
+    /* long-press-drag across the midline ⇒ re-dock, the Fold hint made real */
+    if((DOCK==='right'&&e.clientX<VW/2-12)||(DOCK==='left'&&e.clientX>VW/2+12)){
+      D.mode='dock';D.glideZone=null;D.openT=0;
+      D.dockX=e.clientX;D.dockY=e.clientY;
+      e.preventDefault();return;
+    }
     const r=dist(e.clientX,e.clientY),a=ang(e.clientX,e.clientY);
     const z=zoneFor(r,D.glideZone);
     if(z!==D.glideZone){
       D.glideZone=z;D.lastA=a;                        // re-baseline so switching rings doesn't jump
       if(z)tick();
-      glidechip.textContent=z==='In'?'turning collections':z==='Out'?'release to insert':'move out to pick a ring';
+      glidechip.textContent=z==='In'?'turning types':z==='Out'?(EGRESS==='copy'?'release to copy':'release to insert'):'move out to pick a ring';
     }
     if(D.glideZone){
       const delta=wrapDeg(a-D.lastA);
@@ -1135,6 +1464,16 @@ addEventListener('pointerup',e=>{
   clearTimeout(D.holdTimer);D.holdTimer=null;
   clearTimeout(D.cycT);D.cycT=null;
   if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}
+  if(D.mode==='dock'){
+    D.mode='closed';glidechip.style.display='none';
+    const past=DOCK==='right'?e.clientX<VW/2:e.clientX>VW/2;
+    if(past){
+      DOCKS[DEV]=DOCK==='right'?'left':'right';
+      try{localStorage.setItem(DOCKKEY,JSON.stringify(DOCKS))}catch(_){}
+      sizes();tick();receipt('Docked '+DOCKS[DEV]);
+    }
+    D.downBand=null;drawDial();return;
+  }
   if(D.cycOn){D.cycOn=false;                     // a cycle-hold is not a tap
     if(D.grab){settle(D.grab);D.grab=null;}
     D.downBand=null;return;}
@@ -1142,7 +1481,7 @@ addEventListener('pointerup',e=>{
     const z=D.glideZone;
     D.mode='closed';D.glideZone=null;glidechip.style.display='none';
     settle('In');settle('Out');                       // already on whole detents; just resync raw
-    if(z==='Out'){useItem(focusedItem());D.openT=0;}  // only the item ring fires on release
+    if(z==='Out'){useItem(focusedItem(),'dial');D.openT=0;}  // only the item ring fires on release
     else{D.openT=1;}                                  // neutral or collections: stay open to browse
     return;
   }
@@ -1155,15 +1494,16 @@ addEventListener('pointerup',e=>{
     const now=Date.now();
     if(now-D.lastTapAt<300){clearTimeout(D.tapTimer);D.tapTimer=null;D.lastTapAt=0;pasteLast();return;}
     D.lastTapAt=now;
-    D.tapTimer=setTimeout(()=>{D.openT=1;tick();D.tapTimer=null;},290);
+    D.tapTimer=setTimeout(()=>{D.openT=1;tick();D.tapTimer=null;catchOnOpen();},290);
     return;
   }
+  if(D.offer&&d<=HUB+21){doCatch(D.offer);D.downBand=null;return;}   // the center offer
   if(d<=HUB+8){D.openT=0;return;}
   if(d>OUT1+24){D.openT=0;return;}
-  const rel=wrapDeg(a-270),hit=band(d);
+  const rel=wrapDeg(a-CA),hit=band(d);
   if(hit==='Out'&&Math.abs(Math.abs(rel)-PIN_OFF)<13){   // pinned slot: use immediately
     const pn=pinnedItems()[rel>0?1:0];
-    if(pn){const okd=useItem(pn);if(okd)D.openT=0;}
+    if(pn){const okd=useItem(pn,'dial');if(okd)D.openT=0;}
     D.downBand=null;return;
   }
   if(hit&&hit===D.downBand){
@@ -1171,7 +1511,7 @@ addEventListener('pointerup',e=>{
     const dd=rel/step;
     if(Math.abs(rel)<=win+step*.6){
       if(hit==='Out'&&Math.abs(dd)<.45){
-        const okd=useItem(focusedItem());
+        const okd=useItem(focusedItem(),'dial');
         if(okd)D.openT=0;
       }else{D['t'+hit]=Math.round(D['t'+hit]+dd);D['raw'+hit]=D['t'+hit];}
     }
@@ -1190,23 +1530,23 @@ addEventListener('pointercancel',e=>{
   PTR=null;clearTimeout(D.holdTimer);D.holdTimer=null;
   clearTimeout(D.cycT);D.cycT=null;D.cycOn=false;
   if(D.cycInt){clearInterval(D.cycInt);D.cycInt=null;}
-  if(D.mode==='glide'){D.mode='closed';D.glideZone=null;glidechip.style.display='none';D.openT=0;}
+  if(D.mode==='glide'||D.mode==='dock'){D.mode='closed';D.glideZone=null;glidechip.style.display='none';D.openT=0;}
   if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
 });
 
 /* first-visit coach — not on iPad: there is no handle there */
 addEventListener('hashchange',()=>{
   if(location.hash==='#dial'&&DEV!=='ipad'&&!localStorage.getItem('reel.coach.dial')){
-    setTimeout(()=>toast('Tap the handle on the right edge →'),500);
+    setTimeout(()=>toast('Tap the round handle at the screen edge'),500);
     localStorage.setItem('reel.coach.dial','1');
   }
 });
 if(location.hash==='#dial'&&DEV!=='ipad'&&!localStorage.getItem('reel.coach.dial')){
-  setTimeout(()=>toast('Tap the handle on the right edge →'),600);
+  setTimeout(()=>toast('Tap the round handle at the screen edge'),600);
   localStorage.setItem('reel.coach.dial','1');
 }
 
-refreshKb();applyDevice();
+refreshKb();applyDevice();permApply();
 </script>
 
 </body>
