@@ -782,7 +782,7 @@
 <div id="devframe" aria-hidden="true"></div>
 <div id="hinge" aria-hidden="true"></div>
 <svg id="dialsvg" aria-hidden="true"></svg>
-<div class="glidechip" id="glidechip">release to insert</div>
+<div class="glidechip" id="glidechip">release to paste</div>
 <button id="kbfab" hidden aria-label="Open vault keyboard"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.6" y="6.4" width="18.8" height="11.2" rx="2.4"/><path d="M6.4 10h.01M9.8 10h.01M13.2 10h.01M16.6 10h.01M9 13.8h6"/></svg></button>
 <div id="kb" aria-label="Vault keyboard">
   <div class="kdots" id="kdots"><span class="on"></span><span></span></div>
@@ -929,10 +929,14 @@ function tick(){
 
 /* ============ dial-page state: catch style, egress, permission, docking ============ */
 /* All persisted, all self-healing to a default on any unknown value. */
-const CATCHKEY='reel.dial.catch.v1',EGRESSKEY='reel.dial.egress.v1',
+const CATCHKEY='reel.dial.catch.v1',EGRESSKEY='reel.dial.egress.v2',
       PERMKEY='reel.perm.v1',DOCKKEY='reel.dock.v1';
 let CATCH=(()=>{try{const v=localStorage.getItem(CATCHKEY);return v==='auto'||v==='ask'?v:'ask'}catch(_){return 'ask'}})();
-let EGRESS=(()=>{try{const v=localStorage.getItem(EGRESSKEY);return v==='insert'||v==='copy'?v:'copy'}catch(_){return 'copy'}})();
+/* Demo default is INSERT (NF ruling 2026-08-06: "it shouldn't be that way in the
+   demo" - releasing on an item should paste it, so the demo demonstrates the
+   outcome). The Copy (honest) mode stays one toggle away for feeling the real
+   overlay contract; the native build's contract is unchanged (copy + receipt). */
+let EGRESS=(()=>{try{const v=localStorage.getItem(EGRESSKEY);return v==='insert'||v==='copy'?v:'insert'}catch(_){return 'insert'}})();
 /* Preview: where you READ what the dial has up. 'top' is the idea under test —
    the thumb is the input, the top of the screen is the output — so it defaults on. */
 const PREVKEY='reel.dial.preview.v1';
@@ -2216,7 +2220,7 @@ addEventListener('pointermove',e=>{
     if(z!==D.glideZone){
       D.glideZone=z;D.lastA=a;                        // re-baseline so switching rings doesn't jump
       if(z)tick();
-      glidechip.textContent=z==='Out'?(EGRESS==='copy'?'release to copy':'release to insert'):'slide out to the ring';
+      glidechip.textContent=z==='Out'?'release to paste':'slide out to the ring';
     }
     if(D.glideZone){
       const delta=wrapDeg(a-D.lastA);
