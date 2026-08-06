@@ -14,6 +14,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%231A1F26%22 stroke=%22%23333B45%22 stroke-width=%228%22/><rect x=%2246%22 y=%228%22 width=%228%22 height=%2224%22 rx=%224%22 fill=%22%23FF4D4D%22/></svg>">
 </head>
 <body>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -456,11 +457,12 @@
     <div class="card tips">
       <h2>The moves</h2>
       <table>
-        <tr><td>Tap the round button</td><td>Opens and stays. Copied something just before? The dial catches it — or offers to, depending on the catch switch below. Spin a ring: it steps one item at a time and settles; the item at the <b style="color:#FF4D4D">red mark</b> is up. Tap it — copied, receipt, and the dial slips away. One paste finishes the job.</td></tr>
-        <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button, slide <b>out</b>: a little reaches the <b>inner</b> ring (types), further reaches the <b>outer</b> ring (items). Arc your finger to spin whichever you're on. Release on the outer ring to take the item and put the dial away.</td></tr>
+        <tr><td>Tap the round button</td><td>Opens and stays. Copied something just before? The dial catches it — or offers to, depending on the catch switch below. Spin the ring: it steps one item at a time and settles; the item at the <b style="color:#FF4D4D">red mark</b> is up. Tap it — copied, receipt, and the dial slips away. One paste finishes the job.</td></tr>
+        <tr><td>One ring, everything on it</td><td>Your two <b>pinned items hold the edge slots</b> — same place forever, tap to use — and everything else follows, <b>newest first</b>, all types together. Colour says the type: <b style="color:var(--c-txt)">amber</b> is text, <b style="color:var(--c-lnk)">rust</b> is a link, <b style="color:var(--c-img)">violet</b> is an image.</td></tr>
+        <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button and slide <b>out</b> onto the ring, then arc your finger to spin it. Release on an item to take it and put the dial away.</td></tr>
         <tr><td>Hold · drag across</td><td>Drag the button past the middle of the screen and let go — it <b>docks to the other edge</b> and stays there.</td></tr>
         <tr><td>Double-tap the button</td><td>Your most recent item, instantly. No dial.</td></tr>
-        <tr><td>Pins &amp; slow-cycle</td><td>The two <b>edge slots are pinned</b> — same place forever, tap to use. Hold a finger on any off-center item and the ring <b>cycles slowly</b> until you let go.</td></tr>
+        <tr><td>Slow-cycle</td><td>Hold a finger on any off-center item and the ring <b>cycles slowly</b> until you let go.</td></tr>
       </table>
       <p class="muted" style="margin:8px 0 0">Three switches below — <b>Catch style</b>, <b>Egress</b> and <b>Preview</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
       <p class="muted" style="margin:6px 0 0"><b>Preview</b> is the new one: what's up shows at the top of the screen, so your eyes can stay up there while your thumb spins down here.</p>
@@ -482,12 +484,12 @@
       <div class="co"><div class="logo" style="background:#31589E">N</div>
         <div><b>Northbeam Careers</b><small>Product Design Intern · Application form</small></div></div>
       <div class="two">
-        <div><label>Full name</label><input type="text" placeholder="Text → Full name"></div>
-        <div><label>Phone</label><input type="text" placeholder="Text → Phone"></div>
+        <div><label>Full name</label><input type="text" placeholder="Full name — it's on the dial"></div>
+        <div><label>Phone</label><input type="text" placeholder="Phone — on the dial"></div>
       </div>
-      <label>Email</label><input type="text" placeholder="Text → Email (it's pinned)">
-      <label>Portfolio URL</label><input type="text" placeholder="Links → Portfolio">
-      <label>Why Northbeam?</label><textarea rows="3" placeholder="There's an opener for this in Text…"></textarea>
+      <label>Email</label><input type="text" placeholder="Email — it's pinned on the dial">
+      <label>Portfolio URL</label><input type="text" placeholder="Portfolio — the link is on the dial">
+      <label>Why Northbeam?</label><textarea rows="3" placeholder="There's an opener for this on the dial…"></textarea>
       <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
       <label>Headshot — optional (image)</label><div class="drop" data-accept="img" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/></svg> Tap to attach — Reel shows up as a source</div>
     </div>
@@ -498,26 +500,26 @@
       <div class="chatlog">
         <div class="bub">Strong application, Alex! Can you send your LinkedIn and a couple of times to talk this week?</div>
       </div>
-      <label>Reply</label><input type="text" placeholder="Links has both of those…">
+      <label>Reply</label><input type="text" placeholder="The dial has both of those…">
     </div>
 
     <div class="task">
       <div class="co"><div class="logo" style="background:#3E7C4F">W</div>
         <div><b>Guests at the door</b><small>via text</small></div></div>
       <div class="chatlog"><div class="bub">we're outside!! what's the wifi??</div></div>
-      <label>Reply</label><input type="text" placeholder="Text → Wifi password">
+      <label>Reply</label><input type="text" placeholder="Wifi password — on the dial">
     </div>
 
     <div class="task">
       <div class="co"><div class="logo" style="background:#8A5A2B">B</div>
         <div><b>Split the deposit</b><small>bank transfer form</small></div></div>
-      <label>Recipient IBAN</label><input type="text" placeholder="Text → IBAN (it's masked on the ring)">
+      <label>Recipient IBAN</label><input type="text" placeholder="IBAN — masked on the ring">
       <label>Reference</label><input type="text" placeholder="e.g. Maple Grove deposit">
     </div>
 
     <div class="task">
       <h2>＋ Make it yours</h2>
-      <p class="muted" style="margin-bottom:10px">Add your <b>own</b> resume or a photo — a photo joins the dial's Images, a document shows up when you attach above. The file never uploads; only its name is remembered, in your browser.</p>
+      <p class="muted" style="margin-bottom:10px">Add your <b>own</b> resume or a photo — a photo joins the dial, a document shows up when you attach above. The file never uploads; only its name is remembered, in your browser.</p>
       <button class="filebtn" id="addfile1"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Add a file to the vault</button>
       <p class="muted" style="margin:10px 0 0">Also: select any text on this page and a <b>Save to Reel</b> chip appears — write one line of your own cover letter, select it, save it, reuse it on the keyboard page.</p>
     </div>
@@ -528,10 +530,10 @@
     <div class="eyebrow">Test 2 · the keyboard</div>
     <h1>Second application of the day — keyboard style</h1>
     <p style="font-size:12.5px;border:1px dashed var(--line);border-radius:10px;padding:8px 12px;color:var(--dim)">
-      <b style="color:var(--ink)">Concept exhibit — not being built.</b> The keyboard was cut
-      (2026-08-05): a keyboard is a whole product, and the one you already use is better at
-      typing than ours would be. The dial carries retrieval instead. This page stays so the
-      idea's record survives its retirement.</p>
+      <b style="color:var(--ink)">Concept exhibit — the iOS keyboard.</b> This page is the
+      iOS surface: on iPhone and iPad, the vault rides the keyboard. On Android the dial
+      carries retrieval instead — the Android IME is what was cut (2026-08-05). Not being
+      built as an Android keyboard.</p>
     <p>Tap into any box and the vault keyboard rises — <b>vault first, keys one swipe left</b>. Three things to try: the search field (it uses our own keys — a keyboard can't summon a keyboard), the <b>Interview thanks</b> card (it asks you to fill a blank before inserting), and the <b>⇄ done</b> key that hands you straight back to your own keyboard.</p>
 
     <div class="task">
@@ -563,7 +565,7 @@
     </div>
   </section>
 
-  <footer>reel · prototype v0.4 · everything stays in this browser<br>a Shipaton 2026 project, built in public · <a href="#home">start over</a></footer>
+  <footer>reel · prototype v0.5 · everything stays in this browser<br>a Shipaton 2026 project, built in public · <a href="#home">start over</a></footer>
 </main>
 
 <input type="file" id="filepick" multiple hidden>
@@ -752,10 +754,7 @@ function doCatch(content){
   vault.push({id:'c'+now,type,label:content.slice(0,24)+(content.length>24?'…':''),content,
     use_count:0,last_used_at:0,captured_at:now,source:'catch',pin_order:null,is_sensitive:0});
   save(vault);refreshKb();
-  const idx=COLS.findIndex(c=>c[1]===type);
-  let d0=mod(idx-DIAL.tIn,COLS.length);if(d0>COLS.length/2)d0-=COLS.length;
-  DIAL.tIn+=d0;DIAL.rawIn=DIAL.tIn;   // ring turns to the caught type with a click
-  DIAL.tOut=0;DIAL.rawOut=0;          // fresh item lands at the index mark
+  DIAL.tOut=0;DIAL.rawOut=0;          // the caught item lands at the index mark
   DIAL.offer=null;stagedClip=null;
   receipt('Caught');
 }
@@ -828,10 +827,10 @@ function openPerm(){
       <rect x="76" y="36" width="52" height="7" rx="3.5" fill="var(--line)"/>
       <rect x="76" y="50" width="64" height="7" rx="3.5" fill="var(--line)"/>
       <g class="arcgrp">
-        <path d="M164 28 A32 32 0 0 0 164 92" fill="none" stroke="#2A323D" stroke-width="9"/>
-        <path d="M164 40 A20 20 0 0 0 164 80" fill="none" stroke="#39424F" stroke-width="7"/>
+        <path d="M164 26 A34 34 0 0 0 164 94" fill="none" stroke="#23282F" stroke-width="12"/>
+        <path d="M164 33 A27 27 0 0 0 164 87" fill="none" stroke="#E2472B" stroke-width="1.2" opacity=".8"/>
       </g>
-      <circle cx="170" cy="60" r="12" fill="#151A21" stroke="#39424F" stroke-width="2"/>
+      <circle cx="170" cy="60" r="11" fill="#0A0D11" stroke="#2A323D" stroke-width="2"/>
       <line x1="170" y1="50" x2="170" y2="54" stroke="#FF4D4D" stroke-width="2.4" stroke-linecap="round"/>
     </svg></div>
     <button type="button" class="pm-go">Continue</button>
@@ -975,7 +974,7 @@ chip.addEventListener('pointerdown',e=>{
   vault.push({id:'u'+now,type:'txt',label:selText.slice(0,26)+(selText.length>26?'…':''),
     content:selText,col:'Clipboard',use_count:0,last_used_at:now,captured_at:now,source:'selection'});
   save(vault);chip.style.display='none';
-  toast('Saved to Text — double-tap the dial handle to use it');
+  toast('Saved — double-tap the dial handle to use it');
   refreshKb();
 });
 
@@ -1188,21 +1187,42 @@ const glidechip=document.getElementById('glidechip');
    `t`. So the ring is never rendered part-way between items — it falls into place and
    settles before the next step can start. `raw` exists only so a slow drag still has
    somewhere to accumulate; it is never drawn. */
+/* ═══ CATEGORY SEAM (2026-08-05) ═══
+   The dial is ONE mixed ring by owner decision: pins in the fixed edge slots,
+   then every item together, newest first. Type survives as colour; the floating
+   preview carries full identity. If categories return, they come back as a
+   second inner ring: reintroduce sIn/tIn/rawIn + STEP_IN/WIN_IN, a type filter
+   in dialItems(), and the two-zone glide in zoneFor(). The single ring keeps
+   its 'Out' name below so that return is a diff, not a rename. */
 const DIAL={enabled:false,mode:'closed',open:0,openT:0,
-  sIn:0,tIn:0,rawIn:0,sOut:0,tOut:0,rawOut:0,cat:0,grab:null,downBand:null,
+  sOut:0,tOut:0,rawOut:0,grab:null,downBand:null,
   lastA:0,moved:0,downT:0,tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null,
   offer:null,dockX:0,dockY:0};
 const DEADBAND=0.55;                                   // >0.5 so it can't flicker on the boundary
 const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
 const BTN_R=27;                                        // round logo button (primary affordance)
 function turn(ring,deltaDeg){
-  const D=DIAL,step=ring==='In'?STEP_IN:STEP_OUT;
-  D['raw'+ring]+=-EDGE*deltaDeg/step;                  // EDGE keeps drag-down = next on either edge
+  const D=DIAL;
+  D['raw'+ring]+=-EDGE*deltaDeg/STEP_OUT;              // EDGE keeps drag-down = next on either edge
   D['t'+ring]=detent(D['raw'+ring],D['t'+ring]);
 }
 function settle(ring){const D=DIAL;D['raw'+ring]=D['t'+ring];}
-const STEP_IN=42,STEP_OUT=33,WIN_IN=46,WIN_OUT=70;
-let VW=innerWidth,VH=innerHeight,FW=innerWidth,AX=innerWidth,R=0,HUB=0,IN0=0,IN1=0,OUT0=0,OUT1=0,CY=0;
+const STEP_OUT=33,WIN_OUT=70;
+/* ═══ Sony lens finish — tunable constants (the native build mirrors these) ═══ */
+const LENS={
+  body:['#1E2126','#17191C','#141619'],  // barrel matte anodize: lit edge → base → shadowed
+  edge:'#0C0E11',                        // barrel outline hairline
+  knPitch:2.4,                           // knurling: degrees between rib centres
+  knW:1.5,                               // rib stroke width, px
+  knDepth:10,                            // rib length (radial), px
+  knGap:3,                               // gap between content band and rib band, px
+  knLight:'#272C33',knDark:'#0F1114',    // alternating rib tones, a hair off the body
+  engrave:'#B9BEC5',engraveDim:'#8F969E',engraveShadow:'#07090B',
+  accent:['#F05A38','#C93A22'],          // the G Master band (~#E2472B), lit → shadowed
+  index:'#FF4D4D',indexRim:'#3A0D0A',    // painted index mark + its dark rim
+  glass:['#10151C','#080B0F','#05070A'], // hub lens element, centre → edge
+};
+let VW=innerWidth,VH=innerHeight,FW=innerWidth,AX=innerWidth,R=0,HUB=0,OUT0=0,OUT1=0,CY=0;
 /* either-edge docking: DOCK is per-device, persisted; CA is the arc's center
    angle (270 opens leftward from the right edge, 90 mirrors it) */
 let DOCK='right',EDGE=1,CA=270;
@@ -1225,10 +1245,10 @@ function sizes(){
   DOCK=DOCKS[DEV]||'right';EDGE=DOCK==='right'?1:-1;CA=DOCK==='right'?270:90;
   AX=DOCK==='right'?(VW+FW)/2:(VW-FW)/2;
   R=Math.min(FW*0.46,205);
-  HUB=R*.17;IN0=R*.25;IN1=R*.52;OUT0=R*.58;OUT1=R*.88;
+  HUB=R*.20;OUT0=R*.40;OUT1=R*.84;   // one wide band; the knurling rides outside OUT1
   /* Tablet: the dial rides the LOWER third — where the thumb lands when a hand
      grips a tablet's side edge — clamped so the ring never falls off-screen. */
-  CY=DEV==='tablet'?Math.min(VH*.72,VH-(R*.88+44)):VH*.56;
+  CY=DEV==='tablet'?Math.min(VH*.72,VH-(OUT1+LENS.knGap+LENS.knDepth+40)):VH*.56;
   svg.setAttribute('width',VW);svg.setAttribute('height',VH);
   svg.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
 }
@@ -1241,14 +1261,13 @@ const wrapDeg=x=>((x+180)%360+360)%360-180;
 const mod=(a,n)=>((a%n)+n)%n;
 const dist=(x,y)=>Math.hypot(x-AX,y-CY);
 const ang=(x,y)=>mod(Math.atan2(y-CY,x-AX)*180/Math.PI+90,360);
-const band=d=>(d>=IN0-8&&d<=IN1+8)?'In':(d>=OUT0-8&&d<=OUT1+14)?'Out':null;
-/* Glide zones: while holding, how far OUT the finger is picks which ring it turns.
-   Hysteresis (H) so a ring you're already turning doesn't flip on small wobble. */
+const band=d=>(d>=OUT0-10&&d<=OUT1+LENS.knGap+LENS.knDepth+10)?'Out':null;
+/* Glide: one ring, one threshold — slide out far enough and you're on it.
+   Hysteresis (H) so small wobble near the boundary doesn't drop the ring. */
 function zoneFor(r,cur){
-  const NEUT=IN0,MID=(IN1+OUT0)/2,H=14;
-  if(cur===null)  return r>=NEUT+H?(r<MID?'In':'Out'):null;
-  if(cur==='In')  return r<NEUT-H?null:(r>MID+H?'Out':'In');
-  return r<MID-H?(r<NEUT-H?null:'In'):'Out';          // cur==='Out'
+  const NEUT=(HUB+OUT0)/2,H=14;
+  if(cur==='Out')return r<NEUT-H?null:'Out';
+  return r>=NEUT+H?'Out':null;
 }
 function seg(r0,r1,a0,a1){
   const p1=P(r1,a0),p2=P(r1,a1),p3=P(r0,a1),p4=P(r0,a0),big=(a1-a0)>180?1:0;
@@ -1265,8 +1284,12 @@ function slots(list,s,step,win){
 const PIN_OFF=64, WIN_ROT=38;
 function pinnedItems(){return vault.filter(i=>i.pin_order!=null&&!i.deleted_at)
   .sort((a,b)=>a.pin_order-b.pin_order).slice(0,2)}
+/* ONE ring holds everything: docs stay off (a slot you cannot insert is a dead
+   end), pins lift out to their fixed slots, the rest mixes newest-first.
+   (A type filter would re-enter here if categories return — see the seam.) */
 function dialItems(){const pins=new Set(pinnedItems().map(p=>p.id));
-  return byType(COLS[DIAL.cat][1]).filter(i=>!pins.has(i.id))}
+  return vault.filter(i=>i.type!=='doc'&&!pins.has(i.id)&&!i.deleted_at)
+    .sort((a,b)=>b.captured_at-a.captured_at)}
 function focusedItem(){const its=dialItems();return its.length?its[mod(Math.round(DIAL.sOut),its.length)]:null}
 
 /* ═══ the floating preview ═══
@@ -1300,7 +1323,7 @@ function previewHTML(it){
 }
 function renderPreview(force){
   const it=previewItem();
-  const key=(it?it.id:'none')+':'+DIAL.cat;
+  const key=it?it.id:'none';
   if(!force&&key===prevKey)return;
   prevKey=key;
   const layers=prevEl.querySelectorAll('.dp-layer');
@@ -1323,27 +1346,47 @@ function syncPreview(){
 }
 
 function handleSVG(bx,by){
-  let s=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="#151A21" stroke="#39424F" stroke-width="2"/>`;
-  for(let a=-70;a<=70;a+=10){const p1=P2(bx,by,BTN_R-4,a),p2=P2(bx,by,BTN_R-1,a);
-    s+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#39424F" stroke-width="1.3" opacity=".8"/>`;}
-  s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-9}" fill="none" stroke="#4A5563" stroke-width="1.4"/>`;
-  s+=`<circle cx="${bx}" cy="${by}" r="6.5" fill="#5F6B79"/>`;
-  s+=`<line x1="${bx}" y1="${by-BTN_R+3}" x2="${bx}" y2="${by-BTN_R+10}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round"/>`;
+  /* the closed handle is a miniature of the lens ring: matte charcoal body,
+     ribbed rim, a thin accent ring, and the painted red index */
+  let s=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="#17191C" stroke="#2A2F36" stroke-width="2"/>`;
+  for(let a=-70,i=0;a<=70;a+=8,i++){const p1=P2(bx,by,BTN_R-6,a),p2=P2(bx,by,BTN_R-1.5,a);
+    s+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${i%2?LENS.knDark:LENS.knLight}" stroke-width="1.4" stroke-linecap="round" opacity=".9"/>`;}
+  s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-8.5}" fill="none" stroke="#B8452C" stroke-width="1" opacity=".8"/>`;
+  s+=`<circle cx="${bx}" cy="${by}" r="6.5" fill="#0B0E12" stroke="#39424F" stroke-width="1"/>`;
+  s+=`<line x1="${bx}" y1="${by-BTN_R+2}" x2="${bx}" y2="${by-BTN_R+10}" stroke="${LENS.indexRim}" stroke-width="4.4" stroke-linecap="round"/>`;
+  s+=`<line x1="${bx}" y1="${by-BTN_R+3}" x2="${bx}" y2="${by-BTN_R+9.5}" stroke="${LENS.index}" stroke-width="2.6" stroke-linecap="round"/>`;
   return s;
 }
 function drawDial(){
   if(!DIAL.enabled){svg.innerHTML='';return;}
   const f=DIAL.open,o=x=>x*(0.55+0.45*f);
-  const catc=TYPEC[COLS[DIAL.cat][1]]||'#FFC978';    // the selected type lends its colour
-  let h=`<defs><radialGradient id="brl" cx="100%" cy="56%" r="75%">
-    <stop offset="55%" stop-color="#161B22"/><stop offset="82%" stop-color="#1D242E"/>
-    <stop offset="100%" stop-color="#12161C"/></radialGradient>
-    <radialGradient id="hb" cx="50%" cy="42%" r="70%">
-    <stop offset="0%" stop-color="#2C3542"/><stop offset="100%" stop-color="#12161C"/></radialGradient>
+  const themeAttr=document.documentElement.dataset.theme;
+  const darkPage=themeAttr?themeAttr==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  /* the light falls from the upper-INNER side (away from the docked edge);
+     EDGE mirrors every gradient axis when the dial docks the other side */
+  const lx0=AX-EDGE*R*.55,lx1=AX+EDGE*R*.25;
+  let h=`<defs>
+    <linearGradient id="barrel" gradientUnits="userSpaceOnUse" x1="${lx0}" y1="${CY-R}" x2="${lx1}" y2="${CY+R}">
+      <stop offset="0" stop-color="${LENS.body[0]}"/><stop offset=".45" stop-color="${LENS.body[1]}"/>
+      <stop offset="1" stop-color="${LENS.body[2]}"/></linearGradient>
+    <linearGradient id="aniso" gradientUnits="userSpaceOnUse" x1="${lx0}" y1="${CY-R}" x2="${lx1}" y2="${CY+R}">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".13"/><stop offset=".38" stop-color="#FFFFFF" stop-opacity=".03"/>
+      <stop offset=".62" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity=".32"/></linearGradient>
+    <linearGradient id="rimg" gradientUnits="userSpaceOnUse" x1="${AX}" y1="${CY-R}" x2="${AX}" y2="${CY+R}">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="${darkPage?.28:.38}"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity=".05"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+    <linearGradient id="acc" gradientUnits="userSpaceOnUse" x1="${AX}" y1="${CY-R}" x2="${AX}" y2="${CY+R}">
+      <stop offset="0" stop-color="${LENS.accent[0]}"/><stop offset="1" stop-color="${LENS.accent[1]}"/></linearGradient>
+    <radialGradient id="lensg" cx="46%" cy="40%" r="72%">
+      <stop offset="0" stop-color="${LENS.glass[0]}"/><stop offset=".55" stop-color="${LENS.glass[1]}"/>
+      <stop offset="1" stop-color="${LENS.glass[2]}"/></radialGradient>
     <linearGradient id="g0" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0" stop-color="#584479"/><stop offset="1" stop-color="#2E2542"/></linearGradient>
     <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#6E5694"/><stop offset="1" stop-color="#352A4E"/></linearGradient></defs>`;
+    <stop offset="0" stop-color="#6E5694"/><stop offset="1" stop-color="#352A4E"/></linearGradient>
+    <filter id="dsh" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#000000" flood-opacity="${darkPage?.55:.30}"/></filter>
+  </defs>`;
   if(DIAL.mode==='dock'){
     /* the handle rides the finger; a dashed target waits at the other edge */
     const oppAX=DOCK==='right'?(VW-FW)/2:(VW+FW)/2;
@@ -1374,32 +1417,55 @@ function drawDial(){
     }
     svg.innerHTML=h;return;
   }
-  h+=`<circle cx="${AX}" cy="${CY}" r="${o(OUT1)+22}" fill="rgba(5,8,12,${.5*f})"/>`;
+  const kn0=o(OUT1)+LENS.knGap,kn1=kn0+LENS.knDepth;
+  h+=`<circle cx="${AX}" cy="${CY}" r="${kn1+22}" fill="rgba(5,8,12,${(darkPage?.5:.35)*f})"/>`;
   const A0=CA-WIN_OUT-16,A1=CA+WIN_OUT+16;
-  h+=`<path d="${seg(o(IN0),o(IN1),A0,A1)}" fill="url(#brl)" stroke="#2A323D"/>`;
-  h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="url(#brl)" stroke="#2A323D"/>`;
-  const knurl=(r0,r1,s,st)=>{let k='';const sh=-(s*st)%7;
-    for(let a=A0;a<=A1;a+=7){const p1=P(r0,a+sh),p2=P(r1,a+sh);
-      k+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#333D4A" stroke-width="1.5" opacity="${.55*f}"/>`;}
-    return k;};
-  h+=knurl(o(IN1)+1,o(IN1)+6,DIAL.sIn,STEP_IN)+knurl(o(OUT1)+1,o(OUT1)+7,DIAL.sOut,STEP_OUT);
-  if(DIAL.mode==='glide'){                            // which ring the finger currently owns
-    const z=DIAL.glideZone;
-    if(z){const r0=z==='In'?o(IN0):o(OUT0),r1=z==='In'?o(IN1):o(OUT1);
-      h+=`<path d="${seg(r0,r1,A0,A1)}" fill="${catc}" fill-opacity=".10" stroke="${catc}" stroke-width="2"/>`;}
-    else{h+=`<path d="${seg(o(IN0),o(IN1),A0,A1)}" fill="none" stroke="${catc}" stroke-width="1.5" stroke-dasharray="4 5" opacity=".5"/>`;}
+  const arcAt=(r,a0,a1)=>{const p1=P(r,a0),p2=P(r,a1),big=(a1-a0)>180?1:0;
+    return `M${p1.x} ${p1.y}A${r} ${r} 0 ${big} 1 ${p2.x} ${p2.y}`;};
+  /* barrel: one matte anodized piece, content band through knurl, soft drop shadow */
+  h+=`<g filter="url(#dsh)"><path d="${seg(o(OUT0),kn1+2,A0,A1)}" fill="url(#barrel)" stroke="${LENS.edge}"/></g>`;
+  h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="url(#aniso)" opacity="${.45*f}"/>`;
+  /* hair-thin bevels: a dark inner cut plus a whisper of rim light beside it */
+  h+=`<path d="${arcAt(o(OUT0),A0,A1)}" fill="none" stroke="#0A0C0F" stroke-opacity="${.8*f}"/>`;
+  h+=`<path d="${arcAt(o(OUT0)+1,A0,A1)}" fill="none" stroke="#FFFFFF" stroke-opacity="${.06*f}"/>`;
+  /* the G Master signature: one thin brushed accent band — noticed second */
+  h+=`<path d="${arcAt(o(OUT1)+1,A0+1.5,A1-1.5)}" fill="none" stroke="url(#acc)" stroke-width="1.6" opacity="${.85*f}"/>`;
+  /* KNURLING: fine-pitch radial ribs, alternating a hair light/dark, rounded
+     ends, curving with the ring — they shift with sOut like real grip metal */
+  {const sh=-(DIAL.sOut*STEP_OUT)%(LENS.knPitch*2);
+   for(let a=A0+1,i=0;a<=A1-1;a+=LENS.knPitch,i++){
+     const aa=a+sh;if(aa<A0+.5||aa>A1-.5)continue;
+     const p1=P(kn0,aa),p2=P(kn1,aa);
+     h+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${i%2?LENS.knDark:LENS.knLight}" stroke-width="${LENS.knW}" stroke-linecap="round" opacity="${.92*f}"/>`;
+   }}
+  /* anisotropic light falling across the ribbed metal + outer rim highlight */
+  h+=`<path d="${seg(kn0-1,kn1+1.5,A0,A1)}" fill="url(#aniso)" opacity="${f}"/>`;
+  h+=`<path d="${arcAt(kn1+2,A0,A1)}" fill="none" stroke="url(#rimg)" stroke-width="1.2" opacity="${f}"/>`;
+  /* engraved scale marks along the inner edge, riding the ring's rotation */
+  {const ss=-(DIAL.sOut*STEP_OUT)%(STEP_OUT/2);
+   for(let a=A0+4;a<=A1-4;a+=STEP_OUT/2){
+     const aa=a+ss;if(aa<A0+2||aa>A1-2)continue;
+     const p1=P(o(OUT0)+4,aa),p2=P(o(OUT0)+9,aa);
+     h+=`<line x1="${p1.x}" y1="${p1.y-.6}" x2="${p2.x}" y2="${p2.y-.6}" stroke="${LENS.engraveShadow}" stroke-width="1.6" opacity="${.55*f}"/>`;
+     h+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${LENS.engraveDim}" opacity="${.5*f}"/>`;
+   }}
+  /* the focused item lends its type colour to the highlights */
+  const fit=focusedItem(),catc=fit?(TYPEC[fit.type]||'#8A94A0'):'#8A94A0';
+  if(DIAL.mode==='glide'){                            // does the finger own the ring yet?
+    if(DIAL.glideZone)h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="${catc}" fill-opacity=".10" stroke="${catc}" stroke-width="2"/>`;
+    else h+=`<path d="${seg(o(OUT0),o(OUT1),A0,A1)}" fill="none" stroke="${catc}" stroke-width="1.5" stroke-dasharray="4 5" opacity=".5"/>`;
   }
   h+=`<path d="${seg(o(OUT0)+2,o(OUT1)-2,CA-STEP_OUT/2,CA+STEP_OUT/2)}" fill="${catc}" opacity="${.14*f}"/>`;
-  h+=`<path d="${seg(o(IN0)+2,o(IN1)-2,CA-STEP_IN/2,CA+STEP_IN/2)}" fill="${catc}" opacity="${.18*f}"/>`;
-  slots(COLS,DIAL.sIn,STEP_IN,WIN_IN).forEach(({i,off})=>{
-    const p=P(o((IN0+IN1)/2),CA+off),foc=Math.abs(off)<STEP_IN*.45;
-    const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_IN+10)/18))*f;
-    h+=`<text x="${p.x}" y="${p.y}" font-size="${foc?11.5:9.5}" font-weight="${foc?700:500}" letter-spacing=".06em" text-anchor="middle" dominant-baseline="central" opacity="${op}" fill="#DFE6EE">${COLS[i][0].toUpperCase()}</text>`;});
   /* outer ring = Samsung-clipboard content cards: raw text, image thumbs, filenames.
      No identity icons out here — the inner ring owns wayfinding; only the pin mark decorates.
      Card washes are the current type tints, dimmed for the dark instrument. */
   const midO=o((OUT0+OUT1)/2);
-  const TINT={txt:'#33290F',url:'#3B2018',doc:'#2A2430'};
+  const TINT={txt:'#33290F',url:'#3B2018'};
+  /* engraved marking: light-grey fill over a 1px darker copy offset up — the
+     text reads as cut into the metal, not printed on */
+  const eng=(x,y,size,txt,attrs,fill)=>
+    `<text x="${x}" y="${y-.7}" font-size="${size}" ${attrs} fill="${LENS.engraveShadow}" opacity=".9">${txt}</text>`+
+    `<text x="${x}" y="${y}" font-size="${size}" ${attrs} fill="${fill}">${txt}</text>`;
   const gpick=id=>'g'+(Math.abs([...String(id)].reduce((a,c)=>a+c.charCodeAt(0),0))%2);
   const card=(it,ang,scale,op,pinned)=>{
     const c=P(midO,ang),w=58*scale,hh=40*scale;
@@ -1413,13 +1479,13 @@ function drawDial(){
     if(it.is_sensitive){
       /* masked: the label says which thing, the dots say "not for shoulders" —
          the real value still rides the copy */
-      s+=`<text x="${c.x}" y="${c.y-5}" font-size="${7.5*scale}" letter-spacing=".08em" text-anchor="middle" dominant-baseline="central" fill="#98A3B0">${escq(it.label.slice(0,14).toUpperCase())}</text>`;
-      s+=`<text x="${c.x}" y="${c.y+6.5*scale}" font-size="${9*scale}" letter-spacing=".14em" text-anchor="middle" dominant-baseline="central" fill="#D6DEE8">••••&#8202;••••</text>`;
+      s+=eng(c.x,c.y-5,7.5*scale,escq(it.label.slice(0,14).toUpperCase()),`letter-spacing=".08em" text-anchor="middle" dominant-baseline="central"`,LENS.engraveDim);
+      s+=eng(c.x,c.y+6.5*scale,9*scale,'••••&#8202;••••',`letter-spacing=".14em" text-anchor="middle" dominant-baseline="central"`,LENS.engrave);
     }else if(!isImg){
-      const raw=(it.type==='doc'?it.label:(it.content||it.label)).replace(/\s+/g,' ');
+      const raw=(it.content||it.label).replace(/\s+/g,' ');
       const l1=raw.slice(0,12),l2=raw.slice(12,23)+(raw.length>23?'…':'');
-      s+=`<text x="${c.x}" y="${c.y-(l2?5:0)}" font-size="${8.5*scale}" text-anchor="middle" dominant-baseline="central" fill="#D6DEE8">${escq(l1)}</text>`;
-      if(l2)s+=`<text x="${c.x}" y="${c.y+6.5*scale}" font-size="${8.5*scale}" text-anchor="middle" dominant-baseline="central" fill="#98A3B0">${escq(l2)}</text>`;
+      s+=eng(c.x,c.y-(l2?5:0),8.5*scale,escq(l1),`text-anchor="middle" dominant-baseline="central"`,LENS.engrave);
+      if(l2)s+=eng(c.x,c.y+6.5*scale,8.5*scale,escq(l2),`text-anchor="middle" dominant-baseline="central"`,LENS.engraveDim);
     }
     if(pinned)s+=`<g stroke="${TYPEC[it.type]||'#8A94A0'}" stroke-width="1.2" stroke-linecap="round" fill="none">
       <circle cx="${c.x+w/2-8}" cy="${c.y-hh/2+7}" r="2.4"/>
@@ -1451,31 +1517,41 @@ function drawDial(){
   });
   pinnedItems().forEach((pn,k)=>{const a=CA+(k===0?-PIN_OFF:PIN_OFF);
     h+=floating?tickSeg(pn,a,false,f,true):card(pn,a,1,f,true);});
-  const m1=P(o(OUT1)+9,CA),m2=P(o(OUT1)+17,CA);
-  h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="#FF4D4D" stroke-width="3" stroke-linecap="round" opacity="${f}"/>`;
+  /* the index mark: painted-dot crispness — red over a dark rim, flush against
+     the knurled edge like a lens body index */
+  const m1=P(kn1+2,CA),m2=P(kn1+10,CA);
+  h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="${LENS.indexRim}" stroke-width="4.6" stroke-linecap="round" opacity="${f}"/>`;
+  h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="${LENS.index}" stroke-width="2.8" stroke-linecap="round" opacity="${f}"/>`;
   if(DIAL.offer){
     /* catch-on-open, "ask" style: the clipboard's newest thing waits at the
        center; tapping it catches, anything else lets it go */
     const HO=HUB+13,oc=TYPEC[/^https?:\/\//.test(DIAL.offer)?'url':'txt'];
     const sn=DIAL.offer.replace(/\s+/g,' ').slice(0,11)+(DIAL.offer.length>11?'…':'');
-    h+=`<circle cx="${AX}" cy="${CY}" r="${HO}" fill="url(#hb)" stroke="${oc}" stroke-width="2" opacity="${f}"/>`;
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HO}" fill="url(#lensg)" stroke="${oc}" stroke-width="2" opacity="${f}"/>`;
     h+=`<text x="${AX-EDGE*HO*.48}" y="${CY-7}" font-size="11.5" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#F0F1F3" opacity="${f}">Catch?</text>`;
     h+=`<text x="${AX-EDGE*HO*.48}" y="${CY+8}" font-size="8" text-anchor="middle" dominant-baseline="central" fill="#98A3B0" opacity="${f}">${escq(sn)}</text>`;
   }else{
-    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#hb)" stroke="#39424F" stroke-width="1.5" opacity="${f}"/>`;
+    /* the hub is a lens element: coated near-black glass, two dim cool
+       reflection arcs (mirrored with the dock), a hair-thin bevel collar */
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB+1.6}" fill="none" stroke="#0A0C0F" opacity="${.7*f}"/>`;
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#lensg)" stroke="#262C33" stroke-width="1.2" opacity="${f}"/>`;
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB-.8}" fill="none" stroke="url(#rimg)" stroke-width=".8" opacity="${.6*f}"/>`;
+    const ra0=EDGE===1?-72:8,ra1=EDGE===1?-8:72;
+    h+=`<path d="${arcAt(HUB*.62,ra0,ra1)}" fill="none" stroke="#5E7186" stroke-width="1.3" opacity="${.3*f}"/>`;
+    h+=`<path d="${arcAt(HUB*.40,ra0-EDGE*108,ra1-EDGE*108)}" fill="none" stroke="#46586A" opacity="${.18*f}"/>`;
     h+=`<text x="${AX-EDGE*HUB*.45}" y="${CY}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#C9D3DF" opacity="${f}">✕</text>`;
   }
   if(DIAL.mode==='glide'){                 // glide keeps its one-line mode hint; browse needs none —
-    const cp=P(o(OUT1)+24,CA);             // the cards show their own content now
+    const cp=P(kn1+26,CA);                 // the ring shows its own content now
     const gx=DOCK==='right'?cp.x-128:cp.x;
     h+=`<g opacity="${f}"><rect x="${gx}" y="${cp.y-12}" width="128" height="24" rx="8" fill="rgba(10,13,17,.9)" stroke="#2B333D"/>
-    <text x="${gx+64}" y="${cp.y+1}" font-size="9.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">${DIAL.glideZone==='Out'?(EGRESS==='copy'?'release to copy':'release to insert'):DIAL.glideZone==='In'?'turning types':'slide out to pick a ring'}</text></g>`;
+    <text x="${gx+64}" y="${cp.y+1}" font-size="9.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">${DIAL.glideZone==='Out'?(EGRESS==='copy'?'release to copy':'release to insert'):'slide out to the ring'}</text></g>`;
   }
   svg.innerHTML=h;
 }
 
 /* physics loop */
-let prevIn=0,prevOut=0;
+let prevOut=0;
 (function loop(){
   const D=DIAL;
   D.open+=(D.openT-D.open)*.18;
@@ -1483,14 +1559,9 @@ let prevIn=0,prevOut=0;
   // Always ease toward the committed detent, dragging included — never rest part-way.
   // Rate .5 + a .004 landing threshold puts a step on screen in ~8 frames (~130ms):
   // fast enough to read as a mechanical click, slow enough not to look like a teleport.
-  for(const r of ['In','Out']){
-    D['s'+r]+=(D['t'+r]-D['s'+r])*.5;
-    if(Math.abs(D['t'+r]-D['s'+r])<.004)D['s'+r]=D['t'+r];
-  }
+  D.sOut+=(D.tOut-D.sOut)*.5;
+  if(Math.abs(D.tOut-D.sOut)<.004)D.sOut=D.tOut;
   // click at the moment of commitment, not when the animation crosses a midpoint
-  if(D.tIn!==prevIn){prevIn=D.tIn;tick();
-    const c=mod(D.tIn,COLS.length);
-    if(c!==D.cat){D.cat=c;D.sOut=0;D.tOut=0;D.rawOut=0;prevOut=0;}}
   if(D.tOut!==prevOut){prevOut=D.tOut;tick();}
   // an unanswered center offer is dropped the moment the dial is fully away
   if(D.open===0&&D.openT===0&&D.offer){D.offer=null;stagedClip=null;}
@@ -1513,7 +1584,7 @@ addEventListener('pointerdown',e=>{
   /* hold on an off-center rotating slot ⇒ slow auto-cycle toward that side */
   if(D.openT>0&&D.downBand){
     const rel=wrapDeg(ang(e.clientX,e.clientY)-CA),ar=Math.abs(rel);
-    const zone=(D.downBand==='Out'&&ar>=12&&ar<=48)||(D.downBand==='In'&&ar>=15&&ar<=58);
+    const zone=ar>=12&&ar<=48;
     if(zone){
       D.cycT=setTimeout(()=>{D.cycOn=true;
         const ring=D.downBand,dir=Math.sign(rel);
@@ -1528,7 +1599,7 @@ addEventListener('pointerdown',e=>{
       D.holdTimer=null;
       clearTimeout(D.tapTimer);D.tapTimer=null;
       D.mode='glide';D.glideZone=null;D.openT=1;tick();catchOnOpen();
-      glidechip.style.display='block';glidechip.textContent='move out to pick a ring';
+      glidechip.style.display='block';glidechip.textContent='slide out to the ring';
       if(DOCK==='right'){glidechip.style.left='auto';glidechip.style.right=((VW-AX)+R+40)+'px';}
       else{glidechip.style.right='auto';glidechip.style.left=(AX+R+40)+'px';}
       glidechip.style.top=(CY-34)+'px';
@@ -1561,7 +1632,7 @@ addEventListener('pointermove',e=>{
     if(z!==D.glideZone){
       D.glideZone=z;D.lastA=a;                        // re-baseline so switching rings doesn't jump
       if(z)tick();
-      glidechip.textContent=z==='In'?'turning types':z==='Out'?(EGRESS==='copy'?'release to copy':'release to insert'):'move out to pick a ring';
+      glidechip.textContent=z==='Out'?(EGRESS==='copy'?'release to copy':'release to insert'):'slide out to the ring';
     }
     if(D.glideZone){
       const delta=wrapDeg(a-D.lastA);
@@ -1605,9 +1676,9 @@ addEventListener('pointerup',e=>{
   if(D.mode==='glide'){
     const z=D.glideZone;
     D.mode='closed';D.glideZone=null;glidechip.style.display='none';
-    settle('In');settle('Out');                       // already on whole detents; just resync raw
-    if(z==='Out'){useItem(focusedItem(),'dial');D.openT=0;}  // only the item ring fires on release
-    else{D.openT=1;}                                  // neutral or collections: stay open to browse
+    settle('Out');                                    // already on whole detents; just resync raw
+    if(z==='Out'){useItem(focusedItem(),'dial');D.openT=0;}  // release on the ring takes the item
+    else{D.openT=1;}                                  // released short of the ring: stay open to browse
     return;
   }
   const d=dist(e.clientX,e.clientY),a=ang(e.clientX,e.clientY);
@@ -1632,22 +1703,21 @@ addEventListener('pointerup',e=>{
     D.downBand=null;return;
   }
   if(hit&&hit===D.downBand){
-    const step=hit==='In'?STEP_IN:STEP_OUT,win=hit==='In'?WIN_IN:WIN_ROT;
-    const dd=rel/step;
-    if(Math.abs(rel)<=win+step*.6){
-      if(hit==='Out'&&Math.abs(dd)<.45){
+    const dd=rel/STEP_OUT;
+    if(Math.abs(rel)<=WIN_ROT+STEP_OUT*.6){
+      if(Math.abs(dd)<.45){
         const okd=useItem(focusedItem(),'dial');
         if(okd)D.openT=0;
-      }else{D['t'+hit]=Math.round(D['t'+hit]+dd);D['raw'+hit]=D['t'+hit];}
+      }else{D.tOut=Math.round(D.tOut+dd);D.rawOut=D.tOut;}
     }
   }
   D.downBand=null;
 });
 addEventListener('wheel',e=>{                          // desktop: one notch = one whole detent
   const D=DIAL;if(!D.enabled||D.openT===0)return;
-  const r=band(dist(e.clientX,e.clientY));if(!r)return;
+  if(!band(dist(e.clientX,e.clientY)))return;
   e.preventDefault();
-  D['t'+r]+=Math.sign(e.deltaY);D['raw'+r]=D['t'+r];
+  D.tOut+=Math.sign(e.deltaY);D.rawOut=D.tOut;
 },{passive:false});
 
 addEventListener('pointercancel',e=>{
