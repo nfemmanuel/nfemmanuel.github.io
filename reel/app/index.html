@@ -158,6 +158,23 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gc .pin{top:11px;right:11px;opacity:.5}
 .gc.img .pin{color:#fff;opacity:.92}
+/* text found inside a picture — the quiet chip a search result wears when the hit
+   lives only in the image, and the same chip pulsing while the picture is read */
+.gc .fin{position:absolute;top:9px;left:9px;z-index:2;font-size:10px;font-weight:600;color:var(--ink-3);
+  background:color-mix(in srgb,var(--surf) 88%,transparent);padding:3px 8px;border-radius:99px}
+.gc .fin.busy{animation:readpulse 1.1s ease-in-out infinite}
+@keyframes readpulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* the sheet's found-text block: mono, selectable, its own small copy */
+.ocrsec{margin:0 20px 14px;border:1px solid var(--hair);border-radius:14px;background:var(--ground)}
+.ocrhead{display:flex;align-items:center;padding:10px 14px 0;font-size:12px;font-weight:600;color:var(--ink-3)}
+.ocrhead .t{flex:1}
+.ocrcopy{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ink-2);
+  cursor:pointer;padding:5px 10px;border-radius:99px;background:var(--surf);border:1px solid var(--hair);
+  transition:transform .2s var(--spring)}
+.ocrcopy:active{transform:scale(.94)}
+.ocrtx{padding:8px 14px 12px;font-family:var(--mono);font-size:12.5px;line-height:1.55;
+  white-space:pre-wrap;word-break:break-word;user-select:text;-webkit-user-select:text}
+.ocrtx.busy{color:var(--ink-3);animation:readpulse 1.1s ease-in-out infinite}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:0 16px}
 .tile{padding:15px 14px 13px;cursor:pointer;position:relative;overflow:hidden;display:flex;
   flex-direction:column;min-height:126px;transition:transform .34s var(--spring)}
@@ -462,8 +479,9 @@ const SEED=[
   {id:5,t:'txt',v:'DE89 3704 0044 0532 0130 00',code:1,sens:1},
   {id:6,t:'txt',v:'482 Maple Grove Ave, Apt 3B, Columbus OH 43210'},
   {id:7,t:'txt',v:'Thanks for the great conversation — I left even more excited about the role.'},
-  {id:8,t:'img',v:'Headshot',g:'linear-gradient(135deg,#7B55B4,#3E2C5E)'},
-  {id:9,t:'img',v:'Portfolio cover',g:'linear-gradient(135deg,#356BA6,#1D3A5C)'},
+  {id:8,t:'img',v:'Headshot',g:'linear-gradient(135deg,#7B55B4,#3E2C5E)',ocr:'PROOF - Jordan Lane Photography\nrivera-headshot-04.jpg'},
+  {id:9,t:'img',v:'Portfolio cover',g:'linear-gradient(135deg,#356BA6,#1D3A5C)',ocr:'Alex Rivera\nProduct and brand design\nSelected work 2023-2026'},
+  {id:24,t:'img',v:'Wifi voucher screenshot',g:'linear-gradient(135deg,#37878A,#1C4648)',ocr:'Guest Wi-Fi\nNetwork: PARKSIDE-GUEST\nPassword: mellow-otter-217\nValid until Sunday'},
   {id:10,t:'doc',v:'Resume.pdf'},
   {id:11,t:'doc',v:'Cover-letter.docx'},
   {id:12,t:'doc',v:'Transcript.pdf'},
@@ -479,6 +497,12 @@ const SEED=[
   {id:22,t:'doc',v:'Showreel.mp4'},
   {id:23,t:'doc',v:'Voice-memo.m4a'},
 ];
+/* The Add screen's simulated pick — always this same screenshot, so attaching a
+   second time exercises the duplicate catcher. The real app opens the system
+   picker here; fid stands in for the file identity the native build gets from
+   the sha256 the core already computes. */
+const ATTACH={v:'Receipt screenshot',g:'linear-gradient(135deg,#BA5138,#5E2A1D)',fid:'sim-receipt',
+  ocr:'Blue Door Cafe\nOrder 4187\n2x flat white  $9.00\nAlmond croissant  $5.20\nBanana bread  $4.60\nTotal  $18.80'};
 /* ── stored state ──
    Versioned the way the extensions prototype stores its vault: one key per schema
    version, corrupt data discarded, and when v2 comes the loader carries non-seed
@@ -503,6 +527,18 @@ try{
 }catch(_){}
 if(!ITEMS)ITEMS=SEED.map(i=>({...i,src:'seed'}));
 ITEMS.forEach(i=>i.fresh=0);
+/* Stored vaults from before this build (same v1 key — no version bump) predate the
+   found-text field and the wifi seed. Backfill seed images by id and add the missing
+   seed if its id is free; user-made items are never touched, and items without the
+   new fields render exactly as before. */
+SEED.forEach(s=>{ if(!s.ocr)return;
+  const held=ITEMS.find(i=>i.id===s.id&&i.src==='seed'&&i.t==='img'&&!i.ocr);
+  if(held)held.ocr=s.ocr; });
+if(ITEMS.some(i=>i.src==='seed')&&!ITEMS.some(i=>i.id===24||(i.t==='img'&&i.v==='Wifi voucher screenshot')))
+  ITEMS.push({...SEED.find(s=>s.id===24),src:'seed'});
+/* a Reading state must not survive a reload — settle it from the sim source */
+ITEMS.forEach(i=>{ if(i.ocrPending){ delete i.ocrPending;
+  if(i.fid===ATTACH.fid&&!i.ocr)i.ocr=ATTACH.ocr; }});
 function saveStore(){try{localStorage.setItem(KEY,
   JSON.stringify({v:1,items:ITEMS,watch:st.watch,theme:st.theme,device:DEVICE,votes:VOTES,
     noteDismissed:st.noteDismissed}))}catch(_){}}
@@ -540,6 +576,8 @@ function saveNew(){
   const el=document.getElementById('ed'); const v=(el?el.value:'').trim();
   if(!v){toast('Nothing to save');return;}
   const t=isUrl(v)?'lnk':'txt';
+  const dupe=findDupe(t,v);
+  if(dupe){go('vault');bumpItem(dupe);return;}   /* saving the same thing twice bumps — no twin */
   ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1});
   clearFresh(); toast('Saved to '+TYPE[t]); go('type',t);
 }
@@ -558,6 +596,45 @@ function edit(id){st.sheet=null;go('edit',id);}
    user could permanently hold exactly two things. Keep = stop ageing out, free
    and unlimited. Pin = occupy a dial slot, which is the scarce thing. */
 function keep(id){const it=find(id); if(!it)return; it.auto=0; render(); toast('Kept — it stays now');}
+
+/* ── the duplicate catcher ──
+   Capturing a thing the vault already holds must not mint a twin. The original is
+   bumped instead: touched exactly like any other use (heat rises, so it stops
+   being the coldest thing in the buffer), moved to Recent's top, flashed with the
+   fresh ring. Pins, kept status and tags are untouched — a bump is a touch, not
+   an edit. Text and links match on the exact trimmed string; images and files
+   match on the simulated file identity. The native version keys on the sha256
+   the core already computes. */
+function findDupe(t,v,fid){
+  const s=(v||'').trim();
+  if(t==='img'||t==='doc')return ITEMS.find(i=>i.t===t&&(fid?i.fid===fid:i.v===s));
+  return ITEMS.find(i=>(i.t==='txt'||i.t==='lnk')&&i.v.trim()===s);
+}
+function bumpItem(it){
+  touchItem(it);                                 /* the same touch a copy gives — clears eviction exposure */
+  it.fresh=1;
+  ITEMS=[it,...ITEMS.filter(i=>i.id!==it.id)];   /* Recent's top */
+  render();
+  toast('Already saved - bumped it up');
+  clearFresh();
+}
+
+/* the Add screen's attach action, simulated. A second attach of the same picture
+   goes through the duplicate catcher like every other capture path. */
+function attachSim(){
+  const dupe=findDupe('img',ATTACH.v,ATTACH.fid);
+  if(dupe){go('vault');bumpItem(dupe);return;}
+  const it={id:nextId(),t:'img',v:ATTACH.v,g:ATTACH.g,fid:ATTACH.fid,fresh:1,ocrPending:1};
+  ITEMS.unshift(it);
+  toast('Saved to Images'); go('type','img'); clearFresh();
+  /* the beat while the picture is read — ML Kit on Android, Vision on iOS,
+     both on-device, zero network */
+  setTimeout(()=>{const l=find(it.id); if(!l||!l.ocrPending)return;
+    delete l.ocrPending; l.ocr=ATTACH.ocr; render();},900);
+}
+/* copies JUST the text found inside the picture, not the picture */
+function copyOcr(id){const it=find(id); if(!it||!it.ocr)return;
+  touchItem(it); toast('Copied the text inside');}
 
 /* ── clipboard: the same constraint the real app has ──
    No OS lets a background app watch the clipboard. It can only look when it
@@ -598,6 +675,12 @@ async function grabClip(manual){
     if(txt===lastClip){ if(manual)toast('Already saved that one'); return false; }
     lastClip=txt;
     const v=txt.trim(), t=isUrl(v)?'lnk':'txt';
+    const dupe=findDupe(t,v);
+    if(dupe){   /* same thing again — bump the original, mint nothing */
+      if(!manual&&st.view!=='edit'&&st.view!=='add'){st.view='vault';st.sheet=null;st.tagEdit=false;}
+      bumpItem(dupe);
+      return true;
+    }
     ITEMS.unshift({id:nextId(),t,v,code:isCode(v),fresh:1,auto:1,uses:0,touch:++seq});
     const dropped=pruneAuto();
     if(!manual&&st.view!=='edit'&&st.view!=='add'){st.view='vault';st.sheet=null;st.tagEdit=false;}
@@ -673,9 +756,18 @@ const card=it=>{
   const pin=it.pin?`<span class="pin">${ic('pin',13,1.9)}</span>`:'';
   const open=`onclick="openSheet(${it.id})"`;
   const fresh=it.fresh?' fresh':'';
-  if(it.t==='img')return `<div class="gc img${fresh}" ${open}>
+  if(it.t==='img'){
+    /* a hit that lives only in the picture would look like a mistake in the
+       results — the chip is the quiet receipt that the match is real */
+    const q=st.q.trim().toLowerCase();
+    const insideOnly=st.view==='vault'&&st.searching&&q&&(it.ocr||'').toLowerCase().includes(q)
+      &&!it.v.toLowerCase().includes(q)&&!(it.tags||[]).some(t=>t.includes(q));
+    const chip=it.ocrPending?'<span class="fin busy">Reading…</span>'
+      :insideOnly?'<span class="fin">text inside</span>':'';
+    return `<div class="gc img${fresh}" ${open}>
     <div class="shot" style="background:${it.g}"></div>
-    <div class="cap">${esc(it.v)}</div>${pin}</div>`;
+    ${chip}<div class="cap">${esc(it.v)}</div>${pin}</div>`;
+  }
   if(it.t==='doc'){const k=kindOf(it.v);
     return `<div class="gc doc${fresh}" style="--fc:${k.c}" ${open}>
     <div class="face">${ic(k.g,34,1.5)}<span class="ext">${extOf(it.v)}</span></div>
@@ -715,7 +807,8 @@ function vote(i,o){if(VOTES[i]===o)delete VOTES[i];else VOTES[i]=o;render();}
 /* ── screens ── */
 const V={
 vault:()=>{const q=st.q.trim().toLowerCase();
-  const res=q?ITEMS.filter(i=>i.v.toLowerCase().includes(q)||(i.tags||[]).some(t=>t.includes(q))):[];
+  const res=q?ITEMS.filter(i=>i.v.toLowerCase().includes(q)||(i.tags||[]).some(t=>t.includes(q))
+    ||(i.ocr||'').toLowerCase().includes(q)):[];
   const toolsRight=[
     '<span style="display:flex;align-items:center;gap:8px">',
     '<span class="tbtn" onclick="go(&#39;add&#39;)">'+ic('add',17)+'</span>',
@@ -773,6 +866,12 @@ add:()=>`${sbar()}${tbar("go('vault')",'New',
       onclick="saveNew()">Save</span>`)}
   <div class="roll" style="padding-top:52px">
     <textarea class="ed" id="ed" placeholder="Type or paste anything…" autocomplete="off"></textarea>
+    <div class="sect">Or attach</div>
+    <div class="card" onclick="attachSim()"><div class="in" style="display:flex;align-items:center;gap:13px">
+      <span style="width:38px;height:38px;border-radius:13px;background:var(--t-img);color:var(--c-img);
+        display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic('img',19)}</span>
+      <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">Attach a picture</b>
+      <span style="font-size:13px;color:var(--ink-3)">a screenshot from your photos</span></span>${ic('next',17)}</div></div>
     <div class="sect">Reel works the rest out</div>
     <div class="card" style="cursor:default"><div class="in" style="display:flex;align-items:center;gap:13px">
       <span style="width:38px;height:38px;border-radius:13px;background:var(--t-lnk);color:var(--c-lnk);
@@ -943,6 +1042,10 @@ function sheetBody(it){
       <div style="font-size:${it.code?18:17}px;line-height:1.5;${it.code?'font-family:var(--mono);letter-spacing:-.02em':''}">
         ${it.g?`<div class="thumb" style="background:${it.g};margin:0 0 12px;height:104px"></div>`:''}${it.v.replace(/\n/g,'<br>')}</div>
     </div>
+    ${it.t==='img'&&(it.ocr||it.ocrPending)?`<div class="ocrsec">
+      <div class="ocrhead"><span class="t">Text found inside</span>
+        ${it.ocr?`<span class="ocrcopy" onclick="copyOcr(${it.id})">${ic('copy',13,2)} Copy</span>`:''}</div>
+      <div class="ocrtx${it.ocrPending?' busy':''}">${it.ocr?esc(it.ocr):'Reading…'}</div></div>`:''}
     ${it.t==='txt'||it.t==='lnk'?`<div class="act" style="background:var(--c-${c})" onclick="copy(${it.id})">${ic('copy',19)} Copy</div>`:''}
     ${it.sens?`<div style="display:flex;align-items:center;gap:9px;padding:14px 20px 2px;font-size:13px;color:var(--ink-3)">
       ${ic('time',16)} Leaves your clipboard after 60 seconds</div>`:''}
@@ -1094,6 +1197,8 @@ function render(){
     <h3>One screen, search-first</h3>
     <p><b>Vault:</b> home, inline search, the item sheet, manual add — no bottom nav. The clipboard watcher is on by default and sits at the bottom as a quiet gauge row; tapping it opens Settings, where the real switch lives.<br>
        <b>Settings</b> (gear, top-right): The everyday (Theme, clipboard watch) up top, everything else under More — and the <b>Ideas</b> page, ten proposals with yes / no / later votes that stick.</p>
+    <h3>New in this build</h3>
+    <p>Search <b>"otter"</b> — a screenshot turns up because the words live <b>inside the picture</b>; open it for the found text and its own Copy. Save the <b>same text twice</b> from the plus, or attach the same picture twice: the original bumps to the top instead of duplicating.</p>
     <h3>What the paywall does</h3>
     <p>Pinning a third thing doesn't error — it takes you to the upgrade page, in the moment the limit actually matters. Gate on scale, never on access.</p>
     <h3>Device views</h3>
@@ -1108,7 +1213,7 @@ function renderKeepFocus(){
   if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
 }
 Object.assign(window,{go,openSearch,closeSearch,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
-  saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch,dismissNote,
+  saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch,dismissNote,attachSim,copyOcr,
   openThemePicker,closeThemePicker,setTheme,vote,openTags,closeTags,addTag,removeTag,flipCopy});
 render();
 /* let the bounce finish, then never again this session */
