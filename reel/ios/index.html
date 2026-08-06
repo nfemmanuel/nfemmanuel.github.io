@@ -3,800 +3,395 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>The iOS app — a guided tour</title>
+<title>iOS screens — a guided tour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* ═══════════════════════════════════════════════════════════════════
-     /reel/ios/ — the iOS exhibit, rebuilt 2026-08-06 to the ruling
-     "the iOS surface catches up to its own law" (docs/design-decisions.md).
-
-     One palette across /reel/: every colour below is copied verbatim from
-     design/app-mockup.html (canonical), light AND dark. The CONTENT layer
-     (tiles, chips, receipts) is the shared soul with Android; the CHROME
-     is native per platform — Liquid Glass here, Material there.
-     Page accent is --c-img, the tint the hub gives this exhibit.
-
-     Self-contained by rule: no external requests. The family names stay
-     first in the font stacks and fall back to system faces; in-frame
-     content uses the Apple system stack, which is the honest choice for
-     an iOS depiction anyway.
-     ═══════════════════════════════════════════════════════════════════ */
+  /* ═══ product token family (app-mockup.html is canonical) ═══
+     Values are copied, never invented — one palette across /reel/.
+     Page accent is --c-img, the tint the hub already gives this exhibit.
+     The --ios-* set below is NOT palette: it depicts Apple's own system UI
+     inside the phone frame and stays exactly as Apple ships it. */
   :root{
-    color-scheme:light;
+    color-scheme:light dark;
     --ground:#F6F6F7; --surf:#FFFFFF; --ink:#14161A; --ink-2:#5C636D; --ink-3:#8B929C; --hair:#E7E8EB;
-    --c-txt:#B4761C;  --t-txt:#FBF2E2;
-    --c-img:#7B55B4;  --t-img:#F0EAF9;
-    --c-doc:#356BA6;  --t-doc:#E6EFF8;
-    --c-lnk:#BA5138;  --t-lnk:#FAEAE5;
+    --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
     --accent:var(--c-img); --accent-soft:#7B55B422;
+    --ios-bg:#F2F2F7; --ios-card:#FFFFFF; --ios-txt:#000000; --ios-dim:#8A8A8E;
+    --ios-sep:#E5E5EA; --ios-blue:#007AFF;
     --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
     --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
-    --f-pdf:#C0413B; --f-doc:#2F6DB5; --f-txt:#5D6773; --f-sheet:#2C8A56;
-    --f-deck:#C07524; --f-code:#6B58A4; --f-zip:#96793D; --f-vid:#A8348B; --f-aud:#37878A;
-    --fmix:10%;
-    /* depiction, not palette: the one colour Apple's own controls wear
-       inside the frame (Cancel, Browse). Everything else uses our tokens. */
-    --sys-blue:#007AFF;
-    /* ── the Liquid Glass recipe — the ONLY new variables this page adds.
-       Glass carries chrome (header slab, sheets, widget stock); content
-       stays opaque. Tinted translucency + blur/saturate behind, a 1px
-       specular top edge, a soft lifted shadow, large concentric radii. ── */
-    --lg-bg:color-mix(in srgb,var(--ground) 55%,transparent);
-    --lg-surf:color-mix(in srgb,var(--surf) 64%,transparent);
-    --lg-blur:blur(26px) saturate(1.7);
-    --lg-edge:rgba(255,255,255,.45);
-    --lg-drop:0 10px 30px rgba(16,20,26,.13);
-    --r-in:29px;              /* the frame's inner corner radius … */
-    --r-bar:calc(var(--r-in) - 5px);   /* … bars curve concentric with it */
-    --r-sheet:calc(var(--r-in) - 8px); /* … sheets sit 8px in, so 8px less */
     --display:"Bricolage Grotesque",system-ui,sans-serif;
-    --ui:"IBM Plex Sans",system-ui,sans-serif;
-    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
-    --apple:-apple-system,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
-    --spring:cubic-bezier(.34,1.56,.5,1); --glide:cubic-bezier(.2,.85,.3,1);
+    --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
   }
-  html[data-theme="dark"]{
+  @media (prefers-color-scheme:dark){:root{
+    --ground:#0E1013; --surf:#181B20; --ink:#F0F1F3; --ink-2:#A2A9B3; --ink-3:#767D87; --hair:#272B31;
+    --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
+    --accent-soft:#C6A8FF26;
+    --ios-bg:#000000; --ios-card:#1C1C1E; --ios-txt:#FFFFFF; --ios-dim:#98989F;
+    --ios-sep:#38383A; --ios-blue:#0A84FF;
+    --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
+  }}
+  :root[data-theme="dark"]{
     color-scheme:dark;
     --ground:#0E1013; --surf:#181B20; --ink:#F0F1F3; --ink-2:#A2A9B3; --ink-3:#767D87; --hair:#272B31;
-    --c-txt:#FFC978;  --t-txt:#5A3D0C;
-    --c-img:#C6A8FF;  --t-img:#432D73;
-    --c-doc:#8FC6FF;  --t-doc:#0F4275;
-    --c-lnk:#FFA184;  --t-lnk:#66301F;
+    --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
     --accent-soft:#C6A8FF26;
+    --ios-bg:#000000; --ios-card:#1C1C1E; --ios-txt:#FFFFFF; --ios-dim:#98989F;
+    --ios-sep:#38383A; --ios-blue:#0A84FF;
     --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
-    --f-pdf:#FF8A80; --f-doc:#8CB9FF; --f-txt:#A7B1BD; --f-sheet:#6FD79B;
-    --f-deck:#FFB265; --f-code:#BBA8F5; --f-zip:#E3C57E; --f-vid:#FF9FE0; --f-aud:#6FD4D6;
-    --fmix:17%;
-    --sys-blue:#0A84FF;
-    --lg-bg:color-mix(in srgb,var(--ground) 52%,transparent);
-    --lg-surf:color-mix(in srgb,var(--surf) 62%,transparent);
-    --lg-edge:rgba(255,255,255,.12);
-    --lg-drop:0 12px 34px rgba(0,0,0,.5);
   }
-  .lg-glass{background:var(--lg-surf);
-    -webkit-backdrop-filter:var(--lg-blur);backdrop-filter:var(--lg-blur);
-    box-shadow:inset 0 1px 0 var(--lg-edge),var(--lg-drop)}
-
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --ground:#F6F6F7; --surf:#FFFFFF; --ink:#14161A; --ink-2:#5C636D; --ink-3:#8B929C; --hair:#E7E8EB;
+    --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
+    --accent-soft:#7B55B422;
+    --ios-bg:#F2F2F7; --ios-card:#FFFFFF; --ios-txt:#000000; --ios-dim:#8A8A8E;
+    --ios-sep:#E5E5EA; --ios-blue:#007AFF;
+    --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+    --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
+  }
+  *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0;background:var(--ground);color:var(--ink);
-    font:15px/1.5 var(--ui);display:flex;flex-direction:column;overflow-x:hidden;
-    -webkit-font-smoothing:antialiased}
-  a{color:var(--accent)}
+    font:15px/1.5 var(--ui);
+    display:flex;flex-direction:column}
 
-  /* ─────────── chassis: explainer, segs, screen picker, nav ─────────── */
-  .top{padding:14px 14px 0;flex:0 0 auto}
-  .hrow{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
-  .top h1{font-family:var(--display);font-weight:700;font-size:16px;margin:0;letter-spacing:-.025em}
-  .ptag{font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
-    border:1px solid var(--hair);border-radius:99px;padding:2px 8px;white-space:nowrap;margin-top:2px}
-  .ctrls{display:flex;flex-direction:column;gap:6px;margin-left:auto;align-items:flex-end}
-  .crow{display:flex;gap:7px}
-  .seg{display:flex;background:var(--surf);border:1px solid var(--hair);border-radius:99px;padding:3px}
-  .seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;
-    color:var(--ink-3);padding:5px 12px;border-radius:99px;cursor:pointer;transition:.2s var(--glide)}
-  .seg button[data-on="1"]{background:var(--ink);color:var(--ground)}
-  .top p.lede{margin:6px 0 0;font-size:12.5px;color:var(--ink-2);max-width:64ch}
+  /* ---------- top: explainer + chips ---------- */
+  .top{padding:12px 14px 0;flex:0 0 auto}
+  .top h1{font-family:var(--display);font-weight:700;font-size:15.5px;margin:0 0 2px;letter-spacing:-.025em}
+  .top p{margin:0;font-size:12.5px;color:var(--ink-2)}
   .top b.us{color:var(--accent)} .top b.sys{color:var(--ink-3)}
-
   .chips{display:flex;gap:7px;overflow-x:auto;padding:10px 14px;flex:0 0 auto;
     -webkit-overflow-scrolling:touch;scrollbar-width:none}
   .chips::-webkit-scrollbar{display:none}
-  .pick{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:1.5px solid var(--hair);
+  .chip{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:1.5px solid var(--hair);
     background:var(--surf);color:var(--ink-2);border-radius:999px;padding:7px 13px;
     font:inherit;font-size:12.5px;cursor:pointer;white-space:nowrap}
-  .pick .dot{width:8px;height:8px;border-radius:50%}
-  .pick[data-on="1"]{border-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
-
+  .chip .dot{width:8px;height:8px;border-radius:50%}
+  .chip[data-on="1"]{border-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
   .nav{display:flex;gap:8px;align-items:center;padding:0 14px 8px;flex:0 0 auto}
-  .nav button{display:flex;align-items:center;justify-content:center;border:1.5px solid var(--hair);
-    background:var(--surf);color:var(--ink);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer}
-  .meta{flex:1;font-size:12px;color:var(--ink-2);line-height:1.4}
+  .nav button{border:1.5px solid var(--hair);background:var(--surf);color:var(--ink);
+    border-radius:9px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+  .meta{flex:1;font-size:12px;color:var(--ink-2);line-height:1.35}
   .tag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.05em;
     text-transform:uppercase;padding:2px 7px;border-radius:5px;color:var(--ground);margin-right:6px;vertical-align:1px}
 
-  /* ─────────── the stage: an iPhone (or iPad) with a status bar ───────────
-     the min-height keeps the frame tall enough for sheets to float over a
-     visible backdrop on phones — the page scrolls a little instead */
-  .stage{flex:1;min-height:480px;padding:0 10px 6px;display:flex;justify-content:center}
-  .phone{position:relative;width:100%;max-width:392px;height:100%;border-radius:30px;overflow:hidden;
-    background:var(--ground);box-shadow:var(--shadow-m);border:1px solid var(--hair)}
-  .scr{position:absolute;inset:0;background:var(--ground);overflow:hidden;
-    font-family:var(--apple);color:var(--ink)}
-  /* the status bar and home indicator ride over every screen; their colour
-     follows the surface behind them (data-sb="lite" on wallpaper scenes) */
-  .sbz{position:absolute;top:0;left:0;right:0;height:40px;z-index:40;pointer-events:none;
-    display:flex;align-items:center;justify-content:space-between;padding:8px 24px 0;
-    font-size:13px;font-weight:600;color:var(--ink)}
-  .sbz .cell{display:flex;align-items:center;gap:5px;font-size:11.5px}
-  .scr[data-sb="lite"] .sbz{color:#fff}
-  .homebar{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:118px;height:5px;
-    border-radius:3px;background:var(--ink);opacity:.75;z-index:40;pointer-events:none}
-  .scr[data-sb="lite"] .homebar{background:#fff;opacity:.85}
+  /* ---------- the screen ---------- */
+  .stage{flex:1;min-height:0;padding:0 10px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+  .frame{position:relative;width:100%;max-width:400px;height:100%;
+    border-radius:22px;overflow:hidden;box-shadow:var(--shadow-m);border:1px solid var(--hair)}
+  .scr{position:absolute;inset:0;background:var(--ios-bg);display:flex;flex-direction:column;
+    font-family:-apple-system,"SF Pro Text",ui-sans-serif,system-ui,sans-serif;color:var(--ios-txt)}
 
-  .ipadnote,.footrow{display:none;padding:2px 16px 10px;font-size:11.5px;color:var(--ink-3);
-    text-align:center;line-height:1.5;flex:0 0 auto}
-  .footrow{display:block}
-  body.device-ipad:not(.ipad-wide) .ipadnote{display:block}
-  /* the iPad frame — only the Vault (and its search state) re-lays for it;
-     everything else keeps an iPhone-width frame plus the honest note above */
-  body.device-ipad.ipad-wide .phone{max-width:960px;height:auto;max-height:100%;aspect-ratio:4/3;
-    border-radius:24px;--r-in:23px}
-
-  /* desktop: bezel + side notes, same arrangement the other /reel/ pages use */
-  .desk{display:none}
-  @media (min-width:880px){
+  /* desktop: add bezel + side notes */
+  @media (min-width:860px){
     body{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:center;
-      gap:0 28px;padding:26px;height:auto;min-height:100%}
-    .top{flex-basis:100%;max-width:850px;padding:0}
-    .chips{flex-basis:100%;max-width:850px;padding:10px 0}
+      gap:26px;padding:26px;height:auto;min-height:100%}
+    .top{flex-basis:100%;max-width:820px;padding:0}
+    .chips{flex-basis:100%;max-width:820px;padding:10px 0}
     .nav{display:none}
     .stage{flex:0 0 auto;padding:0;height:auto}
-    .phone{width:376px;height:768px;border:9px solid #0B0C0E;border-radius:42px;--r-in:33px}
-    body.device-ipad.ipad-wide .phone{width:min(960px,calc(100vw - 56px));max-width:none;
-      height:auto;aspect-ratio:4/3;border-radius:30px;--r-in:21px}
-    .desk{display:block;flex:0 0 310px;max-width:350px}
+    .frame{width:352px;height:712px;border:10px solid #101317;border-radius:46px}
+    .desk{display:block;flex:0 0 320px;max-width:360px}
     .desk .card{background:var(--surf);border:1px solid var(--hair);border-radius:14px;
-      padding:15px;margin-bottom:13px;box-shadow:var(--shadow-s);font-size:13px;color:var(--ink-2);line-height:1.55}
+      padding:15px;margin-bottom:13px;box-shadow:var(--shadow-s);font-size:13px;color:var(--ink-2)}
     .desk h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2);margin:0 0 8px}
     .desk b{color:var(--ink)}
-    .ipadnote,.footrow{flex-basis:100%;text-align:center;padding:8px 0 0}
-    .footrow{order:9}
   }
+  .desk{display:none}
 
-  /* ─────────── screen: the Vault (the hero) ───────────
-     One scroller under one fixed glass slab. The slab holds the title row,
-     the search capsule and the lens chips; the grid slides UNDER it — the
-     blur-through is the point. A hairline fades in at its foot once the
-     stream has moved (same behaviour as the Android prototype). Nothing
-     above the grid ever scrolls: cross-platform law. No tab bar. No FAB. */
-  .roll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none;padding:190px 0 46px}
-  .roll::-webkit-scrollbar{display:none}
-  .roll.plain{padding-top:54px}
-  .inwrap{max-width:100%;margin:0 auto}
-  body.ipad-wide .inwrap{max-width:820px}
-  .lg-head{position:absolute;top:0;left:0;right:0;z-index:20;
-    padding:44px 14px 12px;border-radius:0 0 var(--r-bar) var(--r-bar)}
-  .lg-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
-    background:var(--hair);opacity:0;transition:opacity .25s}
-  .lg-head.scrolled::after{opacity:1}
-  .lg-head{background:var(--lg-bg)}
-  .trow{display:flex;align-items:center;gap:9px;padding:0 4px 10px}
-  .trow .markrow{display:flex;align-items:center;gap:8px;color:var(--ink);min-width:0}
-  .trow .markrow svg{color:var(--accent);flex:0 0 auto}
-  .trow .markrow b{font-family:var(--display);font-size:15.5px;font-weight:700;letter-spacing:-.02em;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .hbtns{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
-  .gearbtn{width:33px;height:33px;border-radius:50%;flex:0 0 auto;
-    display:flex;align-items:center;justify-content:center;color:var(--ink-2);cursor:pointer;
-    background:color-mix(in srgb,var(--surf) 70%,transparent);border:.5px solid var(--hair)}
-  .cap{height:42px;border-radius:21px;display:flex;align-items:center;gap:8px;padding:0 15px;
-    font-size:15.5px;color:var(--ink-3);cursor:pointer;
-    background:color-mix(in srgb,var(--surf) 74%,transparent);border:.5px solid var(--hair)}
-  .cap .qtx{color:var(--ink)}
-  .cap .cancel{margin-left:auto;font-size:14px;font-weight:600;color:var(--ink-2)}
-  .caret{width:2px;height:17px;border-radius:1px;background:var(--accent);flex:0 0 auto}
-  /* the lens row — same anatomy, order and selected states as Android:
-     All | Text | Links | Images | Docs, counts in mono on the type chips,
-     a selected type chip wears the wash and colour its tiles already carry */
-  .lens{display:flex;gap:6px;padding:11px 2px 0;overflow-x:auto;scrollbar-width:none}
-  .lens::-webkit-scrollbar{display:none}
-  .chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:33px;padding:0 12px;
-    border-radius:99px;background:color-mix(in srgb,var(--surf) 82%,transparent);
-    border:1px solid var(--hair);font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer}
-  .chip .cnt{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink-3)}
-  .chip.on .cnt{color:inherit;opacity:.62}
-
-  .sect{font-size:12px;font-weight:600;color:var(--ink-3);padding:18px 16px 10px}
-  body.ipad-wide .sect{padding-inline:6px}
-  .endnote{padding:26px 16px 6px;text-align:center;font-size:12px;color:var(--ink-3)}
-
-  /* ── square tiles: the shared soul. Anatomy copied from app-mockup —
-     image = the picture with a scrim caption, file = kind glyph as cover
-     plus extension badge, text = the value itself, centred, mono when it
-     looks like a code, a fade for overflow. 3-across on iPhone (this
-     exhibit's stream is text-heavy), 6-across on iPad. ── */
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:0 14px}
-  body.ipad-wide .grid{grid-template-columns:repeat(6,1fr);padding:0 4px;gap:11px}
-  .gc{position:relative;aspect-ratio:1;background:var(--surf);box-shadow:var(--shadow-s);
-    border-radius:18px;cursor:pointer;overflow:hidden}
-  html[data-theme="dark"] .gc{border:1px solid var(--hair)}
-  .gc .face{position:absolute;inset:0;padding:12px;display:flex}
-  .gc .face>.tx,.gc .face>.lstack{margin-top:auto;margin-bottom:auto}
-  .gc .tx{font-size:11.5px;line-height:1.44;font-weight:450;word-break:break-word}
-  .gc .tx.s1{font-size:15px;line-height:1.3;letter-spacing:-.015em}
-  .gc .tx.s2{font-size:13px;line-height:1.38;letter-spacing:-.01em}
-  .gc .tx.ind{padding-right:15px}
-  .gc .tx.code{font-family:var(--mono);font-size:10.5px;letter-spacing:-.01em}
-  .gc .tx.code.s1{font-size:14px} .gc .tx.code.s2{font-size:12px}
-  .gc .tx .dom{font-weight:650;color:var(--c-lnk)}
-  .gc .lstack{flex:1;min-width:0}
-  .gc .ltitle{font-size:10.5px;line-height:1.35;font-weight:450;color:var(--ink-3);margin-top:5px;
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-  .gc.txt.ov::after,.gc.lnk.ov::after{content:"";position:absolute;left:0;right:0;bottom:0;height:30px;
-    background:linear-gradient(transparent,var(--surf));pointer-events:none}
-  .gc .shot{position:absolute;inset:0}
-  .gc .capline{position:absolute;left:0;right:0;bottom:0;padding:24px 11px 9px;color:#fff;
-    font-size:11px;font-weight:600;letter-spacing:-.01em;
-    background:linear-gradient(transparent,rgba(0,0,0,.66))}
-  .gc.doc{background:color-mix(in srgb,var(--fc) var(--fmix),var(--surf))}
-  .gc.doc .face{flex-direction:column;align-items:center;justify-content:center;gap:8px;
-    padding-bottom:30px;color:var(--fc)}
-  .gc .ext{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;
-    padding:2.5px 7px;border-radius:7px;color:var(--fc);
-    background:color-mix(in srgb,var(--fc) 20%,transparent)}
-  .gc .fname{position:absolute;left:0;right:0;bottom:0;padding:0 10px 11px;text-align:center;
-    font-size:10.5px;font-weight:600;color:var(--ink-2);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .gc .pinmark{position:absolute;top:10px;right:10px;color:var(--ink-3);opacity:.55;display:flex}
-  .gc.img .pinmark{color:#fff;opacity:.92}
-
-  /* ─────────── sheets: Liquid Glass, floating concentric ─────────── */
-  .scrim{position:absolute;inset:0;background:rgba(8,10,14,.38);z-index:22}
-  .dim{position:absolute;inset:0;filter:brightness(.68) saturate(.92)}
-  .lg-sheet{position:absolute;left:9px;right:9px;bottom:9px;z-index:24;
-    border-radius:var(--r-sheet);padding:8px 0 18px;overflow:hidden;
-    background:var(--lg-surf)}
-  .lg-sheet.tall{top:56px;display:flex;flex-direction:column;padding-bottom:12px}
-  .psc{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding-bottom:6px}
-  .psc::-webkit-scrollbar{display:none}
-  .grab{width:36px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--ink) 28%,transparent);
-    margin:4px auto 12px;flex:0 0 auto}
-  .shrow{display:flex;align-items:center;gap:14px;padding:2px 18px 14px}
-  .ptile{width:92px;height:92px;flex:0 0 auto;position:relative;border-radius:16px;overflow:hidden;
-    background:color-mix(in srgb,var(--fc) var(--fmix),var(--surf));box-shadow:var(--shadow-s)}
-  .ptile .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-    justify-content:center;gap:7px;color:var(--fc)}
-  .pname{min-width:0;font-size:16.5px;font-weight:650;letter-spacing:-.01em;word-break:break-word}
-  .arows{margin:0 14px;border-radius:16px;overflow:hidden;
-    background:color-mix(in srgb,var(--surf) 55%,transparent)}
-  .arow{display:flex;align-items:center;gap:13px;padding:13px 16px;font-size:15.5px;cursor:pointer}
-  .arow+.arow{border-top:.5px solid color-mix(in srgb,var(--hair) 70%,transparent)}
-  .arow svg{color:var(--ink-2)}
-  .receipt{position:absolute;left:16px;right:16px;bottom:24px;z-index:30;padding:13px 16px;
-    border-radius:16px;background:var(--ink);color:var(--ground);font-size:14px;font-weight:500;
-    text-align:center;box-shadow:var(--shadow-m)}
-  /* over a sheet, the receipt floats up in the dimmed area instead —
-     never across the sheet's own rows */
-  .receipt.up{bottom:auto;top:74px;left:50%;right:auto;transform:translateX(-50%);
-    width:max-content;max-width:80%;padding:11px 22px;border-radius:14px}
-
-  /* ─────────── screen: You (behind the gear) ─────────── */
-  .backpill{position:absolute;top:46px;left:14px;z-index:21;width:33px;height:33px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;color:var(--ink-2);cursor:pointer;
-    background:color-mix(in srgb,var(--surf) 70%,transparent);border:.5px solid var(--hair)}
-  .bigt{font-family:var(--apple);font-size:30px;font-weight:700;letter-spacing:-.02em;
-    margin:0;padding:34px 18px 2px}
-  .setgrp{margin:0 14px;border-radius:16px;overflow:hidden;background:var(--surf);box-shadow:var(--shadow-s)}
-  html[data-theme="dark"] .setgrp{border:1px solid var(--hair)}
-  .setrow{display:flex;align-items:center;gap:13px;padding:14px 16px}
-  .setrow+.setrow{border-top:.5px solid var(--hair)}
-  .setrow .tt{flex:1;min-width:0}
-  .setrow .tt b{display:block;font-size:15px;font-weight:600}
-  .setrow .tt span{display:block;font-size:12.5px;color:var(--ink-3);margin-top:2px;line-height:1.45}
-  .setrow .val{font-size:14px;color:var(--ink-3)}
-  .miniseg{display:flex;background:var(--ground);border:1px solid var(--hair);border-radius:9px;padding:2px;flex:0 0 auto}
-  .miniseg i{font-style:normal;font-size:12px;font-weight:500;color:var(--ink-3);padding:4px 9px;border-radius:7px}
-  .miniseg i.on{background:var(--surf);color:var(--ink);box-shadow:var(--shadow-s)}
-  .pend{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);
-    border:1px solid var(--hair);border-radius:99px;padding:3px 8px;flex:0 0 auto}
-
-  /* ─────────── wallpaper scenes: widgets and Spotlight ─────────── */
-  .wall{position:absolute;inset:0;background:linear-gradient(165deg,#2b3a44,#151b21)}
-  .wall::after{content:"";position:absolute;inset:0;
-    background:radial-gradient(90% 60% at 22% 8%,rgba(123,85,180,.28),transparent 60%)}
-  .homewrap{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;gap:20px;
-    align-items:center;justify-content:center;padding:54px 20px 40px}
-  .approw{display:flex;gap:18px}
-  .appdot{width:52px;height:52px;border-radius:14px;
-    background:rgba(255,255,255,.16);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
-  .wg{width:308px;border-radius:24px;padding:13px;display:flex;flex-direction:column;gap:9px}
-  .wgh{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;letter-spacing:.06em;
-    color:var(--ink-2)}
-  .wgh svg{color:var(--accent)}
-  .wgg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .wcell{position:relative;border-radius:14px;padding:10px 11px;min-height:62px;display:flex;
-    background:color-mix(in srgb,var(--surf) 84%,transparent)}
-  .wcell .tx{margin:auto 0;font-size:11px;line-height:1.35;font-weight:500;color:var(--ink);
-    word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .wcell .tx.code{font-family:var(--mono);font-size:10.5px}
-  .wcell .tx .dom{font-weight:650;color:var(--c-lnk)}
-  .wchip{align-self:center;padding:8px 16px;border-radius:12px;background:var(--ink);color:var(--ground);
-    font-size:12.5px;font-weight:600;box-shadow:var(--shadow-m)}
-
-  .spotwash{position:absolute;inset:0;z-index:2;padding-top:64px;
-    background:rgba(10,14,18,.52);-webkit-backdrop-filter:blur(28px) saturate(1.4);
-    backdrop-filter:blur(28px) saturate(1.4)}
-  .spotf{margin:0 16px 16px;height:44px;border-radius:22px;display:flex;align-items:center;gap:9px;
-    padding:0 15px;color:#fff;font-size:16px;
-    background:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
-  .spotf .caret{background:#fff}
-  .spotl{color:rgba(255,255,255,.62);font-size:11.5px;font-weight:600;text-transform:uppercase;
-    letter-spacing:.05em;padding:12px 20px 7px}
-  .spotg{margin:0 14px;border-radius:20px;overflow:hidden;
-    background:rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
-  .spotr{display:flex;align-items:center;gap:12px;padding:11px 14px;color:#fff;font-size:15px}
-  .spotr+.spotr{border-top:.5px solid rgba(255,255,255,.12)}
-  .spotr .sic{width:31px;height:31px;border-radius:9px;display:flex;align-items:center;
-    justify-content:center;flex:0 0 auto}
-  .spotr .stx{min-width:0}
-  .spotr .stx small{display:block;font-size:12px;opacity:.62;overflow:hidden;
-    text-overflow:ellipsis;white-space:nowrap}
-
-  /* ─────────── system backdrops: Mail and Safari, dimmed ─────────── */
-  .sysnav{display:flex;align-items:center;justify-content:space-between;padding:52px 16px 10px;font-size:16px}
-  .sysnav .b{color:var(--sys-blue)} .sysnav .t{font-weight:600}
-  .fline{display:flex;gap:8px;padding:11px 16px;font-size:15px;border-bottom:.5px solid var(--hair)}
-  .fline .k{color:var(--ink-3)}
-  .pgtitle{font-family:var(--apple);font-size:26px;font-weight:700;letter-spacing:-.02em;padding:66px 20px 6px}
-  .pgline{height:9px;border-radius:5px;background:var(--hair);margin:10px 20px 0}
-  .addr{position:absolute;left:44px;right:44px;bottom:18px;height:44px;border-radius:22px;
-    display:flex;align-items:center;justify-content:center;gap:7px;font-size:14.5px;color:var(--ink-2)}
-
-  /* ─────────── the pickers and share row inside sheets ─────────── */
-  .pnav{display:flex;align-items:center;justify-content:space-between;padding:0 16px 8px;font-size:16px}
-  .pnav .sysb{color:var(--sys-blue)} .pnav b{font-size:16.5px}
-  .pcap{margin:0 14px 4px;height:36px;border-radius:18px;display:flex;align-items:center;gap:7px;
-    padding:0 13px;font-size:14.5px;color:var(--ink-3);
-    background:color-mix(in srgb,var(--surf) 60%,transparent);border:.5px solid var(--hair)}
-  .pgrp{margin:0 14px;border-radius:16px;overflow:hidden;
-    background:color-mix(in srgb,var(--surf) 55%,transparent)}
-  .prow{display:flex;align-items:center;gap:12px;padding:12px 14px;font-size:15px}
-  .prow+.prow{border-top:.5px solid color-mix(in srgb,var(--hair) 70%,transparent)}
-  .prow .sic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;
-    justify-content:center;flex:0 0 auto}
-  .prow .stx{flex:1;min-width:0}
-  .prow .stx small{display:block;font-size:12px;color:var(--ink-3)}
-  .prow.us{background:var(--accent-soft)}
-  .prow .okmark{color:var(--accent);display:flex}
-  .shsite{display:flex;align-items:center;gap:12px;padding:2px 18px 12px}
-  .shsite .stx2{min-width:0}
-  .shsite .stx2 b{display:block;font-size:15px;font-weight:600;overflow:hidden;
-    text-overflow:ellipsis;white-space:nowrap}
-  .shsite .stx2 small{display:block;font-size:12.5px;color:var(--ink-3)}
-  .apps{display:flex;gap:16px;padding:6px 18px 14px;border-top:.5px solid color-mix(in srgb,var(--hair) 70%,transparent);
-    border-bottom:.5px solid color-mix(in srgb,var(--hair) 70%,transparent);margin-bottom:12px}
-  .ap{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;color:var(--ink-2);
-    padding-top:10px;min-width:56px}
-  .ap .apc{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-    background:color-mix(in srgb,var(--surf) 78%,transparent);border:.5px solid var(--hair);color:var(--ink-2)}
-  .ap.us .apc{background:var(--accent);color:var(--ground);border:none}
-  .ap.us{color:var(--ink);font-weight:600}
-  .ourpanel{margin:0 14px;border-radius:16px;padding:13px 14px;
-    background:color-mix(in srgb,var(--surf) 78%,transparent);
-    border:1px solid color-mix(in srgb,var(--accent) 32%,transparent)}
-  .lnkprev{font-size:13.5px;word-break:break-word}
-  .lnkprev .dom{font-weight:650;color:var(--c-lnk)}
-  .lnkprev small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:3px}
-  .savebtn{margin-top:11px;height:44px;border-radius:13px;background:var(--accent);color:var(--ground);
-    display:flex;align-items:center;justify-content:center;font-size:15.5px;font-weight:600;cursor:pointer}
-
-  /* one settle bounce on first appearance — the standing motion law; never
-     staggered, never repeated, and glass itself does not animate at all */
-  .settle{animation:settle .52s cubic-bezier(.3,1,.5,1) 1}
-  @keyframes settle{
-    0%{transform:translateY(0)}26%{transform:translateY(-7px)}
-    54%{transform:translateY(3.5px)}78%{transform:translateY(-1.5px)}100%{transform:translateY(0)}
-  }
+  /* ---------- iOS bits ---------- */
+  .sb{height:44px;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 22px 5px;font-size:13px;font-weight:600}
+  .body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
+  .lt{font-size:30px;font-weight:700;letter-spacing:-.028em;padding:4px 16px 8px}
+  .srch{margin:0 14px 12px;height:36px;border-radius:10px;background:var(--ios-sep);
+    display:flex;align-items:center;padding:0 10px;color:var(--ios-dim);font-size:15px;gap:6px}
+  .sec{font-size:12.5px;font-weight:600;color:var(--ios-dim);text-transform:uppercase;
+    letter-spacing:.045em;padding:12px 16px 6px}
+  .grp{background:var(--ios-card);margin:0 12px;border-radius:12px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-bottom:.5px solid var(--ios-sep);
+    font-size:15.5px;cursor:pointer}
+  .row:last-child{border-bottom:none}
+  .row:active{background:var(--ios-sep)}
+  .row .ic{width:29px;height:29px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+    font-size:15px;flex:0 0 auto;background:var(--accent-soft);color:var(--accent)}
+  .row .tx{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .row .sub{font-size:12.5px;color:var(--ios-dim);margin-top:1px}
+  .row .cnt{color:var(--ios-dim);font-size:14.5px}
+  .row .chev{color:#C4C4C6;font-size:15px}
+  .tabbar{flex:0 0 auto;height:64px;background:var(--ios-card);border-top:.5px solid var(--ios-sep);
+    display:flex;padding-top:8px}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--ios-dim)}
+  .tab.on{color:var(--accent)}
+  .tab .g{font-size:20px;line-height:1}
+  .fab{position:absolute;right:16px;bottom:82px;width:54px;height:54px;border-radius:50%;
+    background:var(--accent);color:var(--ground);display:flex;align-items:center;justify-content:center;
+    font-size:22px;box-shadow:0 6px 18px rgba(0,0,0,.28);cursor:pointer;z-index:5}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--ios-card);
+    border-radius:16px 16px 0 0;padding:9px 0 20px;z-index:8;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+  .grab{width:36px;height:5px;border-radius:3px;background:#C6C6C8;margin:0 auto 12px}
+  .wgwrap{padding:26px 16px;display:flex;flex-direction:column;gap:16px;align-items:center}
+  .wg{width:152px;height:152px;border-radius:22px;background:var(--ios-card);padding:12px;
+    box-shadow:0 4px 14px rgba(0,0,0,.16);display:flex;flex-direction:column;gap:6px}
+  .wg.med{width:100%;height:152px}
+  .wgh{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ios-dim);font-weight:600}
+  .wgi{display:flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 7px;border-radius:8px;
+    background:var(--ios-sep);overflow:hidden;white-space:nowrap}
+  .wgg{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1}
+  .spot{position:absolute;inset:0;background:rgba(10,14,18,.66);backdrop-filter:blur(16px);
+    display:flex;flex-direction:column;padding-top:52px;z-index:7}
+  .spotf{margin:0 14px 14px;height:40px;border-radius:11px;background:rgba(255,255,255,.22);
+    display:flex;align-items:center;padding:0 12px;color:#fff;font-size:16px;gap:8px}
+  .spotg{background:rgba(255,255,255,.14);margin:0 14px;border-radius:13px;overflow:hidden}
+  .spotr{display:flex;align-items:center;gap:11px;padding:11px 13px;color:#fff;font-size:15px;
+    border-bottom:.5px solid rgba(255,255,255,.12)}
+  .spotr:last-child{border-bottom:none}
+  .spotl{color:rgba(255,255,255,.65);font-size:11.5px;padding:13px 16px 6px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.05em}
+  .navbar{height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px;font-size:16px;border-bottom:.5px solid var(--ios-sep);background:var(--ios-card)}
+  .navbar .t{font-weight:600;font-size:16.5px}
+  .navbar .b{color:var(--ios-blue)}
+  #dialsvg{width:100%;flex:1;display:block;min-height:0}
 
   #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(90px);
     background:var(--ink);color:var(--ground);border-radius:11px;
     padding:9px 15px;font-size:13px;z-index:60;transition:transform .22s;max-width:86vw;text-align:center}
   #toast.show{transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion:reduce){#toast{transition:none}}
   button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-  svg{display:block}
 </style>
 </head>
 <body>
 
 <div class="top">
-  <div class="hrow">
-    <h1>The iOS app — 8 mock screens</h1>
-    <span class="ptag">picture tour</span>
-    <div class="ctrls">
-      <div class="crow"><div class="seg" id="themeseg" aria-label="Theme"></div></div>
-      <div class="crow"><div class="seg" id="devseg" aria-label="Device"></div></div>
-    </div>
-  </div>
-  <p class="lede">Nothing here runs — it is a picture tour of the iOS design, current to the latest rulings. Pick a screen below. <b class="us">Purple</b> = screens we design. <b class="sys">Grey</b> = iOS draws them, our things just appear in them.</p>
+  <h1>The iOS app — 8 mock screens</h1>
+  <p>Nothing here is a real app — it's a picture tour. Pick a screen below. <b class="us">Purple</b> = screens we design. <b class="sys">Grey</b> = iOS draws them, our stuff just appears in them.</p>
 </div>
 
 <div class="chips" id="chips"></div>
 
 <div class="nav">
-  <button id="prev" aria-label="Previous screen"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.4 5.6 8 12l6.4 6.4"/></svg></button>
+  <button id="prev">‹ Prev</button>
   <div class="meta" id="meta"></div>
-  <button id="next" aria-label="Next screen"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.6 5.6 6.4 6.4-6.4 6.4"/></svg></button>
+  <button id="next">Next ›</button>
 </div>
 
-<div class="stage"><div class="phone"><div class="scr" id="scr"></div></div></div>
-
-<div class="ipadnote">Shown at iPhone width — the iPad layout keeps the same bones. The Vault is the screen that genuinely re-lays for iPad.</div>
+<div class="stage"><div class="frame"><div class="scr" id="scr"></div></div></div>
 
 <aside class="desk" id="desk"></aside>
-
-<div class="footrow">Two screens left this tour: Collection (types are lenses now, not places) and the in-app dial (the dial is Android's surface). The keyboard exhibit lives on <a href="../extensions/">the extensions page</a>.</div>
 
 <div id="toast" role="status"></div>
 
 <script>
 'use strict';
-/* Icon set: the same stroke language as app-mockup.html (24-box, 1.7 stroke,
-   round caps); shared names carry the exact same path data. Never emoji —
-   inline SVG only, per the deploy guard. */
+/* Icon set: same stroke language as app-mockup.html (24-box, 1.7 stroke,
+   round caps). Shared names carry the exact same path data. Never emoji. */
 const I={
   txt:'<path d="M5 5.5h14M5 12h14M5 18.5h9"/>',
   img:'<rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/>',
-  lnk:'<path d="M10.4 13.6a4.1 4.1 0 0 0 5.8 0l2.3-2.3a4.1 4.1 0 0 0-5.8-5.8l-1.2 1.2"/><path d="M13.6 10.4a4.1 4.1 0 0 0-5.8 0l-2.3 2.3a4.1 4.1 0 0 0 5.8 5.8l1.2-1.2"/>',
-  pin:'<path d="M9.5 3h5v5.6l2.3 3.1v2.1H7.2v-2.1L9.5 8.6z"/><path d="M12 13.8V21"/>',
-  find:'<circle cx="11" cy="11" r="6.4"/><path d="m15.6 15.6 4 4"/>',
-  cog:'<circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 5.8V3.4M12 18.2v2.4M5.8 12H3.4M18.2 12h2.4M7.6 7.6 5.9 5.9M16.4 16.4l1.7 1.7M16.4 7.6l1.7-1.7M7.6 16.4l-1.7 1.7"/>',
-  plus:'<path d="M12 5.4v13.2M5.4 12h13.2"/>',
-  copy:'<rect x="8.6" y="8.6" width="12.4" height="12.4" rx="2.6"/><path d="M15.4 5.6V5A2 2 0 0 0 13.4 3H5A2 2 0 0 0 3 5v8.4a2 2 0 0 0 2 2h.6"/>',
-  send:'<path d="M12 15.6V3.4"/><path d="m8.4 6.8 3.6-3.4 3.6 3.4"/><path d="M6.8 10.6H5.2v10h13.6v-10h-1.6"/>',
-  pencil:'<path d="M16.4 3.6a2.3 2.3 0 0 1 3.3 3.3L8.2 18.4l-4.3 1 1-4.3z"/><path d="m14.6 5.4 4 4"/>',
-  tag:'<path d="M3.5 11V4.5a1 1 0 0 1 1-1H11a2 2 0 0 1 1.4.6l7.6 7.6a2 2 0 0 1 0 2.8L14.6 20a2 2 0 0 1-2.8 0L4.1 12.4A2 2 0 0 1 3.5 11z"/><circle cx="8.3" cy="8.3" r="1.4"/>',
-  open:'<path d="M9.4 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3.4"/><path d="M13.6 4.4h6v6"/><path d="M19.6 4.4 11 13"/>',
-  ok:'<path d="m4.8 12.4 4.8 4.8L19.2 7.6"/>',
-  back:'<path d="M14.4 5.6 8 12l6.4 6.4"/>',
-  cloud:'<path d="M7.2 18.6a4.3 4.3 0 0 1-.7-8.5 5.5 5.5 0 0 1 10.8 1.1 3.7 3.7 0 0 1-.7 7.4z"/>',
-  folder:'<path d="M3.4 6.4a1.8 1.8 0 0 1 1.8-1.8h4.1l2 2.3h7.5a1.8 1.8 0 0 1 1.8 1.8v8.9a1.8 1.8 0 0 1-1.8 1.8H5.2a1.8 1.8 0 0 1-1.8-1.8z"/>',
-  mail:'<rect x="3.4" y="5.4" width="17.2" height="13.2" rx="2.4"/><path d="m4.6 7.6 7.4 5.4 7.4-5.4"/>',
-  msg:'<path d="M12 4.4c-4.6 0-8.3 2.9-8.3 6.6 0 2.2 1.3 4.1 3.3 5.3-.1.9-.5 2-1.4 2.9 1.6-.2 2.9-.8 3.8-1.5.8.2 1.7.3 2.6.3 4.6 0 8.3-2.9 8.3-6.7S16.6 4.4 12 4.4z"/>',
-  /* the app mark — the ring the old exhibit drew as a text glyph, now SVG */
-  mark:'<circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.1"/>',
-  /* file families: one document silhouette, differing inside */
+  doc:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/>',
   fAny:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/>',
   fDoc:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="M9.2 12.6h5.6M9.2 15.4h5.6M9.2 18.2h3.4"/>',
-  fSheet:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><rect x="9" y="12" width="6.2" height="6.6" rx="1"/><path d="M9 15.3h6.2M12.1 12v6.6"/>',
-  fDeck:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="M9.6 18.6v-2.9M12.1 18.6v-5.6M14.6 18.6v-3.8"/>',
-  fVid:'<rect x="3.2" y="5.4" width="17.6" height="13.2" rx="2.8"/><path d="m10.3 9.3 5.2 2.7-5.2 2.7z"/>',
+  lnk:'<path d="M10.4 13.6a4.1 4.1 0 0 0 5.8 0l2.3-2.3a4.1 4.1 0 0 0-5.8-5.8l-1.2 1.2"/><path d="M13.6 10.4a4.1 4.1 0 0 0-5.8 0l-2.3 2.3a4.1 4.1 0 0 0 5.8 5.8l1.2-1.2"/>',
+  copy:'<rect x="8.6" y="8.6" width="12.4" height="12.4" rx="2.6"/><path d="M15.4 5.6V5A2 2 0 0 0 13.4 3H5A2 2 0 0 0 3 5v8.4a2 2 0 0 0 2 2h.6"/>',
+  find:'<circle cx="11" cy="11" r="6.4"/><path d="m15.6 15.6 4 4"/>',
+  cog:'<circle cx="12" cy="12" r="3.1"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.4 5.4 7.2 7.2M16.8 16.8l1.8 1.8M18.6 5.4 16.8 7.2M7.2 16.8l-1.8 1.8"/>',
+  send:'<path d="M12 15.6V3.4"/><path d="m8.4 6.8 3.6-3.4 3.6 3.4"/><path d="M6.8 10.6H5.2v10h13.6v-10h-1.6"/>',
+  pin:'<path d="M9.5 3h5v5.6l2.3 3.1v2.1H7.2v-2.1L9.5 8.6z"/><path d="M12 13.8V21"/>',
+  tag:'<path d="M3.5 11V4.5a1 1 0 0 1 1-1H11a2 2 0 0 1 1.4.6l7.6 7.6a2 2 0 0 1 0 2.8L14.6 20a2 2 0 0 1-2.8 0L4.1 12.4A2 2 0 0 1 3.5 11z"/><circle cx="8.3" cy="8.3" r="1.4"/>',
+  pencil:'<path d="M16.4 3.6a2.3 2.3 0 0 1 3.3 3.3L8.2 18.4l-4.3 1 1-4.3z"/><path d="m14.6 5.4 4 4"/>',
+  mail:'<rect x="3.4" y="5.4" width="17.2" height="13.2" rx="2.4"/><path d="m4.6 7.6 7.4 5.4 7.4-5.4"/>',
+  phone:'<rect x="7" y="2.8" width="10" height="18.4" rx="2.6"/><path d="M10.8 18.2h2.4"/>',
+  home:'<path d="m4 11.2 8-7.2 8 7.2"/><path d="M6.2 9.8v10.4h11.6V9.8"/><path d="M10 20.2v-5.6h4v5.6"/>',
+  person:'<circle cx="12" cy="8.2" r="3.6"/><path d="M5.4 20.2a6.6 6.6 0 0 1 13.2 0"/>',
+  people:'<circle cx="9" cy="8.6" r="3.2"/><path d="M3.2 19.6a5.8 5.8 0 0 1 11.6 0"/><path d="M15.2 5.9a3.2 3.2 0 0 1 0 5.4M17 13.9a5.8 5.8 0 0 1 3.6 5.3"/>',
+  target:'<circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r=".9"/>',
+  eye:'<path d="M2.8 12c2.2-4 5.3-6 9.2-6s7 2 9.2 6c-2.2 4-5.3 6-9.2 6s-7-2-9.2-6z"/><circle cx="12" cy="12" r="2.7"/>',
+  cloud:'<path d="M7.2 18.6a4.3 4.3 0 0 1-.7-8.5 5.5 5.5 0 0 1 10.8 1.1 3.7 3.7 0 0 1-.7 7.4z"/>',
+  folder:'<path d="M3.4 6.4a1.8 1.8 0 0 1 1.8-1.8h4.1l2 2.3h7.5a1.8 1.8 0 0 1 1.8 1.8v8.9a1.8 1.8 0 0 1-1.8 1.8H5.2a1.8 1.8 0 0 1-1.8-1.8z"/>',
+  case:'<rect x="3.4" y="7.6" width="17.2" height="11.8" rx="2.2"/><path d="M9 7.6V5.8a1.6 1.6 0 0 1 1.6-1.6h2.8A1.6 1.6 0 0 1 15 5.8v1.8M3.4 12.4h17.2"/>',
+  cal:'<rect x="3.6" y="5" width="16.8" height="15.2" rx="2.4"/><path d="M3.6 9.8h16.8M8.2 3v3.6M15.8 3v3.6"/>',
+  lib:'<path d="M4.4 4.6h3.4v14.8H4.4zM9.6 4.6H13v14.8H9.6z"/><path d="m14.8 5.5 3.3-.8 3.4 14.4-3.3.8z"/>',
 };
 const ic=(n,s,w)=>`<svg viewBox="0 0 24 24" width="${s||16}" height="${s||16}" fill="none" stroke="currentColor" stroke-width="${w||1.7}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
 
-/* ── the demo inventory — the same person and things every /reel/ page uses.
-   Pins first, then the one stream, newest first. Types are lenses. ── */
-const PINS=[
-  {t:'txt',v:'Best,\nAlex Rivera'},
-  {t:'txt',v:'alex.rivera@example.com'},
-  {t:'txt',v:'+1 (614) 555-0164',code:1},
-  {t:'lnk',v:'alexrivera.example.com',title:'Alex Rivera - Product Designer'},
-];
-const STREAM=[
-  {t:'txt',v:'PineTree-Guest / autumn2026!',code:1},
-  {t:'img',v:'Headshot',g:'linear-gradient(135deg,#7B55B4,#3E2C5E)'},
-  {t:'doc',v:'Alex-Rivera-Resume.pdf'},
-  {t:'lnk',v:'cal.example.com/alex/15min',title:'Book 15 minutes with Alex'},
-  {t:'txt',v:'482 Maple Grove Ave, Apt 3B, Columbus OH 43210'},
-  {t:'doc',v:'Cover-letter.docx'},
-  {t:'img',v:'Portfolio cover',g:'linear-gradient(135deg,#356BA6,#1D3A5C)'},
-  {t:'lnk',v:'linkedin.example.com/in/alexrivera',title:'Alex Rivera | LinkedIn'},
-  {t:'txt',v:'Thanks for the great conversation — I left even more excited about the role.'},
-  {t:'doc',v:'Rate-card.xlsx'},
-  {t:'doc',v:'Case-study.pptx'},
-  {t:'img',v:'Wifi voucher screenshot',g:'linear-gradient(135deg,#37878A,#1C4648)'},
-  {t:'doc',v:'Showreel.mp4'},
-  {t:'txt',v:'DE89 3704 0044 0532 0130 00',code:1},
-  {t:'doc',v:'Transcript.pdf'},
-];
-const ALL=PINS.concat(STREAM);
-const TYPE={txt:'Text',lnk:'Links',img:'Images',doc:'Docs'};
-
-const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
-const wbr=s=>s.replace(/([@./_-])/g,'$1<wbr>');
-const domify=v=>{const m=v.match(/^([^/]+)(\/.*)?$/);
-  return m?`<span class="dom">${m[1]}</span>${m[2]||''}`:v};
-const extOf=v=>{const m=v.match(/\.(\w{1,5})$/);return m?m[1].toUpperCase():'FILE'};
-const FILE=[
-  [/^pdf$/,'fDoc','pdf'],[/^(docx?|rtf|pages|odt)$/,'fDoc','doc'],
-  [/^(txt|md|log)$/,'fDoc','txt'],[/^(xlsx?|csv|numbers|ods)$/,'fSheet','sheet'],
-  [/^(pptx?|key|odp)$/,'fDeck','deck'],[/^(mp4|mov|avi|mkv|webm)$/,'fVid','vid'],
-];
-const kindOf=v=>{const e=extOf(v).toLowerCase(),h=FILE.find(f=>f[0].test(e));
-  return h?{g:h[1],c:`var(--f-${h[2]})`}:{g:'fAny',c:'var(--c-doc)'}};
-
-/* one square tile — anatomy shared with Android to the pixel where it matters:
-   image = cover shot + scrim caption, file = kind glyph + extension badge,
-   text = the value itself, centred, faded when it overflows. Value-only. */
-const tile=(it,pinned)=>{
-  const pin=pinned?`<span class="pinmark">${ic('pin',12,1.9)}</span>`:'';
-  if(it.t==='img')return `<div class="gc img"><div class="shot" style="background:${it.g}"></div>
-    <div class="capline">${esc(it.v)}</div>${pin}</div>`;
-  if(it.t==='doc'){const k=kindOf(it.v);
-    return `<div class="gc doc" style="--fc:${k.c}"><div class="face">${ic(k.g,30,1.5)}
-      <span class="ext">${extOf(it.v)}</span></div>
-      <div class="fname">${esc(it.v.replace(/\.\w{1,5}$/,''))}</div>${pin}</div>`;}
-  const body=it.t==='lnk'?domify(wbr(esc(it.v))):wbr(esc(it.v)).replace(/\n/g,'<br>');
-  const n=it.v.length, size=n<=26?' s1':n<=58?' s2':'', ov=n>58?' ov':'';
-  const tx=`<div class="tx${it.code?' code':''}${size}${pinned?' ind':''}">${body}</div>`;
-  const inner=it.t==='lnk'&&it.title
-    ?`<div class="lstack">${tx}<div class="ltitle">${esc(it.title)}</div></div>`:tx;
-  return `<div class="gc ${it.t}${ov}"><div class="face">${inner}</div>${pin}</div>`;
+const ITEMS={
+  Clipboard:[['mail','Email','alex.rivera@example.com'],['phone','Phone','+1 (614) 555-0164'],['home','Address','482 Maple Grove Ave…']],
+  Snippets:[['person','Full name','Alex Rivera'],['target','Why-us opener','I’ve followed your design work…'],['send','Follow-up','Just floating this back…'],['pencil','Signature','Best, Alex Rivera']],
+  Docs:[['fDoc','Resume.pdf','248 KB · PDF'],['fAny','Cover-letter.pdf','96 KB · PDF'],['fAny','Transcript.pdf','1.1 MB · PDF']],
+  Images:[['img','Headshot','JPEG · 2.1 MB'],['img','Portfolio cover','PNG · 840 KB']],
+  Links:[['lnk','Portfolio','alexrivera.example.com'],['case','LinkedIn','linkedin.example.com'],['cal','Calendly','cal.example.com']]
 };
-const grid=(list,pinned)=>`<div class="grid">${list.map(it=>tile(it,pinned)).join('')}</div>`;
+const COLS=Object.keys(ITEMS);
+const ICON={Clipboard:'copy',Snippets:'txt',Docs:'doc',Images:'img',Links:'lnk'};
+const sb=`<div class="sb"><span>9:41</span><span>5G ▮▮▮</span></div>`;
+const tabs=on=>`<div class="tabbar">${[['Library','lib'],['Search','find'],['Settings','cog']].map((t,i)=>
+  `<div class="tab ${i===on?'on':''}">${ic(t[1],21)}${t[0]}</div>`).join('')}</div>`;
 
-/* the lens row — order, counts and selected states are the Android chip row,
-   verbatim: a selected type chip wears its own wash and colour, All wears ink */
-const lensRow=on=>'<div class="lens">'+['all','txt','lnk','img','doc'].map(t=>{
-  const sel=on===t;
-  const sty=sel?(t==='all'?'background:var(--ink);border-color:var(--ink);color:var(--ground)'
-    :`background:var(--t-${t});border-color:color-mix(in srgb,var(--c-${t}) 30%,transparent);color:var(--c-${t})`):'';
-  return `<div class="chip${sel?' on':''}"${sty?` style="${sty}"`:''}>${t==='all'?'All':TYPE[t]}`
-    +(t==='all'?'':`<span class="cnt">${ALL.filter(i=>i.t===t).length}</span>`)+`</div>`;
-}).join('')+'</div>';
-
-/* the fixed glass slab: title row (mark + wordmark line, quiet add, gear),
-   the search capsule, the lens chips. It never scrolls — cross-platform law —
-   and the grid slides under it. liveId gives the interactive copy its handle;
-   the dimmed backdrops behind sheets reuse the same slab without one. */
-const glassHead=(o)=>`
-  <div class="lg-head lg-glass"${o&&o.live?' id="glasshead"':''}>
-    <div class="inwrap">
-      <div class="trow">
-        <span class="markrow">${ic('mark',20,1.8)}<b>Everything you reuse</b></span>
-        <span class="hbtns"><span class="gearbtn">${ic('plus',16)}</span><span class="gearbtn">${ic('cog',16)}</span></span>
-      </div>
-      ${o&&o.q!==undefined
-        ?`<div class="cap on">${ic('find',17)}<span class="qtx">${esc(o.q)}</span><span class="caret"></span><span class="cancel">Cancel</span></div>`
-        :`<div class="cap">${ic('find',17)}<span>Search everything</span></div>`}
-      ${lensRow(o&&o.lens||'all')}
-    </div>
-  </div>`;
-
-const vaultBody=()=>`
-    <div class="sect">Pinned</div>${grid(PINS,true)}
-    <div class="sect">Recent</div>${grid(STREAM,false)}
-    <div class="endnote">Everything stays on this phone.</div>`;
-
-/* a static, dimmed vault for sheets to float over */
-const vaultBack=()=>`<div class="dim">
-    <div class="roll">${'<div class="inwrap">'+vaultBody()+'</div>'}</div>
-    ${glassHead()}
-  </div>`;
-
-const sbz=`<div class="sbz"><span>9:41</span><span class="cell">5G
-  <svg viewBox="0 0 18 12" width="17" height="12" fill="currentColor" aria-hidden="true"><rect x="0" y="7.5" width="3" height="4.5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
-  <svg viewBox="0 0 27 13" width="25" height="13" fill="none" aria-hidden="true"><rect x="1" y="1" width="21" height="11" rx="3.4" stroke="currentColor" opacity=".45"/><rect x="3" y="3" width="13" height="7" rx="1.8" fill="currentColor"/><path d="M24.5 4.8v3.4" stroke="currentColor" opacity=".45" stroke-linecap="round"/></svg>
-  </span></div>`;
-const homebar=`<div class="homebar"></div>`;
-
-/* ═══ the eight screens ═══
-   own:1 = we design it. own:0 = iOS draws it; our things just appear.
-   Collection and the in-app dial are gone — see the footnote row. */
 const SCREENS={
-  vault:{own:1,name:'Vault',sb:'ink',
-    cap:'One screen. Pinned first, then everything, newest first. The glass bar holds still while the grid slides under it — Apple’s own apps let this bar shrink and drop the search down low; ours does not move. A product choice, same as Android: nothing above the grid ever scrolls.',
-    html:()=>`<div class="roll" id="vroll" onscroll="vaultEdge(this)"><div class="inwrap">${vaultBody()}</div></div>
-      ${glassHead({live:1})}`},
+  library:{own:1,name:'Library',cap:'The app. Plain iOS lists on purpose — content reads fast, chrome disappears.',
+    html:()=>`${sb}<div class="body">
+      <div class="lt">Library</div>
+      <div class="srch">${ic('find',15)} Search everything</div>
+      <div class="sec">Pinned</div>
+      <div class="grp">
+        ${ITEMS.Snippets.slice(3,4).concat(ITEMS.Clipboard.slice(0,1)).map(i=>
+          `<div class="row"><div class="ic">${ic(i[0],16)}</div><div class="tx">${i[1]}<div class="sub">${i[2]}</div></div></div>`).join('')}
+      </div>
+      <div class="sec">Collections</div>
+      <div class="grp">
+        ${COLS.map(c=>`<div class="row" data-live="1" onclick="go('collection')"><div class="ic">${ic(ICON[c],16)}</div>
+          <div class="tx">${c}</div><span class="cnt">${ITEMS[c].length}</span><span class="chev">›</span></div>`).join('')}
+      </div>
+      <div style="height:24px"></div>
+    </div><div class="fab" data-live="1" onclick="go('retrieve')">◎</div>${tabs(0)}`},
 
-  search:{own:1,name:'Search as a lens',sb:'ink',
-    cap:'Search composes with the lens instead of replacing it — Links is on, the query narrows inside it. Filters and search are one gesture family, not modes.',
-    html:()=>{const res=ALL.filter(i=>i.t==='lnk'&&i.v.includes('alex'));
-      return `<div class="roll" id="vroll" onscroll="vaultEdge(this)"><div class="inwrap">
-        <div class="sect">${res.length} results</div>${grid(res,false)}
-      </div></div>
-      ${glassHead({live:1,lens:'lnk',q:'alex'})}`}},
+  collection:{own:1,name:'Collection',cap:'Inside Docs. PDFs and images sit in one list with the same look — no special cases to learn.',
+    html:()=>`${sb}<div class="body">
+      <div style="padding:6px 14px 0;font-size:16px;color:var(--ios-blue);cursor:pointer" data-live="1" onclick="go('library')">‹ Library</div>
+      <div class="lt">Docs</div>
+      <div class="srch">${ic('find',15)} Search Docs</div>
+      <div class="grp">
+        ${ITEMS.Docs.map(i=>`<div class="row" data-live="1" onclick="go('item')"><div class="ic">${ic(i[0],16)}</div>
+          <div class="tx">${i[1]}<div class="sub">${i[2]}</div></div><span class="chev">›</span></div>`).join('')}
+      </div>
+      <div class="sec">Also here</div>
+      <div class="grp">
+        ${ITEMS.Images.map(i=>`<div class="row"><div class="ic">${ic(i[0],16)}</div>
+          <div class="tx">${i[1]}<div class="sub">${i[2]}</div></div><span class="chev">›</span></div>`).join('')}
+      </div>
+    </div>${tabs(0)}`},
 
-  item:{own:1,name:'Item sheet',sb:'ink',
-    cap:'Tap a tile, get a glass sheet. The thing itself on top — just the value, nothing else. Quiet actions under it, and the receipt from a rename still on screen.',
-    html:()=>`${vaultBack()}<div class="scrim"></div>
-      <div class="lg-sheet lg-glass">
-        <div class="grab"></div>
-        <div class="shrow">
-          <div class="ptile" style="--fc:var(--f-pdf)"><div class="face">${ic('fDoc',30,1.5)}<span class="ext">PDF</span></div></div>
-          <div class="pname">Alex-Rivera-Resume.pdf</div>
+  item:{own:1,name:'Item sheet',cap:'Tap an item, get a sheet. One big obvious action; the rest stays quiet.',
+    html:()=>`${sb}<div class="body" style="filter:brightness(.62)">
+      <div class="lt">Docs</div>
+      <div class="grp">${ITEMS.Docs.map(i=>`<div class="row"><div class="ic">${ic(i[0],16)}</div><div class="tx">${i[1]}<div class="sub">${i[2]}</div></div></div>`).join('')}</div>
+    </div>
+    <div class="sheet">
+      <div class="grab"></div>
+      <div style="padding:0 16px">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+          <div style="width:50px;height:50px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px">${ic('fDoc',26)}</div>
+          <div><div style="font-size:18px;font-weight:650">Resume.pdf</div>
+          <div style="font-size:13px;color:var(--ios-dim)">248 KB · added 3 days ago · used 6×</div></div>
         </div>
-        <div class="arows">
-          <div class="arow">${ic('open',18)}Open</div>
-          <div class="arow">${ic('send',18)}Send somewhere</div>
-          <div class="arow">${ic('pencil',18)}Rename</div>
-          <div class="arow">${ic('tag',18)}Tags</div>
+        <div style="background:var(--accent);color:var(--ground);border-radius:12px;padding:12px;text-align:center;font-size:16px;font-weight:600;margin-bottom:9px">Copy</div>
+        <div class="grp" style="margin:0">
+          <div class="row"><div class="ic">${ic('send',16)}</div><div class="tx">Share…</div></div>
+          <div class="row"><div class="ic">${ic('eye',16)}</div><div class="tx">Preview</div></div>
+          <div class="row"><div class="ic">${ic('pin',16)}</div><div class="tx">Pin to top</div></div>
+          <div class="row"><div class="ic">${ic('tag',16)}</div><div class="tx">Collections &amp; tags</div></div>
         </div>
       </div>
-      <div class="receipt up">Renamed</div>`},
+    </div>${tabs(0)}`},
 
-  you:{own:1,name:'You',sb:'ink',
-    cap:'Behind the gear, and deliberately short. Appearance, one capture question still being decided, and the promise that matters most.',
-    html:()=>`<div class="roll plain"><div class="inwrap">
-      <h2 class="bigt">You</h2>
-      <div class="sect">Appearance</div>
-      <div class="setgrp"><div class="setrow"><span class="tt"><b>Theme</b></span>
-        <span class="miniseg"><i>Light</i><i>Dark</i><i class="on">System</i></span></div></div>
-      <div class="sect">Catching</div>
-      <div class="setgrp"><div class="setrow">
-        <span class="tt"><b>Catch on open</b><span>Ask first, or save quietly. Still being decided.</span></span>
-        <span class="pend">deciding</span></div></div>
-      <div class="sect">About</div>
-      <div class="setgrp">
-        <div class="setrow"><span class="tt"><b>Everything stays on this phone</b><span>No account. Nothing online.</span></span></div>
-        <div class="setrow"><span class="tt"><b>Version</b></span><span class="val">0.1</span></div>
+  retrieve:{own:1,name:'Quick retrieve',cap:'The dial, living inside the app — same object as Android, pivoted to the thumb.',
+    html:()=>`${sb}<div class="body" style="display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;padding:6px 16px 2px;font-size:16px;color:var(--ios-blue)">
+        <span data-live="1" onclick="go('library')" style="cursor:pointer">Cancel</span><span style="opacity:.4">Edit</span></div>
+      <div style="text-align:center;font-size:13px;color:var(--ios-dim);padding:4px 0 0">Turn to choose · tap to copy</div>
+      <svg id="dialsvg" viewBox="0 0 340 380"></svg>
+      <div style="text-align:center;padding:0 22px 12px">
+        <div style="font-size:19px;font-weight:650">Signature</div>
+        <div style="font-size:13px;color:var(--ios-dim);margin-top:2px">Snippets · used 24×</div>
       </div>
-    </div></div>
-    <div class="backpill">${ic('back',15,2)}</div>`},
+    </div>${tabs(0)}`},
 
-  widgets:{own:1,name:'Widgets',sb:'lite',
-    cap:'Pins on the home screen, wearing the glass the shelf itself wears. Tap one and it is copied — the app never opens. The receipt is the whole ceremony.',
-    html:()=>`<div class="wall"></div>
-      <div class="homewrap">
-        <div class="approw"><span class="appdot"></span><span class="appdot"></span><span class="appdot"></span><span class="appdot"></span></div>
-        <div class="wg lg-glass">
-          <div class="wgh">${ic('mark',13,1.9)}PINNED</div>
+  widget:{own:1,name:'Widgets',cap:'Home-screen widgets. Tap one and the item is copied — the app never opens.',
+    html:()=>`${sb}<div class="body" style="background:linear-gradient(165deg,#2b3a44,#151b21)">
+      <div class="wgwrap">
+        <div style="align-self:stretch;color:#fff;opacity:.55;font-size:12px;text-align:center">Home Screen</div>
+        <div class="wg">
+          <div class="wgh">◎ PINNED</div>
           <div class="wgg">
-            ${PINS.map(p=>{const body=p.t==='lnk'?domify(esc(p.v)):esc(p.v).replace(/\n/g,'<br>');
-              return `<div class="wcell"><div class="tx${p.code?' code':''}">${body}</div></div>`;}).join('')}
+            ${[['pencil','Signature'],['mail','Email'],['phone','Phone'],['lnk','Portfolio']].map(i=>
+              `<div class="wgi" style="justify-content:center;flex-direction:column;gap:2px">
+                ${ic(i[0],16)}<span style="font-size:10px">${i[1]}</span></div>`).join('')}
           </div>
         </div>
-        <div class="wchip">Copied</div>
-        <div class="approw" style="opacity:.65"><span class="appdot"></span><span class="appdot"></span><span class="appdot"></span><span class="appdot"></span></div>
-      </div>`},
+        <div class="wg med">
+          <div class="wgh">◎ RECENT</div>
+          ${[['fDoc','Resume.pdf'],['target','Why-us opener'],['case','LinkedIn']].map(i=>
+            `<div class="wgi">${ic(i[0],14)}<span>${i[1]}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>`},
 
-  spotlight:{own:0,name:'Spotlight',sb:'lite',
-    cap:'Pull down, type two letters, your things are already there. iOS draws every pixel of this — we just supply the items. Zero setup.',
-    html:()=>`<div class="wall"></div>
-      <div class="spotwash">
-        <div class="spotf">${ic('find',16)}<span>ca</span><span class="caret"></span></div>
-        <div class="spotl">From the app</div>
+  spotlight:{own:0,name:'Spotlight',cap:'Swipe down, type two letters, your snippet is right there. iOS draws all of this — we just supply the items. Zero setup.',
+    html:()=>`${sb}<div class="body" style="background:linear-gradient(165deg,#2b3a44,#151b21)"></div>
+      <div class="spot">
+        <div class="spotf">${ic('find',16)} signat…</div>
+        <div class="spotl">From our app</div>
         <div class="spotg">
-          <div class="spotr"><span class="sic" style="background:var(--t-lnk);color:var(--c-lnk)">${ic('lnk',15)}</span>
-            <div class="stx">cal.example.com/alex/15min<small>Book 15 minutes with Alex</small></div></div>
-          <div class="spotr"><span class="sic" style="background:rgba(255,255,255,.16);color:#fff">${ic('fDeck',15,1.5)}</span>
-            <div class="stx">Case-study.pptx<small>In the app</small></div></div>
+          <div class="spotr">${ic('pencil',16)}<div style="flex:1">Signature<div style="font-size:12px;opacity:.6">Best, Alex Rivera</div></div></div>
+          <div class="spotr"><span>◎</span><div style="flex:1">Copy Signature<div style="font-size:12px;opacity:.6">Shortcut action</div></div></div>
         </div>
         <div class="spotl">Applications</div>
-        <div class="spotg"><div class="spotr"><span class="sic" style="background:var(--accent);color:var(--ground)">${ic('mark',15,1.8)}</span>
-          <div class="stx">The app</div></div></div>
+        <div class="spotg"><div class="spotr"><span>◎</span><div style="flex:1">Open the app</div></div></div>
       </div>`},
 
-  files:{own:0,name:'Files picker',sb:'ink',
-    cap:'Attaching in Mail. We are a place in the picker, right next to iCloud. Tap the resume and it attaches — you never left Mail.',
-    html:()=>`<div class="dim">
-        <div class="sysnav"><span class="b">Cancel</span><span class="t">New Message</span><span class="b" style="opacity:.4">Send</span></div>
-        <div class="fline"><span class="k">To:</span>taylor@studio.example.com</div>
-        <div class="fline"><span class="k">Subject:</span>Application — Product Designer</div>
-        <div class="fline" style="border:none">Hi Taylor — resume attached.</div>
-      </div>
-      <div class="scrim"></div>
-      <div class="lg-sheet tall lg-glass">
-        <div class="grab"></div>
-        <div class="pnav"><span class="sysb">Cancel</span><b>Browse</b><span style="width:44px"></span></div>
-        <div class="psc">
-        <div class="pcap">${ic('find',15)}<span>Search</span></div>
-        <div class="sect">Locations</div>
-        <div class="pgrp">
-          <div class="prow"><span class="sic" style="background:var(--t-doc);color:var(--sys-blue)">${ic('cloud',16)}</span>
-            <span class="stx">iCloud Drive</span></div>
-          <div class="prow us"><span class="sic" style="background:var(--accent);color:var(--ground)">${ic('mark',16,1.8)}</span>
-            <span class="stx"><b>The app</b><small>Docs · Images</small></span></div>
-          <div class="prow"><span class="sic" style="background:color-mix(in srgb,var(--ink-3) 16%,transparent);color:var(--ink-2)">${ic('folder',16)}</span>
-            <span class="stx">On My iPhone</span></div>
+  files:{own:0,name:'Files picker',cap:'You are in Mail, attaching a file. We show up as a place, next to iCloud. Tap the resume, it attaches. You never left Mail.',
+    html:()=>`${sb}
+      <div class="navbar"><span class="b">Cancel</span><span class="t">Browse</span><span class="b">Select</span></div>
+      <div class="body">
+        <div class="srch" style="margin-top:12px">${ic('find',15)} Search</div>
+        <div class="sec">Locations</div>
+        <div class="grp">
+          <div class="row"><div class="ic" style="background:#E8F0FE;color:#3478C6">${ic('cloud',16)}</div><div class="tx">iCloud Drive</div><span class="chev">›</span></div>
+          <div class="row" style="background:var(--accent-soft)"><div class="ic">◎</div><div class="tx"><b>Our app</b><div class="sub">Docs · Images</div></div><span class="chev">›</span></div>
+          <div class="row"><div class="ic" style="background:#EDEDF0;color:#8A8A8E">${ic('folder',16)}</div><div class="tx">On My iPhone</div><span class="chev">›</span></div>
         </div>
-        <div class="sect">The app — Docs</div>
-        <div class="pgrp">
-          <div class="prow"><span class="sic" style="background:color-mix(in srgb,var(--f-pdf) 14%,transparent);color:var(--f-pdf)">${ic('fDoc',16,1.5)}</span>
-            <span class="stx">Alex-Rivera-Resume.pdf</span><span class="okmark">${ic('ok',16,2.2)}</span></div>
-          <div class="prow"><span class="sic" style="background:color-mix(in srgb,var(--f-doc) 14%,transparent);color:var(--f-doc)">${ic('fDoc',16,1.5)}</span>
-            <span class="stx">Cover-letter.docx</span></div>
-          <div class="prow"><span class="sic" style="background:color-mix(in srgb,var(--f-pdf) 14%,transparent);color:var(--f-pdf)">${ic('fDoc',16,1.5)}</span>
-            <span class="stx">Transcript.pdf</span></div>
-        </div>
+        <div class="sec">Our app · Docs</div>
+        <div class="grp">
+          ${ITEMS.Docs.map(i=>`<div class="row"><div class="ic">${ic(i[0],16)}</div><div class="tx">${i[1]}<div class="sub">${i[2]}</div></div></div>`).join('')}
         </div>
       </div>`},
 
-  share:{own:0,name:'Share sheet',sb:'ink',
-    cap:'Saving from Safari. iOS owns the sheet; the small panel that confirms is ours. Receipt: Saved. Hand it five files at once and the receipt says 5 saved.',
-    html:()=>`<div class="dim">
-        <div class="pgtitle">Alex Rivera</div>
-        <div class="pgline" style="width:72%"></div><div class="pgline" style="width:84%"></div><div class="pgline" style="width:58%"></div>
-        <div class="addr lg-glass" style="border-radius:22px">${ic('lnk',14)}alexrivera.example.com</div>
+  share:{own:0,name:'Share sheet',cap:'Saving something in. You are in Safari, hit share, tap us, done. iOS owns the sheet; the small panel is ours.',
+    html:()=>`${sb}<div class="body" style="filter:brightness(.5)">
+        <div class="lt">Safari</div><div style="padding:0 16px;color:var(--ios-dim);font-size:14px">alexrivera.example.com</div>
       </div>
-      <div class="scrim"></div>
-      <div class="lg-sheet lg-glass">
+      <div class="sheet" style="padding-bottom:18px">
         <div class="grab"></div>
-        <div class="shsite"><span class="sic" style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--t-lnk);color:var(--c-lnk)">${ic('lnk',16)}</span>
-          <div class="stx2"><b>Alex Rivera - Product Designer</b><small>alexrivera.example.com</small></div></div>
-        <div class="apps">
-          <div class="ap"><span class="apc">${ic('msg',22,1.5)}</span>Messages</div>
-          <div class="ap"><span class="apc">${ic('mail',22,1.5)}</span>Mail</div>
-          <div class="ap us"><span class="apc">${ic('mark',24,1.8)}</span>The app</div>
-          <div class="ap"><span class="apc">${ic('copy',20,1.5)}</span>Copy</div>
+        <div style="padding:0 15px">
+          <div style="display:flex;gap:11px;align-items:center;margin-bottom:13px">
+            <div style="width:42px;height:42px;border-radius:10px;background:var(--accent);color:var(--ground);display:flex;align-items:center;justify-content:center;font-size:20px">◎</div>
+            <div style="flex:1"><div style="font-weight:650;font-size:16px">Save</div>
+            <div style="font-size:12.5px;color:var(--ios-dim)">Portfolio — alexrivera.example.com</div></div>
+          </div>
+          <div class="grp" style="margin:0 0 10px">
+            <div class="row"><div class="ic">${ic('lnk',16)}</div><div class="tx">Collection</div><span class="cnt">Links</span><span class="chev">›</span></div>
+            <div class="row"><div class="ic">${ic('tag',16)}</div><div class="tx">Tags</div><span class="cnt">none</span><span class="chev">›</span></div>
+          </div>
+          <div style="background:var(--accent);color:var(--ground);border-radius:12px;padding:12px;text-align:center;font-size:16px;font-weight:600">Save</div>
         </div>
-        <div class="ourpanel">
-          <div class="lnkprev">${domify('alexrivera.example.com')}<small>Alex Rivera - Product Designer</small></div>
-          <div class="savebtn">Save</div>
-        </div>
-      </div>
-      <div class="receipt up">Saved</div>`},
+      </div>`}
 };
-const ORDER=['vault','search','item','you','widgets','spotlight','files','share'];
 
-/* ── state: screen, theme, device. Theme and device persist; a query string
-   (?screen=&theme=&device=) overrides both, which is how evidence shots are
-   taken deterministically. ── */
-const qs=new URLSearchParams(location.search);
-let cur=ORDER.includes(qs.get('screen'))?qs.get('screen'):'vault';
-const TKEY='reel.ios.theme',DKEY='reel.ios.device';
-let THEME=(()=>{const o=qs.get('theme');if(o==='light'||o==='dark')return o;
-  try{const t=localStorage.getItem(TKEY);if(t==='light'||t==='dark')return t}catch(_){}
-  return matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'})();
-let DEVICE=(()=>{const o=qs.get('device');if(o==='iphone'||o==='ipad')return o;
-  try{const d=localStorage.getItem(DKEY);if(d==='iphone'||d==='ipad')return d}catch(_){}
-  return 'iphone'})();
-let firstOpen=true;   /* the settle bounce plays once, on the first screen only */
-
-function applyTheme(){document.documentElement.dataset.theme=THEME;
-  [...themeseg.children].forEach(b=>b.dataset.on=b.dataset.t===THEME?'1':'0');}
-function applyDevice(){document.body.classList.toggle('device-ipad',DEVICE==='ipad');
-  [...devseg.children].forEach(b=>b.dataset.on=b.dataset.d===DEVICE?'1':'0');render();}
-const themeseg=document.getElementById('themeseg');
-themeseg.innerHTML='<button type="button" data-t="light">Light</button><button type="button" data-t="dark">Dark</button>';
-[...themeseg.children].forEach(b=>b.onclick=()=>{THEME=b.dataset.t;
-  try{localStorage.setItem(TKEY,THEME)}catch(_){}applyTheme();});
-const devseg=document.getElementById('devseg');
-devseg.innerHTML='<button type="button" data-d="iphone">iPhone</button><button type="button" data-d="ipad">iPad</button>';
-[...devseg.children].forEach(b=>b.onclick=()=>{DEVICE=b.dataset.d;
-  try{localStorage.setItem(DKEY,DEVICE)}catch(_){}applyDevice();});
+const ORDER=['library','collection','item','retrieve','widget','spotlight','files','share'];
+let cur='library';
 
 function go(k){cur=k;render();}
 window.go=go;
 
-/* the slab's hairline appears only once the stream has actually moved —
-   the same edge rule the Android prototype and app follow */
-function vaultEdge(el){const h=document.getElementById('glasshead');
-  if(h)h.classList.toggle('scrolled',el.scrollTop>2);}
-window.vaultEdge=vaultEdge;
-
-/* the fixed slab owns the top of the scroller: measure it, pad the roll,
-   so the first tiles start below the glass and end up under it only by scrolling */
-function sizeVault(){const h=document.getElementById('glasshead'),r=document.getElementById('vroll');
-  if(h&&r)r.style.paddingTop=(h.offsetHeight+6)+'px';}
-
 function render(){
   const s=SCREENS[cur];
-  /* only the Vault (and its search state) genuinely re-lays for iPad width */
-  const wide=DEVICE==='ipad'&&(cur==='vault'||cur==='search');
-  document.body.classList.toggle('ipad-wide',wide);
-  const scr=document.getElementById('scr');
-  scr.dataset.sb=s.sb;
-  scr.innerHTML=`<div class="scrfill${firstOpen?' settle':''}" style="position:absolute;inset:0">${s.html()}</div>${sbz}${homebar}`;
-  firstOpen=false;
-  sizeVault();
+  document.getElementById('scr').innerHTML=s.html();
   const own=s.own;
   document.getElementById('meta').innerHTML=
     `<span class="tag" style="background:${own?'var(--accent)':'var(--ink-3)'}">${own?'we design this':'iOS draws this'}</span>${s.cap}`;
   [...document.getElementById('chips').children].forEach(el=>el.dataset.on=el.dataset.k===cur?'1':'0');
-  const on=document.querySelector(`.pick[data-k="${cur}"]`);
-  if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
+  document.querySelector(`.chip[data-k="${cur}"]`)?.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+  if(cur==='retrieve')drawDial();
   document.getElementById('desk').innerHTML=`<div class="card"><h2>Reading this</h2>
-    Five screens are <b>ours to design</b>: the vault, its search, the item sheet, You, widgets.
-    Three belong to Apple — <b>Spotlight, the Files picker, the share sheet</b>. Those work the
-    moment the app is installed; nothing to enable, our things simply appear in them.</div>
-    <div class="card"><h2>Current screen</h2><span class="tag" style="background:${own?'var(--accent)':'var(--ink-3)'}">${own?'ours':'iOS'}</span>${s.cap}</div>
-    <div class="card"><h2>One product, two coats</h2>
-    Same product as Android at a glance — same colours, same square tiles, same chips with the
-    same counts, same receipts (<b>Saved</b>, <b>5 saved</b>, <b>Renamed</b>). Only the chrome
-    changes nationality: glass here, Material there.</div>`;
+    On Android the dial is the product's face. On iOS, three of our best surfaces are drawn by
+    Apple (<b>Spotlight, Files, share sheet</b>) — zero setup, our content inside their pixels.
+    Our own design shows up in four places: <b>the app, the item sheet, the dial, widgets</b>.</div>
+    <div class="card"><h2>Current screen</h2><span class="tag" style="background:${own?'var(--accent)':'var(--ink-3)'}">${own?'ours':'iOS'}</span>${s.cap}</div>`;
 }
 
 /* dead taps say so instead of doing nothing */
@@ -804,30 +399,64 @@ let toastT;
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
   clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800);}
 document.getElementById('scr').addEventListener('click',e=>{
-  if(e.target.closest('.gc,.chip,.cap,.gearbtn,.arow,.wcell,.spotr,.prow,.ap,.savebtn,.setrow,.backpill'))
-    toast('Just a picture — use the chips up top to move around');
+  if(e.target.closest('[data-live]'))return;
+  if(e.target.closest('.row,.fab,.wgi,.spotr'))toast('Just a picture — use the chips up top to move around');
 });
 
-/* screen picker + prev/next + swipe */
+/* chips + prev/next */
 const chips=document.getElementById('chips');
-chips.innerHTML=ORDER.map(k=>`<button class="pick" type="button" data-k="${k}">
+chips.innerHTML=ORDER.map(k=>`<button class="chip" data-k="${k}">
   <span class="dot" style="background:${SCREENS[k].own?'var(--accent)':'var(--ink-3)'}"></span>${SCREENS[k].name}</button>`).join('');
 [...chips.children].forEach(el=>el.onclick=()=>go(el.dataset.k));
 document.getElementById('prev').onclick=()=>go(ORDER[(ORDER.indexOf(cur)+ORDER.length-1)%ORDER.length]);
 document.getElementById('next').onclick=()=>go(ORDER[(ORDER.indexOf(cur)+1)%ORDER.length]);
+
+/* swipe left/right on the screen switches screens (mobile) */
 let sx=null,sy=null;
-const scrEl=document.getElementById('scr');
-scrEl.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
-scrEl.addEventListener('touchend',e=>{
+const scr=document.getElementById('scr');
+scr.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+scr.addEventListener('touchend',e=>{
   if(sx===null)return;
   const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;sx=null;
   if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.6)
     document.getElementById(dx<0?'next':'prev').click();
 },{passive:true});
-addEventListener('resize',sizeVault);
 
-applyTheme();
-applyDevice();
+/* --- dial (bottom-pivot half lens) --- */
+function drawDial(){
+  const svg=document.getElementById('dialsvg');if(!svg)return;
+  const cx=170,cy=352,R1i=56,R1o=98,R2i=106,R2o=150;
+  const rad=d=>(d-90)*Math.PI/180;
+  const P=(r,d)=>({x:cx+r*Math.cos(rad(d)),y:cy+r*Math.sin(rad(d))});
+  const seg=(r0,r1,a0,a1)=>{const p1=P(r1,a0),p2=P(r1,a1),p3=P(r0,a1),p4=P(r0,a0);
+    return `M${p1.x} ${p1.y}A${r1} ${r1} 0 0 1 ${p2.x} ${p2.y}L${p3.x} ${p3.y}A${r0} ${r0} 0 0 0 ${p4.x} ${p4.y}Z`;};
+  const dark=matchMedia('(prefers-color-scheme:dark)').matches
+    ||document.documentElement.dataset.theme==='dark';
+  const barrel=dark?'#22272E':'#EDEDF0', edge=dark?'#333B45':'#D7D7DC', knurl=dark?'#3B4550':'#C6C6CC';
+  const css=getComputedStyle(document.documentElement);
+  const acc=css.getPropertyValue('--accent').trim()||css.getPropertyValue('--c-img').trim();
+  const inkc=css.getPropertyValue('--ink').trim();
+  const gicon=(n,p,S,o)=>`<g transform="translate(${(p.x-S/2).toFixed(1)} ${(p.y-S/2).toFixed(1)}) scale(${(S/24).toFixed(3)})" fill="none" stroke="${inkc}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${o}">${I[n]}</g>`;
+  const A0=282,A1=438;
+  let h=`<path d="${seg(R1i,R1o,A0,A1)}" fill="${barrel}" stroke="${edge}"/>`;
+  h+=`<path d="${seg(R2i,R2o,A0,A1)}" fill="${barrel}" stroke="${edge}"/>`;
+  for(let a=A0;a<=A1;a+=6){const p1=P(R2o,a),p2=P(R2o+6,a);
+    h+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${knurl}" stroke-width="1.5"/>`;}
+  h+=`<path d="${seg(R1i+2,R1o-2,339,381)}" fill="${acc}" opacity=".16"/>`;
+  h+=`<path d="${seg(R2i+2,R2o-2,344,376)}" fill="${acc}" opacity=".13"/>`;
+  [[-42,'copy'],[0,'txt'],[42,'doc']].forEach(([o,n])=>{
+    const p=P((R1i+R1o)/2,360+o);
+    h+=gicon(n,p,o?15:19,o?.5:1);});
+  [[-62,'person'],[-31,'target'],[0,'pencil'],[31,'send'],[62,'people']].forEach(([o,n])=>{
+    const p=P((R2i+R2o)/2,360+o);
+    h+=gicon(n,p,o?14:17,o?.45:1);});
+  const m1=P(R2o+8,360),m2=P(R2o+16,360);
+  h+=`<line x1="${m1.x}" y1="${m1.y}" x2="${m2.x}" y2="${m2.y}" stroke="#FF3B30" stroke-width="3.5" stroke-linecap="round"/>`;
+  h+=`<circle cx="${cx}" cy="${cy}" r="${R1i-8}" fill="${barrel}" stroke="${edge}"/>`;
+  h+=`<circle cx="${cx}" cy="${cy}" r="9" fill="${acc}"/>`;
+  svg.innerHTML=h;
+}
+render();
 </script>
 </body>
 </html>
