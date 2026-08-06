@@ -276,8 +276,15 @@ body.device-ipad .app .task .drop,body.device-ipad .app .task .chatlog{break-ins
 #dialsvg{position:absolute;inset:0;width:100%;height:100%;z-index:50;pointer-events:none;touch-action:none}
 body.dialing #dialsvg{pointer-events:auto}
 #dialsvg text{font-family:var(--ui)}
-.glidechip{position:absolute;z-index:51;background:#1A1F26;color:#E9EDF2;border:1px solid #333B45;
+/* the glide/dock hint chip is ROOM, not lens (dial light-native pass,
+   2026-08-06): in light it wears the page tokens; dark keeps its original
+   literals exactly, so the dark experience is byte-for-byte unchanged */
+.glidechip{position:absolute;z-index:51;background:var(--card);color:var(--ink);border:1px solid var(--line);
+  box-shadow:var(--shadow);
   border-radius:10px;padding:6px 11px;font-size:12.5px;pointer-events:none;display:none}
+@media (prefers-color-scheme: dark){.glidechip{background:#1A1F26;color:#E9EDF2;border-color:#333B45;box-shadow:none}}
+:root[data-theme="dark"] .glidechip{background:#1A1F26;color:#E9EDF2;border-color:#333B45;box-shadow:none}
+:root[data-theme="light"] .glidechip{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:var(--shadow)}
 
 /* ═══ the floating preview — pill glow, filmstrip peek — inside the frame ═══
    The thumb is the input; the top of the phone's screen is the output. The
@@ -1064,6 +1071,15 @@ function applyTheme(){
 /* the ring is always a dark instrument, so it speaks the dark palette's type
    colours regardless of page theme (app-mockup.html is canonical for the hues) */
 const TYPEC={txt:'#FFC978',url:'#FFA184',img:'#C6A8FF'};
+/* ROOM feedback (the hub pulse) speaks the PAGE's type tokens instead, like
+   the preview pill's aura already does — so light mode glows light-native.
+   In dark the tokens resolve to exactly the TYPEC hues: dark is unchanged. */
+const TYPEVAR={txt:'--c-txt',url:'--c-lnk',img:'--c-img'};
+function typeInk(t){
+  try{const v=getComputedStyle(document.documentElement).getPropertyValue(TYPEVAR[t]||'').trim();
+    if(v)return v}catch(_){}
+  return TYPEC[t]||'#8A94A0';
+}
 /* stand-in image "thumbnails" — one pair of gradients, shared by the keyboard
    tiles and the floating preview so a fake photo looks the same everywhere */
 const KGRAD=['linear-gradient(135deg,#3E5A72,#22303E)','linear-gradient(135deg,#5C4A6E,#2C2438)'];
@@ -1142,7 +1158,7 @@ function copyEgress(it){
   try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).catch(()=>{});}catch(_){}
   if(it.type==='txt'||it.type==='url')pendingPaste={text:txt,label:it.label};
   receipt('Copied — tap the box to paste');
-  dialPulse(TYPEC[it.type]);tick();
+  dialPulse(typeInk(it.type));tick();
   showPasteChip();
   return true;
 }
@@ -1274,7 +1290,7 @@ function useItem(it,via){
     if(T.field&&visibleSection().contains(T.field)){
       insertAtCursor(T.field,it.content||it.label);touch(it);
       toast(it.is_sensitive?`${it.label} inserted — auto-clears from clipboard in 60s`:`Inserted · ${it.label}`);
-      if(via==='dial')dialPulse(TYPEC[it.type]);
+      if(via==='dial')dialPulse(typeInk(it.type));
       tick();setTimeout(tick,70);return true;
     }
     pulse('.app:not([hidden]) input[type=text],.app:not([hidden]) textarea');
@@ -1282,7 +1298,7 @@ function useItem(it,via){
   }
   if(it.type==='img'){
     touch(it);   // images ride the clipboard, like the real app — both egress modes agree
-    if(via==='dial'){receipt(`Copied · ${it.label}`);dialPulse(TYPEC.img);tick();return true;}
+    if(via==='dial'){receipt(`Copied · ${it.label}`);dialPulse(typeInk('img'));tick();return true;}
     toast(`${it.label} copied — paste it where you need it`);
     tick();setTimeout(tick,70);return true;
   }
@@ -2028,7 +2044,13 @@ const DIAL={enabled:false,mode:'closed',open:0,openT:0,
   cru:null,cruT:null,cruZone:null,cruised:false,vel:null,fliT:null};
 const DEADBAND=0.55;                                   // >0.5 so it can't flicker on the boundary
 const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
-const BTN_R=27;                                        // round logo button (primary affordance)
+/* Discord-overlay parity (owner ask, 2026-08-06): Discord's mobile overlay
+   bubble is a compact ~48dp chat-head — noticeably smaller than a 56dp FAB.
+   The frame plays a 375pt-class phone at ~1 CSS px per dp, so the visual is
+   r=24 (48px). The HIT circle stays BTN_R+11 (onLogoBtn) = 70px across —
+   comfortably past the 44px floor; the cling math is all BTN_R-relative,
+   so the smaller tab still sits flush on either edge at any height. */
+const BTN_R=24;                                        // round logo button (primary affordance)
 function turn(ring,deltaDeg){
   const D=DIAL;
   D['raw'+ring]+=-EDGE*deltaDeg/STEP_OUT;              // EDGE keeps drag-down = next on either edge
@@ -2239,6 +2261,19 @@ function drawDial(){
   const f=DIAL.open,o=x=>x*(0.55+0.45*f);
   const themeAttr=document.documentElement.dataset.theme;
   const darkPage=themeAttr?themeAttr==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  /* ═══ the ROOM retunes with the page; the LENS never does ═══
+     Dial metals are exempt from the palette law — a black camera lens sits in
+     a light room and stays a black lens. These are the room-side furnishings
+     only (dock rail + cling target, panel-edge slit, drag-dots, the fold
+     caption). Dark values are the originals, byte-for-byte; light picks from
+     the same grey family, retuned. `seat` is the light-only soft drop shadow
+     that grounds the dark metal tab on a light room — shadow allowed,
+     recoloring the metal is not. */
+  const ROOM=darkPage
+    ?{rail:'#39424F',edge:'#3A4655',dots:'#8A94A0',
+      capBg:'rgba(10,13,17,.88)',capLn:'#2B333D',capInk:'#AEB9C6',seat:''}
+    :{rail:'#8792A0',edge:'#9AA4B0',dots:'#6E7884',
+      capBg:'rgba(255,255,255,.92)',capLn:'#D9DDE2',capInk:'#4C545E',seat:' filter="url(#dsh)"'};
   /* the light falls from the upper-INNER side (away from the docked edge);
      EDGE mirrors every gradient axis when the dial docks the other side */
   const lx0=AX-EDGE*R*.55,lx1=AX+EDGE*R*.25;
@@ -2273,29 +2308,29 @@ function drawDial(){
     const tAX=tEdge==='right'?VW:0,tE=tEdge==='right'?1:-1;
     const ty=Math.max(DYMIN,Math.min(DYMAX,DIAL.dockY));
     const railX=tAX-tE*3;
-    h+=`<line x1="${railX}" y1="${DYMIN}" x2="${railX}" y2="${DYMAX}" stroke="#39424F" stroke-width="1.5" stroke-dasharray="2 7" opacity=".45"/>`;
-    h+=`<circle cx="${tAX-tE*BTN_R}" cy="${ty}" r="${BTN_R}" fill="none" stroke="#39424F" stroke-width="2" stroke-dasharray="5 6" opacity=".85"/>`;
-    h+=`<g opacity=".8">`+handleSVG(DIAL.dockX,DIAL.dockY)+`</g>`;
+    h+=`<line x1="${railX}" y1="${DYMIN}" x2="${railX}" y2="${DYMAX}" stroke="${ROOM.rail}" stroke-width="1.5" stroke-dasharray="2 7" opacity=".45"/>`;
+    h+=`<circle cx="${tAX-tE*BTN_R}" cy="${ty}" r="${BTN_R}" fill="none" stroke="${ROOM.rail}" stroke-width="2" stroke-dasharray="5 6" opacity=".85"/>`;
+    h+=`<g opacity=".8"${ROOM.seat}>`+handleSVG(DIAL.dockX,DIAL.dockY)+`</g>`;
     svg.innerHTML=h;return;
   }
   if(f<.02){
     const bx=AX-EDGE*BTN_R,by=CY;
     const off=PERM!=='granted';
     // secondary: the docked panel edge, a quiet hint that something lives here
-    h+=`<rect x="${DOCK==='right'?AX-4:AX+1}" y="${CY-52}" width="3" height="104" rx="1.5" fill="#3A4655" opacity="${off?.18:.45}"/>`;
+    h+=`<rect x="${DOCK==='right'?AX-4:AX+1}" y="${CY-52}" width="3" height="104" rx="1.5" fill="${ROOM.edge}" opacity="${off?.18:.45}"/>`;
     // primary: round logo button — dimmed and inert while the permission is off
-    h+=`<g opacity="${off?.28:1}">`+handleSVG(bx,by)+`</g>`;
+    h+=`<g opacity="${off?.28:1}"${ROOM.seat}>`+handleSVG(bx,by)+`</g>`;
     if(!off){
       /* drag-dots: the re-dock affordance, real on every device view —
          hold and drag across the frame's midline to dock the other edge */
       for(const dy of [-7,0,7])for(const dx of [-2.6,2.6])
-        h+=`<circle cx="${bx-EDGE*(BTN_R+8)+dx}" cy="${by+dy}" r="1.3" fill="#8A94A0"/>`;
+        h+=`<circle cx="${bx-EDGE*(BTN_R+8)+dx}" cy="${by+dy}" r="1.3" fill="${ROOM.dots}"/>`;
       if(DEV==='fold'){
         /* Reach changes on a wide unfolded screen — the caption spells out
            what the dots offer, on the device that needs it most. */
         const cw=210,cx0=DOCK==='right'?AX-12-cw:AX+12,cy0=by+BTN_R+16;
-        h+=`<rect x="${cx0}" y="${cy0}" width="${cw}" height="24" rx="8" fill="rgba(10,13,17,.88)" stroke="#2B333D"/>`;
-        h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="#AEB9C6">Hold and drag — any edge, any height</text>`;
+        h+=`<rect x="${cx0}" y="${cy0}" width="${cw}" height="24" rx="8" fill="${ROOM.capBg}" stroke="${ROOM.capLn}"/>`;
+        h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="${ROOM.capInk}">Hold and drag — any edge, any height</text>`;
       }
       h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
     }
@@ -2504,6 +2539,9 @@ function drawDial(){
       :(t=>escq(t.slice(0,16)+(t.length>16?'…':'')))
         ((fit.type==='url'?(fit.title||fit.label):fit.type==='img'?fit.label:(fit.content||fit.label)).replace(/\s+/g,' ').trim());
     h+=`<defs><path id="readarc" d="M${rp1.x} ${rp1.y}A${rr} ${rr} 0 0 0 ${rp2.x} ${rp2.y}"/></defs>`;
+    /* the reading rides the scrim gap between hub and band — on a light room
+       that gap is only a .35 wash, so light adds a dark halo under the fill */
+    if(!darkPage)h+=`<text font-size="8" letter-spacing=".05em" style="font-family:var(--mono)" text-anchor="middle" fill="none" stroke="${LENS.engraveShadow}" stroke-width="2.4" stroke-linejoin="round" opacity="${.5*f}"><textPath href="#readarc" startOffset="50%">${rd}</textPath></text>`;
     h+=`<text font-size="8" letter-spacing=".05em" style="font-family:var(--mono)" text-anchor="middle" fill="${LENS.engraveShadow}" opacity="${.85*f}" dy="-.7"><textPath href="#readarc" startOffset="50%">${rd}</textPath></text>`;
     h+=`<text font-size="8" letter-spacing=".05em" style="font-family:var(--mono)" text-anchor="middle" fill="${LENS.engrave}" opacity="${f}"><textPath href="#readarc" startOffset="50%">${rd}</textPath></text>`;
   }
@@ -2546,7 +2584,10 @@ function drawDial(){
       const lab=sl.it.is_sensitive?'••••'
         :(s=>s.slice(0,12)+(s.length>12?'…':''))
           ((sl.it.type==='url'?(sl.it.title||sl.it.label):sl.it.label).replace(/\s+/g,' ').trim());
-      h+=`<g opacity="${op}" text-anchor="${EDGE===1?'end':'start'}">`
+      /* fan labels bloom OFF the metal onto the room: on a light room the
+         engraved grey needs a dark halo to read — halo, never a recolor */
+      const fanHalo=darkPage?'':`<text x="${p.x}" y="${p.y}" font-size="8.5" dominant-baseline="central" fill="none" stroke="${LENS.engraveShadow}" stroke-width="2.4" stroke-linejoin="round" opacity=".5">${escq(lab)}</text>`;
+      h+=`<g opacity="${op}" text-anchor="${EDGE===1?'end':'start'}">`+fanHalo
         +eng(p.x,p.y,8.5,escq(lab),`dominant-baseline="central"`,LENS.engrave)+`</g>`;
     });
     if(!live)FAN.t0=0;   // sweep done: pure instrument again

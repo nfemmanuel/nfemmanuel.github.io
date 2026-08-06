@@ -436,6 +436,51 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
 .shrow .sok{color:var(--c-doc);display:flex}
 .shrow .sno{color:var(--ink-3);font-size:12px;flex:0 0 auto}
 
+/* ── your profile: the editor rows. Label over value, per-field clear, no
+   accent drama — the calm end of the app, same family as Settings groups. ── */
+.pfrow{position:relative;display:flex;flex-direction:column;gap:1px;padding:11px 18px 12px}
+.pfrow+.pfrow{border-top:1px solid var(--hair)}
+.pfl{font-size:11.5px;font-weight:600;color:var(--ink-3)}
+.pfrow input{font:inherit;border:0;outline:none;background:transparent;color:var(--ink);padding:0 30px 0 0}
+.pfrow input.pfv{font-size:15.5px;margin-top:2px}
+.pfrow input.pflab{font-size:11.5px;font-weight:600;color:var(--ink-3)}
+.pfrow input::placeholder{color:var(--ink-3);opacity:.6}
+.pfx{position:absolute;right:9px;bottom:10px;width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:var(--ink-3);cursor:pointer}
+.pfx:active{background:var(--hair)}
+/* ── the fill moment: a pretend third-party form. Squarer, denser, none of our
+   accents — it has to read as someone else's app under the same daylight. ── */
+.fabar{flex:0 0 auto;display:flex;align-items:center;gap:11px;padding:10px 14px;
+  border-bottom:1px solid var(--hair);background:var(--surf)}
+.fat{display:block;font-size:15px;font-weight:600;letter-spacing:-.01em}
+.fas{display:block;font-size:11.5px;color:var(--ink-3);margin-top:1px}
+.ff{position:relative;padding:0 18px;margin-top:14px}
+.ffl{font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+.ff input{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--surf);
+  border:1.5px solid var(--hair);border-radius:9px;padding:11px 12px;outline:none}
+.ff input:focus{border-color:var(--ink-3)}
+/* Android tints what it just filled; ours borrows that, briefly, then settles */
+.ff input.just{animation:autotint 1.3s ease}
+@keyframes autotint{0%,40%{background:var(--t-doc);border-color:color-mix(in srgb,var(--c-doc) 45%,var(--hair))}
+  100%{background:var(--surf)}}
+/* the offer under the focused field — the system draws this; our answer rides it */
+.afchip{position:absolute;left:18px;top:calc(100% + 4px);z-index:6;min-width:238px;max-width:calc(100% - 36px);
+  background:var(--surf);border:1px solid var(--hair);border-radius:14px;box-shadow:var(--shadow-m);
+  overflow:hidden;animation:rise .28s var(--spring)}
+.afrow{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer}
+.afrow+.afrow{border-top:1px solid var(--hair)}
+.afrow:active{background:var(--hair)}
+.afmark{width:27px;height:27px;border-radius:9px;background:var(--ink);color:var(--ground);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.afb{display:block;font-size:13.5px;font-weight:600}
+.afs{display:block;font-size:11.5px;color:var(--ink-3);margin-top:1px;white-space:nowrap}
+.afone{font-family:var(--mono);font-size:12.5px;flex:1;min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.ffsub{margin:22px 18px 6px;height:48px;border-radius:10px;background:var(--ink);color:var(--ground);
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;opacity:.92;cursor:default}
+.simnote{margin:14px 18px 10px;padding:11px 13px;border:1px dashed var(--hair);border-radius:12px;
+  font-size:12px;line-height:1.55;color:var(--ink-3)}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 svg{display:block}
 </style>
@@ -480,6 +525,7 @@ const I={
   pencil:'<path d="M16.4 3.6a2.3 2.3 0 0 1 3.3 3.3L8.2 18.4l-4.3 1 1-4.3z"/><path d="m14.6 5.4 4 4"/>',
   close:'<path d="M6 6l12 12M18 6 6 18"/>',
   tag:'<path d="M3.5 11V4.5a1 1 0 0 1 1-1H11a2 2 0 0 1 1.4.6l7.6 7.6a2 2 0 0 1 0 2.8L14.6 20a2 2 0 0 1-2.8 0L4.1 12.4A2 2 0 0 1 3.5 11z"/><circle cx="8.3" cy="8.3" r="1.4"/>',
+  user:'<circle cx="12" cy="8.1" r="3.5"/><path d="M5.5 20.4a6.5 6.5 0 0 1 13 0"/>',
   /* File families. Documents keep one silhouette and differ inside, so a shelf of them
      still reads as a shelf; archives and media get their own outline because they are
      not documents and pretending otherwise helps nobody. */
@@ -505,7 +551,7 @@ const DEVICES_IOS=[['phone','Phone'],['tablet','iPad']];
 let firstOpen=true;   /* the settle bounce plays once, on launch — not on every navigation */
 const st={view:'vault',arg:null,filter:'all',sheet:null,q:'',searching:false,toast:null,pinCap:2,
   noteDismissed:false,tagEdit:false,watch:true,theme:'system',themePicker:false,perm:'unknown',
-  flipFlash:null};
+  flipFlash:null,fillsim:null};
 const SEED=[
   {id:1,t:'txt',v:'alex.rivera@example.com',pin:1},
   {id:2,t:'txt',v:'Best,\nAlex Rivera',pin:2},
@@ -538,6 +584,38 @@ const SEED=[
    the sha256 the core already computes. */
 const ATTACH={v:'Receipt screenshot',g:'linear-gradient(135deg,#BA5138,#5E2A1D)',fid:'sim-receipt',
   ocr:'Blue Door Cafe\nOrder 4187\n2x flat white  $9.00\nAlmond croissant  $5.20\nBanana bread  $4.60\nTotal  $18.80'};
+/* ── your profile (PRD 006): a FIXED vocabulary in sensible groups. Not items —
+   structured, tiny, singular. There is deliberately no field a password, card
+   or ID number could live in; that lane is sealed on both platforms. */
+const PF_GROUPS=[
+  ['Identity',[['name_full','Full name'],['name_given','First name'],['name_family','Last name']]],
+  ['Contact',[['email','Email'],['phone','Phone']]],
+  ['Address',[['address_line1','Street'],['address_line2','Apt or unit'],['city','City'],
+    ['region','State or region'],['postal','Postal code'],['country','Country']]],
+  ['Work',[['company','Company'],['job_title','Job title'],['website','Website']]],
+];
+const PF_CUSTOM=['custom_1','custom_2','custom_3','custom_4'];
+const PROFILE_SEED={
+  name_full:'Alex Rivera',name_given:'Alex',name_family:'Rivera',
+  email:'alex.rivera@example.com',phone:'+1 (614) 555-0164',
+  address_line1:'482 Maple Grove Ave',address_line2:'Apt 3B',city:'Columbus',
+  region:'Ohio',postal:'43210',country:'United States',
+  company:'Independent',job_title:'Product designer',website:'alexrivera.example.com',
+  custom_1:{label:'LinkedIn',v:'linkedin.example.com/in/alexrivera'},
+};
+/* The pretend job form: which of its fields the profile recognises. 'heard' is
+   unmapped ON PURPOSE — an honest no-match gets no suggestion, ever. A custom
+   row earns its keep here: 'LinkedIn' matches by its own label. */
+const FORM_FIELDS=[
+  ['name','Full name','name_full'],
+  ['email','Email','email'],
+  ['phone','Phone','phone'],
+  ['city','City','city'],
+  ['company','Current company','company'],
+  ['site','Website or portfolio','website'],
+  ['li','LinkedIn','custom_1'],
+  ['heard','How did you hear about us?',null],
+];
 /* ── stored state ──
    Versioned the way the extensions prototype stores its vault: one key per schema
    version, corrupt data discarded, and when v2 comes the loader carries non-seed
@@ -547,7 +625,7 @@ const ATTACH={v:'Receipt screenshot',g:'linear-gradient(135deg,#BA5138,#5E2A1D)'
    theme choice, the chosen lens (the type filter), and the idea votes. */
 const KEY='reel.app.v1';
 const MOJIBAKE=/ðŸ|â€|Ã°|Ã¢/;   /* double-encoded UTF-8 fingerprints = corrupt store */
-let ITEMS=null,VOTES={};
+let ITEMS=null,VOTES={},PROFILE=null;
 try{
   const raw=localStorage.getItem(KEY);
   if(raw&&MOJIBAKE.test(raw))localStorage.removeItem(KEY);
@@ -559,9 +637,12 @@ try{
       if(['phone','flip','fold','tablet'].includes(j.device))DEVICE=j.device;
       if(j.filter==='all'||TYPE[j.filter])st.filter=j.filter;   /* junk heals to All */
       st.noteDismissed=j.noteDismissed===true;
+      if(j.profile&&typeof j.profile==='object'&&!Array.isArray(j.profile))PROFILE=j.profile;
     }}
 }catch(_){}
 if(!ITEMS)ITEMS=SEED.map(i=>({...i,src:'seed'}));
+/* older stores predate the profile — they simply gain the demo one, untouched otherwise */
+if(!PROFILE)PROFILE=JSON.parse(JSON.stringify(PROFILE_SEED));
 ITEMS.forEach(i=>{i.fresh=0;i.titlePending=0;i.titleNew=0;});   /* transient flags never survive a reload */
 /* Stored vaults from before this build (same v1 key — no version bump) predate the
    found-text field and the wifi seed. Backfill seed images by id and add the missing
@@ -581,7 +662,7 @@ SEED.forEach(s=>{ if(!s.title)return;
   if(held)held.title=s.title; });
 function saveStore(){try{localStorage.setItem(KEY,
   JSON.stringify({v:1,items:ITEMS,watch:st.watch,theme:st.theme,device:DEVICE,votes:VOTES,
-    filter:st.filter,noteDismissed:st.noteDismissed}))}catch(_){}}
+    filter:st.filter,noteDismissed:st.noteDismissed,profile:PROFILE}))}catch(_){}}
 /* ── inference: the app works out the type, it never asks ── */
 const isUrl=v=>/^(https?:\/\/|www\.)/i.test(v.trim())||/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v.trim());
 const isCode=v=>{const s=v.trim();
@@ -593,7 +674,9 @@ const find=id=>ITEMS.find(i=>i.id===id);
 const nextPin=()=>{const u=pinned().map(p=>p.pin);for(let n=1;n<=99;n++)if(!u.includes(n))return n;};
 
 /* ── actions ── */
-function go(view,arg){st.view=view;st.arg=arg??null;st.sheet=null;st.themePicker=false;render();}
+function go(view,arg){st.view=view;st.arg=arg??null;st.sheet=null;st.themePicker=false;
+  if(view!=='fillsim')st.fillsim=null;   /* the pretend form resets between visits */
+  render();}
 /* Types are lenses, not places (design-decisions 2026-08-06): "landing in a type"
    now means the Vault wearing that lens. Every former go('type',t) call site
    routes here — the type screens themselves are gone. */
@@ -870,6 +953,7 @@ const tbar=(back,title,right)=>`<div class="tbar">
   ${title?`<span style="font-weight:600;font-size:15px">${title}</span>`:'<span></span>'}
   ${right||'<span style="width:36px"></span>'}</div>`;
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const eatt=s=>esc(s).replace(/"/g,'&quot;');   /* for value="" attributes */
 const extOf=v=>{const m=v.match(/\.(\w{1,5})$/);return m?m[1].toUpperCase():'FILE'};
 /* Extensions are grouped into families because a tile has room for a kind, not a
    format — nobody needs .xls told apart from .xlsx at a glance. */
@@ -951,6 +1035,45 @@ const IDEAS=[
  ['A share target that queues many files','Send a whole handful into Docs at once, straight from another app\'s share sheet.','approved'],
 ];
 function vote(i,o){if(VOTES[i]===o)delete VOTES[i];else VOTES[i]=o;render();}
+
+/* ── your profile: fill once, forms stop asking twice (PRD 006) ──
+   One editor design on both platforms; only delivery differs — Android offers
+   the whole profile on any form in one tap, iPhone surfaces the match per
+   field from the keyboard (that demo rides the keyboard page, later pass). */
+function pfEmpty(){
+  return !PF_GROUPS.some(g=>g[1].some(f=>(PROFILE[f[0]]||'').trim()))
+    &&!PF_CUSTOM.some(k=>{const c=PROFILE[k];return c&&((c.label||'').trim()||(c.v||'').trim())});
+}
+const pfVal=k=>{const v=PROFILE[k];return PF_CUSTOM.includes(k)?(v&&v.v||''):(v||'')};
+/* Typing writes straight to the store — no re-render mid-keystroke. The Saved
+   receipt lands once typing pauses, and the render it brings keeps focus. */
+function renderKeepField(){
+  const a=document.activeElement,id=a?a.id:'',pos=a&&a.selectionStart!=null?a.selectionStart:null;
+  render();
+  if(id){const n=document.getElementById(id);
+    if(n){n.focus();if(pos!=null)try{n.setSelectionRange(pos,pos)}catch(e){}}}
+}
+function toastKeep(m){st.toast=m;renderKeepField();clearTimeout(toast._t);
+  toast._t=setTimeout(()=>{st.toast=null;renderKeepField()},1900);}
+function pfReceipt(){clearTimeout(pfReceipt._t);pfReceipt._t=setTimeout(()=>toastKeep('Saved'),800);}
+function pfSet(k,v){PROFILE[k]=v;saveStore();pfReceipt();}
+function pfSetC(k,part,v){const c=PROFILE[k]||(PROFILE[k]={label:'',v:''});c[part]=v;saveStore();pfReceipt();}
+function pfClear(k){
+  if(PF_CUSTOM.includes(k))delete PROFILE[k]; else PROFILE[k]='';
+  clearTimeout(pfReceipt._t);   /* a clear must not resurrect a stale Saved */
+  toast('Cleared');
+}
+/* the pretend form: focus draws the offer under the field; the offer fills */
+function fsState(){return st.fillsim||(st.fillsim={focus:null,values:{},just:{}})}
+function fsFocus(id){const s=fsState();if(s.focus===id)return;s.focus=id;renderKeepField();}
+function fsSettle(){clearTimeout(fsSettle._t);
+  fsSettle._t=setTimeout(()=>{const w=st.fillsim;if(!w)return;w.just={};render()},1400);}
+function fsFillAll(){const s=fsState();
+  FORM_FIELDS.forEach(f=>{const v=f[2]&&pfVal(f[2]);if(v){s.values[f[0]]=v;s.just[f[0]]=1}});
+  s.focus=null;render();fsSettle();}
+function fsFillOne(){const s=fsState();const f=FORM_FIELDS.find(x=>x[0]===s.focus);
+  const v=f&&f[2]&&pfVal(f[2]);if(!v)return;
+  s.values[f[0]]=v;s.just={[f[0]]:1};s.focus=null;render();fsSettle();}
 
 /* ── screens ── */
 const V={
@@ -1065,6 +1188,8 @@ you:()=>`${sbar()}${tbar("go('vault')",'','')}
 
     <div class="sect">The everyday</div>
     <div class="set">
+      <div class="row" onclick="go('profile')">
+        <span class="tt"><b>Your profile</b><span>fill a form in one tap</span></span>${ic('next',17)}</div>
       <div class="row" onclick="openThemePicker()">
         <span class="tt"><b>Theme</b></span>
         <span class="val">${st.theme==='system'?'System':st.theme==='light'?'Light':'Dark'}</span></div>
@@ -1193,6 +1318,62 @@ ideas:()=>{const back="go('"+(st.arg==='vault'?'vault':'you')+"')";
       <div class="vote">${['yes','no','later'].map(o=>`<span class="${VOTES[i]===o?'on':''}" onclick="vote(${i},'${o}')">${o[0].toUpperCase()+o.slice(1)}</span>`).join('')}</div>
     </div></div>`).join('')}
     <div class="empty" style="padding:14px 34px 24px"><div class="e2">Nothing here is promised. A vote is a nudge, not an order form.</div></div>
+  </div>`},
+
+profile:()=>{const empty=pfEmpty();
+  const row=(k,lab)=>{const v=PROFILE[k]||'';
+    return `<div class="pfrow"><span class="pfl">${lab}</span>
+      <input class="pfv" id="pf_${k}" value="${eatt(v)}" autocomplete="off" oninput="pfSet('${k}',this.value)">
+      ${v?`<span class="pfx" onclick="pfClear('${k}')">${ic('close',13,2.2)}</span>`:''}</div>`};
+  const crow=k=>{const c=PROFILE[k]||{label:'',v:''};
+    return `<div class="pfrow">
+      <input class="pflab" id="pfl_${k}" value="${eatt(c.label||'')}" placeholder="Your own - name it" autocomplete="off" oninput="pfSetC('${k}','label',this.value)">
+      <input class="pfv" id="pf_${k}" value="${eatt(c.v||'')}" placeholder="what it fills in" autocomplete="off" oninput="pfSetC('${k}','v',this.value)">
+      ${(c.label||c.v)?`<span class="pfx" onclick="pfClear('${k}')">${ic('close',13,2.2)}</span>`:''}</div>`};
+  const groups=PF_GROUPS.map(g=>`<div class="sect">${g[0]}</div>
+    <div class="set">${g[1].map(f=>row(f[0],f[1])).join('')}</div>`).join('');
+  const haveC=PF_CUSTOM.filter(k=>PROFILE[k]),freeC=PF_CUSTOM.find(k=>!PROFILE[k]);
+  const customs=`<div class="sect">Custom</div><div class="set">${haveC.map(crow).join('')}${freeC?crow(freeC):''}</div>`;
+  const forms=PLAT==='md'
+    ?`<div class="sect">Filling forms</div><div class="set">
+      <div class="row" onclick="toast('That would open Settings')">
+        <span class="tt"><b>Fill forms with your profile</b><span>your phone asks once - after that, forms offer it</span></span>
+        <span class="val">On</span></div>
+      <div class="row" onclick="go('fillsim')">
+        <span class="tt"><b>Try it on a job form</b><span>a pretend form from another app</span></span>${ic('next',17)}</div></div>`
+    :`<div class="sect">Filling forms</div><div class="set">
+      <div class="row inert"><span class="tt"><b>On iPhone it rides your keyboard</b><span>the matching item surfaces as you tap each field</span></span></div></div>`;
+  return `${sbar()}${tbar("go('you')",'','')}
+  <div class="roll ${firstOpen?'settle':''}" id="profile-editor" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:33px">Your<br>profile</h1>
+      <div class="sub">Lives on this phone. Never sent anywhere.</div></div>
+    ${empty?`<div class="empty" style="padding:24px 34px 2px"><div class="e1">Fill this once</div><div class="e2">Forms stop asking twice.</div></div>`:''}
+    ${groups}${customs}${forms}
+    <div class="empty" style="padding:14px 34px 6px"><div class="e2">No passwords, cards or ID numbers in here - those never belong in this profile.</div></div>
+  </div>`},
+
+fillsim:()=>{if(PLAT!=='md')return V.profile();   /* the chip is Android's surface */
+  const s=fsState();
+  const nFill=FORM_FIELDS.filter(f=>f[2]&&pfVal(f[2])).length;
+  const field=f=>{const id=f[0],key=f[2],v=s.values[id]||'';
+    const chip=s.focus===id&&key&&pfVal(key)?`<div class="afchip" id="autofill-chip">
+        <div class="afrow" onclick="fsFillAll()"><span class="afmark">${ic('user',15,1.9)}</span>
+          <span style="min-width:0"><span class="afb">Fill with your profile</span>
+          <span class="afs">${esc(PROFILE.name_full||'Your profile')} · ${nFill} fields</span></span></div>
+        <div class="afrow" onclick="fsFillOne()"><span class="afone">${esc(pfVal(key))}</span>
+          <span class="afs">just this field</span></div>
+      </div>`:'';
+    return `<div class="ff"><div class="ffl">${f[1]}</div>
+      <input id="fs_${id}" value="${eatt(v)}"${s.just[id]?' class="just"':''} autocomplete="off"
+        onfocus="fsFocus('${id}')" oninput="st.fillsim.values['${id}']=this.value">${chip}</div>`};
+  return `${sbar()}
+  <div class="fabar"><span class="tbtn" style="width:32px;height:32px" onclick="go('profile')">${ic('back',15)}</span>
+    <span style="flex:1;min-width:0"><span class="fat">Senior Product Designer</span>
+    <span class="fas">Northwind Studio · Careers</span></span><span class="ftag">demo</span></div>
+  <div class="roll" style="padding-top:6px">
+    ${FORM_FIELDS.map(field).join('')}
+    <div class="ffsub">Submit application</div>
+    <div class="simnote">Android draws the chip; we supply the answer. One tap fills every field the profile knows — the one it does not know stays empty.</div>
   </div>`},
 };
 
@@ -1372,7 +1553,7 @@ function render(){
     <p><b>Vault:</b> home, inline search, filter chips, the item sheet, manual add — no bottom nav. The head (title, pill, chips) stays fixed; only the stream scrolls. The clipboard watcher is on by default and sits at the bottom as a quiet gauge row; tapping it opens Settings, where the real switch lives.<br>
        <b>Settings</b> (gear, top-right): The everyday (Theme, clipboard watch) up top, everything else under More — and the <b>Ideas</b> page, ten proposals with yes / no / later votes that stick.</p>
     <h3>New in this build</h3>
-    <p><b>Types are lenses now:</b> the By-type section is gone. Chips under the search pill narrow the full stream in place, the choice survives a relaunch, and All takes the lens off. Search <b>"otter"</b> — a screenshot turns up because the words live <b>inside the picture</b>; open it for the found text and its own Copy. Save the <b>same text twice</b> from the plus, or attach the same picture twice: the original bumps to the top instead of duplicating.</p>
+    <p><b>Types are lenses now:</b> the By-type section is gone. Chips under the search pill narrow the full stream in place, the choice survives a relaunch, and All takes the lens off. Search <b>"otter"</b> — a screenshot turns up because the words live <b>inside the picture</b>; open it for the found text and its own Copy. Save the <b>same text twice</b> from the plus, or attach the same picture twice: the original bumps to the top instead of duplicating. <b>Your profile</b> lives in Settings now — fill it once, then <b>Try it on a job form</b>: tap a field, take the offer, and everything the profile knows lands at once. Android draws the chip; we supply the answer — and the field it does not know stays empty.</p>
     <h3>What the paywall does</h3>
     <p>Pinning a third thing doesn't error — it takes you to the upgrade page, in the moment the limit actually matters. Gate on scale, never on access.</p>
     <h3>Device views</h3>
@@ -1389,7 +1570,7 @@ function renderKeepFocus(){
 Object.assign(window,{go,goVault,setFilter,vaultEdge,openSearch,closeSearch,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
   saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch,dismissNote,attachSim,copyOcr,
   openThemePicker,closeThemePicker,setTheme,vote,openTags,closeTags,addTag,removeTag,flipCopy,
-  simShareIn,closeShare});
+  simShareIn,closeShare,pfSet,pfSetC,pfClear,fsFocus,fsFillAll,fsFillOne});
 render();
 /* let the bounce finish, then never again this session */
 setTimeout(()=>{firstOpen=false},600);
