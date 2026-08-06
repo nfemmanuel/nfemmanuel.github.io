@@ -764,6 +764,7 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
     </div>
     <svg id="dialsvg" aria-hidden="true"></svg>
     <div class="glidechip" id="glidechip">release to paste</div>
+    <div class="glidechip" id="tuckhint">Swipe in to tuck it away</div>
     <div id="dialprev" aria-hidden="true"><div class="dp-stack"><div class="dp-layer on"></div><div class="dp-layer"></div></div></div>
     <div id="dialpulse" aria-hidden="true"></div>
     <div id="receipt" role="status"></div>
@@ -830,10 +831,11 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
         <tr><td>Double-tap the button</td><td>Your most recent item, instantly. No dial.</td></tr>
         <tr><td>Hold — it comes to you</td><td><b>Hold, and the ring comes to you.</b> Hold an off-center item and the ring walks it to the index mark, then stops. Hold either <b>end of the arc</b> — or drag past it and stay — and the ring keeps cruising from that end, gathering speed, until you let go.</td></tr>
       </table>
-      <p class="muted" style="margin:8px 0 0">The switches below — <b>Catch style</b>, <b>Egress</b>, <b>Preview</b>, <b>Peek</b> and <b>Size</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
+      <p class="muted" style="margin:8px 0 0">The switches below — <b>Catch style</b>, <b>Egress</b>, <b>Preview</b>, <b>Peek</b>, <b>Size</b> and <b>Handle</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
       <p class="muted" style="margin:6px 0 0"><b>Preview</b>: what's up shows at the top of the phone's screen, so your eyes can stay up there while your thumb spins down here.</p>
       <p class="muted" style="margin:6px 0 0"><b>Style</b> tries five ways the ring can mark what it holds — today's chips down to bare dots. Same metal, same moves; rule by eye.</p>
       <p class="muted" style="margin:6px 0 0"><b>Peek</b> answers "what's coming": <b>Neighbors</b> sits the previous and next item beside the floating preview — tap one to step; <b>Fan</b> blooms every visible label outward when the overlay opens, and they stay put until it closes. Rule by feel.</p>
+      <p class="muted" style="margin:6px 0 0"><b>Handle</b> is for when the button feels in the way: pick <b>Sliver</b>, then swipe the button into the edge — it tucks to a slim tab, nearly flush. Tap the tab and it's back. Opened, the overlay stays open, same as ever.</p>
     </div>
     <div class="permrow" id="permrow" hidden>The edge handle is off<b>Turn it on</b></div>
     <div class="card" id="diallab">
@@ -850,6 +852,8 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
         <span class="muted" id="peeknote" style="color:var(--ink-3)" hidden>needs the floating preview</span></div>
       <div class="labrow"><span>Size</span>
         <div class="dseg" id="segSize"><button type="button" data-v="compact">Compact</button><button type="button" data-v="regular">Regular</button></div></div>
+      <div class="labrow"><span>Handle</span>
+        <div class="dseg" id="segHandle"><button type="button" data-v="button">Button</button><button type="button" data-v="sliver">Sliver</button></div></div>
       <div class="labrow labbtns"><button type="button" class="labbtn" id="stagebtn">Copy something in another app</button><button type="button" class="labbtn ghost" id="firstrunbtn">Replay first run</button></div>
     </div>
     <div class="card" id="makeyours">
@@ -1042,6 +1046,15 @@ let PEEK=(()=>{try{const v=localStorage.getItem(PEEKKEY);return PEEKS.includes(v
    construction. The winner becomes the PRD 004 geometry amendment. */
 const SIZEKEY='reel.dial.size.v1',SIZES=['compact','regular'],SIZE_SCALE={compact:.88,regular:1};
 let SIZE=(()=>{try{const v=localStorage.getItem(SIZEKEY);return SIZES.includes(v)?v:'regular'}catch(_){return 'regular'}})();
+/* Handle (collapse-to-sliver, owner ruling 2026-08-06): how the closed
+   overlay rests on the edge. 'button' is today's round handle, exactly.
+   'sliver' arms the tuck — swipe the handle toward the edge and it collapses
+   to a near-flush Samsung-style tab at the same persisted height; tap the tab
+   (or drag it in a little) and the handle is back. Opening is untouched; once
+   open it stays open; and closing always returns to the handle, never the
+   sliver — tucking stays a deliberate act on the handle itself. */
+const HANDLEKEY='reel.dial.handle.v1',HANDLES=['button','sliver'];
+let HANDLE=(()=>{try{const v=localStorage.getItem(HANDLEKEY);return HANDLES.includes(v)?v:'button'}catch(_){return 'button'}})();
 let PERM=(()=>{try{return localStorage.getItem(PERMKEY)==='denied'?'denied':'granted'}catch(_){return 'granted'}})();
 /* the dock store grew a second axis (2026-08-06): edge + y-fraction per
    device. Self-healing both ways — the old bare 'left'/'right' strings still
@@ -1225,6 +1238,7 @@ bindSeg('segPreview',()=>PREVIEW,v=>{PREVIEW=v;persist(PREVKEY,v);syncPeekNote()
 bindSeg('segStyle',()=>STYLE,v=>{STYLE=v;persist(STYLEKEY,v);});       // redraws next frame, live
 bindSeg('segPeek',()=>PEEK,v=>{PEEK=v;persist(PEEKKEY,v);syncPeekNote();});
 bindSeg('segSize',()=>SIZE,v=>{SIZE=v;persist(SIZEKEY,v);sizes();drawDial();});  // one factor; sizes() re-derives the rest
+bindSeg('segHandle',()=>HANDLE,v=>{HANDLE=v;persist(HANDLEKEY,v);handleModeApply();});
 /* Neighbors reads in the floating pill; on-ring mode has no pill to read in.
    The seg stays selectable — this quiet note beside it carries the truth. */
 function syncPeekNote(){document.getElementById('peeknote').hidden=!(PEEK==='neighbors'&&PREVIEW==='ring');}
@@ -2054,6 +2068,13 @@ const DIAL={enabled:false,mode:'closed',open:0,openT:0,
   sOut:0,tOut:0,rawOut:0,grab:null,downBand:null,
   lastA:0,moved:0,downT:0,tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null,
   offer:null,dockX:0,dockY:0,
+  /* collapse-to-sliver: tucked is the resting truth, tuck/tuckT its easing
+     pair; downX/downY + the two pointer flags keep the tab's touch separate
+     from the ring's. Sliver mode wakes up tucked — the mode's whole promise
+     is "out of the way at rest" — while every tuck DURING a session stays an
+     explicit swipe on the handle. */
+  tucked:HANDLE==='sliver',tuck:HANDLE==='sliver'?1:0,tuckT:HANDLE==='sliver'?1:0,
+  downX:0,downY:0,onHandleDown:false,sliverPtr:null,
   cru:null,cruT:null,cruZone:null,cruised:false,vel:null,fliT:null};
 const DEADBAND=0.55;                                   // >0.5 so it can't flicker on the boundary
 const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
@@ -2064,6 +2085,15 @@ const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
    comfortably past the 44px floor; the cling math is all BTN_R-relative,
    so the smaller tab still sits flush on either edge at any height. */
 const BTN_R=24;                                        // round logo button (primary affordance)
+/* ═══ collapse-to-sliver geometry + gesture thresholds (2026-08-06) ═══
+   The tucked handle is a Samsung-edge-panel-style tab: PROUD px of metal past
+   the wall (near flush), 2*HALF tall, rounded, subtly translucent, cut in the
+   live finish's tab metal. Its touch target is a generous HIT_IN x 2*HIT_HALF
+   corner of the screen edge — finger-physical, so it never scales. TUCK_DX px
+   of mostly-horizontal swipe INTO the edge tucks the handle; UNTUCK_DX px
+   back out — or a plain tap on the tab — brings it back. */
+const SLIVER={PROUD:5.5,HALF:32,RX:5.2,HIT_IN:30,HIT_HALF:44};
+const TUCK_DX=18,UNTUCK_DX=12;
 function turn(ring,deltaDeg){
   const D=DIAL;
   D['raw'+ring]+=-EDGE*deltaDeg/STEP_OUT;              // EDGE keeps drag-down = next on either edge
@@ -2184,6 +2214,7 @@ const rad=d=>(d-90)*Math.PI/180;
 const P=(r,deg)=>({x:AX+r*Math.cos(rad(deg)),y:CY+r*Math.sin(rad(deg))});
 const P2=(cx,cy,r,deg)=>({x:cx+r*Math.cos(rad(deg)),y:cy+r*Math.sin(rad(deg))});
 const onLogoBtn=(x,y)=>Math.hypot(x-(AX-EDGE*BTN_R),y-CY)<=BTN_R+11;
+const onSliver=(x,y)=>Math.abs(y-CY)<=SLIVER.HIT_HALF&&(DOCK==='right'?x>=VW-SLIVER.HIT_IN:x<=SLIVER.HIT_IN);
 const wrapDeg=x=>((x+180)%360+360)%360-180;
 const mod=(a,n)=>((a%n)+n)%n;
 const dist=(x,y)=>Math.hypot(x-AX,y-CY);
@@ -2314,6 +2345,20 @@ function handleSVG(bx,by){
   s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-7.5}" fill="none" stroke="${LF.tabGroove}" stroke-width="1.2" opacity=".85"/>`;
   return s;
 }
+/* ═══ the sliver — the tucked handle (owner ruling, 2026-08-06) ═══
+   A near-flush rounded tab hugging the wall at the handle's own persisted
+   height. Half the capsule sits past the wall (the frame clips it), so PROUD
+   px of metal show with rounded shoulders — the Samsung edge-panel posture,
+   wearing the live finish's tab metal: dark machined charcoal on the prime,
+   light warm-gray on the white telephoto. One faint machined groove line
+   keeps it kin to the handle it stands in for. */
+function sliverSVG(op){
+  const gx=AX-EDGE*(SLIVER.PROUD-1.7);
+  return `<g opacity="${op}">`
+    +`<rect x="${AX-SLIVER.PROUD}" y="${CY-SLIVER.HALF}" width="${SLIVER.PROUD*2}" height="${SLIVER.HALF*2}" rx="${SLIVER.RX}" fill="${LF.tab}" fill-opacity=".6" stroke="${LF.tabEdge}" stroke-opacity=".9"/>`
+    +`<line x1="${gx}" y1="${CY-SLIVER.HALF+10}" x2="${gx}" y2="${CY+SLIVER.HALF-10}" stroke="${LF.tabGroove}" stroke-opacity=".5"/>`
+    +`</g>`;
+}
 function drawDial(){
   if(!DIAL.enabled){svg.innerHTML='';return;}
   const f=DIAL.open,o=x=>x*(0.55+0.45*f);
@@ -2377,27 +2422,44 @@ function drawDial(){
     svg.innerHTML=h;return;
   }
   if(f<.02){
-    const bx=AX-EDGE*BTN_R,by=CY;
     const off=PERM!=='granted';
-    // secondary: the docked panel edge, a quiet hint that something lives here
-    // (radius-derived, so it rides the size factor with the ring it hints at)
-    const slit=52*SIZE_SCALE[SIZE];
-    h+=`<rect x="${DOCK==='right'?AX-4:AX+1}" y="${CY-slit}" width="3" height="${2*slit}" rx="1.5" fill="${ROOM.edge}" opacity="${off?.18:.45}"/>`;
-    // primary: round logo button — dimmed and inert while the permission is off
-    h+=`<g opacity="${off?.28:1}"${ROOM.seat}>`+handleSVG(bx,by)+`</g>`;
-    if(!off){
-      /* drag-dots: the re-dock affordance, real on every device view —
-         hold and drag across the frame's midline to dock the other edge */
-      for(const dy of [-7,0,7])for(const dx of [-2.6,2.6])
-        h+=`<circle cx="${bx-EDGE*(BTN_R+8)+dx}" cy="${by+dy}" r="1.3" fill="${ROOM.dots}"/>`;
-      if(DEV==='fold'){
-        /* Reach changes on a wide unfolded screen — the caption spells out
-           what the dots offer, on the device that needs it most. */
-        const cw=210,cx0=DOCK==='right'?AX-12-cw:AX+12,cy0=by+BTN_R+16;
-        h+=`<rect x="${cx0}" y="${cy0}" width="${cw}" height="24" rx="8" fill="${ROOM.capBg}" stroke="${ROOM.capLn}"/>`;
-        h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="${ROOM.capInk}">Hold and drag — any edge, any height</text>`;
+    /* ═══ collapse-to-sliver (owner ruling, 2026-08-06) ═══ tk eases 0→1 as
+       the handle tucks: the button slides into the wall while the near-flush
+       tab takes over — one object changing posture, never a swap. Permission-
+       off keeps today's dimmed button: a handle that's off has nothing to
+       tuck. Button mode holds tk at 0, so it renders exactly as before. */
+    const tk=off?0:(HANDLE==='sliver'?DIAL.tuck:0);
+    const tuckedT=!off&&HANDLE==='sliver'&&DIAL.tuckT===1;
+    if(tk>.02)h+=sliverSVG(tk);
+    if(tk<.98){
+      const bx=AX-EDGE*(BTN_R-(BTN_R+4)*tk),by=CY;
+      // secondary: the docked panel edge, a quiet hint that something lives here
+      // (radius-derived, so it rides the size factor with the ring it hints at)
+      const slit=52*SIZE_SCALE[SIZE];
+      h+=`<g opacity="${1-tk}">`;
+      h+=`<rect x="${DOCK==='right'?AX-4:AX+1}" y="${CY-slit}" width="3" height="${2*slit}" rx="1.5" fill="${ROOM.edge}" opacity="${off?.18:.45}"/>`;
+      // primary: round logo button — dimmed and inert while the permission is off
+      h+=`<g opacity="${off?.28:1}"${ROOM.seat}>`+handleSVG(bx,by)+`</g>`;
+      if(!off){
+        /* drag-dots: the re-dock affordance, real on every device view —
+           hold and drag across the frame's midline to dock the other edge */
+        for(const dy of [-7,0,7])for(const dx of [-2.6,2.6])
+          h+=`<circle cx="${bx-EDGE*(BTN_R+8)+dx}" cy="${by+dy}" r="1.3" fill="${ROOM.dots}"/>`;
+        if(DEV==='fold'){
+          /* Reach changes on a wide unfolded screen — the caption spells out
+             what the dots offer, on the device that needs it most. */
+          const cw=210,cx0=DOCK==='right'?AX-12-cw:AX+12,cy0=by+BTN_R+16;
+          h+=`<rect x="${cx0}" y="${cy0}" width="${cw}" height="24" rx="8" fill="${ROOM.capBg}" stroke="${ROOM.capLn}"/>`;
+          h+=`<text x="${cx0+cw/2}" y="${cy0+13}" font-size="10.5" text-anchor="middle" dominant-baseline="central" fill="${ROOM.capInk}">Hold and drag — any edge, any height</text>`;
+        }
       }
-      h+=`<circle cx="${bx}" cy="${by}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
+      h+=`</g>`;
+    }
+    /* the live hit target follows the TARGET state, so a tap mid-ease still
+       lands on the thing the gesture is becoming */
+    if(!off){
+      if(tuckedT)h+=`<rect x="${DOCK==='right'?VW-SLIVER.HIT_IN:0}" y="${Math.max(0,CY-SLIVER.HIT_HALF)}" width="${SLIVER.HIT_IN}" height="${SLIVER.HIT_HALF*2}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
+      else h+=`<circle cx="${AX-EDGE*BTN_R}" cy="${CY}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
     }
     svg.innerHTML=h;return;
   }
@@ -2688,6 +2750,31 @@ function drawDial(){
   svg.innerHTML=h;
 }
 
+/* ═══ tuck state + the once-per-session teach (collapse-to-sliver) ═══ */
+const tuckhint=document.getElementById('tuckhint');let tuckhintT=null;
+function maybeTuckHint(){
+  /* the hint rides the only moment the swipe is actually available — sliver
+     armed, handle out, overlay closed — and says its one line once per
+     session, styled like the glide hints */
+  if(HANDLE!=='sliver'||DIAL.tucked||DIAL.openT>0||!DIAL.enabled||PERM!=='granted')return;
+  try{if(sessionStorage.getItem('reel.hint.sliver.v1'))return;
+    sessionStorage.setItem('reel.hint.sliver.v1','1');}catch(_){return;}
+  if(DOCK==='right'){tuckhint.style.left='auto';tuckhint.style.right=(BTN_R*2+18)+'px';}
+  else{tuckhint.style.right='auto';tuckhint.style.left=(BTN_R*2+18)+'px';}
+  tuckhint.style.top=Math.max(12,CY-14)+'px';
+  tuckhint.style.display='block';
+  clearTimeout(tuckhintT);tuckhintT=setTimeout(()=>{tuckhint.style.display='none'},3200);
+}
+function tuckNow(){DIAL.tucked=true;DIAL.tuckT=1;tuckhint.style.display='none';tick();}
+function untuck(){DIAL.tucked=false;DIAL.tuckT=0;tick();maybeTuckHint();}
+/* the seg applies its mode on the spot; Button mode is exactly the pre-sliver
+   prototype — nothing tucked, nothing armed, no sliver anywhere */
+function handleModeApply(){
+  if(HANDLE!=='sliver'){DIAL.tucked=false;DIAL.tuckT=0;}
+  else maybeTuckHint();
+  drawDial();
+}
+
 /* physics loop */
 let prevOut=0;
 (function loop(){
@@ -2699,6 +2786,10 @@ let prevOut=0;
   // fast enough to read as a mechanical click, slow enough not to look like a teleport.
   D.sOut+=(D.tOut-D.sOut)*.5;
   if(Math.abs(D.tOut-D.sOut)<.004)D.sOut=D.tOut;
+  // the tuck posture eases the same way — ~150ms of slide, then settled
+  D.tuck+=(D.tuckT-D.tuck)*.28;
+  if(Math.abs(D.tuckT-D.tuck)<.01)D.tuck=D.tuckT;
+  if(D.openT>0&&tuckhint.style.display==='block')tuckhint.style.display='none';
   // click at the moment of commitment, not when the animation crosses a midpoint
   if(D.tOut!==prevOut){prevOut=D.tOut;tick();}
   // an unanswered center offer is dropped the moment the dial is fully away
@@ -2794,12 +2885,16 @@ addEventListener('pointerdown',e=>{
   syncFrameRect();
   const px=e.clientX-FRX,py=e.clientY-FRY;
   const d=dist(px,py);
-  const onHandle=D.openT===0&&onLogoBtn(px,py);
-  if(D.openT===0&&!onHandle)return;
+  const tucked=HANDLE==='sliver'&&D.tucked;
+  const onHandle=D.openT===0&&!tucked&&onLogoBtn(px,py);
+  const onTab=D.openT===0&&tucked&&onSliver(px,py);
+  if(D.openT===0&&!onHandle&&!onTab)return;
   flickStop();                                         // a touch catches a coasting ring
   PTR=e.pointerId;D.moved=0;D.downT=Date.now();D.lastA=ang(px,py);
   D.glideY=py;D.downBand=band(d);
+  D.downX=px;D.downY=py;D.onHandleDown=onHandle;D.sliverPtr=null;
   D.vel=[];D.cruised=false;
+  if(onTab){D.sliverPtr='track';e.preventDefault();return;}   // the tab owns this touch
   /* "hold, and the ring comes to you": a fresh press on the ring arms the
      cruise — item zone walks the held slot to the index; end zone streams */
   if(D.openT>0&&D.downBand)cruiseTrack(wrapDeg(D.lastA-CA),true,true);
@@ -2822,6 +2917,27 @@ addEventListener('pointerdown',e=>{
 addEventListener('pointermove',e=>{
   const D=DIAL;if(!D.enabled||e.pointerId!==PTR)return;
   const px=e.clientX-FRX,py=e.clientY-FRY;
+  if(D.sliverPtr){
+    /* the tucked tab: a short drag IN (away from the wall) restores the
+       handle — the tap path settles at pointerup */
+    if(D.sliverPtr==='track'&&EDGE*(px-D.downX)<=-UNTUCK_DX){D.sliverPtr='done';untuck();}
+    e.preventDefault();return;
+  }
+  if(D.onHandleDown&&HANDLE==='sliver'&&D.mode==='closed'&&D.openT===0){
+    /* the collapse gesture: a mostly-horizontal swipe from the handle INTO
+       the wall — the one direction no other closed-handle gesture wants.
+       Any real movement also stands down the long-press, so a slow deliberate
+       swipe can never accidentally open the overlay mid-tuck. */
+    const dxe=EDGE*(px-D.downX),dye=Math.abs(py-D.downY);
+    if(D.holdTimer&&Math.hypot(px-D.downX,py-D.downY)>12){clearTimeout(D.holdTimer);D.holdTimer=null;}
+    if(dxe>=TUCK_DX&&dxe>dye){
+      clearTimeout(D.holdTimer);D.holdTimer=null;
+      clearTimeout(D.tapTimer);D.tapTimer=null;D.lastTapAt=0;
+      D.onHandleDown=false;PTR=null;
+      tuckNow();
+      e.preventDefault();return;
+    }
+  }
   if(D.mode==='dock'){
     D.dockX=px;D.dockY=py;
     /* release ALWAYS docks now — nearest frame edge, at this height */
@@ -2881,6 +2997,11 @@ addEventListener('pointerup',e=>{
   const cruised=D.cruised;D.cruised=false;
   cruiseStop();               // lifting stops a cruise on the spot — already on a whole detent
   const px=e.clientX-FRX,py=e.clientY-FRY;
+  const sp=D.sliverPtr;D.sliverPtr=null;D.onHandleDown=false;
+  if(sp){
+    if(sp==='track'&&Math.hypot(px-D.downX,py-D.downY)<10)untuck();   // a tap on the tab
+    return;
+  }
   if(D.mode==='dock'){
     D.mode='closed';glidechip.style.display='none';
     /* the magnet: cling to the NEAREST frame wall, at the height you left it —
@@ -2946,6 +3067,7 @@ addEventListener('wheel',e=>{                          // desktop: one notch = o
 addEventListener('pointercancel',e=>{
   const D=DIAL;if(e.pointerId!==PTR)return;
   PTR=null;clearTimeout(D.holdTimer);D.holdTimer=null;
+  D.sliverPtr=null;D.onHandleDown=false;
   D.cruised=false;cruiseStop();flickStop();
   if(D.mode==='glide'||D.mode==='dock'){D.mode='closed';D.glideZone=null;glidechip.style.display='none';D.openT=0;}
   if(D.grab){D['t'+D.grab]=Math.round(D['s'+D.grab]);D.grab=null;}
