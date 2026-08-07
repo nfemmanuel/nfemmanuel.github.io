@@ -44,18 +44,38 @@
 
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);
-  font:15px/1.55 var(--ui);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-main{max-width:620px;margin:0 auto;padding:30px 18px 44px}
-@media (min-width:760px){main{max-width:660px;padding:52px 24px 64px}}
+  font:15px/1.55 var(--ui);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden}
+main{max-width:620px;margin:0 auto;padding:8px 18px 30px}
+@media (min-width:760px){main{max-width:660px;padding:16px 24px 40px}}
+
+/* ═══ site chrome: the same nav and footer on every page under /reel/ ═══
+   Built from this page's own tokens so it inherits both themes for free.
+   The wordmark's knob is the shared mark; nav targets are 44px tall. */
+.sitenav{max-width:620px;margin:0 auto;padding:6px 18px 0;display:flex;align-items:center;gap:4px 14px;flex-wrap:wrap}
+@media (min-width:760px){.sitenav{max-width:660px;padding:14px 24px 0}}
+.sn-home{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;color:var(--ink);
+  font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.025em}
+.sn-knob{width:17px;height:17px;border-radius:50%;background:#1A1F26;border:1.6px solid #333B45;position:relative;flex:0 0 auto}
+.sn-knob::after{content:"";position:absolute;top:.5px;left:50%;width:1.6px;height:4.6px;background:#FF4D4D;
+  transform:translateX(-50%);border-radius:2px}
+.sn-links{display:flex;align-items:center;flex-wrap:wrap;gap:0 2px;margin-left:auto}
+.sn-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;border-radius:99px;
+  font-size:12.5px;font-weight:500;color:var(--ink-2);text-decoration:none;transition:color .18s}
+.sn-links a:hover{color:var(--ink)}
+.sn-links a[aria-current="page"]{color:var(--ink);font-weight:600;background:var(--surf);box-shadow:inset 0 0 0 1px var(--hair)}
+.sitefoot{border-top:1px solid var(--hair);margin-top:38px;padding-top:16px;
+  font-size:12px;color:var(--ink-3);line-height:1.75;text-align:left}
+.sf-links{display:flex;flex-wrap:wrap;align-items:center;gap:0 2px;margin-bottom:4px}
+/* right padding only, so a wrapped second line still starts flush left */
+.sitefoot a{display:inline-flex;align-items:center;min-height:44px;padding:0 18px 0 0;
+  color:var(--ink-2);text-decoration:none;font-size:12.5px}
+.sitefoot a:hover{color:var(--ink);text-decoration:underline}
+.sitefoot p{margin:0;color:var(--ink-3);font-size:12px;max-width:62ch}
 
 /* ── hero ── */
-.mark{display:flex;align-items:center;gap:9px;margin-bottom:30px;user-select:none}
-.mark .knob{width:24px;height:24px;border-radius:50%;background:#1A1F26;
-  border:2px solid #333B45;position:relative;flex:0 0 auto}
-.mark .knob::after{content:"";position:absolute;top:1px;left:50%;width:2px;height:6px;
-  background:#FF4D4D;transform:translateX(-50%);border-radius:2px}
-.mark b{font-family:var(--display);font-size:17px;letter-spacing:-.01em}
-.mark span{font-size:12px;color:var(--ink-3)}
+.tagline{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);margin:14px 0 10px}
 h1{font-family:var(--display);font-weight:800;font-size:31px;line-height:1.08;
   letter-spacing:-.035em;margin:0 0 13px;text-wrap:balance}
 @media (min-width:760px){h1{font-size:38px}}
@@ -122,13 +142,22 @@ a.card.minor{flex-direction:column;gap:10px;padding:14px;margin-bottom:0}
 .btn svg{width:15px;height:15px;color:var(--ink-2)}
 .fine{margin:10px 0 0 !important;font-size:12px;color:var(--ink-3)}
 
-footer{margin-top:40px;font-size:12px;color:var(--ink-3);text-align:center;line-height:1.9}
-footer a{color:var(--ink-2)}
 </style>
+
+<nav class="sitenav" aria-label="Reel">
+  <a class="sn-home" href="./"><span class="sn-knob" aria-hidden="true"></span>reel</a>
+  <div class="sn-links">
+    <a href="./" aria-current="page">Home</a>
+    <a href="app/">The app</a>
+    <a href="extensions/">Extensions</a>
+    <a href="ios/">On iPhone</a>
+    <a href="island/">Fill session</a>
+  </div>
+</nav>
 
 <main>
   <header>
-    <div class="mark"><span class="knob"></span><b>reel</b><span>— a working title</span></div>
+    <p class="tagline">Reel — a working title</p>
     <h1>The quick way to store and retrieve what you reuse.</h1>
     <p class="lede">Reel is a phone app that keeps your reusable
       <b class="w-txt">text</b>, <b class="w-lnk">links</b>, <b class="w-img">images</b> and
@@ -168,24 +197,24 @@ footer a{color:var(--ink-2)}
     <a class="card" href="extensions/" style="--tint:var(--c-lnk)">
       <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><circle cx="12" cy="12" r="3.1"/><path d="M12 3.6v2.4"/></svg></span>
       <span class="txt"><b>The extensions</b>
-        <em>The edge dial and the vault keyboard, tested against a fake job application you
-          fill without leaving the form.</em>
-        <span class="status"><b>Half built, half concept</b> — the dial is being built for
-          Android; the keyboard is an iOS concept under research.</span></span>
+        <em>The edge overlay and the vault keyboard, tried against a stand-in job application
+          you fill without ever leaving the form.</em>
+        <span class="status"><b>Half built, half concept</b> — the overlay is being built for
+          Android and simulated here; the keyboard is an iOS concept under research.</span></span>
     </a>
 
     <div class="duo">
       <a class="card minor" href="ios/" style="--tint:var(--c-img)">
         <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.6 5.4h2.8"/></svg></span>
-        <span class="txt"><b>The iOS surfaces</b>
+        <span class="txt"><b>On iPhone</b>
           <em>Spotlight, Shortcuts and the share sheet — how the vault travels on iPhone.</em>
-          <span class="status">Older exhibit</span></span>
+          <span class="status">A picture tour — nothing runs</span></span>
       </a>
       <a class="card minor" href="island/" style="--tint:var(--c-txt)">
         <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.6" y="8.4" width="18.8" height="7.2" rx="3.6"/><circle cx="17.4" cy="12" r="1.5"/></svg></span>
         <span class="txt"><b>The fill session</b>
           <em>A long form, one item at a time, driven from the Dynamic Island.</em>
-          <span class="status">Older exhibit</span></span>
+          <span class="status">A feel demo — newer iPhones only</span></span>
       </a>
     </div>
   </section>
@@ -229,10 +258,13 @@ footer a{color:var(--ink-2)}
     </div>
   </section>
 
-  <footer>
-    built in public — a Shipaton 2026 project<br>
-    &#8220;Reel&#8221; is a working title, not a decision<br>
-    last updated 2026-08-06 · <a href="/">nfemmanuel.com</a>
+  <footer class="sitefoot">
+    <div class="sf-links">
+      <a href="./">Reel home</a><a href="app/">The app</a><a href="extensions/">Extensions</a><a href="ios/">On iPhone</a><a href="island/">Fill session</a><a href="privacy/">Privacy</a>
+    </div>
+    <p>Built in public — a Shipaton 2026 project. &#8220;Reel&#8221; is a working title, not a decision.
+      Nothing on this page is stored or sent anywhere. Last updated 2026-08-06 ·
+      <a href="/" style="min-height:0;padding:0;display:inline">nfemmanuel.com</a></p>
   </footer>
 </main>
 

@@ -49,7 +49,34 @@
     font:15px/1.5 var(--ui);
     max-width:520px;margin-inline:auto;padding:14px 14px calc(20px + env(safe-area-inset-bottom))}
   h1{font-family:var(--display);font-weight:700;font-size:16.5px;margin:0 0 3px;letter-spacing:-.025em}
+  .hrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:3px}
+  .hrow h1{margin:0}
+  .ptag{font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+    border:1px solid var(--hair);border-radius:99px;padding:2px 8px;white-space:nowrap}
   .sub{font-size:12.5px;color:var(--ink-2);margin:0 0 12px}
+
+  /* ═══ site chrome: the same nav and footer on every page under /reel/ ═══
+     Built from this page's own tokens so it inherits both themes for free.
+     The wordmark's knob is the shared mark; nav targets are 44px tall. */
+  .sitenav{display:flex;align-items:center;gap:4px 14px;flex-wrap:wrap;margin:-6px 0 4px}
+  .sn-home{display:inline-flex;align-items:center;gap:8px;min-height:40px;text-decoration:none;color:var(--ink);
+    font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.025em}
+  .sn-knob{width:17px;height:17px;border-radius:50%;background:#1A1F26;border:1.6px solid #333B45;position:relative;flex:0 0 auto}
+  .sn-knob::after{content:"";position:absolute;top:.5px;left:50%;width:1.6px;height:4.6px;background:#FF4D4D;
+    transform:translateX(-50%);border-radius:2px}
+  .sn-links{display:flex;align-items:center;flex-wrap:wrap;gap:0 2px;margin-left:auto}
+  .sn-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;border-radius:99px;
+    font-size:12.5px;font-weight:500;color:var(--ink-2);text-decoration:none;transition:color .18s}
+  .sn-links a:hover{color:var(--ink)}
+  .sn-links a[aria-current="page"]{color:var(--ink);font-weight:600;background:var(--surf);box-shadow:inset 0 0 0 1px var(--hair)}
+  .sitefoot{border-top:1px solid var(--hair);margin-top:22px;padding-top:12px;
+    font-size:12px;color:var(--ink-3);line-height:1.7}
+  .sf-links{display:flex;flex-wrap:wrap;align-items:center;gap:0 2px}
+  /* right padding only, so a wrapped second line still starts flush left */
+  .sitefoot a{display:inline-flex;align-items:center;min-height:40px;padding:0 18px 0 0;
+    color:var(--ink-2);text-decoration:none;font-size:12.5px}
+  .sitefoot a:hover{color:var(--ink);text-decoration:underline}
+  .sitefoot p{margin:0;color:var(--ink-3);font-size:12px;max-width:62ch}
   .row{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
   .chipb{border:1.5px solid var(--hair);background:var(--surf);color:var(--ink);border-radius:999px;
     padding:7px 14px;font:inherit;font-size:12.5px;cursor:pointer}
@@ -126,8 +153,19 @@
 </head>
 <body>
 
-<h1>Press the orange button</h1>
-<p class="sub">This simulates an iPhone's <b>Action Button</b> starting a fill session in the <b>Dynamic Island</b>. The app never opens. Copies are real — you can actually paste afterwards.</p>
+<nav class="sitenav" aria-label="Reel">
+  <a class="sn-home" href="../"><span class="sn-knob" aria-hidden="true"></span>reel</a>
+  <div class="sn-links">
+    <a href="../">Home</a>
+    <a href="../app/">The app</a>
+    <a href="../extensions/">Extensions</a>
+    <a href="../ios/">On iPhone</a>
+    <a href="../island/" aria-current="page">Fill session</a>
+  </div>
+</nav>
+
+<div class="hrow"><h1>Press the orange button</h1><span class="ptag">Concept exhibit</span></div>
+<p class="sub">A stand-in for an iPhone's <b>Action Button</b> starting a fill session in the <b>Dynamic Island</b>. The app never opens. The copies are real — you can paste them afterwards.</p>
 
 <div class="row">
   <button class="chipb" id="snd" data-on="1">Sound on</button>
@@ -146,7 +184,7 @@
 </div>
 
 <div class="card">
-  <h2>What just happened, in real API terms</h2>
+  <h2>What just happened, and how it would really work</h2>
   <div class="step"><span class="n">1</span><span><b>Action Button</b> runs our Control (iOS 18 Controls API) — which is just one of our App Intents wearing a button.</span></div>
   <div class="step"><span class="n">2</span><span>The intent starts a <b>Live Activity</b> — that's the only way into the Dynamic Island, and it fits: a fill session is a real ongoing activity with progress.</span></div>
   <div class="step"><span class="n">3</span><span>Each tap on the island is a <b>LiveActivityIntent button</b> — it copies the next item without the app opening. Long-press expands the full session list.</span></div>
@@ -160,6 +198,13 @@
 </div>
 
 <div id="toast" role="status"></div>
+
+<footer class="sitefoot">
+  <div class="sf-links">
+    <a href="../">Reel home</a><a href="../app/">The app</a><a href="../extensions/">Extensions</a><a href="../privacy/">Privacy</a>
+  </div>
+  <p>Built in public &#8212; a Shipaton 2026 project. This page saves nothing; the only thing it touches is your clipboard, and only when you tap.</p>
+</footer>
 
 <script>
 'use strict';

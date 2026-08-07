@@ -41,12 +41,40 @@
   --fmix:17%;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--ui);
+/* min-height, not height: the page now carries a site nav and a footer, and a
+   hard 100% would have paid for them out of the phone's height. The frame
+   keeps its own size and the page scrolls the little that is left over. */
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--ground);color:var(--ink);font-family:var(--ui);
   display:flex;flex-direction:column;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-header{padding:14px 16px 0;flex:0 0 auto}
+header{padding:10px 16px 0;flex:0 0 auto}
 .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ═══ site chrome: the same nav and footer on every page under /reel/ ═══
+   Built from this page's own tokens so it inherits both themes for free.
+   Both are flex:0 0 auto so the phone keeps the room it has left. */
+.sitenav{flex:0 0 auto;padding:4px 16px 0;display:flex;align-items:center;gap:4px 14px;flex-wrap:wrap}
+.sn-home{display:inline-flex;align-items:center;gap:8px;min-height:40px;text-decoration:none;color:var(--ink);
+  font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.025em}
+.sn-knob{width:17px;height:17px;border-radius:50%;background:#1A1F26;border:1.6px solid #333B45;position:relative;flex:0 0 auto}
+.sn-knob::after{content:"";position:absolute;top:.5px;left:50%;width:1.6px;height:4.6px;background:#FF4D4D;
+  transform:translateX(-50%);border-radius:2px}
+.sn-links{display:flex;align-items:center;flex-wrap:wrap;gap:0 2px;margin-left:auto}
+.sn-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;border-radius:99px;
+  font-size:12.5px;font-weight:500;color:var(--ink-2);text-decoration:none;transition:color .18s}
+.sn-links a:hover{color:var(--ink)}
+.sn-links a[aria-current="page"]{color:var(--ink);font-weight:600;background:var(--surf);box-shadow:inset 0 0 0 1px var(--hair)}
+.sitefoot{flex:0 0 auto;border-top:1px solid var(--hair);margin:0 16px;padding:6px 0 8px;
+  font-size:12px;color:var(--ink-3);line-height:1.7}
+.sf-links{display:flex;flex-wrap:wrap;align-items:center;gap:0 2px}
+/* right padding only, so a wrapped second line still starts flush left */
+.sitefoot a{display:inline-flex;align-items:center;min-height:40px;padding:0 18px 0 0;
+  color:var(--ink-2);text-decoration:none;font-size:12.5px}
+.sitefoot a:hover{color:var(--ink);text-decoration:underline}
+.sitefoot p{margin:0;color:var(--ink-3);font-size:12px;max-width:62ch}
 h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-.035em;margin:0}
+.ptag{font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+  border:1px solid var(--hair);border-radius:99px;padding:2px 8px;white-space:nowrap}
 .lede{font-size:12.5px;color:var(--ink-2);margin:5px 0 0;line-height:1.5;max-width:62ch}
 .lede b{color:var(--ink);font-weight:600}
 .ctrls{display:flex;flex-direction:column;gap:7px;margin-left:auto;align-items:flex-start}
@@ -56,13 +84,18 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
   color:var(--ink-3);padding:6px 13px;border-radius:99px;cursor:pointer;transition:.2s var(--glide)}
 .seg button[data-on="1"]{background:var(--ink);color:var(--ground)}
 .stage{flex:1 1 auto;min-height:0;display:flex;justify-content:center;padding:12px 12px 14px}
-.phone{position:relative;width:100%;max-width:392px;height:min(74vh,100%);border-radius:30px;overflow:hidden;
+/* 74vh, not min(74vh,100%): the percentage resolved against a flex item with
+   no definite height, so the frame's height depended on how much chrome sat
+   above it. A viewport unit makes the phone the same size on every page. */
+.phone{position:relative;width:100%;max-width:392px;height:74vh;border-radius:30px;overflow:hidden;
   background:var(--ground);box-shadow:var(--shadow-m);border:1px solid var(--hair)}
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--ground)}
 .notes{display:none}
 @media (min-width:900px){
-  body{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:0 32px;padding:28px}
+  body{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:0 32px;padding:20px 28px 28px}
   header{flex-basis:100%;max-width:860px;padding-inline:0}
+  .sitenav{flex-basis:100%;max-width:860px;padding:0}
+  .sitefoot{flex-basis:100%;max-width:860px;margin:8px 0 0;padding-top:14px}
   .stage{flex:0 0 auto;height:auto;padding:18px 0 0}
   .phone{width:376px;height:768px;border-radius:42px;border:9px solid #0B0C0E}
   .notes{display:block;flex:0 0 300px;max-width:340px;padding-top:18px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
@@ -487,9 +520,20 @@ svg{display:block}
 </head>
 <body class="md">
 
+<nav class="sitenav" aria-label="Reel">
+  <a class="sn-home" href="../"><span class="sn-knob" aria-hidden="true"></span>reel</a>
+  <div class="sn-links">
+    <a href="../">Home</a>
+    <a href="../app/" aria-current="page">The app</a>
+    <a href="../extensions/">Extensions</a>
+    <a href="../ios/">On iPhone</a>
+    <a href="../island/">Fill session</a>
+  </div>
+</nav>
+
 <header>
   <div class="hrow">
-    <h1 class="pt">Reel</h1>
+    <h1 class="pt">The app</h1><span class="ptag">working prototype</span>
     <div class="ctrls">
       <div class="crow"><div class="seg" id="platSeg"></div><div class="seg" id="themeSeg"></div></div>
       <div class="crow"><div class="seg" id="devSeg"></div></div>
@@ -499,8 +543,15 @@ svg{display:block}
 </header>
 
 <div class="stage"><div class="phone"><div class="scr" id="scr"></div></div>
-  <div class="devcap">Cover screen concept - still in discussion on the ideas page.</div></div>
+  <div class="devcap">The cover screen is an idea, not a commitment &#8212; it is still being argued about.</div></div>
 <aside class="notes" id="notes"></aside>
+
+<footer class="sitefoot">
+  <div class="sf-links">
+    <a href="../">Reel home</a><a href="../extensions/">Extensions</a><a href="../ios/">On iPhone</a><a href="../privacy/">Privacy</a>
+  </div>
+  <p>Built in public &#8212; a Shipaton 2026 project. Everything you do here is saved in this browser only; nothing is uploaded and there is no account.</p>
+</footer>
 
 <script>
 'use strict';
@@ -1141,7 +1192,7 @@ vault:()=>{const q=st.q.trim().toLowerCase(),f=st.filter;
     ${q?'':`<div class="catch" style="margin-top:11px" onclick="simShareIn()">
       <span style="display:flex;color:var(--ink-3)">${ic('send',16)}</span>
       <span class="slabel">Share 5 files from another app</span>
-      <span class="cntnum">sim</span></div>`}
+      <span class="cntnum">try it</span></div>`}
     ${noteCard()}
   </div>`},
 
@@ -1253,7 +1304,7 @@ reach:()=>`${sbar()}${tbar("go('you')",'Reach','')}
     <div class="sect">Set up one thing</div>
     <div class="card" style="background:var(--t-lnk)" onclick="go('setup')">
       <div class="in" style="padding:17px">
-        <div style="font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.03em;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Edge dial'}</div>
+        <div style="font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.03em;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Floating overlay'}</div>
         <div style="font-size:14px;line-height:1.5;margin-top:6px;color:var(--c-lnk);opacity:.85">
           ${PLAT==='ios'?'Double-tap the back of your phone. Your last thing lands on the clipboard.':'Swipe in from the edge, turn, let go. It inserts where you were typing.'}</div>
         <div style="margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:var(--c-lnk);
@@ -1269,9 +1320,9 @@ reach:()=>`${sbar()}${tbar("go('you')",'Reach','')}
         <span style="font-size:13px;color:var(--ink-3)">${r[2]}</span></span>${ic('next',17)}</div></div>`).join('')}
   </div>`,
 
-setup:()=>`${sbar()}${tbar("go('reach')",PLAT==='ios'?'Back Tap':'Edge dial','')}
+setup:()=>`${sbar()}${tbar("go('reach')",PLAT==='ios'?'Back Tap':'Floating overlay','')}
   <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
-    <div><h1 class="big" style="font-size:31px;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Edge dial'}</h1>
+    <div><h1 class="big" style="font-size:31px;color:var(--c-lnk)">${PLAT==='ios'?'Back Tap':'Floating overlay'}</h1>
       <div class="sub">about 40 seconds, once</div></div>
     ${(PLAT==='ios'
       ?[['Open Settings','Accessibility, then Touch, then Back Tap'],
@@ -1559,7 +1610,7 @@ function render(){
     <h3>Device views</h3>
     <p>The third switch tries the same app on other glass. <b>Fold</b> is the inner screen and it is <b>medium</b> (~673dp), not a tablet: grids go 4-across, search sticks to the top, and a hairline marks the hinge — tiles clear it through the middle gap. <b>Tablet / iPad</b> is expanded: vault on the left, and tapping a tile docks its actions on the right instead of raising a sheet. <b>Flip</b> is the cover-screen concept from the Ideas page — top four pins, tap to copy, the phone stays shut.</p>
     <h3>Still to design</h3>
-    <p>Onboarding · the dial and keyboard themselves (separate prototype) · multi-select · Recently deleted · widget gallery · where the plus button lands long-term.</p>`;
+    <p>Onboarding · the overlay and the keyboard themselves (they live on <a href="../extensions/">the extensions page</a>) · multi-select · Recently deleted · widget gallery · where the plus button lands long-term.</p>`;
 }
 function renderKeepFocus(){
   const el=document.getElementById('q'); const pos=el?el.selectionStart:0;

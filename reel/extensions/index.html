@@ -161,17 +161,38 @@ body.device-fold .phone::after{content:"";position:absolute;top:0;bottom:0;left:
 body.device-tablet .phone,body.device-ipad .phone{max-width:960px;height:auto;min-height:0;max-height:none;
   aspect-ratio:4/3;border-radius:22px}
 
-.notes{padding:10px 16px 44px;max-width:620px;margin:0 auto}
-.foot{margin-top:26px;font-size:12px;color:var(--dim);text-align:center;line-height:1.7}
+.notes{padding:10px 16px 30px;max-width:620px;margin:0 auto}
 @media (min-width:900px){
   .wrap{max-width:none;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:0 36px;padding:0 28px 28px}
   .stage{flex:0 0 auto;padding:18px 0 0}
   .phone{width:376px;height:768px;min-height:0;max-height:none;border-radius:42px;border:9px solid #0B0C0E}
   body.device-fold .phone{width:560px;height:700px;aspect-ratio:auto;border-radius:26px}
   body.device-tablet .phone,body.device-ipad .phone{width:960px;height:720px;aspect-ratio:auto;border-radius:26px}
-  .notes{flex:0 0 360px;max-width:400px;margin:0;padding:18px 0 40px}
-  .foot{text-align:left}
+  .notes{flex:0 0 360px;max-width:400px;margin:0;padding:18px 0 24px}
 }
+
+/* ═══ site chrome: the same nav and footer on every page under /reel/ ═══
+   Built from this page's own tokens so it inherits both themes for free.
+   The wordmark's knob is the shared mark; nav targets are 44px tall. */
+.sitenav{max-width:920px;margin:0 auto;padding:6px 16px 0;display:flex;align-items:center;gap:4px 14px;flex-wrap:wrap}
+.sn-home{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;color:var(--ink);
+  font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.025em}
+.sn-knob{width:17px;height:17px;border-radius:50%;background:#1A1F26;border:1.6px solid #333B45;position:relative;flex:0 0 auto}
+.sn-knob::after{content:"";position:absolute;top:.5px;left:50%;width:1.6px;height:4.6px;background:#FF4D4D;
+  transform:translateX(-50%);border-radius:2px}
+.sn-links{display:flex;align-items:center;flex-wrap:wrap;gap:0 2px;margin-left:auto}
+.sn-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;border-radius:99px;
+  font-size:12.5px;font-weight:500;color:var(--dim);text-decoration:none;transition:color .18s}
+.sn-links a:hover{color:var(--ink)}
+.sn-links a[aria-current="page"]{color:var(--ink);font-weight:600;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+.sitefoot{max-width:920px;margin:8px auto 0;padding:16px 16px 30px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--ink-3);line-height:1.75}
+.sf-links{display:flex;flex-wrap:wrap;align-items:center;gap:0 2px;margin-bottom:4px}
+/* right padding only, so a wrapped second line still starts flush left */
+.sitefoot a,.sitefoot .linkbtn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px 0 0;
+  color:var(--dim);text-decoration:none;font-size:12.5px}
+.sitefoot a:hover,.sitefoot .linkbtn:hover{color:var(--ink);text-decoration:underline}
+.sitefoot p{margin:0;color:var(--ink-3);font-size:12px;max-width:62ch}
 
 /* ═══ notes cards: tips, lab, prose ═══ */
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
@@ -183,25 +204,58 @@ body.device-tablet .phone,body.device-ipad .phone{max-width:960px;height:auto;mi
 .tips td b{color:var(--ink)}
 .muted{font-size:12px;color:var(--dim)}
 .linkbtn{background:none;border:none;color:var(--accent);cursor:pointer;font:inherit;padding:0;text-decoration:underline}
-.filebtn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);
-  border:none;border-radius:12px;padding:9px 14px;font:inherit;font-size:13.5px;cursor:pointer}
-.filebtn:hover{filter:brightness(1.06)}
 .permrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
   border-radius:14px;padding:12px 15px;margin-bottom:14px;color:var(--dim);font-size:13px;cursor:pointer}
 .permrow b{margin-left:auto;color:var(--ink);font-weight:600}
-.labrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px}
-.labrow:first-of-type{margin-top:0}
-.labrow>span{font-size:12.5px;font-weight:600;flex:0 0 auto;min-width:84px}
-.dseg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:99px;padding:2px}
-.dseg button{appearance:none;border:0;background:transparent;font:inherit;font-size:11.5px;font-weight:500;
-  color:var(--dim);padding:4px 11px;border-radius:99px;cursor:pointer;transition:.2s}
+/* ═══ the control panel ═══
+   Every switch on this page lives in ONE panel, grouped by what it changes:
+   the overlay itself, how it behaves, what it shows, and things to try. Rows
+   share a label column, so the segs line up down the panel instead of
+   stepping in and out; each group's note sits under its rows as quiet
+   supporting copy rather than a competing card. Two columns once the column
+   is wide enough for them, one column on a phone and in the desktop rail. */
+.panel{padding:2px 16px 12px}
+.pgroup{border-top:1px solid var(--line);padding:12px 0 2px;min-width:0}
+.pgroup:first-of-type{border-top:0;padding-top:6px}
+.pglabel{font-family:var(--ui);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 10px}
+.prow{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin:0 0 9px}
+/* one label column, so every seg starts at the same x down the whole panel.
+   A control too wide to sit beside its label (the five-up) drops to its own
+   full-width line rather than shoving the column out of true. */
+.prow>.plabel{font-size:12.5px;font-weight:600;color:var(--ink);flex:0 0 auto;width:96px}
+.pnote{flex:1 1 100%;font-size:11.5px;line-height:1.5;color:var(--dim);margin:0 0 10px}
+.pnote b{color:var(--ink);font-weight:600}
+.prow .pnote{margin:-3px 0 0}
+.dseg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:99px;padding:3px;max-width:100%}
+.dseg button{position:relative;appearance:none;border:0;background:transparent;font:inherit;font-size:12px;
+  font-weight:500;color:var(--dim);padding:6px 12px;border-radius:99px;cursor:pointer;transition:.2s;white-space:nowrap}
+/* the visible pill stays compact; the touch target is grown vertically only,
+   so neighbouring options in the same seg never overlap each other */
+.dseg button::after{content:"";position:absolute;left:0;right:0;top:-7px;bottom:-7px}
 .dseg button[data-on="1"]{background:var(--ink);color:var(--paper)}
-#segStyle button{padding:4px 9px}   /* five-up row: trimmed so it fits a phone */
-.labbtns{gap:8px}
-.labbtn{appearance:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
-  background:var(--field);border:1px solid var(--line);border-radius:10px;padding:8px 13px;cursor:pointer}
+#segStyle button{padding:6px 9px}   /* five-up row: trimmed so it fits a phone */
+.labbtns{gap:8px;margin-bottom:6px}
+.labbtn{appearance:none;display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:12.5px;
+  font-weight:600;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:12px;
+  padding:0 14px;min-height:44px;cursor:pointer;transition:border-color .18s}
 .labbtn:hover{border-color:var(--dim)}
 .labbtn.ghost{color:var(--dim);font-weight:500}
+.labbtn svg{flex:0 0 auto}
+@media (min-width:660px) and (max-width:899px){
+  .panel{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;align-items:start}
+  .pgroup:nth-of-type(2){border-top:0;padding-top:6px}
+  .pgroup.span{grid-column:1/-1}
+  /* the paired columns are too narrow for a label column, and two ragged
+     label columns read worse than none: here every label sits above its
+     control, so the whole panel keeps one left edge */
+  .prow{display:block;margin-bottom:13px}
+  .prow>.plabel{display:block;width:auto;margin-bottom:6px}
+  .prow>.dseg{width:max-content;max-width:100%}
+  .prow>.pnote{margin:8px 0 0}
+  .prow>#peeknote{display:block;margin-top:6px}
+  .prow.labbtns{display:flex}
+}
 
 /* ═══ in-frame app screens ═══ */
 .task{background:var(--card);border:1px solid var(--line);border-radius:18px;
@@ -663,9 +717,8 @@ body.on-kb.device-fold .stage,body.on-kb.device-tablet .stage{display:none}
 body.device-fold #kbfab,body.device-tablet #kbfab{display:none}
 body.device-ipad [data-page="dial"] .pintro,
 body.device-ipad [data-page="dial"] .tips,
-body.device-ipad [data-page="dial"] #diallab,
 body.device-ipad [data-page="dial"] .permrow,
-body.device-ipad [data-page="dial"] #makeyours{display:none}
+body.device-ipad [data-page="dial"] #diallab{display:none}
 body.on-dial.device-ipad .stage{display:none}
 
 [hidden]{display:none !important}
@@ -674,9 +727,20 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
 </head>
 <body class="on-dial device-phone">
 
+<nav class="sitenav" aria-label="Reel">
+  <a class="sn-home" href="../"><span class="sn-knob" aria-hidden="true"></span>reel</a>
+  <div class="sn-links">
+    <a href="../">Home</a>
+    <a href="../app/">The app</a>
+    <a href="../extensions/" aria-current="page">Extensions</a>
+    <a href="../ios/">On iPhone</a>
+    <a href="../island/">Fill session</a>
+  </div>
+</nav>
+
 <header>
   <div class="hrow">
-    <h1 class="pt">Reel</h1><span class="ptag">extensions prototype</span>
+    <h1 class="pt">Extensions</h1><span class="ptag">overlay + keyboard</span>
     <div class="ctrls">
       <div class="crow"><div class="seg" id="pageseg" aria-label="Page"></div><div class="seg" id="themeseg" aria-label="Theme"></div></div>
       <div class="crow"><div class="seg" id="devseg" aria-label="Device"></div></div>
@@ -812,7 +876,7 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
 <aside class="notes" id="notes">
   <!-- ============ DIAL NOTES ============ -->
   <section data-page="dial">
-    <div class="eyebrow">Test 1 · the overlay · Android</div>
+    <div class="eyebrow">The overlay · Android <span class="ptag" style="margin-left:6px">Being built · simulated here</span></div>
     <h2 class="lead" id="dialLead">Apply to Northbeam using only the overlay</h2>
     <p class="pintro">The phone is inside Northbeam's careers app. The round button on its edge is Reel — it floats over whatever app you're in. Fill the whole application without ever leaving the form.</p>
     <!-- iPad only: iOS has no overlay API — no AccessibilityService, no
@@ -828,49 +892,62 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
         <tr><td>One ring, everything on it</td><td>Your two <b>pinned items hold the edge slots</b> — same place forever, tap to use — and everything else follows, <b>newest first</b>, all types together. Colour says the type: <b style="color:var(--c-txt)">amber</b> is text, <b style="color:var(--c-lnk)">rust</b> is a link, <b style="color:var(--c-img)">violet</b> is an image.</td></tr>
         <tr><td>Hold · slide out · release</td><td>One finger, never lifting. Hold the button and slide <b>out</b> onto the ring, then arc your finger to spin it. Release on an item to take it and put the overlay away.</td></tr>
         <tr><td>Hold · drag</td><td>Drag the button anywhere and let go — it <b>clings to the nearest frame edge, at the height you left it</b>, and stays there.</td></tr>
-        <tr><td>Double-tap the button</td><td>Your most recent item, instantly. No dial.</td></tr>
+        <tr><td>Double-tap the button</td><td>Your most recent item, instantly. No ring, no aiming.</td></tr>
         <tr><td>Hold — it comes to you</td><td><b>Hold, and the ring comes to you.</b> Hold an off-center item and the ring walks it to the index mark, then stops. Hold either <b>end of the arc</b> — or drag past it and stay — and the ring keeps cruising from that end, gathering speed, until you let go.</td></tr>
       </table>
-      <p class="muted" style="margin:8px 0 0">The switches below — <b>Catch style</b>, <b>Egress</b>, <b>Preview</b>, <b>Peek</b>, <b>Size</b> and <b>Handle</b> — change how it feels. Flip one, run the errand again. <b>Copy something in another app</b> pretends you copied elsewhere; <b>Replay first run</b> shows the one-time permission moment.</p>
-      <p class="muted" style="margin:6px 0 0"><b>Preview</b>: what's up shows at the top of the phone's screen, so your eyes can stay up there while your thumb spins down here.</p>
-      <p class="muted" style="margin:6px 0 0"><b>Style</b> tries five ways the ring can mark what it holds — today's chips down to bare dots. Same metal, same moves; rule by eye.</p>
-      <p class="muted" style="margin:6px 0 0"><b>Peek</b> answers "what's coming": <b>Neighbors</b> sits the previous and next item beside the floating preview — tap one to step; <b>Fan</b> blooms every visible label outward when the overlay opens, and they stay put until it closes. Rule by feel.</p>
-      <p class="muted" style="margin:6px 0 0"><b>Handle</b> is for when the button feels in the way: pick <b>Sliver</b>, then swipe the button into the edge — it tucks to a slim tab, nearly flush. Tap the tab and it's back. Opened, the overlay stays open, same as ever.</p>
+      <p class="muted" style="margin:8px 0 0">The panel below changes how the overlay feels. Flip one switch, run the errand again.</p>
     </div>
     <div class="permrow" id="permrow" hidden>The edge handle is off<b>Turn it on</b></div>
-    <div class="card" id="diallab">
-      <div class="labrow"><span>Catch style</span>
-        <div class="dseg" id="segCatch"><button type="button" data-v="auto">Automatic</button><button type="button" data-v="ask">Ask</button></div></div>
-      <div class="labrow"><span>Egress</span>
-        <div class="dseg" id="segEgress"><button type="button" data-v="insert">Insert (demo magic)</button><button type="button" data-v="copy">Copy (honest)</button></div></div>
-      <div class="labrow"><span>Preview</span>
-        <div class="dseg" id="segPreview"><button type="button" data-v="ring">On the ring</button><button type="button" data-v="top">Floating at top</button></div></div>
-      <div class="labrow"><span>Style</span>
-        <div class="dseg" id="segStyle"><button type="button" data-v="chips">Chips</button><button type="button" data-v="markers">Markers</button><button type="button" data-v="scale">Scale</button><button type="button" data-v="window">Window</button><button type="button" data-v="dots">Dots</button></div></div>
-      <div class="labrow"><span>Peek</span>
-        <div class="dseg" id="segPeek"><button type="button" data-v="off">Off</button><button type="button" data-v="neighbors">Neighbors</button><button type="button" data-v="fan">Fan</button></div>
-        <span class="muted" id="peeknote" style="color:var(--ink-3)" hidden>needs the floating preview</span></div>
-      <div class="labrow"><span>Size</span>
-        <div class="dseg" id="segSize"><button type="button" data-v="compact">Compact</button><button type="button" data-v="regular">Regular</button></div></div>
-      <div class="labrow"><span>Handle</span>
-        <div class="dseg" id="segHandle"><button type="button" data-v="button">Button</button><button type="button" data-v="sliver">Sliver</button></div></div>
-      <div class="labrow labbtns"><button type="button" class="labbtn" id="stagebtn">Copy something in another app</button><button type="button" class="labbtn ghost" id="firstrunbtn">Replay first run</button></div>
-    </div>
-    <div class="card" id="makeyours">
-      <h2>＋ Make it yours</h2>
-      <p class="muted" style="margin-bottom:10px">Add your <b>own</b> resume or a photo — a photo joins the overlay, a document shows up when you attach inside the form. The file never uploads; only its name is remembered, in your browser.</p>
-      <button class="filebtn" id="addfile1"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Add a file to the vault</button>
-      <p class="muted" style="margin:10px 0 0">Also: select any text on this page and a <b>Save to Reel</b> chip appears — write one line of your own cover letter, select it, save it, reuse it on the keyboard page.</p>
+    <div class="card panel" id="diallab">
+      <div class="pgroup">
+        <h3 class="pglabel">The overlay</h3>
+        <div class="prow"><span class="plabel">Size</span>
+          <div class="dseg" id="segSize"><button type="button" data-v="compact">Compact</button><button type="button" data-v="regular">Regular</button></div></div>
+        <div class="prow"><span class="plabel">Edge handle</span>
+          <div class="dseg" id="segHandle"><button type="button" data-v="button">Button</button><button type="button" data-v="sliver">Sliver</button></div></div>
+        <p class="pnote">Pick <b>Sliver</b> for when the button feels in the way, then swipe it into the edge — it tucks to a slim tab, nearly flush. Tap the tab and it is back.</p>
+      </div>
+      <div class="pgroup">
+        <h3 class="pglabel">How it behaves</h3>
+        <div class="prow"><span class="plabel">Tap an item</span>
+          <div class="dseg" id="segEgress"><button type="button" data-v="insert">Fills the box</button><button type="button" data-v="copy">Copies it</button></div></div>
+        <div class="prow"><span class="plabel">New copies</span>
+          <div class="dseg" id="segCatch"><button type="button" data-v="auto">Keep them</button><button type="button" data-v="ask">Ask first</button></div></div>
+        <p class="pnote">On a real phone the overlay copies and the box grows a <b>Paste</b> chip — one tap finishes it. Filling the box outright is a demo convenience, so the speed is easy to feel here.</p>
+      </div>
+      <div class="pgroup span">
+        <h3 class="pglabel">What it shows</h3>
+        <div class="prow"><span class="plabel">Marks</span>
+          <div class="dseg" id="segStyle"><button type="button" data-v="chips">Chips</button><button type="button" data-v="markers">Markers</button><button type="button" data-v="scale">Scale</button><button type="button" data-v="window">Window</button><button type="button" data-v="dots">Dots</button></div>
+          <p class="pnote">Five ways the ring can mark what it is holding, from today's chips down to bare dots. Same metal, same moves — rule by eye.</p></div>
+        <div class="prow"><span class="plabel">Preview</span>
+          <div class="dseg" id="segPreview"><button type="button" data-v="ring">On the ring</button><button type="button" data-v="top">Floating at top</button></div>
+          <p class="pnote">Floating puts whatever is up at the top of the screen, so your eyes can stay up there while your thumb spins down here.</p></div>
+        <div class="prow"><span class="plabel">Peek</span>
+          <div class="dseg" id="segPeek"><button type="button" data-v="off">Off</button><button type="button" data-v="neighbors">Neighbors</button><button type="button" data-v="fan">Fan</button></div>
+          <span class="muted" id="peeknote" style="color:var(--ink-3)" hidden>needs the floating preview</span>
+          <p class="pnote"><b>Neighbors</b> sits the previous and next item beside the floating preview — tap one to step. <b>Fan</b> blooms every label outward when the overlay opens and leaves them there.</p></div>
+      </div>
+      <div class="pgroup span">
+        <h3 class="pglabel">Try it</h3>
+        <div class="prow labbtns">
+          <button type="button" class="labbtn" id="stagebtn">Copy something in another app</button>
+          <button type="button" class="labbtn ghost" id="firstrunbtn">Replay the first run</button>
+          <button type="button" class="labbtn" id="addfile1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Add a file of your own</button>
+        </div>
+        <p class="pnote">The first pretends you copied something elsewhere; the second replays the one-time permission moment. Add a photo and it joins the overlay; add a document and it shows up when you attach inside the form — the file never leaves this browser, only its name is remembered.</p>
+        <p class="pnote" style="margin-bottom:2px">Select any text on this page and a <b>Save to Reel</b> chip appears — write a line of your own cover letter, save it, then reuse it on the keyboard page.</p>
+      </div>
     </div>
   </section>
   <!-- ============ KEYBOARD NOTES ============ -->
   <section data-page="keyboard" hidden>
-    <div class="eyebrow">Test 2 · the keyboard · iOS <span class="ptag" style="margin-left:6px">Concept exhibit</span></div>
+    <div class="eyebrow">The keyboard · iOS <span class="ptag" style="margin-left:6px">Concept exhibit</span></div>
     <h2 class="lead">Second application of the day — this time on the iPhone</h2>
     <p class="pintro" id="kbintro">This is the iOS surface: your stuff rides the keyboard. Tap into any box on the phone and the vault comes up first — you drop in, take what you came for, and leave. Swipe left and the keys page is a faithful twin of the iPhone keyboard — same shapes, same moves, same feel — with one strip of your stuff where the suggestions would be. On Android the overlay carries this job instead.</p>
     <!-- Fold/Tablet frames only: Android hardware gets the truth, not a fake demo -->
     <div class="card" id="androidKbCard">
-      <p style="margin:0">This keyboard is iPhone and iPad. The frame you picked is Android hardware — there, the <a href="#dial">dial</a> is how the vault travels.</p>
+      <p style="margin:0">This keyboard is iPhone and iPad. The frame you picked is Android hardware — there, the <a href="#dial">overlay</a> is how the vault travels.</p>
     </div>
     <div class="card tips">
       <h2>Five things to try</h2>
@@ -881,19 +958,34 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
         <tr><td>Tap the password box</td><td>iOS hands passwords to Apple's own keyboard, automatically. Watch the swap — nothing custom ever sees a password.</td></tr>
         <tr><td>Leave</td><td>One tap on <b>back to your keyboard</b> — or the globe under the keys — and you're typing on your own again. iOS brings up whichever keyboard you used last, so a fast exit is part of the design.</td></tr>
       </table>
-      <p class="muted" style="margin:8px 0 0">Also here: search runs on our own keys (a keyboard can't summon a keyboard), and the <b>Interview thanks</b> tile asks you to fill a blank before it inserts. <b>Replay first run</b> below shows the one-time Full Access moment — try both answers. On the <b>iPad</b> frame the keys widen into the iPad arrangement, with the tuck-away key at the bottom corner.</p>
+      <p class="muted" style="margin:8px 0 0">Also here: search runs on our own keys (a keyboard can't summon a keyboard), and the <b>Interview thanks</b> tile asks you to fill a blank before it inserts. <b>Replay the first run</b> below shows the one-time Full Access moment — try both answers. On the <b>iPad</b> frame the keys widen into the iPad arrangement, with the tuck-away key at the bottom corner.</p>
     </div>
-    <div class="card" id="kblab">
-      <div class="labrow"><span>X-ray</span>
-        <div class="dseg" id="kbXray"><button type="button" data-v="off">Off</button><button type="button" data-v="on">On</button></div>
-        <span class="muted" style="color:var(--ink-3)">who owns each part</span></div>
-      <div class="labrow labbtns"><button type="button" class="labbtn ghost" id="kbfirstrun">Replay first run</button><button type="button" class="labbtn" id="addfile2">Add your own file</button></div>
-      <p class="muted" style="margin:10px 0 0">A photo you add joins the strip; a document shows up when you attach inside the form. Nothing uploads — only the name is remembered.</p>
+    <div class="card panel" id="kblab">
+      <div class="pgroup">
+        <h3 class="pglabel">What it shows</h3>
+        <div class="prow"><span class="plabel">X-ray</span>
+          <div class="dseg" id="kbXray"><button type="button" data-v="off">Off</button><button type="button" data-v="on">On</button></div></div>
+        <p class="pnote">Tints every part of the keyboard by who owns it — ours, Apple's design rebuilt by us, or the parts only Apple's own keyboard can have.</p>
+      </div>
+      <div class="pgroup">
+        <h3 class="pglabel">Try it</h3>
+        <div class="prow labbtns">
+          <button type="button" class="labbtn ghost" id="kbfirstrun">Replay the first run</button>
+          <button type="button" class="labbtn" id="addfile2"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Add a file of your own</button>
+        </div>
+        <p class="pnote" style="margin-bottom:2px">A photo you add joins the strip; a document shows up when you attach inside the form. Nothing uploads — only the name is remembered.</p>
+      </div>
     </div>
   </section>
-  <div class="foot">reel · prototype v0.6 · everything stays in this browser<br>a Shipaton 2026 project, built in public · <button class="linkbtn" id="resetbtn">Reset demo data</button></div>
 </aside>
 </div>
+
+<footer class="sitefoot">
+  <div class="sf-links">
+    <a href="../">Reel home</a><a href="../app/">The app</a><a href="../ios/">On iPhone</a><a href="../privacy/">Privacy</a><button type="button" class="linkbtn" id="resetbtn">Reset demo data</button>
+  </div>
+  <p>Built in public — a Shipaton 2026 project. Everything you do here is saved in this browser only; nothing is uploaded and there is no account.</p>
+</footer>
 
 <input type="file" id="filepick" multiple hidden>
 <div id="savechip"><b>＋</b> Save to Reel</div>
@@ -1045,7 +1137,7 @@ let PEEK=(()=>{try{const v=localStorage.getItem(PEEKKEY);return PEEKS.includes(v
    that one factor. Angles (detents, windows, cruise zones) are size-free by
    construction. The winner becomes the PRD 004 geometry amendment. */
 const SIZEKEY='reel.dial.size.v1',SIZES=['compact','regular'],SIZE_SCALE={compact:.88,regular:1};
-let SIZE=(()=>{try{const v=localStorage.getItem(SIZEKEY);return SIZES.includes(v)?v:'regular'}catch(_){return 'regular'}})();
+let SIZE=(()=>{try{const v=localStorage.getItem(SIZEKEY);return SIZES.includes(v)?v:'compact'}catch(_){return 'compact'}})();  /* compact won the thumb vote (NF, 2026-08-06) */
 /* Handle (collapse-to-sliver, owner ruling 2026-08-06): how the closed
    overlay rests on the edge. 'button' is today's round handle, exactly.
    'sliver' arms the tuck — swipe the handle toward the edge and it collapses
@@ -1283,7 +1375,7 @@ function openPicker(drop){
     ${items.length?items.map(i=>`<div class="pk-row" data-id="${i.id}">
       <span class="pk-badge">${t==='doc'?'PDF':'IMG'}</span>
       <span class="pk-name">${i.label}</span></div>`).join('')
-     :`<div class="pk-empty">Nothing saved yet — add one with the button in the notes.</div>`}
+     :`<div class="pk-empty">Nothing saved yet — use <b>Add a file of your own</b>, below the phone.</div>`}
     <div class="pk-cancel">Cancel</div>
    </div>`;
   p.style.display='block';
@@ -1399,7 +1491,7 @@ function applyDevice(){
      card; the keyboard path is the whole iPad story */
   const ipad=DEV==='ipad';
   document.getElementById('ipadDialCard').hidden=!ipad;
-  dialLead.textContent=ipad?'There is no dial on iPad':DIAL_H1;
+  dialLead.textContent=ipad?'There is no overlay on iPad':DIAL_H1;
   sizes();route();kcRender();   // the clone reflows per frame (iPhone vs iPad arrangement)
 }
 
