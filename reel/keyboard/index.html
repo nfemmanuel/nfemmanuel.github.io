@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>The keyboard — an Apple replica with one difference</title>
+<title>The keyboard: an Apple replica with one difference</title>
 <!-- ═══════════════════════════════════════════════════════════════════════
      design/keyboard-mockup.html — the REVIEW prototype for the iOS keyboard.
      Rebuilt 2026-08-09. Judge this by eye; the native build comes after.
@@ -40,8 +40,13 @@
         iOS 26 keys; "semi-transparent" is the strongest sourced claim
         [spec 1.1]. The alphas here are chosen to read right and are a
         capture-checklist question, not a fact.
-      · The STRIP uses app tokens only, copied verbatim from
-        design/app-mockup.html. No invented colours anywhere in it.
+      · The MARK, the SUGGESTION ROW and the VAULT PANEL use /reel/ tokens
+        only. The palette and the file-family colours are copied verbatim from
+        design/app-mockup.html; the lifted card face is --kb-tile /
+        --kb-tile-line, copied verbatim from design/web-prototype.html, which
+        already solved the same problem (the app's --surf sits within two
+        values of Apple's dark tray, so cards drawn on it disappear).
+        No colour anywhere on this page was invented for it.
 
      ── FIDELITY ROUND, 2026-08-09 ──────────────────────────────────────
      NF held this page next to their real iPhone and ruled: "the font, the
@@ -66,6 +71,41 @@
      the measured size whichever font wins; the letterforms themselves still
      differ. Cost is written out in the side notes and in the spec.
 
+     ── THE STRIP INVERTS, 2026-08-09 ───────────────────────────────────
+     NF reviewed the measured page against their phone and ruled three things.
+     The ruling is docs/design-decisions.md, entry "The keyboard strip inverts",
+     and it is law for this file.
+
+     1. THE STRIP INVERTS. The band used to hold a row of vault chips where
+        QuickType sits, behind a three-way control that let you choose between
+        chips, suggestions, or both at the cost of a whole extra band. That
+        control is GONE and there is one design now: a suggestion row, plus a
+        small bothy. mark at the left of it. Tapping the mark opens the vault
+        as a panel over the keys, the way Gboard's toolbar opens its grid.
+
+        The row's honest content is vault-aware matches, not language
+        predictions. Apple lends its predictor to nobody and ours is out of v1,
+        so the row matches what you typed against the things you saved and
+        stays empty when nothing matches, which is what iOS does too. The
+        honesty note lives in the x-ray and the side cards, never on the
+        keyboard itself.
+
+     2. REAL CONTENT, NEVER TYPE NAMES. NF: "I don't really like how it says
+        things like address instead of previewing the actual address". Every
+        surface that shows a saved thing now shows the thing: the address, the
+        number, the picture, the file's own name and kind, in the register
+        design/app-mockup.html already uses. Alternate names a person could
+        assign are PARKED, recorded in design-decisions rather than built here.
+
+     3. TWO GLYPHS RE-TRACED. The emoji face and the microphone were "just a
+        little off". Both were re-read off the capture by coverage integration
+        and both moved; the working is in the icon block below. The microphone
+        stays dimmed, permanently, because Apple's capability lists exclude the
+        microphone in BOTH access states.
+
+     Everything the fidelity round measured survives untouched: the geometry,
+     the era toggle, both themes, the password eviction, the four-owner x-ray.
+
      Self-contained: no external requests, so headless screenshots and
      offline review both behave.
      ═══════════════════════════════════════════════════════════════════ -->
@@ -79,6 +119,18 @@
     --c-doc:#356BA6;  --t-doc:#E6EFF8;
     --c-lnk:#BA5138;  --t-lnk:#FAEAE5;
     --accent:var(--c-img); --accent-soft:#7B55B422;
+    /* file-family colours, verbatim from design/app-mockup.html. A saved file
+       shows its own kind here exactly as it does in the app: red is a PDF,
+       green is a spreadsheet, orange is a deck. */
+    --f-pdf:#C0413B; --f-doc:#2F6DB5; --f-txt:#5D6773; --f-sheet:#2C8A56;
+    --f-deck:#C07524; --f-code:#6B58A4; --f-zip:#96793D; --f-vid:#A8348B; --f-aud:#37878A;
+    --fmix:10%;
+    /* the card face a saved thing wears when it sits ON the keyboard, verbatim
+       from design/web-prototype.html's keyboard deck (--kb-tile / --kb-tile-line).
+       The app's --surf is right on the app's ground and wrong on Apple's tray:
+       in dark it is within two values of the tray itself and the cards vanish.
+       The /reel/ token family already had the lifted face for this exact job. */
+    --kb-tile:#FFFFFF; --kb-tile-line:rgba(20,22,26,.09);
     --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
     --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
 
@@ -132,11 +184,28 @@
     --r-slabr:.067854;     /* slab top radius  80px   26.67pt */
     --r-k123:.229856;      /* 123 key         271px   90.33pt */
     --r-kret:.230704;      /* return key      272px   90.67pt */
-    --r-emoji:.068702;     /* emoji glyph      81px   27.00pt */
-    --r-emojicx:.107718;   /* emoji centre-x  127px   42.33pt */
     --r-qtfs:.042189;      /* suggestion size  16.58pt from an 11.69pt cap */
     --r-sepw:.002545;      /* separator width   3px    1.00pt */
     --r-seph:.061069;      /* separator height 72px   24.00pt */
+
+    /* ── the two accessory glyphs, RE-MEASURED 2026-08-09 ────────────────
+       NF held the page against the phone again and called the emoji face and
+       the microphone "just a little off". Both were re-read off capture-01 by
+       coverage integration, which is antialiasing-free, and both moved.
+       [spec 4A.17, 4A.18, 4A.43-4A.47]
+
+       Emoji, was 81px on a threshold, is 80.4px on coverage; its centre was
+       127px, it is 127.74. The shape moved more than the size did — see the
+       path itself.
+
+       Dictation was one line in the spec ("56 x 85") and that line turned out
+       to be the outer box of four separate parts, none of which the old glyph
+       drew at the right size. Every part below is measured. */
+    --r-emoji:.068193;     /* emoji diameter   80.4px  26.80pt */
+    --r-emojicx:.108346;   /* emoji centre-x  127.74px 42.58pt */
+    --r-micw:.046124;      /* mic glyph box    54.4px  18.13pt */
+    --r-mich:.070543;      /* mic glyph box    83.2px  27.72pt */
+    --r-miccr:.108990;     /* mic centre, from the RIGHT screen edge  42.83pt */
   }
   html[data-theme="dark"]{
     color-scheme:dark;
@@ -146,6 +215,10 @@
     --c-doc:#8FC6FF;  --t-doc:#0F4275;
     --c-lnk:#FFA184;  --t-lnk:#66301F;
     --accent-soft:#C6A8FF26;
+    --f-pdf:#FF8A80; --f-doc:#8CB9FF; --f-txt:#A7B1BD; --f-sheet:#6FD79B;
+    --f-deck:#FFB265; --f-code:#BBA8F5; --f-zip:#E3C57E; --f-vid:#FF9FE0; --f-aud:#6FD4D6;
+    --fmix:17%;
+    --kb-tile:#20242B; --kb-tile-line:rgba(255,255,255,.09);
     --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
 
     --sys-blue:#0A84FF;
@@ -294,7 +367,10 @@
     --sepw:calc(var(--W) * var(--r-sepw));
     --seph:calc(var(--W) * var(--r-seph));
     --emojid:calc(var(--W) * var(--r-emoji));
-    --emojicx:calc(var(--W) * var(--r-emojicx))}
+    --emojicx:calc(var(--W) * var(--r-emojicx));
+    --micw:calc(var(--W) * var(--r-micw));
+    --mich:calc(var(--W) * var(--r-mich));
+    --miccr:calc(var(--W) * var(--r-miccr))}
   /* iPad's widest row is ~12 key-widths, and NONE of its metrics are measured
      [spec 7.5] — this is a shape, not a specification */
   body.device-ipad .scr{--kw:calc((var(--W) - 2 * var(--m) - 11 * var(--gap)) / 12)}
@@ -365,45 +441,150 @@
   body[data-era="18"] .slab{box-shadow:none}
   .slab.evicted{opacity:1}
 
-  /* ── the vault strip: OURS. app tokens only. one row, so keyboard height
-        stays honest — it replaces the QuickType bar, it does not add to it ── */
-  .stripzone{position:relative}
-  /* the strip occupies EXACTLY the band Apple gives QuickType: 156px @3x =
-     52.00pt, measured top-of-tray to top-of-Q. That is the whole argument for
-     one row — it is a swap, not an addition. [spec 4A.11] */
-  .strip{display:flex;align-items:center;gap:7px;height:var(--qth);
-    padding:0 calc(var(--m) * .92);overflow-x:auto;scrollbar-width:none}
-  .strip::-webkit-scrollbar{display:none}
+  /* ══════ THE TOP BAND — INVERTED, 2026-08-09 ═══════════════════════════
+     Was: a row of vault chips standing where QuickType stands, behind a
+     three-way control that let you pick which one you got.
+     Is:  a suggestion row, plus a small bothy. mark at its left. The mark
+          opens the vault as a panel over the keys, the way Gboard and the
+          Samsung keyboard open theirs.
 
-  /* ── the suggestion row: OUR predictions, not Apple's. Drawn to the
-        capture's QuickType metrics so the trade is judged at true size:
-        three equal thirds, hairline separators 3px @3x = 1.00pt wide and
-        72px = 24.00pt tall, text at a measured 12.00pt cap. [spec 4A.12] ── */
-  .sugg{display:flex;align-items:stretch;height:var(--qth);position:relative}
-  .sugg .s{flex:1 1 0;display:flex;align-items:center;justify-content:center;
+     NF's words: "we leave the suggested typing thing on the top but add a
+     small icon for the bothy logo which allows us to view the saved
+     documents". The keyboard reads as a keyboard, and the vault is one tap
+     away instead of always in the way.
+
+     The band is EXACTLY the one Apple gives QuickType: 156px @3x = 52.00pt,
+     tray top to top-of-Q. Nothing here makes the keyboard taller. [spec 4A.11]
+     ══════════════════════════════════════════════════════════════════════ */
+  .qtband{position:relative;display:flex;align-items:stretch;height:var(--qth)}
+
+  /* the mark. Sized off the band, not off a pixel count, so it holds its
+     proportion at any frame width. Its glyph is the app's own icon, the four
+     ic_mono.xml paths, reused rather than redrawn. */
+  .markbtn{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+    width:calc(var(--W) * .098);background:transparent;border:0;padding:0;cursor:pointer;
+    color:var(--sug-ink);position:relative;
+    transition:color .16s var(--glide),transform .16s var(--glide)}
+  .markbtn svg{width:calc(var(--W) * .054);height:calc(var(--W) * .054)}
+  .markbtn:active{transform:scale(.92)}
+  .markbtn[data-open="1"]{color:var(--accent)}
+  /* the hairline after the mark is drawn to the SAME measured separator the
+     QuickType band uses between its thirds: 1.00pt wide, 24.00pt tall.
+     Its PLACEMENT is ours and is INFERRED — Apple has no mark to divide off. */
+  .markbtn::after{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);
+    width:var(--sepw);height:var(--seph);background:var(--sug-sep);border-radius:1px}
+
+  /* ── the suggestion row. Drawn to the capture's QuickType metrics so it is
+        judged at true size: equal thirds, hairline separators 3px @3x =
+        1.00pt wide and 72px = 24.00pt tall, text at a measured 11.69pt cap.
+        [spec 4A.12, 4A.37]
+
+        What goes IN it is the honest part. Apple lends its predictor to
+        nobody and ours is out of v1, so this row carries matches from the
+        things you saved. When nothing matches it stays quiet, which is also
+        what Apple's row does before it has anything to say. ── */
+  .sugg{flex:1 1 auto;display:flex;align-items:stretch;position:relative;min-width:0}
+  .sugg .s{flex:1 1 0;display:flex;align-items:center;justify-content:center;gap:5px;
     font-family:var(--apple);font-size:var(--qtfs);font-weight:450;color:var(--sug-ink);
-    font-size-adjust:cap-height .705;cursor:pointer;position:relative;min-width:0}
+    font-size-adjust:cap-height .705;cursor:pointer;position:relative;min-width:0;
+    padding:0 6px;background:transparent;border:0;overflow:hidden}
   .sugg .s+.s::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
     width:var(--sepw);height:var(--seph);background:var(--sug-sep);border-radius:1px}
   .sugg .s:active{background:rgba(128,128,132,.22);border-radius:6px}
-  /* the label rides the BOTTOM of the band — the tray's 26.67pt top corners
-     eat anything parked in the upper corners */
-  .sugg .lbl{position:absolute;right:10px;bottom:2px;font-family:var(--ui);font-size:8.5px;
-    font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-lnk);
-    background:color-mix(in srgb,var(--c-lnk) 15%,transparent);border-radius:4px;padding:1px 5px;
-    pointer-events:none}
-  .stripmark{flex:0 0 auto;display:flex;align-items:center;color:var(--accent);opacity:.85;padding-right:1px}
-  .vit{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;
-    border-radius:16px;background:var(--surf);border:.5px solid var(--hair);cursor:pointer;
-    font-family:var(--ui);font-size:12.5px;font-weight:500;color:var(--ink);max-width:180px;
-    box-shadow:var(--shadow-s);transition:transform .16s var(--spring)}
-  .vit:active{transform:scale(.95)}
-  .vit .g{flex:0 0 auto;display:flex}
-  .vit .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .vit.txt{--fc:var(--c-txt)} .vit.img{--fc:var(--c-img)}
-  .vit.doc{--fc:var(--c-doc)} .vit.lnk{--fc:var(--c-lnk)}
-  .vit .g{color:var(--fc)}
-  .vit.on{background:color-mix(in srgb,var(--fc) 14%,var(--surf));border-color:color-mix(in srgb,var(--fc) 40%,transparent)}
+  /* a match shows the saved thing itself, never the word for its type */
+  .sugg .s .val{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .sugg .s .hit{color:var(--ink);font-weight:600}
+  html[data-theme="dark"] .sugg .s .hit{color:#fff}
+  .sugg .s .sthumb{flex:0 0 auto;width:calc(var(--W)*.052);height:calc(var(--W)*.052);
+    border-radius:calc(var(--W)*.014)}
+  .sugg .s .sfile{flex:0 0 auto;display:flex;color:var(--fc,var(--c-doc))}
+  .sugg .s.on{background:rgba(128,128,132,.22);border-radius:6px}
+
+  /* ══════ THE VAULT PANEL ═══════════════════════════════════════════════
+     INFERRED, all of it. There is no capture of a third-party keyboard's
+     expanded panel in this repo, so the shape comes from the convention
+     Gboard and the Samsung keyboard already set: the toolbar mark opens a
+     sheet over the keys, the keys stay where they were underneath, and the
+     keyboard does not change height. What a capture of Gboard's iOS clipboard
+     panel would settle: the header height, whether the keys dim or vanish,
+     and the exact opening curve.
+
+     The tiles are the app's own. Same three columns and same 16px radius the
+     extensions prototype already uses on its keyboard deck, same content
+     rules as design/app-mockup.html: a saved thing shows itself. */
+  .keyzone{position:relative}
+  /* the selector is scoped rather than bare because the x-ray's .zn rule sets
+     position:relative later in this stylesheet and would otherwise win on
+     equal specificity, dropping the panel back into the flow and doubling the
+     keyboard's height */
+  /* the panel is made of the tray's own material, so in the flat era it covers
+     the keys and in the glass era they ghost through it. Which of those two
+     Apple's own keyboards do is one of the things a capture would settle. */
+  .keyzone>.panel{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;
+    background:var(--kb-slab);
+    padding:0 var(--m) calc(var(--W) * .012);opacity:0;pointer-events:none;
+    transform:translateY(calc(var(--W) * .014));
+    transition:opacity .17s var(--glide),transform .17s var(--glide)}
+  .panel[data-open="1"]{opacity:1;pointer-events:auto;transform:none}
+  .rows{transition:opacity .17s var(--glide)}
+  /* the keys stay where they are and read as a ghost through the panel. Low
+     enough that the panel's own text is never fighting a letter for the same
+     pixels, high enough that the keyboard has clearly not gone anywhere. */
+  .keyzone[data-open="1"] .rows{opacity:.09;pointer-events:none}
+  .phead{flex:0 0 auto;display:flex;align-items:center;gap:8px;
+    height:calc(var(--W) * .066);font-family:var(--ui);font-size:calc(var(--W) * .0295);
+    font-weight:600;color:var(--ink-3);letter-spacing:.01em}
+  .phead .pclose{margin-left:auto;background:transparent;border:0;padding:0 2px;cursor:pointer;
+    color:var(--ink-3);display:flex;align-items:center}
+  .pgrid{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);
+    gap:calc(var(--W) * .0172);grid-auto-rows:calc(var(--W) * .218);
+    align-content:start;scrollbar-width:none;padding-bottom:2px}
+  .pgrid::-webkit-scrollbar{display:none}
+  /* there are more things below the fold and the panel has to say so without
+     drawing a scrollbar. The app uses the same fade on tiles that overflow. */
+  .pfade{position:absolute;left:0;right:0;bottom:0;height:calc(var(--W) * .05);
+    pointer-events:none;background:linear-gradient(transparent,var(--kb-slab))}
+  .pit{position:relative;background:var(--kb-tile);border:1px solid var(--kb-tile-line);
+    border-radius:calc(var(--W) * .041);color:var(--ink);cursor:pointer;overflow:hidden;
+    display:flex;padding:calc(var(--W) * .026) calc(var(--W) * .028);
+    font-family:var(--ui);text-align:left;
+    transition:transform .18s var(--spring)}
+  .pit:active{transform:scale(.96)}
+  /* text: the words themselves, at the app's own size tiers. A phone number is
+     the whole point of its tile so it gets to be big; a paragraph has to be
+     small to show enough of itself to be recognised. */
+  .pit .pv{margin:auto 0;width:100%;font-size:calc(var(--W) * .0295);line-height:1.42;
+    font-weight:450;word-break:break-word;
+    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .pit .pv.s1{font-size:calc(var(--W) * .0385);line-height:1.3;letter-spacing:-.015em;-webkit-line-clamp:3}
+  .pit .pv.s2{font-size:calc(var(--W) * .0333);line-height:1.38;letter-spacing:-.01em}
+  .pit .pv.code{font-family:var(--mono);font-size:calc(var(--W) * .0270)}
+  .pit .pv.code.s1{font-size:calc(var(--W) * .0359)}
+  /* a link leads with its address; the page title rides under it, never over */
+  .pit .tit{margin:auto 0;width:100%;min-width:0}
+  .pit .tit .d{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    font-size:calc(var(--W) * .0295);font-weight:600;line-height:1.34;word-break:break-word;color:var(--ink)}
+  .pit .tit .d b{color:var(--c-lnk);font-weight:700}
+  .pit .tit .t{display:block;font-size:calc(var(--W) * .0257);color:var(--ink-3);font-weight:500;
+    margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* a picture is its own tile */
+  .pit.img{padding:0}
+  .pit.img .shot{position:absolute;inset:0}
+  .pit.img .cap{position:absolute;left:0;right:0;bottom:0;padding:18px 9px 8px;color:#fff;
+    font-size:calc(var(--W) * .0270);font-weight:600;letter-spacing:-.01em;
+    background:linear-gradient(transparent,rgba(0,0,0,.62))}
+  /* a file wears its kind: the family glyph, the extension, and its own name */
+  .pit.doc{flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--W)*.014);
+    background:color-mix(in srgb,var(--fc) var(--fmix),var(--kb-tile));color:var(--fc)}
+  .pit.doc .ext{font-family:var(--mono);font-size:calc(var(--W) * .0212);font-weight:700;
+    letter-spacing:.1em;padding:2px 6px;border-radius:6px;color:var(--fc);
+    background:color-mix(in srgb,var(--fc) 20%,transparent)}
+  .pit.doc .fname{position:absolute;left:0;right:0;bottom:0;padding:0 9px 9px;text-align:center;
+    font-size:calc(var(--W) * .0270);font-weight:600;color:var(--ink-2);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pit.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  .pempty{grid-column:1/-1;color:var(--ink-3);font-family:var(--ui);
+    font-size:calc(var(--W) * .0308);padding:14px;text-align:center}
 
   /* ── the keys · every number MEASURED off capture-01 ──────────────────
      cell 97.7x129px = 32.57 x 43.00pt · gap 18px = 6.00pt · side margin
@@ -457,7 +638,7 @@
   /* iPad keys are bigger, and its metrics are unmeasured — this is a shape,
      not a specification [spec 7.5, 7.6] */
   body.device-ipad .scr{--kh:calc(var(--W) * .064);--kr:calc(var(--W) * .011)}
-  body.device-ipad .vit{height:36px;font-size:13.5px;max-width:230px}
+  body.device-ipad .pit .pv{font-size:calc(var(--W) * .026)}
 
   /* ── the accessory row · MEASURED ─────────────────────────────────────
      Apple moved emoji and dictation OUT of the key grid and onto their own
@@ -477,8 +658,14 @@
     background:transparent;border:0;padding:0}
   .acck:active{opacity:.55}
   .acck.emoji{margin-left:calc(var(--emojicx) - var(--m) - var(--W) * .056)}
+  /* the dictation slot. Its centre is MEASURED at 42.83pt in from the right
+     screen edge, so it is positioned from the right rather than floated there.
+     It stays DIMMED because it stays sealed: Apple's capability lists exclude
+     the microphone in both access states, so this key can be drawn accurately
+     and can never be made to work. [spec 8.5, 4A.18] */
   .accrow .never{margin-left:auto;display:flex;align-items:center;justify-content:center;
-    width:calc(var(--W) * .112);height:100%;opacity:.32;color:var(--ink-3)}
+    width:calc(var(--miccr) * 2);height:100%;opacity:.32;color:var(--ink-3);
+    margin-right:calc(0px - var(--m))}
   body.xray .accrow .never{outline:2px dotted color-mix(in srgb,var(--c-lnk) 80%,transparent);
     outline-offset:-4px;border-radius:10px;opacity:.7}
 
@@ -540,11 +727,12 @@
   /* labels sit in gutters the overlay opens up, never on top of the thing
      they name — a review overlay that hides the pixels is useless */
   body.xray .slab{padding-top:20px}
-  body.xray .stripzone::after{top:-17px;right:6px;left:auto}
-  body.xray .rows{margin-top:15px}
-  body.xray .rows::after{top:-14px;left:6px}
+  body.xray .qtband::after{top:-17px;right:6px;left:auto}
+  body.xray .keyzone{margin-top:15px}
+  body.xray .keyzone::after{top:-14px;left:6px}
+  body.xray .panel::after{top:-14px;left:auto;right:6px}
   body.xray .gkey{outline:2px dashed rgba(139,146,156,.95);outline-offset:-2px}
-  body.xray .strip .vit{position:relative;z-index:1}
+  body.xray .markzone{outline:2px solid var(--accent);outline-offset:-2px;border-radius:8px}
   /* the never-zone: a label, never a demo [spec 8.9] */
   .neverbar{display:none;margin:2px 6px 6px;border:1.5px dotted color-mix(in srgb,var(--c-lnk) 70%,transparent);
     border-radius:11px;padding:7px 11px;font-family:var(--ui);font-size:11px;line-height:1.45;
@@ -584,7 +772,7 @@
     .quiet,.footrow,.legend,.hcost{flex-basis:100%;max-width:880px;order:9}
   }
 
-  button:focus-visible,.k:focus-visible,.vit:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  button:focus-visible,.k:focus-visible,.pit:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
     .field .caret{opacity:1}
@@ -601,7 +789,7 @@
 
 <div class="top">
   <div class="hrow">
-    <h1>The keyboard — an Apple replica with one difference</h1>
+    <h1>The keyboard: an Apple replica with one difference</h1>
     <span class="ptag">review prototype</span>
     <div class="ctrls">
       <div class="crow">
@@ -610,24 +798,23 @@
         <div class="seg" id="eraseg" aria-label="Which keyboard the app gets"></div>
       </div>
       <div class="crow">
-        <div class="seg" id="stripseg" aria-label="What sits in the suggestions band"></div>
-      </div>
-      <div class="crow">
         <div class="seg" id="fieldseg" aria-label="What you are typing into"></div>
+        <button class="xbtn" type="button" id="playbtn"><span class="sw"></span>Play a line</button>
         <button class="xbtn" type="button" id="xraybtn"><span class="sw"></span>X-ray</button>
       </div>
     </div>
   </div>
   <p class="lede">Type on it. Hold a vowel. Double-tap shift. Hold the space bar.
     Everything here is meant to be indistinguishable from the iPhone keyboard except
-    <b class="us">the strip along the top</b> — that part is ours.
-    Turn on <b>X-ray</b> to see which parts are whose.</p>
-  <p class="lede note2"><b>Two keyboards, both current.</b> Apple ships the flat one and the glass one
-    at the same time and picks between them per app, so this is not a question of which year it is.
-    The page opens on the flat one because that is what your capture shows.
-    <b>Suggested typing:</b> Apple's word suggestions are its own keyboard's and are lent to nobody —
-    but the band they sit in is the band our strip uses, so switching the second control
-    shows you the trade at true size.</p>
+    <b class="us">the small mark at the top left</b>, which is ours.
+    Tap it and your things come up over the keys. Turn on <b>X-ray</b> to see which parts are whose.</p>
+  <p class="lede note2"><b>The row beside the mark.</b> It fills with things you saved as you type
+    past the third letter of one, and it stays empty the rest of the time, which is what your phone's
+    own row does before it has anything to say. Press <b>Play a line</b> to watch it happen, or type
+    <b>resu</b> or <b>head</b> yourself.
+    <b>Two keyboards, both current:</b> Apple ships the flat one and the glass one at the same time and
+    picks between them per app, so this is not a question of which year it is. The page opens on the
+    flat one because that is what your capture shows.</p>
 </div>
 
 <div class="stage">
@@ -639,7 +826,7 @@
 <div class="legend">
   <span><i style="background:#6C7480"></i>iOS draws it</span>
   <span><i style="background:var(--c-doc)"></i>We draw it, to Apple's design</span>
-  <span><i style="background:var(--accent)"></i>Ours — the only difference</span>
+  <span><i style="background:var(--accent)"></i>Ours, the only difference</span>
   <span><i style="background:var(--c-lnk)"></i>Apple's alone, permanently</span>
 </div>
 
@@ -651,11 +838,11 @@
 <div class="desk" id="desk"></div>
 
 <p class="footrow">Every dark-mode number here is measured off
-  <b>docs/ios/reference/captures/capture-01-dark-qwerty-with-quicktype.png</b> — iPhone 15/16 Pro class,
-  1179px at @3x = 393pt. Still unverified and marked as such: the light theme (no light capture yet),
-  the balloon and callout heights, delete acceleration, and every iPad measurement. Which numbers are
-  measured and which are still guesses is written out in
-  <b>docs/ios/reference/keyboard-visual-spec.md §4A</b>.</p>
+  <b>docs/ios/reference/captures/capture-01-dark-qwerty-with-quicktype.png</b>, an iPhone 15/16 Pro class
+  phone at 1179px @3x = 393pt. Still unverified and marked as such: the light theme (there is no light
+  capture yet), the vault panel (there is no capture of anyone's panel), the balloon and callout heights,
+  delete acceleration, and every iPad measurement. Which numbers are measured and which are still guesses
+  is written out in <b>docs/ios/reference/keyboard-visual-spec.md §4A</b>.</p>
 
 <script>
 'use strict';
@@ -663,6 +850,10 @@
    All behaviour below traces to docs/ios/reference/keyboard-visual-spec.md.
    [spec N.N] markers point at the entry that justifies the line.
    ══════════════════════════════════════════════════════════════════════ */
+
+/* saved text is user content and is escaped everywhere it is drawn */
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const eatt=s=>esc(s).replace(/"/g,'&quot;');
 
 /* ── icons: inline SVG, never emoji (house icon contract) ── */
 const I={
@@ -679,23 +870,65 @@ const I={
   up:'<path d="M12 19.4V5.2"/><path d="m6.6 10.6 5.4-5.4 5.4 5.4"/>',
   wifi:'<path d="M3.6 9.4a12 12 0 0 1 16.8 0M6.8 12.8a7.4 7.4 0 0 1 10.4 0M10 16.2a3 3 0 0 1 4 0"/><circle cx="12" cy="19.2" r=".9" fill="currentColor"/>',
   batt:'<rect x="2.6" y="7.6" width="16" height="9" rx="2.6"/><path d="M21 11v2"/><rect x="4.4" y="9.4" width="11" height="5.4" rx="1.3" fill="currentColor" stroke="none"/>',
-  /* The emoji key, TRACED off capture-01 rather than typed as a character.
-     Apple draws it monochrome white with the tray colour knocked out through
-     the eyes and the mouth — the dominant pixel inside that 81px box is
-     rgb(255,255,255). Every proportion below is measured as a fraction of the
-     glyph diameter: eyes 0.111 x 0.136 centred at (.352,.389) and (.648,.389);
-     mouth 0.654 wide, top edge .543-.580, bottom .852 — a near-semicircle.
-     Drawing it as a path (rather than pasting the character) keeps the icon
-     contract intact and renders identically on every platform. [spec 4A.17] */
+  /* ── THE EMOJI KEY, RE-TRACED 2026-08-09 ─────────────────────────────
+     NF: the face was "just a little off". It was. The first trace read the
+     mouth as a plain half-disc with a slightly curved top. The capture shows
+     a GRIN: an open mouth with a white lip band running across the top of it,
+     which is the single thing your eye uses to tell this face from a flat
+     smiley. That band was missing entirely.
+
+     Re-read off capture-01 by coverage integration, which is free of the
+     antialiasing bias a threshold carries. In face-radius units, origin at the
+     centre of the disc:
+
+       disc          r = 1        (80.4px across, centre 127.74px from the left)
+       eyes          rx .1067  ry .1216, centres (±.2998, -.2351)
+                     was rx .1108 ry .1358 at (±.2967, -.2217) — too tall,
+                     and sitting a shade high
+       mouth corners (±.7040, .000)  — they land on the disc's own centre line
+       mouth lip     a shallow curve dipping to +.1493 at the middle
+       mouth floor   an arc of r .7040 centred on the disc centre, so the grin's
+                     bottom is concentric with the face
+       lip band      from the corners inward, top +.2488, bottom +.3731
+
+     Drawn as a path with fill-rule evenodd, so disc knocks out eyes and mouth,
+     and the mouth knocks the band back in. No emoji character is involved
+     anywhere, which is the house icon contract and also what the capture
+     actually shows: the dominant pixel inside the glyph is rgb(255,255,255).
+     [spec 4A.17, 4A.31, 4A.43] */
   emojiface:'<path fill-rule="evenodd" fill="currentColor" stroke="none" '+
     'd="M12 0A12 12 0 1 0 12 24 12 12 0 1 0 12 0Z'+
-    'M8.44 7.71a1.33 1.63 0 1 0 0 3.26 1.33 1.63 0 1 0 0-3.26Z'+
-    'M15.56 7.71a1.33 1.63 0 1 0 0 3.26 1.33 1.63 0 1 0 0-3.26Z'+
-    'M4.2 13.3Q12 14.5 19.8 13.3A7.85 7.85 0 0 1 4.2 13.3Z"/>',
-  /* dictation — drawn ONLY as the labelled absence [spec 8.5, 8.9] */
-  mic:'<rect x="8.6" y="1.6" width="6.8" height="13.4" rx="3.4" fill="currentColor" stroke="none"/>'+
-    '<path d="M4.6 11.6v1.6a7.4 7.4 0 0 0 14.8 0v-1.6" stroke-width="1.9"/>'+
-    '<path d="M12 20.6v2.6M7.6 23.4h8.8" stroke-width="1.9"/>'
+    'M8.402 7.720a1.280 1.459 0 1 0 0 2.918 1.280 1.459 0 1 0 0-2.918Z'+
+    'M15.598 7.720a1.280 1.459 0 1 0 0 2.918 1.280 1.459 0 1 0 0-2.918Z'+
+    'M3.552 12Q12 15.583 20.448 12A8.448 8.448 0 0 1 3.552 12Z'+
+    'M4.836 14.388Q12 15.583 19.164 14.388C19.44 17.172 4.56 17.172 4.836 14.388Z"/>',
+  /* ── THE DICTATION KEY, RE-TRACED 2026-08-09 ─────────────────────────
+     Also "a little off", and it had further to travel: the spec carried one
+     line for it ("56 x 85"), which turns out to be the outer box of four
+     separate parts. Every part is now measured off capture-01, in capture
+     pixels with the origin at the glyph box's top left, which is why this one
+     glyph carries its own viewBox instead of riding the shared 24x24 grid.
+
+       glyph box   54.4 x 83.2 px = 18.13 x 27.72pt, centre 42.83pt in from
+                   the RIGHT screen edge
+       capsule     26.0 x 54.6px, a full stadium (r 13.0), filled solid white
+       cradle      a stroked U: mid-radius 24.63, stroke 5.13, centred 42.1
+                   below the box top, with arms reaching up to y 33.0
+       stem        5.11 wide, from the cradle floor down to the base
+       base bar    40.4 x 5.14, round ends, centred at y 80.6
+
+     The old glyph drew all four parts too small inside a 24x24 box and put
+     the base bar at the very bottom edge, which is what read as wrong.
+
+     It stays DIMMED and it always will. Apple's capability lists exclude the
+     microphone in BOTH the open-access and the no-open-access states, so no
+     third-party keyboard has ever had dictation and none can be given it.
+     Drawing it accurately and greying it is the honest way to show a key that
+     belongs to somebody else. [spec 8.5, 4A.18, 4A.44] */
+  mic:'<rect x="14.19" y="0" width="26.0" height="54.6" rx="13.0" fill="currentColor" stroke="none"/>'+
+    '<path d="M2.56 33.0V42.1A24.63 24.63 0 0 0 51.82 42.1V33.0" stroke-width="5.13"/>'+
+    '<path d="M27.19 66.73V80.6" stroke-width="5.11"/>'+
+    '<path d="M9.56 80.6H44.82" stroke-width="5.14"/>'
 };
 const ic=(n,s,w)=>'<svg viewBox="0 0 24 24" width="'+(s||16)+'" height="'+(s||16)+'" fill="none" '+
   'stroke="currentColor" stroke-width="'+(w||1.7)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[n]+'</svg>';
@@ -704,24 +937,71 @@ const ic=(n,s,w)=>'<svg viewBox="0 0 24 24" width="'+(s||16)+'" height="'+(s||16
    the glyph rides --glyph and scales with the frame. [spec 4A.16] */
 const gl=(n,w)=>'<svg viewBox="0 0 24 24" style="width:var(--glyph);height:var(--glyph)" fill="none" '+
   'stroke="currentColor" stroke-width="'+(w||1.7)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[n]+'</svg>';
-/* the bothy mark, from the app's own pages */
-const MARK='<svg width="15" height="15" viewBox="0 0 108 108" aria-hidden="true">'+
- '<g transform="rotate(-26 40 50)"><rect x="32.5" y="33" width="16.5" height="27" rx="2.5" fill="currentColor"/></g>'+
- '<g transform="rotate(26 68 50)"><path d="M61.5,33 L70.5,33 L75.5,38 L75.5,60 L59,60 L59,35.5 Q59,33 61.5,33 Z" fill="currentColor"/></g>'+
- '<path d="M44.5,24 L59,24 L66,31 L66,62 L42,62 L42,26.5 Q42,24 44.5,24 Z" fill="currentColor"/>'+
- '<path fill-rule="evenodd" fill="currentColor" d="M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z"/></svg>';
+/* ── the bothy mark ──────────────────────────────────────────────────────
+   The fanned-files silhouette, and NOT a fresh drawing of it. These four
+   paths are ic_mono.xml verbatim, lifted out of the favicon block in
+   scripts/deploy-prototype.ps1, which is the same geometry the app icon, the
+   site favicon and the notification mark already wear. A mark that is redrawn
+   per surface stops being a mark, so this one is copied, never traced.
+   viewBox 0 0 108 108, as shipped. */
+const MARK='<svg viewBox="0 0 108 108" aria-hidden="true">'+
+ '<path fill="currentColor" d="M40.5,31.833 A2.5,2.5 0 0 0 38.390,31.871 L28.054,36.912 A2.5,2.5 0 0 0 26.903,40.255 L34.289,55.4 L40.5,55.4 Z"/>'+
+ '<path fill="currentColor" d="M67.5,31.671 Q68.384,31.273 69.610,31.871 L77.699,35.816 L80.001,42.502 L73.711,55.4 L67.5,55.4 Z"/>'+
+ '<path fill="currentColor" fill-rule="evenodd" d="M44.5,25.5 L58.379,25.5 L64.5,31.621 L64.5,55.4 L43.5,55.4 L43.5,26.5 Q43.5,25.5 44.5,25.5 Z M57.1,28.1 L61.7,32.7 L57.1,32.7 Z"/>'+
+ '<path fill="currentColor" fill-rule="evenodd" d="M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z"/></svg>';
 
-/* ── the demo vault: the same person and things every other design page uses ── */
+/* ── file families, verbatim from design/app-mockup.html ─────────────────
+   A saved file shows its own kind on the keyboard exactly as it does in the
+   app: documents share one silhouette and differ inside, archives and media
+   get their own outline because they are not documents. */
+Object.assign(I,{
+  fAny:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/>',
+  fDoc:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="M9.2 12.6h5.6M9.2 15.4h5.6M9.2 18.2h3.4"/>',
+  fSheet:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><rect x="9" y="12" width="6.2" height="6.6" rx="1"/><path d="M9 15.3h6.2M12.1 12v6.6"/>',
+  fDeck:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="M9.6 18.6v-2.9M12.1 18.6v-5.6M14.6 18.6v-3.8"/>',
+  fCode:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="m11.3 12.9-2.1 2.6 2.1 2.6M13.1 12.9l2.1 2.6-2.1 2.6"/>',
+  fZip:'<rect x="4.2" y="5.4" width="15.6" height="4.2" rx="1.4"/><path d="M5.8 9.6v9a1.6 1.6 0 0 0 1.6 1.6h9.2a1.6 1.6 0 0 0 1.6-1.6v-9"/><path d="M10.3 13.6h3.4"/>',
+  fVid:'<rect x="3.2" y="5.4" width="17.6" height="13.2" rx="2.8"/><path d="m10.3 9.3 5.2 2.7-5.2 2.7z"/>',
+  fAud:'<path d="M3.6 11.1v1.8M7.2 8.6v6.8M10.8 5.8v12.4M14.4 9.2v5.6M18 10.6v3.2M21.2 11.4v1.6"/>',
+  chev:'<path d="m6.4 9.6 5.6 5.6 5.6-5.6"/>'
+});
+/* the same extension-to-family map the app uses, so a .pptx is a deck on both */
+const FILE=[
+  [/^pdf$/,'fDoc','pdf'],[/^(docx?|rtf|pages|odt)$/,'fDoc','doc'],[/^(txt|md|log)$/,'fDoc','txt'],
+  [/^(xlsx?|csv|numbers|ods)$/,'fSheet','sheet'],[/^(pptx?|key|odp)$/,'fDeck','deck'],
+  [/^(json|xml|ya?ml|html?|css|js|ts|svg)$/,'fCode','code'],[/^(zip|rar|7z|tar|gz)$/,'fZip','zip'],
+  [/^(mp4|mov|avi|mkv|webm)$/,'fVid','vid'],[/^(mp3|wav|m4a|aac|flac)$/,'fAud','aud']
+];
+const extOf=v=>{const m=v.match(/\.(\w{1,5})$/);return m?m[1].toUpperCase():'FILE'};
+const kindOf=v=>{const e=extOf(v).toLowerCase(),h=FILE.find(f=>f[0].test(e));
+  return h?{g:h[1],c:'var(--f-'+h[2]+')'}:{g:'fAny',c:'var(--c-doc)'}};
+
+/* ── the demo vault ──────────────────────────────────────────────────────
+   The same person and the same things every other design page carries, in the
+   same SHAPE design/app-mockup.html stores them in: content, an optional
+   gradient for a picture, an optional page title for a link, and the code flag
+   that puts a value in the mono face.
+
+   The old list here carried a `lb` field of short type names — "Address",
+   "Wifi", "Sign-off" — and those labels were what the strip showed. NF ruled
+   them out: "I don't really like how it says things like address instead of
+   previewing the actual address". So the labels are gone. Every surface on
+   this page now shows the thing itself. Editable names a person could assign
+   in-app are a real idea and are PARKED, recorded in design-decisions so the
+   idea survives without being built here. */
 const VAULT=[
-  {t:'txt',v:'+1 (614) 555-0164',lb:'+1 (614) 555-0164'},
-  {t:'doc',v:'Alex-Rivera-Resume.pdf',lb:'Resume.pdf'},
-  {t:'lnk',v:'cal.example.com/alex/15min',lb:'cal.example.com'},
-  {t:'txt',v:'482 Maple Grove Ave, Apt 3B, Columbus OH 43210',lb:'Address'},
-  {t:'img',v:'Headshot',lb:'Headshot'},
-  {t:'txt',v:'alex.rivera@example.com',lb:'alex.rivera@example.com'},
-  {t:'txt',v:'PineTree-Guest / autumn2026!',lb:'Wifi'},
-  {t:'lnk',v:'alexrivera.example.com',lb:'alexrivera.example.com'},
-  {t:'txt',v:'Best,\nAlex Rivera',lb:'Sign-off'}
+  {t:'txt',v:'+1 (614) 555-0164',code:1},
+  {t:'doc',v:'Alex-Rivera-Resume.pdf'},
+  {t:'lnk',v:'cal.example.com/alex/15min',title:'Book 15 minutes with Alex'},
+  {t:'txt',v:'482 Maple Grove Ave, Apt 3B, Columbus OH 43210'},
+  {t:'img',v:'Headshot',g:'linear-gradient(135deg,#7B55B4,#3E2C5E)'},
+  {t:'txt',v:'alex.rivera@example.com'},
+  {t:'txt',v:'PineTree-Guest / autumn2026!',code:1},
+  {t:'lnk',v:'alexrivera.example.com',title:'Alex Rivera - Product Designer'},
+  {t:'txt',v:'Best,\nAlex Rivera'},
+  {t:'img',v:'Portfolio cover',g:'linear-gradient(135deg,#356BA6,#1D3A5C)'},
+  {t:'doc',v:'Rate-card.xlsx'},
+  {t:'doc',v:'Case-study.pptx'}
 ];
 
 /* ── layouts ──────────────────────────────────────────────────────────
@@ -748,7 +1028,7 @@ const ALT={a:'aàáâäæãåā',e:'eèéêëēėę',i:'iîïíīįì',o:'oôö�
    four, which is how the evidence shots are taken deterministically. */
 const qs=new URLSearchParams(location.search);
 const KEYS={t:'design.kb.theme',d:'design.kb.device',f:'design.kb.field',x:'design.kb.xray',
-  e:'design.kb.era',s:'design.kb.strip'};
+  e:'design.kb.era'};
 const pick=(o,ok,key,def)=>{
   if(ok.indexOf(o)>=0)return o;
   try{const s=localStorage.getItem(key);if(ok.indexOf(s)>=0)return s}catch(_){}
@@ -762,13 +1042,14 @@ let XRAY=pick(qs.get('xray'),['on','off'],KEYS.x,'off')==='on';
 /* ERA defaults to 18 because that is what NF's capture shows — the page should
    open on the keyboard NF is actually holding, not on the one we trained on. */
 let ERA=pick(qs.get('era'),['18','26'],KEYS.e,'18');
-/* STRIP: what occupies the QuickType band.
-     vault = our strip alone (the v1 plan)
-     both  = suggestions AND the strip — costs a whole extra band of height
-     sugg  = a predictions row alone, which is the thing Apple will not lend us */
-let STRIP=pick(qs.get('strip'),['vault','both','sugg'],KEYS.s,'vault');
+/* PANEL: is the vault open over the keys. Deliberately NOT persisted — a
+   keyboard that remembers a panel was open is a keyboard that opens wrong.
+   The query string can force it, which is how the evidence shots are taken. */
+let PANEL=qs.get('panel')==='open';
 
-let text='', caret=0;
+/* the field can be pre-filled from the query string, so the suggestion-match
+   moment is a URL rather than a lucky screenshot */
+let text=qs.get('text')||'', caret=text.length;
 let layer='letters';           /* letters | nums | syms */
 let shift=1;                   /* 0 off · 1 one-shot · 2 caps lock [spec 5.1.1] */
 let trackpad=false;
@@ -798,43 +1079,103 @@ function fieldHTML(){
   const f=FIELDS[FIELD];
   if(!text)return '<span class="ph">'+f.ph+'</span><span class="caret"></span>';
   const shown=f.secure?'\u2022'.repeat(text.length):text;
-  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>');
-  return esc(shown.slice(0,caret))+'<span class="caret"></span>'+esc(shown.slice(caret));
+  const lines=s=>esc(s).replace(/\n/g,'<br>');
+  return lines(shown.slice(0,caret))+'<span class="caret"></span>'+lines(shown.slice(caret));
 }
 
-function stripHTML(){
-  /* the ownership outline lives on a wrapper, because the strip itself
-     scrolls and would clip its own label */
-  return '<div class="stripzone zn" data-own="ours" data-zn="ours — the only difference">'+
-    '<div class="strip"><span class="stripmark">'+MARK+'</span>'+
-    VAULT.map((v,i)=>'<button class="vit '+v.t+'" type="button" data-vi="'+i+'">'+
-      '<span class="g">'+ic(v.t,14,1.8)+'</span><span class="lb">'+v.lb+'</span></button>').join('')+
-    '</div></div>';
+/* ══════════ WHAT THE SUGGESTION ROW ACTUALLY KNOWS ══════════
+   Apple does not lend its predictor to anybody, and a predictor of our own is
+   out of v1 on purpose. So the row is not guessing at language. It is looking
+   at what you already saved.
+
+   The rule is deliberately dumb and completely explainable: take the word you
+   are in the middle of typing, and if any word inside a saved thing STARTS
+   with it, offer that thing. Three letters minimum, so ordinary short words
+   never set it off. Files and pictures match on the names they already carry.
+   Nothing is inferred, nothing is learned, and nothing is sent anywhere.
+
+   When nothing matches, the row stays empty. That is not a placeholder state:
+   iOS does the same, and a row that always has something in it would be
+   pretending. */
+const MINFRAG=3;
+const tokensOf=v=>String(v).split(/[\s/\\,;:()"'<>\[\]{}]+/).filter(Boolean);
+function fragment(s){
+  const m=String(s).slice(0,caret).match(/[\w.@+-]+$/);
+  return m?m[0].toLowerCase():'';
+}
+function matchesFor(){
+  const f=fragment(text);
+  if(f.length<MINFRAG)return [];
+  const out=[];
+  VAULT.forEach((v,i)=>{
+    const hay=tokensOf(v.v);
+    /* a file matches on its own name, with the dots opened up so "resume"
+       finds Alex-Rivera-Resume.pdf */
+    if(v.t==='doc')hay.push(...v.v.replace(/[.\-_]/g,' ').split(/\s+/));
+    if(v.title)hay.push(...tokensOf(v.title));
+    if(hay.some(t=>t.toLowerCase().startsWith(f)))out.push({v:v,i:i,f:f});
+  });
+  /* things that can go straight into the field come first, because that is
+     what a row above the keys is for. A picture or a file can only be copied,
+     so it waits behind. Everything else keeps the order the vault has. */
+  const rank=v=>(v.t==='img'||v.t==='doc')?1:0;
+  out.sort((a,b)=>rank(a.v)-rank(b.v));
+  return out.slice(0,3);
+}
+/* the one-line preview a match wears in the band: the thing, never its type */
+function matchPreview(v){
+  if(v.t==='img')return '<span class="sthumb" style="background:'+v.g+'"></span>'+
+    '<span class="val">'+esc(v.v)+'</span>';
+  if(v.t==='doc'){const k=kindOf(v.v);
+    return '<span class="sfile" style="--fc:'+k.c+'">'+ic(k.g,14,1.6)+'</span>'+
+      '<span class="val">'+esc(v.v)+'</span>';}
+  return '<span class="val">'+esc(v.v.replace(/\n/g,' '))+'</span>';
+}
+function suggHTML(){
+  const ms=matchesFor();
+  /* no zn of its own: the band around it already carries the ownership label,
+     and two purple OURS tags stacked on one row is noise rather than an x-ray */
+  return '<div class="sugg">'+
+    ms.map(m=>'<button class="s" type="button" data-mi="'+m.i+'">'+matchPreview(m.v)+'</button>').join('')+
+    '</div>';
 }
 
-/* ══════════ SUGGESTED TYPING — the honest answer, drawn ══════════
-   NF asked "what about suggested typing?". The answer has two halves and the
-   page has to show both.
+/* ══════════ THE VAULT PANEL ══════════
+   The mark opens it over the keys. The keys stay where they are underneath and
+   the keyboard does not change height, which is the whole reason this shape
+   was chosen over a second band.
 
-   HALF ONE, the hard limit: Apple's QuickType engine is not lent to anybody.
-   A third-party keyboard cannot read it, call it, or display its output. What
-   you see on the strip in the capture is Apple's own keyboard talking to
-   Apple's own predictor.
-
-   HALF TWO, what IS possible: we could ship predictions OF OUR OWN. It is
-   buildable — SwiftKey's whole product is the existence proof — and the
-   parity table rates it PARTIAL/big and rules it OUT of v1, because a
-   mediocre predictor breaks the default-feel spell faster than no predictor
-   does. So this row is drawn as a FUTURE, clearly labelled, at true size.
-
-   The trade NF has to rule on is spatial, not technical: Apple gives word
-   suggestions one band, and that band is exactly the one our strip uses. */
-const SUGG=['I','The','I’m'];
-function suggHTML(future){
-  return '<div class="sugg zn" data-own="'+(future?'clone':'apple')+'" '+
-    'data-zn="'+(future?'ours, if we ever build it':'apple’s predictions')+'">'+
-    SUGG.map(s=>'<div class="s">'+s+'</div>').join('')+
-    (future?'<span class="lbl">not in v1</span>':'')+'</div>';
+   Tiles are the app's own: a saved thing shows itself. Text shows its words at
+   the app's size tiers, a link leads with its address, a picture is its own
+   tile, a file wears its kind and its name. No type-name labels anywhere. */
+function tileHTML(v,i){
+  const open='type="button" data-vi="'+i+'"';
+  if(v.t==='img')
+    return '<button class="pit img" '+open+' aria-label="'+eatt(v.v)+'">'+
+      '<span class="shot" style="background:'+v.g+'"></span>'+
+      '<span class="cap">'+esc(v.v)+'</span></button>';
+  if(v.t==='doc'){const k=kindOf(v.v);
+    return '<button class="pit doc" style="--fc:'+k.c+'" '+open+' aria-label="'+eatt(v.v)+'">'+
+      ic(k.g,30,1.5)+'<span class="ext">'+extOf(v.v)+'</span>'+
+      '<span class="fname">'+esc(v.v.replace(/\.\w{1,5}$/,''))+'</span></button>';}
+  if(v.t==='lnk'){
+    const dom=v.v.replace(/^https?:\/\//,''), cut=dom.indexOf('/');
+    const body=cut<0?'<b>'+esc(dom)+'</b>'
+      :'<b>'+esc(dom.slice(0,cut))+'</b>'+esc(dom.slice(cut));
+    return '<button class="pit" '+open+'><span class="tit"><span class="d">'+body+'</span>'+
+      (v.title?'<span class="t">'+esc(v.title)+'</span>':'')+'</span></button>';}
+  const n=v.v.length, size=n<=26?' s1':n<=58?' s2':'';
+  return '<button class="pit" '+open+'><span class="pv'+size+(v.code?' code':'')+'">'+
+    esc(v.v)+'</span></button>';
+}
+function panelHTML(){
+  return '<div class="panel zn" id="panel" data-own="ours" data-zn="ours, shape inferred" data-open="'+(PANEL?'1':'0')+'"'+
+    (PANEL?'':' aria-hidden="true"')+'>'+
+    '<div class="phead"><span>Your things</span>'+
+      '<button class="pclose" type="button" aria-label="Close">'+ic('chev',18,2)+'</button></div>'+
+    '<div class="pgrid">'+
+      (VAULT.length?VAULT.map(tileHTML).join(''):'<div class="pempty">Nothing saved yet.</div>')+
+    '</div><span class="pfade"></span></div>';
 }
 
 /* ══════════ THE ACCESSORY ROW ══════════
@@ -845,7 +1186,7 @@ function suggHTML(future){
    leaves the dictation slot empty, because the microphone is sealed to
    extensions in both the open-access and no-open-access states. [spec 8.5] */
 function accHTML(){
-  return '<div class="accrow zn" data-own="clone" data-zn="we draw it, to apple’s design">'+
+  return '<div class="accrow zn" data-own="clone" data-zn="we draw it, to Apple’s design">'+
     '<button class="acck emoji" type="button" data-a="emoji" aria-label="Emoji">'+
       '<svg viewBox="0 0 24 24" style="width:var(--emojid);height:var(--emojid)" aria-hidden="true">'+
       I.emojiface+'</svg></button>'+
@@ -853,8 +1194,11 @@ function accHTML(){
       '<svg viewBox="0 0 24 24" style="width:calc(var(--emojid)*.95);height:calc(var(--emojid)*.95)" '+
       'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '+
       'stroke-linejoin="round" aria-hidden="true">'+I.globe+'</svg></button>'+
+    /* the microphone rides its own viewBox, in capture pixels, because its four
+       parts were measured separately and squeezing them into the shared 24x24
+       grid is what made the old one wrong. [spec 4A.18, 4A.44] */
     '<span class="never" title="Apple’s dictation key. Sealed to every third-party keyboard.">'+
-      '<svg viewBox="0 0 24 24" style="width:calc(var(--emojid)*.72);height:calc(var(--emojid)*1.05)" '+
+      '<svg viewBox="0 0 54.38 83.17" style="width:var(--micw);height:var(--mich)" '+
       'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" '+
       'aria-hidden="true">'+I.mic+'</svg></span>'+
     '</div>';
@@ -865,7 +1209,9 @@ function keysHTML(){
   const R=rowsFor();
   const pad=DEVICE==='ipad';
   const kk=(label,cls,data)=>'<div class="k '+(cls||'')+'" '+(data||'')+'>'+label+'</div>';
-  let h='<div class="rows zn" id="rows" data-own="clone" data-zn="we draw it, to Apple\'s design">';
+  /* the ownership label rides the .keyzone wrapper now, because the vault panel
+     is a second thing living in the same box and each needs its own outline */
+  let h='<div class="rows" id="rows">';
 
   if(!pad){
     /* iPhone: the shape everybody knows */
@@ -915,29 +1261,39 @@ function keysHTML(){
   return h;
 }
 
+/* the band: the mark, then the suggestion row. One band, the measured one. */
+function bandHTML(){
+  return '<div class="qtband zn" data-own="ours" data-zn="ours">'+
+    '<button class="markbtn markzone" type="button" id="markbtn" data-open="'+(PANEL?'1':'0')+'" '+
+      'aria-expanded="'+(PANEL?'true':'false')+'" aria-label="Your saved things">'+MARK+'</button>'+
+    suggHTML()+'</div>';
+}
+
 function slabHTML(){
   if(FIELD==='password'){
     /* [spec 8.3] custom keyboards are evicted from secure and phone-number
        fields. Showing the refusal is honest; drawing an autofill bar we can
        never have would not be [spec 8.9]. */
     return '<div class="slab pw zn" id="slab" data-own="apple" data-zn="ios draws all of this">'+
-      suggHTML(false)+keysHTML()+accHTML()+
+      '<div class="qtband zn" data-own="apple" data-zn="apple\u2019s own row"><div class="sugg">'+
+        ['I','The','My'].map(s=>'<div class="s">'+s+'</div>').join('')+'</div></div>'+
+      '<div class="keyzone">'+keysHTML()+'</div>'+accHTML()+
       '<div class="evict"><b>iOS took the keyboard back.</b>'+
       '<span>In a password field the system uses its own keyboard and nothing else. '+
-      'Every keyboard that is not Apple\u2019s disappears here \u2014 ours, Gboard, SwiftKey, all of them. '+
-      'The strip is gone with it, and that is correct behaviour rather than a gap.</span></div>'+
+      'Every keyboard that is not Apple\u2019s disappears here, ours and Gboard and SwiftKey alike. '+
+      'Your things go with it, and that is correct behaviour rather than a gap.</span></div>'+
       '<div class="neverbar">Apple\u2019s alone, permanently: the saved-password bar, the code-from-Messages '+
       'suggestion, and speaking instead of typing. No third-party keyboard has ever been given these, '+
       'so none of them are drawn here.</div>'+
       '</div>';
   }
-  const band=(STRIP==='vault')?stripHTML()
-    :(STRIP==='sugg')?suggHTML(true)
-    :suggHTML(true)+stripHTML();
   return '<div class="slab zn" id="slab" data-own="apple" data-zn="ios draws this slab">'+
-    band+keysHTML()+accHTML()+
+    bandHTML()+
+    '<div class="keyzone zn" id="keyzone" data-own="clone" data-zn="we draw it, to Apple\u2019s design" '+
+      'data-open="'+(PANEL?'1':'0')+'">'+keysHTML()+panelHTML()+'</div>'+
+    accHTML()+
     '<div class="neverbar">Apple\u2019s alone, permanently: the saved-password bar, the code-from-Messages '+
-    'suggestion, and speaking instead of typing \u2014 none of which appear on this page, because they cannot.</div>'+
+    'suggestion, and speaking instead of typing. None of those appear on this page, because they cannot.</div>'+
     '<div class="feelnote">The click and the tap you would feel land right here. A web page cannot play either, '+
     'so they are named rather than faked.</div>'+
     '</div>';
@@ -954,7 +1310,7 @@ function render(){
         '<div class="bub me">checking now</div>'+
         '<div class="bub">can you send me your address and the resume too?</div>'+
         '<div class="lensband"><span>A photo in the thread, running on under the keyboard '+
-        'on purpose — whatever sits behind the glass should tint it and show through it.</span></div>'+
+        'on purpose, so whatever sits behind the glass has something to tint.</span></div>'+
       '</div>'+
     '</div>'+
     '<div class="kbwrap" id="kbwrap">'+
@@ -997,16 +1353,37 @@ function layout(){
   reportHeight();
 }
 
-/* the height cost of the strip modes, stated in the page's own pixels and in
-   the device points they stand for — because "both rows" is not a free choice */
+/* ── the height readout ─────────────────────────────────────────────────
+   It used to say what the old three-way control cost, because "suggestions AND
+   the strip" bought a second band and made the keyboard taller than Apple's.
+   The inverted design removes that choice, so the number is now a claim rather
+   than a warning:
+
+     52pt  the suggestion band, which is Apple's own band, holding our row
+   + 205pt the keys, three letter rows and the bottom row with their gaps
+   +  78pt the accessory band under them
+   = 335pt exactly what the capture measures  [spec 4A.19]
+
+   The vault panel opens INSIDE the key area, so an open panel adds nothing.
+   The warning still exists and now watches for that: if any state ever pushes
+   past the measured height the number goes amber, because a keyboard taller
+   than Apple's is the most visible tell there is [spec 8.7]. */
+const KBPT=335;
 function reportHeight(){
   const slab=document.getElementById('slab'), scr=document.getElementById('scr');
   const out=document.getElementById('hcost');
   if(!slab||!scr||!out)return;
   const pts=slab.offsetHeight/scr.clientWidth*393;
-  const base=STRIP==='both'?' — one whole band taller than either row alone':'';
-  out.textContent='keyboard height '+Math.round(pts)+'pt'+base;
-  out.dataset.warn=STRIP==='both'?'1':'0';
+  /* the x-ray deliberately opens gutters between the zones so its labels have
+     somewhere to sit, so the keyboard is taller in that mode on purpose and the
+     warning has to stay quiet there */
+  const over=DEVICE==='iphone'&&!XRAY&&pts>KBPT+5;
+  const tail=XRAY?', with the x-ray gutters added'
+    :DEVICE!=='iphone'?' (iPad, and no iPad measurement exists yet)'
+    :over?', taller than the phone measures'
+    :PANEL?', panel open, the same as closed':', panel open or closed';
+  out.textContent='keyboard height '+Math.round(pts)+'pt'+tail;
+  out.dataset.warn=over?'1':'0';
 }
 
 /* ══════════ the balloon [spec 5.2] ══════════ */
@@ -1077,6 +1454,62 @@ function backspace(word){
 function paintField(){
   const el=document.getElementById('field');
   if(el)el.innerHTML=fieldHTML();
+  paintSugg();
+}
+/* the suggestion row re-reads the vault on every keystroke. Redrawing the row
+   alone (rather than the whole band) keeps the mark and its hairline still, so
+   nothing flickers while you type. */
+function paintSugg(){
+  const band=document.querySelector('.qtband');if(!band)return;
+  const old=band.querySelector('.sugg');if(!old)return;
+  const tmp=document.createElement('div');tmp.innerHTML=suggHTML();
+  band.replaceChild(tmp.firstChild,old);
+  wireSugg();
+}
+function wireSugg(){
+  [...document.querySelectorAll('.sugg .s[data-mi]')].forEach(b=>{
+    b.addEventListener('pointerdown',e=>e.preventDefault());
+    b.onclick=()=>takeItem(VAULT[+b.dataset.mi],b,true);
+  });
+}
+
+/* ── taking a thing ──────────────────────────────────────────────────────
+   Text goes straight into the field. A picture or a file copies instead,
+   because a keyboard cannot attach one. That limit is real for every keyboard
+   on iOS, so the page says it plainly rather than pretending otherwise. */
+function takeItem(v,el,fromRow){
+  if(el){el.classList.add('on');setTimeout(()=>el.classList.remove('on'),900);}
+  if(v.t==='img'||v.t==='doc'){
+    note(v.v+' is copied. Paste it wherever it belongs.');
+    return;
+  }
+  if(fromRow){
+    /* a match replaces the fragment you were typing, the way a suggestion
+       should. Tapping "alex.rivera@example.com" after typing "alex" should not
+       leave you with "alexalex.rivera@example.com". */
+    const f=fragment(text);
+    if(f){text=text.slice(0,caret-f.length)+text.slice(caret);caret-=f.length;}
+  }
+  insert(v.v);
+  if(PANEL)setPanel(false);
+}
+
+/* ── the panel ──────────────────────────────────────────────────────────
+   Calm and fast: 170ms, a short rise and a fade, the keys dropping back
+   underneath rather than being torn away. Reduced motion turns the whole thing
+   into a swap, which the stylesheet handles for every transition on the page. */
+function setPanel(open){
+  PANEL=!!open;
+  const p=document.getElementById('panel'),z=document.getElementById('keyzone'),
+        m=document.getElementById('markbtn');
+  if(!p||!z||!m)return;
+  p.dataset.open=PANEL?'1':'0';
+  z.dataset.open=PANEL?'1':'0';
+  m.dataset.open=PANEL?'1':'0';
+  m.setAttribute('aria-expanded',PANEL?'true':'false');
+  if(PANEL)p.removeAttribute('aria-hidden');else p.setAttribute('aria-hidden','true');
+  hidePop();hideCallout();
+  reportHeight();
 }
 
 /* ══════════ interaction ══════════ */
@@ -1196,11 +1629,15 @@ function commit(k){
 let lastShift=0;
 function setShift(v){shift=v;redrawKeys();}
 function redrawKeys(){
-  const slab=document.getElementById('slab');if(!slab)return;
-  const old=slab.querySelector('#rows');
+  /* the rows live inside .keyzone now, alongside the vault panel, so the swap
+     has to happen against that parent. Replacing against the slab silently
+     stopped working when the panel arrived, and it took shift and the 123 key
+     down with it. */
+  const zone=document.getElementById('keyzone');if(!zone)return;
+  const old=zone.querySelector('#rows');
   if(!old)return;
   const tmp=document.createElement('div');tmp.innerHTML=keysHTML();
-  slab.replaceChild(tmp.firstChild,old);
+  zone.replaceChild(tmp.firstChild,old);
   layout();wireKeys();
 }
 
@@ -1230,24 +1667,22 @@ function wire(){
   [...document.querySelectorAll('.acck')].forEach(b=>{
     b.addEventListener('click',()=>{
       if(b.dataset.a==='globe')note('Tap goes to your next keyboard. Hold opens the picker. Apple’s key, Apple’s job.');
-      else note('Apple’s emoji keyboard is one tap away. We do not rebuild it — the globe reaches the real one.');
+      else note('Apple’s emoji keyboard is one tap away. We do not rebuild it, and the globe reaches the real one.');
     });
   });
-  [...document.querySelectorAll('.sugg .s')].forEach(b=>{
-    b.addEventListener('click',()=>note('Predictions of our own are buildable and deliberately not in v1. '+
-      'Apple’s own suggestions are sealed to every keyboard but Apple’s.'));
-  });
-  [...document.querySelectorAll('.vit')].forEach(b=>{
-    b.addEventListener('click',()=>{
-      const v=VAULT[+b.dataset.vi];
-      if(v.t==='img'||v.t==='doc'){
-        note(v.lb+' \u2014 copied. Paste it wherever it belongs.');
-        b.classList.add('on');setTimeout(()=>b.classList.remove('on'),900);
-        return;
-      }
-      insert(v.v);
-      b.classList.add('on');setTimeout(()=>b.classList.remove('on'),900);
-    });
+  wireSugg();
+  const m=document.getElementById('markbtn');
+  if(m){
+    /* the host field keeps its focus and its caret, so the panel never steals
+       the cursor the way a real keyboard must not */
+    m.addEventListener('pointerdown',e=>e.preventDefault());
+    m.onclick=()=>setPanel(!PANEL);
+  }
+  const pc=document.querySelector('.pclose');
+  if(pc){pc.addEventListener('pointerdown',e=>e.preventDefault());pc.onclick=()=>setPanel(false);}
+  [...document.querySelectorAll('.pit')].forEach(b=>{
+    b.addEventListener('pointerdown',e=>e.preventDefault());
+    b.onclick=()=>takeItem(VAULT[+b.dataset.vi],b,false);
   });
 }
 
@@ -1277,7 +1712,6 @@ function applyAll(){
   document.documentElement.dataset.theme=THEME;
   document.body.dataset.sf=HAS_SF?'1':'0';
   document.body.dataset.era=ERA;
-  document.body.dataset.strip=STRIP;
   document.body.classList.toggle('device-ipad',DEVICE==='ipad');
   document.body.classList.toggle('xray',XRAY);
   const xb=document.getElementById('xraybtn');xb.dataset.on=XRAY?'1':'0';
@@ -1287,9 +1721,6 @@ function applyAll(){
     DEVICE=v;save(KEYS.d,v);applyAll();});
   seg(document.getElementById('eraseg'),[['18','iOS 18'],['26','iOS 26']],ERA,v=>{
     ERA=v;save(KEYS.e,v);applyAll();});
-  seg(document.getElementById('stripseg'),
-    [['vault','Vault strip'],['both','Strip + suggestions'],['sugg','Suggestions only']],STRIP,v=>{
-    STRIP=v;save(KEYS.s,v);applyAll();});
   seg(document.getElementById('fieldseg'),
     [['message','Message'],['search','Search'],['password','Password']],FIELD,v=>{
     FIELD=v;save(KEYS.f,v);applyAll();});
@@ -1297,89 +1728,155 @@ function applyAll(){
 }
 document.getElementById('xraybtn').onclick=()=>{XRAY=!XRAY;save(KEYS.x,XRAY?'on':'off');applyAll();};
 
+/* ── Play a line ────────────────────────────────────────────────────────
+   One sentence, typed a letter at a time, so the suggestion row can be watched
+   doing the thing it does. The line is chosen to show both halves of the
+   honest answer: "resu" finds the resume, "head" finds the headshot, and
+   everything else in it finds nothing and leaves the row empty.
+
+   Reduce Motion gets the finished sentence instead of the performance, which
+   is the same rule the rest of the page follows. */
+const DEMOLINE='resume and headshot are here';
+let playT=null;
+function playLine(){
+  clearInterval(playT);
+  const btn=document.getElementById('playbtn');
+  if(FIELD!=='message'){FIELD='message';save(KEYS.f,'message');applyAll();}
+  if(PANEL)setPanel(false);
+  text='';caret=0;paintField();
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches){
+    text=DEMOLINE;caret=text.length;paintField();return;
+  }
+  btn.dataset.on='1';
+  let i=0;
+  playT=setInterval(()=>{
+    if(i>=DEMOLINE.length){clearInterval(playT);playT=null;btn.dataset.on='0';return;}
+    text+=DEMOLINE[i++];caret=text.length;paintField();
+  },84);
+}
+document.getElementById('playbtn').onclick=playLine;
+
 function paintDesk(){
   const f=FIELDS[FIELD];
   document.getElementById('desk').innerHTML=
   '<div class="card"><h2>Reading this</h2>'+
   '<b>'+f.hint+'</b><ul>'+
-  '<li>Everything except the strip is meant to be <b>indistinguishable</b> from Apple\u2019s keyboard. '+
-  'That is the whole bar: a replica with one difference.</li>'+
-  '<li>The strip is <b>one row</b> on purpose. It takes the space Apple gives to word suggestions '+
-  'rather than making the keyboard taller.</li>'+
-  '<li>Tap a text item and it lands in the field. Images and documents copy instead \u2014 a keyboard '+
-  'cannot attach a file, and no keyboard can.</li></ul></div>'+
+  '<li>Everything except the mark and the row beside it is meant to be <b>indistinguishable</b> from '+
+  'Apple\u2019s keyboard. That is the whole bar: a replica with one difference.</li>'+
+  '<li>The mark opens your things <b>over</b> the keys, the way the Samsung keyboard and Gboard open '+
+  'theirs. The keyboard does not get taller, and it does not change shape when you are not using it.</li>'+
+  '<li>Tap a text item and it lands in the field. Pictures and files copy instead. A keyboard cannot '+
+  'attach a file on iOS, and that is true of every keyboard rather than just ours.</li></ul></div>'+
 
-  '<div class="card"><h2>Suggested typing — you asked</h2>'+
-  '<b>Apple’s word suggestions are not lendable.</b> The three words on your phone’s keyboard come '+
-  'from Apple’s own predictor talking to Apple’s own keyboard. No keyboard that is not Apple’s can '+
-  'read them, ask for them, or show them. That is a wall, not a to-do.<ul>'+
-  '<li>Predictions <b>of our own</b> are a different thing, and they are buildable — SwiftKey is the '+
-  'proof. They are out of v1 on purpose: a predictor that is only nearly right breaks the '+
-  'feels-like-default spell faster than having none does.</li>'+
-  '<li>The real decision is <b>space</b>. Apple gives suggestions one band. That band is the one the '+
-  'strip uses. Switch the control above to see all three answers at true size — and when both are on, '+
-  'watch the height number under the phone go up. That is the whole cost, stated honestly.</li></ul></div>'+
+  '<div class="card"><h2>What the top row knows</h2>'+
+  '<b>It is not guessing at words. It is looking at what you saved.</b> '+
+  'Apple\u2019s word suggestions come from Apple\u2019s own predictor talking to Apple\u2019s own keyboard, '+
+  'and no other keyboard can read them, ask for them or show them. A predictor of our own is buildable '+
+  'and is out of v1 on purpose, because one that is only nearly right breaks the feels-like-default '+
+  'spell faster than having none does.<ul>'+
+  '<li>So the row does the honest job instead. Type three letters that start a word inside something '+
+  'you saved, and that thing is offered. Files and pictures match on the names they already carry.</li>'+
+  '<li>When nothing matches, the row is <b>empty</b>. That is deliberate. Your own keyboard\u2019s row '+
+  'is blank until it has something to say, and a row that always has something in it would be pretending.</li>'+
+  '<li>Nothing is learned and nothing is sent anywhere. The match happens against your own things, '+
+  'on your own phone.</li></ul></div>'+
+
+  '<div class="card"><h2>The panel is a guess, and here is which part</h2>'+
+  '<b>Everything about the keys is measured. Nothing about the panel is.</b> '+
+  'There is no capture of a third-party keyboard\u2019s expanded panel in this repo, so its shape comes '+
+  'from what Gboard and the Samsung keyboard already do: the toolbar mark opens a sheet over the keys, '+
+  'the keys stay underneath, the height never moves.<ul>'+
+  '<li>A screenshot of Gboard\u2019s clipboard panel on iOS would settle three things: how tall its '+
+  'header sits, whether the keys dim or vanish underneath, and the exact curve it opens on.</li>'+
+  '<li>The tiles themselves are not a guess. They are the app\u2019s own, same three columns and same '+
+  'content rules, so a thing you saved looks the same wherever you meet it.</li></ul></div>'+
+
+  '<div class="card"><h2>Your things show themselves</h2>'+
+  '<b>Nothing on this page is labelled with the name of its type.</b> '+
+  'The address shows the address. The phone number shows the number. A picture shows the picture, and a '+
+  'file shows its own name and kind in the colours the app already uses for them. You should be able '+
+  'to recognise something before you have finished reading it.<ul>'+
+  '<li>Short text gets to be big and long text has to be small, which is the same rule the app\u2019s '+
+  'own tiles follow.</li>'+
+  '<li>Giving a saved thing a name of your own is a real idea and it is <b>parked</b>, written down in '+
+  'the decisions file so it survives without being half-built here.</li></ul></div>'+
 
   '<div class="card"><h2>Which keyboard, not which year</h2>'+
   '<b>Your capture is the flat one, so the page opens on the flat one.</b> Apple ships both looks on the '+
   'same phone at the same time and chooses per app: an app built against the newest SDK gets the glass '+
-  'keyboard, everything else keeps the flat one. So neither toggle position is out of date — they are '+
+  'keyboard, everything else keeps the flat one. Neither toggle position is out of date. They are '+
   'two things your phone does today, and the real build will match whichever the host app asks for.<ul>'+
-  '<li><b>Flat</b> — every colour is sampled straight out of your screenshot. The tray is '+
+  '<li><b>Flat.</b> Every colour is sampled straight out of your screenshot. The tray is '+
   'rgb(25,25,27), every key is rgb(62,62,64), and there is no translucency anywhere in it.</li>'+
-  '<li><b>Glass</b> — translucent keys, a lit top edge, the tray blurring what is behind it.</li>'+
-  '<li>Both share what did change for good: <b>one colour for every key</b> (shift and delete are no '+
-  'longer darker) and a <b>return key that draws an icon, not the word</b>. Your capture confirms both.</li>'+
-  '</ul></div>'+
+  '<li><b>Glass.</b> Translucent keys, a lit top edge, the tray blurring what is behind it.</li>'+
+  '<li>Both share what did change for good: <b>one colour for every key</b>, so shift and delete are no '+
+  'longer darker, and a <b>return key that draws an icon rather than the word</b>. Your capture '+
+  'confirms both.</li>'+
+  '<li>The mark and the panel work the same in either one. They take their colour from the app, and '+
+  'the tray underneath them is Apple\u2019s in both.</li></ul></div>'+
+
+  '<div class="card"><h2>The two glyphs you called out</h2>'+
+  'You said the emoji face and the microphone were a little off. Both were, and both were re-read off '+
+  'your screenshot rather than adjusted by eye.<ul>'+
+  '<li><b>The face.</b> The first trace drew a plain half-disc for the mouth. Your phone draws a grin: '+
+  'an open mouth with a white lip band across the top of it, which is the thing your eye actually uses '+
+  'to tell the two apart. The eyes were a shade tall and sat a shade high; both moved.</li>'+
+  '<li><b>The microphone.</b> The reference had one line for it, and that line turned out to be the '+
+  'outer box around four separate parts. The capsule, the cradle under it, the stem and the base bar '+
+  'are each measured now, and the whole glyph is 18.1 by 27.7pt with its centre 42.8pt in from the '+
+  'right edge of the screen.</li>'+
+  '<li><b>It stays grey.</b> Apple\u2019s capability lists leave the microphone out whether or not a '+
+  'keyboard has full access, so no keyboard but Apple\u2019s has ever had dictation and none can be '+
+  'given it. Drawing the key properly and greying it is the honest way to show something that belongs '+
+  'to somebody else.</li></ul></div>'+
 
   '<div class="card"><h2>What the screenshot moved</h2>'+
   'Held against your phone this page was close but wrong in ways worth naming.<ul>'+
   '<li><b>The cells.</b> Keys are 32.6 x 43.0pt with 6.0pt between them and <b>6.5pt</b> of margin at '+
-  'each edge — the old reference said 3pt, and that error alone made every key slightly too wide.</li>'+
+  'each edge. The old reference said 3pt, and that error alone made every key slightly too wide.</li>'+
   '<li><b>The tray.</b> It is not a floating rounded slab. It runs the full width, sits flush to the '+
   'bottom of the screen, and rounds only its top corners. The round bottom in your screenshot is the '+
-  'phone’s own corner, not the keyboard’s.</li>'+
-  '<li><b>The type.</b> Letters are heavier than they were here — measurably medium-weight, not '+
-  'regular — and a capital is exactly half the height of its key.</li>'+
-  '<li><b>The emoji key.</b> It sits in a row of its own below the keys, 27pt across, and it is a plain '+
-  'white face rather than a colour emoji. Both are now matched.</li></ul></div>'+
+  'phone\u2019s own corner, not the keyboard\u2019s.</li>'+
+  '<li><b>The type.</b> Letters are heavier than they were here, measurably medium-weight rather than '+
+  'regular, and a capital is exactly half the height of its key.</li>'+
+  '<li><b>The emoji key.</b> It sits in a row of its own below the keys, 26.8pt across, and it is a '+
+  'plain white face rather than a colour emoji.</li></ul></div>'+
 
   '<div class="card"><h2>The slab is Apple\u2019s, not ours</h2>'+
-  'iOS draws a rounded glass tray around any keyboard and sits the keyboard inside it. Developers '+
+  'iOS draws a rounded tray around any keyboard and sits the keyboard inside it. Developers '+
   'filed bugs about a \u201Cgrey bar\u201D above their keyboards; it was the tray, working as intended. '+
-  'That is why the keyboard here floats with rounded corners instead of sitting flush to the bottom, '+
-  'and why our own background has to be <b>nothing at all</b>.</div>'+
+  'That is why the tray here rounds its top corners and runs to the bottom of the screen, and why our '+
+  'own background has to be <b>nothing at all</b>.</div>'+
 
   '<div class="card"><h2>What we are not showing</h2>'+
   'No saved-password bar. No code-from-Messages suggestion. No talking instead of typing. Those belong '+
-  'to Apple\u2019s keyboard permanently and demoing them would be a lie the review would catch. '+
-  'Switch the field to <b>Password</b> to watch iOS take the keyboard away \u2014 that happens to every '+
+  'to Apple\u2019s keyboard permanently, and demoing them would be a lie the review would catch. '+
+  'Switch the field to <b>Password</b> to watch iOS take the keyboard away. That happens to every '+
   'keyboard that is not Apple\u2019s.</div>'+
 
   '<div class="card"><h2>Where the colours came from</h2>'+
-  'Key and tray greys derive from Apple\u2019s published system greys; the blue is systemBlue. '+
-  'The <b>transparency amounts are ours</b> \u2014 Apple publishes no figure, so those are the first '+
-  'thing a real screenshot will correct. The strip uses only the app\u2019s own palette; nothing in it '+
-  'was invented for this page.</div>'+
+  'Key and tray greys derive from Apple\u2019s published system greys, and the blue is systemBlue. '+
+  'The <b>transparency amounts are ours</b>, since Apple publishes no figure, so those are the first '+
+  'thing a real screenshot will correct. The mark, the row and the panel use only the app\u2019s own '+
+  'palette; nothing in them was invented for this page.</div>'+
 
   '<div class="card"><h2>What a web page cannot do</h2><ul>'+
   '<li>Real glass <b>bends</b> light. A browser can only blur it.</li>'+
   '<li>Apple\u2019s highlights move as you tilt the phone. Here the highlight is painted on.</li>'+
   '<li>The click and the tap you would feel are named on the page, not faked.</li>'+
-  '<li><b>Letterforms</b> — '+(HAS_SF
-    ? 'this machine has the real <b>SF Pro</b> installed, so the letters you are looking at are Apple’s '+
-      'own, not an imitation. One gap remains: Apple’s medium weight is missing from the local install, '+
-      'so the keys draw as regular with a hairline added to make up the measured difference. Close, and '+
-      'named rather than hidden.'
-    : 'this machine does <b>not</b> have SF Pro installed, so the page is drawing in Segoe UI. Sizes and '+
-      'weights are still exact — they are scaled to the measured cap height — but the shapes are not: '+
-      'Segoe’s Q, R, J, 1 and apostrophe are visibly its own, and it has none of SF’s optical spacing. '+
+  '<li><b>Letterforms.</b> '+(HAS_SF
+    ? 'This machine has the real <b>SF Pro</b> installed, so the letters you are looking at are '+
+      'Apple\u2019s own rather than an imitation. One gap remains: Apple\u2019s medium weight is '+
+      'missing from the local install, so the keys draw as regular. Close, and named rather than hidden.'
+    : 'This machine does <b>not</b> have SF Pro installed, so the page is drawing in Segoe UI. Sizes '+
+      'and weights are still exact, since they are scaled to the measured cap height, but the shapes '+
+      'are not: Segoe\u2019s Q, R, J, 1 and apostrophe are visibly its own. '+
       'Install SF Pro from developer.apple.com/fonts and this line changes.')+'</li>'+
   '<li>Press-and-hold timings are set by feel. Slow-motion video of a real phone replaces them.</li>'+
   '</ul></div>'+
 
   '<div class="card"><h2>The promise underneath</h2>'+
-  '<b>No accounts. No servers of ours. Nothing you save is uploaded to us.</b> The strip fills itself '+
+  '<b>No accounts. No servers of ours. Nothing you save is uploaded to us.</b> Your things are there '+
   'the moment you switch to the keyboard, with no setup step in between.</div>';
 }
 
