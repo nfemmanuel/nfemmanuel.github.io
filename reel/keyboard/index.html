@@ -1,0 +1,1405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The keyboard — an Apple replica with one difference</title>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     design/keyboard-mockup.html — the REVIEW prototype for the iOS keyboard.
+     Rebuilt 2026-08-09. Judge this by eye; the native build comes after.
+
+     TRAINING DATA:  docs/ios/reference/keyboard-visual-spec.md
+     Every number, colour and behaviour on this page traces to a numbered
+     entry in that file, tagged SOURCED (URL + fetch date) or INFERRED
+     (reasoning written out). Section references appear in the comments
+     below as [spec N.N]. Platform constraints — Full Access, memory, the
+     read-only projection — live in the iOS channel's companion document,
+     docs/ios/reference/keyboard-research.md, and are not restated here.
+
+     WHAT REPLACED WHAT: the previous version of this file was the
+     2026-08-04 baseline — three competing layout candidates (grid, half
+     lens, search-first) drawn on a flat pre-iOS-26 keyboard, with emoji as
+     iconography and the since-corrected "Full Access is required" claim in
+     its notes. That page answered "which retrieval shape?", a question the
+     clone doctrine has since settled. None of its bones survive except the
+     demo vault, which is shared with the other /reel/ pages anyway.
+
+     THE CLONE DOCTRINE: a faithful Apple replica in which the vault strip
+     is the only visible difference. Every pixel that is not the strip is
+     supposed to be indistinguishable from the system keyboard.
+
+     COLOUR PROVENANCE:
+      · Key and container greys derive from Apple's own published system
+        greys (HIG > Color, fetched 2026-08-09): light systemGray6
+        242/242/247, systemGray4 209/209/214; dark systemGray5 44/44/46,
+        systemGray6 28/28/30. [spec 2.9]
+      · The primary-key blue is systemBlue #007AFF / #0A84FF — the same
+        value design/ios-ui-mockup.html already carries as --sys-blue and
+        documents as "the one colour Apple's own controls wear".
+      · The ALPHAS are ours. Apple publishes no translucency figure for the
+        iOS 26 keys; "semi-transparent" is the strongest sourced claim
+        [spec 1.1]. The alphas here are chosen to read right and are a
+        capture-checklist question, not a fact.
+      · The STRIP uses app tokens only, copied verbatim from
+        design/app-mockup.html. No invented colours anywhere in it.
+
+     ── FIDELITY ROUND, 2026-08-09 ──────────────────────────────────────
+     NF held this page next to their real iPhone and ruled: "the font, the
+     emojis, width of the cells. Close, but you can get closer. And what
+     about suggested typing?" A real device capture now exists and is the
+     oracle:
+         docs/ios/reference/captures/capture-01-dark-qwerty-with-quicktype.png
+     Every geometry number on this page was re-derived from that file by
+     pixel arithmetic and is recorded in keyboard-visual-spec.md §4A tagged
+     MEASURED. The capture is 1179 px wide at @3x = 393 pt (iPhone 15/16 Pro
+     class), so every ratio below is "measured pixels / 1179" and the whole
+     keyboard scales from one variable, --W, the screen width.
+
+     THE ERA TOGGLE: the capture shows OPAQUE keys. The trained iOS 26
+     "Liquid Glass" description is not what NF's phone draws. Both looks are
+     on the page; the capture-matched one is the default, because the
+     capture outranks the training.
+
+     FONT SUBSTITUTION: SF Pro is not licensed for redistribution and is not
+     bundled. On a non-Apple machine this page lands on Segoe UI Variable.
+     font-size-adjust:cap-height normalises the cap height so the letters are
+     the measured size whichever font wins; the letterforms themselves still
+     differ. Cost is written out in the side notes and in the spec.
+
+     Self-contained: no external requests, so headless screenshots and
+     offline review both behave.
+     ═══════════════════════════════════════════════════════════════════ -->
+<style>
+  :root{
+    color-scheme:light;
+    /* ── app tokens, verbatim from design/app-mockup.html ── */
+    --ground:#F6F6F7; --surf:#FFFFFF; --ink:#14161A; --ink-2:#5C636D; --ink-3:#8B929C; --hair:#E7E8EB;
+    --c-txt:#B4761C;  --t-txt:#FBF2E2;
+    --c-img:#7B55B4;  --t-img:#F0EAF9;
+    --c-doc:#356BA6;  --t-doc:#E6EFF8;
+    --c-lnk:#BA5138;  --t-lnk:#FAEAE5;
+    --accent:var(--c-img); --accent-soft:#7B55B422;
+    --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+    --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
+
+    /* ── Apple depiction values (see COLOUR PROVENANCE above) ── */
+    --sys-blue:#007AFF;
+    --sys-gray6:242,242,247;      /* light systemGray6 */
+    --sys-gray4:209,209,214;      /* light systemGray4 */
+    --sys-label:0,0,0;
+    /* the glass slab iOS wraps around the keyboard [spec 3.1] */
+    --kb-slab:rgba(var(--sys-gray4),.62);
+    --kb-blur:blur(24px) saturate(1.8);
+    --kb-edge:rgba(255,255,255,.55);        /* specular top edge [spec 2.3] */
+    --kb-drop:0 -2px 24px rgba(16,20,26,.10);
+    /* keys: ONE colour for system and input keys — the iOS 26 change [spec 1.3] */
+    --key:rgba(255,255,255,.72);
+    --key-down:rgba(255,255,255,.96);
+    --key-ink:rgba(var(--sys-label),1);
+    --key-edge:rgba(255,255,255,.7);
+    --key-drop:0 1px 0 rgba(16,20,26,.06);
+    --pop:rgba(255,255,255,.97);
+
+    --display:"Bricolage Grotesque",system-ui,sans-serif;
+    --ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,"IBM Plex Mono",Consolas,monospace;
+    /* THE REAL FONT, NOT BUNDLED. Apple's own SF Pro renders here when it is
+       installed locally from developer.apple.com/fonts — free to download, and
+       licensed for design and development use. It is deliberately NOT committed
+       to this repo and never will be: the licence permits use, not
+       redistribution, and a font binary in a public repo is redistribution.
+       Order: the system face on Apple hardware, then a locally installed SF Pro,
+       then the closest face that actually ships on Windows. The stack degrades
+       quietly at every step. */
+    --apple:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",
+            "Segoe UI Variable Display","Segoe UI Variable","Segoe UI",
+            "Helvetica Neue",system-ui,sans-serif;
+    --spring:cubic-bezier(.34,1.56,.5,1); --glide:cubic-bezier(.2,.85,.3,1);
+    --r-in:29px;
+
+    /* ══════ MEASURED GEOMETRY ═══════════════════════════════════════════
+       All ratios are measured-pixels / 1179 from capture-01. Nothing here
+       is a guess; the ones that ARE guesses are marked below.
+       [spec 4A] */
+    --r-margin:.016539;    /* side margin      19.5px  6.50pt */
+    --r-gap:.015267;       /* key gap          18px    6.00pt */
+    --r-kh:.109415;        /* key height      129px   43.00pt */
+    --r-rowgap:.027990;    /* row gap          33px   11.00pt */
+    --r-kr:.022000;        /* key radius     25.94px   8.65pt — see 4A.5 */
+    --r-fnw:1.3562;        /* shift/delete width, as a MULTIPLE of key width */
+    --r-qt:.132316;        /* QuickType band  156px   52.00pt */
+    --r-acc:.198473;       /* accessory band  234px   78.00pt */
+    --r-slabr:.067854;     /* slab top radius  80px   26.67pt */
+    --r-k123:.229856;      /* 123 key         271px   90.33pt */
+    --r-kret:.230704;      /* return key      272px   90.67pt */
+    --r-emoji:.068702;     /* emoji glyph      81px   27.00pt */
+    --r-emojicx:.107718;   /* emoji centre-x  127px   42.33pt */
+    --r-qtfs:.042189;      /* suggestion size  16.58pt from an 11.69pt cap */
+    --r-sepw:.002545;      /* separator width   3px    1.00pt */
+    --r-seph:.061069;      /* separator height 72px   24.00pt */
+  }
+  html[data-theme="dark"]{
+    color-scheme:dark;
+    --ground:#0E1013; --surf:#181B20; --ink:#F0F1F3; --ink-2:#A2A9B3; --ink-3:#767D87; --hair:#272B31;
+    --c-txt:#FFC978;  --t-txt:#5A3D0C;
+    --c-img:#C6A8FF;  --t-img:#432D73;
+    --c-doc:#8FC6FF;  --t-doc:#0F4275;
+    --c-lnk:#FFA184;  --t-lnk:#66301F;
+    --accent-soft:#C6A8FF26;
+    --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
+
+    --sys-blue:#0A84FF;
+    --sys-gray5:44,44,46;         /* dark systemGray5 */
+    --sys-gray6:28,28,30;         /* dark systemGray6 */
+    --sys-label:255,255,255;
+    --kb-slab:rgba(var(--sys-gray6),.58);
+    --kb-edge:rgba(255,255,255,.13);
+    --kb-drop:0 -2px 26px rgba(0,0,0,.5);
+    --key:rgba(var(--sys-gray5),.76);
+    --key-down:rgba(120,120,126,.95);
+    --key-ink:rgba(var(--sys-label),1);
+    --key-edge:rgba(255,255,255,.10);
+    --key-drop:0 1px 0 rgba(0,0,0,.25);
+    --pop:rgba(90,90,96,.98);
+  }
+
+  /* ══════ THE TWO ERAS ═══════════════════════════════════════════════════
+     Apple ships both keyboards on the same device at the same time: an app
+     built against the iOS 26 SDK gets the new one, everything else keeps the
+     old one [spec 1.6]. So this is not "which year is it" — it is "which
+     keyboard is this app getting", and both answers are live today.
+
+     iOS 18  = what NF's capture actually shows. Every colour below is a
+               median sampled out of that PNG, not a choice. DEFAULT, because
+               it is the keyboard NF is holding.
+     iOS 26  = the Liquid Glass look this page was built to before the capture
+               existed. Kept, because the native build will get it in any host
+               app compiled against the 26 SDK.
+     ═════════════════════════════════════════════════════════════════════ */
+
+  /* ── iOS 18 · dark · MEASURED, capture-01 ── */
+  html[data-theme="dark"] body[data-era="18"]{
+    --kb-slab:#19191B;              /* rgb(25,25,27)  measured, uniform */
+    --kb-blur:none;                 /* no content bleed anywhere in the capture */
+    --kb-edge:transparent;
+    --kb-drop:none;
+    --key:#3E3E40;                  /* rgb(62,62,64)  measured — every key, one colour */
+    --key-down:#6E6E72;
+    --key-ink:#FFFFFF;              /* rgb(255,255,255) measured */
+    --key-edge:transparent;
+    --key-drop:none;
+    --sug-ink:#AFAFB1;              /* rgb(175,175,177) measured */
+    --sug-sep:#333335;              /* rgb(51,51,53)   measured */
+    --ret-dim:#565658;              /* rgb(86,86,88)   measured (empty field) */
+    --pop:#6E6E72;
+  }
+  /* ── iOS 18 · light · INFERRED. There is no light capture yet, so these are
+        Apple's published light greys arranged to the same relationship the
+        dark capture measures. Capture-checklist item 2 settles them. ── */
+  html[data-theme="light"] body[data-era="18"],
+  html:not([data-theme="dark"]) body[data-era="18"]{
+    --kb-slab:#D1D3D9;
+    --kb-blur:none; --kb-edge:transparent; --kb-drop:none;
+    --key:#FFFFFF; --key-down:#C7C9CE; --key-ink:#000000;
+    --key-edge:transparent; --key-drop:0 1px 0 rgba(16,20,26,.22);
+    --sug-ink:#6D6D72; --sug-sep:#C0C0C4; --ret-dim:#B2B2B6;
+    --pop:#FFFFFF;
+  }
+  /* ── iOS 26 · the glass look, unchanged from the pre-capture build ── */
+  body[data-era="26"]{ --sug-ink:var(--ink-2); --sug-sep:rgba(128,128,132,.45); --ret-dim:rgba(128,128,132,.6); }
+  html[data-theme="dark"] body[data-era="26"]{ --sug-ink:#B9B9BE; --sug-sep:rgba(200,200,210,.22); --ret-dim:rgba(255,255,255,.28); }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font:15px/1.5 var(--ui);display:flex;flex-direction:column;overflow-x:hidden;
+    -webkit-font-smoothing:antialiased}
+
+  /* ─────────── chassis: explainer + controls OUTSIDE the frame ─────────── */
+  .top{padding:14px 14px 0;flex:0 0 auto}
+  .hrow{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .top h1{font-family:var(--display);font-weight:700;font-size:16px;margin:0;letter-spacing:-.025em}
+  .ptag{font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+    border:1px solid var(--hair);border-radius:99px;padding:2px 8px;white-space:nowrap;margin-top:2px}
+  .ctrls{display:flex;flex-direction:column;gap:6px;margin-left:auto;align-items:flex-end;min-width:0}
+  .crow{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
+  /* the fidelity round added two more segmented controls, and on a phone they
+     pushed the page wider than the viewport — which silently shoved the frame
+     off-centre and clipped the P key. Below 700px the controls stack and wrap
+     instead. Verified at 412px, the consumer width this gets reviewed at. */
+  @media (max-width:700px){
+    .ctrls{margin-left:0;width:100%;align-items:stretch}
+    .crow{justify-content:flex-start}
+    .seg button{padding:5px 10px;font-size:11.5px}
+  }
+  .seg{display:flex;flex-wrap:wrap;background:var(--surf);border:1px solid var(--hair);
+    border-radius:99px;padding:3px}
+  .seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;
+    color:var(--ink-3);padding:5px 12px;border-radius:99px;cursor:pointer;transition:.2s var(--glide)}
+  .seg button[data-on="1"]{background:var(--ink);color:var(--ground)}
+  .xbtn{appearance:none;font:inherit;font-size:12px;font-weight:500;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:99px;
+    background:var(--surf);border:1.5px solid var(--hair);color:var(--ink-2)}
+  .xbtn[data-on="1"]{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+  .xbtn .sw{width:9px;height:9px;border-radius:50%;background:var(--ink-3)}
+  .xbtn[data-on="1"] .sw{background:var(--accent)}
+  .top p.lede{margin:8px 0 0;font-size:12.5px;color:var(--ink-2);max-width:66ch}
+  .top p.lede.note2{margin-top:5px;font-size:11.5px;color:var(--ink-3)}
+  .top .lede b.us{color:var(--accent)} .top .lede b.sys{color:var(--ink-3)}
+  .hcost{flex:0 0 auto;margin:6px auto 0;text-align:center;font-size:11px;font-weight:600;
+    letter-spacing:.02em;color:var(--ink-3)}
+  .hcost[data-warn="1"]{color:var(--c-lnk)}
+
+  /* ─────────── the stage ─────────── */
+  .stage{flex:1;min-height:520px;padding:12px 10px 6px;display:flex;justify-content:center;align-items:flex-start}
+  /* the capture is 1179x2556 device pixels = 393x852pt, and the keyboard fills
+     the bottom 335pt of it. The frame has to carry that aspect or the keyboard
+     reads as the wrong share of the screen — which is exactly the kind of thing
+     the eye catches before it catches a radius. [spec 4A] */
+  /* MEASURED: the rounded bottom in the capture fits a circle of r=165px @3x =
+     55.0pt to within a pixel across the whole arc — that is the phone's screen
+     corner, and it is what the keyboard's own bottom edge disappears into.
+     [spec 4A.10] */
+  .phone{position:relative;width:100%;max-width:384px;aspect-ratio:393/852;
+    border-radius:calc(var(--Wp,384px) * .13995);
+    overflow:hidden;background:#000;box-shadow:var(--shadow-m);border:1px solid var(--hair)}
+  body.device-ipad .phone{max-width:820px;aspect-ratio:auto;height:640px}
+  .scr{position:absolute;inset:0;overflow:hidden;font-family:var(--apple);color:var(--ink);
+    background:var(--ground);
+    /* ONE variable drives the entire keyboard. --W is the screen width in px;
+       every measured ratio hangs off it, so the geometry is correct at any
+       frame size instead of only at the one it was drawn at. */
+    --m:calc(var(--W) * var(--r-margin));
+    --gap:calc(var(--W) * var(--r-gap));
+    --kw:calc((var(--W) - 2 * var(--m) - 9 * var(--gap)) / 10);
+    --kh:calc(var(--W) * var(--r-kh));
+    --kr:calc(var(--W) * var(--r-kr));
+    --rowgap:calc(var(--W) * var(--r-rowgap));
+    --fnw:calc(var(--kw) * var(--r-fnw));
+    --qth:calc(var(--W) * var(--r-qt));
+    --acch:calc(var(--W) * var(--r-acc));
+    --slabr:calc(var(--W) * var(--r-slabr));
+    /* Type, sized off the MEASURED cap height, not a nominal point size. The
+       caps were re-measured by coverage integration (antialiasing-free) and the
+       cap ratio is the REAL SF Pro's, read off the installed OTF: 0.7050, not
+       the 0.714 that was assumed before the font was in hand.
+         letter cap  15.43pt -> 21.88pt type -> .5088 of a 43pt key
+         "123" digit 13.26pt -> 18.10pt type (SF digits are .7325 em, taller
+                                than caps)  -> .4209 of the key
+       [spec 4A.14, 4A.22] */
+    --kfs:calc(var(--kh) * .5088);
+    --fnfs:calc(var(--kh) * .4209);
+    --glyph:calc(var(--kh) * .4651);  /* shift / delete / return glyph box: 20pt wide */
+    --qtfs:calc(var(--W) * var(--r-qtfs));
+    --sepw:calc(var(--W) * var(--r-sepw));
+    --seph:calc(var(--W) * var(--r-seph));
+    --emojid:calc(var(--W) * var(--r-emoji));
+    --emojicx:calc(var(--W) * var(--r-emojicx))}
+  /* iPad's widest row is ~12 key-widths, and NONE of its metrics are measured
+     [spec 7.5] — this is a shape, not a specification */
+  body.device-ipad .scr{--kw:calc((var(--W) - 2 * var(--m) - 11 * var(--gap)) / 12)}
+  /* the app fills the screen; the keyboard floats OVER it, which is the only
+     way translucency means anything — content has to be behind the glass */
+  .app{position:absolute;inset:0;display:flex;flex-direction:column;z-index:1}
+  .kbwrap{position:absolute;left:0;right:0;bottom:0;z-index:5}
+
+  /* status bar */
+  .sbz{flex:0 0 auto;height:44px;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 24px 6px;font-size:13px;font-weight:600;color:var(--ink)}
+  .sbz .cell{display:flex;align-items:center;gap:5px;font-size:11.5px}
+
+  /* the host app: a plain message thread, so the glass has something to lens over */
+  .navb{flex:0 0 auto;height:40px;display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:600;color:var(--ink);border-bottom:.5px solid var(--hair)}
+  .thread{flex:1;min-height:0;padding:12px 14px 0;display:flex;flex-direction:column;gap:8px;
+    justify-content:flex-end;overflow:hidden}
+  .bub{max-width:74%;padding:9px 14px;border-radius:19px;font-size:15px;line-height:1.35;
+    background:color-mix(in srgb,var(--ink) 8%,var(--surf));color:var(--ink)}
+  .bub.me{align-self:flex-end;background:var(--sys-blue);color:#fff}
+  /* a photo in the thread that deliberately runs on UNDER the keyboard, so
+     the blur and the tint have something to act on [spec 2.1, 2.5]. In iOS
+     the keyboard always floats over live app content; a mockup that puts a
+     flat colour behind it is testing nothing. */
+  .lensband{flex:0 0 auto;align-self:flex-end;width:74%;height:230px;margin:4px 0 0;
+    border-radius:19px;overflow:hidden;position:relative;
+    background:
+      radial-gradient(120% 80% at 18% 8%,color-mix(in srgb,var(--c-img) 62%,transparent),transparent 62%),
+      radial-gradient(110% 90% at 92% 34%,color-mix(in srgb,var(--c-doc) 58%,transparent),transparent 60%),
+      linear-gradient(168deg,color-mix(in srgb,var(--c-txt) 44%,var(--surf)),color-mix(in srgb,var(--c-lnk) 34%,var(--surf)))}
+  .lensband span{position:absolute;left:14px;top:12px;right:14px;color:#fff;font-family:var(--ui);
+    font-size:11.5px;font-weight:600;line-height:1.4;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+  /* MEASURED: the capture's keyboard area is uniform rgb(25,25,27) all the way
+     to the screen edge — iOS does NOT draw the home indicator over the
+     keyboard. We were drawing it. [spec 4A.21] */
+  .homebar{display:none}
+
+  /* the host's own text field */
+  .fieldrow{padding:0 12px 8px;display:flex;align-items:flex-end;gap:8px}
+  .field{flex:1;min-height:38px;border-radius:19px;background:var(--surf);border:.5px solid var(--hair);
+    display:flex;align-items:center;padding:8px 14px;font-size:16px;color:var(--ink);
+    word-break:break-word;line-height:1.3}
+  .field .ph{color:var(--ink-3)}
+  .field .caret{display:inline-block;width:2px;height:19px;background:var(--sys-blue);
+    border-radius:1px;vertical-align:-4px;animation:blink 1.06s steps(1,end) infinite}
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  .field .dots{letter-spacing:.16em}
+
+  /* ═══════════ THE KEYBOARD ═══════════
+     [spec 3.1] iOS wraps a rounded, glass-effect background view around the
+     keyboard and insets the extension's content inside it. So: a floating
+     rounded slab, NOT a full-bleed bar. This is the only element on the
+     whole page that runs a backdrop filter — the slab blurs, the keys tint,
+     because glass must never stack on glass [spec 2.7]. */
+  /* MEASURED CORRECTION. The previous build floated the tray with a 4px side
+     inset, a 21px bottom margin and four rounded corners. The capture says
+     otherwise: the tray is FULL-BLEED horizontally, runs flush to the bottom
+     edge of the screen, and rounds its TOP corners only — 80px @3x = 26.67pt,
+     a circular fit to within a pixel across the whole arc. The rounded bottom
+     in the capture is the phone's own 55pt screen corner, not the keyboard's.
+     [spec 4A.9, 4A.10] */
+  .slab{position:relative;margin:0;border-radius:var(--slabr) var(--slabr) 0 0;
+    background:var(--kb-slab);
+    -webkit-backdrop-filter:var(--kb-blur);backdrop-filter:var(--kb-blur);
+    box-shadow:inset 0 1px 0 var(--kb-edge),var(--kb-drop);
+    padding:0;z-index:5;overflow:visible}
+  body[data-era="18"] .slab{box-shadow:none}
+  .slab.evicted{opacity:1}
+
+  /* ── the vault strip: OURS. app tokens only. one row, so keyboard height
+        stays honest — it replaces the QuickType bar, it does not add to it ── */
+  .stripzone{position:relative}
+  /* the strip occupies EXACTLY the band Apple gives QuickType: 156px @3x =
+     52.00pt, measured top-of-tray to top-of-Q. That is the whole argument for
+     one row — it is a swap, not an addition. [spec 4A.11] */
+  .strip{display:flex;align-items:center;gap:7px;height:var(--qth);
+    padding:0 calc(var(--m) * .92);overflow-x:auto;scrollbar-width:none}
+  .strip::-webkit-scrollbar{display:none}
+
+  /* ── the suggestion row: OUR predictions, not Apple's. Drawn to the
+        capture's QuickType metrics so the trade is judged at true size:
+        three equal thirds, hairline separators 3px @3x = 1.00pt wide and
+        72px = 24.00pt tall, text at a measured 12.00pt cap. [spec 4A.12] ── */
+  .sugg{display:flex;align-items:stretch;height:var(--qth);position:relative}
+  .sugg .s{flex:1 1 0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--apple);font-size:var(--qtfs);font-weight:450;color:var(--sug-ink);
+    font-size-adjust:cap-height .705;cursor:pointer;position:relative;min-width:0}
+  .sugg .s+.s::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+    width:var(--sepw);height:var(--seph);background:var(--sug-sep);border-radius:1px}
+  .sugg .s:active{background:rgba(128,128,132,.22);border-radius:6px}
+  /* the label rides the BOTTOM of the band — the tray's 26.67pt top corners
+     eat anything parked in the upper corners */
+  .sugg .lbl{position:absolute;right:10px;bottom:2px;font-family:var(--ui);font-size:8.5px;
+    font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-lnk);
+    background:color-mix(in srgb,var(--c-lnk) 15%,transparent);border-radius:4px;padding:1px 5px;
+    pointer-events:none}
+  .stripmark{flex:0 0 auto;display:flex;align-items:center;color:var(--accent);opacity:.85;padding-right:1px}
+  .vit{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;
+    border-radius:16px;background:var(--surf);border:.5px solid var(--hair);cursor:pointer;
+    font-family:var(--ui);font-size:12.5px;font-weight:500;color:var(--ink);max-width:180px;
+    box-shadow:var(--shadow-s);transition:transform .16s var(--spring)}
+  .vit:active{transform:scale(.95)}
+  .vit .g{flex:0 0 auto;display:flex}
+  .vit .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vit.txt{--fc:var(--c-txt)} .vit.img{--fc:var(--c-img)}
+  .vit.doc{--fc:var(--c-doc)} .vit.lnk{--fc:var(--c-lnk)}
+  .vit .g{color:var(--fc)}
+  .vit.on{background:color-mix(in srgb,var(--fc) 14%,var(--surf));border-color:color-mix(in srgb,var(--fc) 40%,transparent)}
+
+  /* ── the keys · every number MEASURED off capture-01 ──────────────────
+     cell 97.7x129px = 32.57 x 43.00pt · gap 18px = 6.00pt · side margin
+     19.5px = 6.50pt (NOT the 3pt the old corpus predicted — the margin grew
+     with the phone) · corner 22px = 7.33pt, a circular fit · row gap 33px =
+     11.00pt · row pitch 54.00pt. [spec 4A.1-4A.8]
+
+     Type: a cap is 46px = 15.33pt in a 43pt key, and the stem integrates to
+     0.101 em — SF Pro Medium territory, not Regular. Weight 470 is the Segoe
+     UI Variable setting that reproduces that stem; on Apple hardware the same
+     declaration lands between SF Medium and Semibold, which is where the
+     capture sits. [spec 4A.14, 4A.15] */
+  .rows{display:flex;flex-direction:column;gap:var(--rowgap);padding:0 var(--m)}
+  .krow{display:flex;gap:var(--gap);justify-content:center;align-items:stretch}
+  .k{position:relative;flex:0 0 var(--kw);height:var(--kh);border-radius:var(--kr);
+    background:var(--key);color:var(--key-ink);
+    box-shadow:inset 0 .5px 0 var(--key-edge),var(--key-drop);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;
+    font-family:var(--apple);font-size:var(--kfs);font-weight:470;letter-spacing:0;
+    font-size-adjust:cap-height .705;
+    transition:background .09s linear,transform .09s var(--glide)}
+  .k.fn{font-size:var(--fnfs);font-weight:470}
+  /* Weight, and a correction that only measurement could have produced.
+     From the outlines alone, the capture's stem (0.1001 em) sits between SF
+     Pro Text Regular (0.0879) and Semibold (0.1260) at about weight 465, so
+     the first fix here added a hairline stroke to Regular to make up the
+     difference. Rendered and measured against the capture, that was 20% too
+     heavy: Chrome's rasteriser already darkens stems more than iOS does, and
+     plain Regular lands within 4%. The stroke is gone. What is left is the
+     honest residue — our stems read 0.145 of cap height against the capture's
+     0.140, which is a rasteriser difference, not a font choice. [spec 4A.15] */
+  .k.down{background:var(--key-down)}
+  .k.wide{flex:1 1 auto}
+  .k.fnw{flex:0 0 var(--fnw)}                       /* shift & delete: 1.356 x a letter key */
+  .k.k123{flex:0 0 calc(var(--W) * var(--r-k123))}  /* 90.33pt */
+  .k.kret{flex:0 0 calc(var(--W) * var(--r-kret))}  /* 90.67pt */
+  .k.dim{color:var(--ret-dim)}                      /* the empty-field return, measured */
+  /* MEASURED CORRECTION. The old build inverted the whole shift key when shift
+     was engaged. The capture says no: the shift key stays rgb(62,62,64) like
+     every other key, and the state is carried entirely by the GLYPH — outline
+     when shift is off, solid white when it is on. Inverting the key was the
+     single loudest wrong note on the page. [spec 4A.19, corrects 5.1.4] */
+  .k[data-a="shift"] svg path{fill:none}
+  .k.on[data-a="shift"] svg path{fill:currentColor}
+  body[data-era="26"] .k.on{background:rgba(var(--sys-label),.16)}
+  .k.primary{background:var(--sys-blue);color:#fff;box-shadow:inset 0 .5px 0 rgba(255,255,255,.25)}
+  .k svg{display:block}
+  .k .capsbar{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);
+    width:15px;height:1.8px;border-radius:1px;background:currentColor}
+  .k.spacer{background:transparent;box-shadow:none;pointer-events:none}
+  /* iPad keys are bigger, and its metrics are unmeasured — this is a shape,
+     not a specification [spec 7.5, 7.6] */
+  body.device-ipad .scr{--kh:calc(var(--W) * .064);--kr:calc(var(--W) * .011)}
+  body.device-ipad .vit{height:36px;font-size:13.5px;max-width:230px}
+
+  /* ── the accessory row · MEASURED ─────────────────────────────────────
+     Apple moved emoji and dictation OUT of the key grid and onto their own
+     row below it. The capture measures that band at 234px = 78.00pt: a 44pt
+     touch row with 16pt above and 18pt below, the lower part of which is the
+     home-indicator's space. The emoji glyph is 81px = 27.00pt across, its
+     centre 127px = 42.33pt from the left screen edge. [spec 4A.16-4A.18]
+
+     It is drawn as a WHITE monochrome face, not a colour emoji — the capture's
+     dominant pixel there is rgb(255,255,255) with the tray colour showing
+     through the eyes and mouth. So it is an SVG here, like every other glyph
+     on the page, and the icon contract holds without an exception. */
+  .accrow{height:var(--acch);padding:calc(var(--W) * .0407) var(--m) calc(var(--W) * .0458);
+    display:flex;align-items:center;gap:calc(var(--W) * .022);position:relative}
+  .acck{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+    width:calc(var(--W) * .112);height:100%;color:var(--key-ink);cursor:pointer;
+    background:transparent;border:0;padding:0}
+  .acck:active{opacity:.55}
+  .acck.emoji{margin-left:calc(var(--emojicx) - var(--m) - var(--W) * .056)}
+  .accrow .never{margin-left:auto;display:flex;align-items:center;justify-content:center;
+    width:calc(var(--W) * .112);height:100%;opacity:.32;color:var(--ink-3)}
+  body.xray .accrow .never{outline:2px dotted color-mix(in srgb,var(--c-lnk) 80%,transparent);
+    outline-offset:-4px;border-radius:10px;opacity:.7}
+
+  /* trackpad mode: "the keyboard turns light grey and the letters
+     disappear" [spec 5.6.1] */
+  .rows.trackpad .k{color:transparent!important;background:rgba(var(--sys-label),.06)!important;
+    box-shadow:none!important}
+  .rows.trackpad .k svg,.rows.trackpad .k .capsbar{opacity:0}
+  .trackhint{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:11.5px;
+    color:var(--ink-3);font-family:var(--ui);pointer-events:none}
+
+  /* ── the character-preview balloon [spec 5.2] ── */
+  .pop{position:absolute;z-index:30;pointer-events:none;display:flex;flex-direction:column;
+    align-items:center;transform-origin:50% 100%;
+    animation:popin .09s var(--glide)}
+  @keyframes popin{from{opacity:0;transform:translateY(5px) scale(.9)}to{opacity:1;transform:none}}
+  .pop .body{background:var(--pop);border-radius:calc(var(--kr) * 1.4);display:flex;align-items:center;
+    justify-content:center;font-family:var(--apple);font-size:calc(var(--kfs) * 1.55);
+    font-weight:470;font-size-adjust:cap-height .705;color:var(--key-ink);
+    box-shadow:0 6px 18px rgba(0,0,0,.18),inset 0 .5px 0 var(--key-edge)}
+  .pop .neck{background:var(--pop);margin-top:-1px}
+  /* the accent callout: a horizontal row of alternates [spec 5.3] */
+  .callout{position:absolute;z-index:31;background:var(--pop);border-radius:12px;padding:5px;
+    display:flex;gap:2px;box-shadow:0 8px 22px rgba(0,0,0,.22),inset 0 .5px 0 var(--key-edge);
+    animation:popin .11s var(--glide)}
+  .callout b{display:flex;align-items:center;justify-content:center;
+    width:calc(var(--kw) * 1.05);height:calc(var(--kh) * .88);
+    border-radius:var(--kr);font-family:var(--apple);font-size:var(--kfs);font-weight:470;
+    font-size-adjust:cap-height .705;color:var(--key-ink);cursor:pointer}
+  .callout b.sel{background:var(--sys-blue);color:#fff}
+
+  /* eviction: the honest refusal [spec 8.3]. The system keyboard is still
+     drawn, because that is what actually happens — an annotation card
+     floats over it rather than an empty box standing in for it. */
+  .evict{position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);z-index:20;
+    padding:14px 16px;border-radius:16px;text-align:center;font-family:var(--ui);
+    background:color-mix(in srgb,var(--surf) 92%,transparent);border:1px solid var(--hair);
+    box-shadow:var(--shadow-m)}
+  .evict b{display:block;font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:5px}
+  .evict span{font-size:12px;color:var(--ink-2);line-height:1.5;display:block;max-width:40ch;margin:0 auto}
+  .slab.pw .rows{opacity:.45;filter:saturate(.55)}
+  /* in this state the keys are not ours to claim — they are the system's */
+  body.xray .slab.pw .rows{outline-color:rgba(139,146,156,.95)}
+  body.xray .slab.pw .rows::after{content:none}
+
+  /* ═══════════ the x-ray ownership overlay ═══════════ */
+  .zn{position:relative}
+  body.xray .zn::after{content:attr(data-zn);position:absolute;z-index:34;
+    font-family:var(--ui);font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    padding:2px 6px;border-radius:5px;white-space:nowrap;pointer-events:none;
+    top:3px;left:6px;color:#fff}
+  body.xray .zn{outline-offset:-2px}
+  body.xray .zn[data-own="apple"]{outline:2px dashed rgba(139,146,156,.95)}
+  body.xray .zn[data-own="apple"]::after{background:#6C7480}
+  body.xray .zn[data-own="clone"]{outline:2px dashed rgba(53,107,166,.95)}
+  body.xray .zn[data-own="clone"]::after{background:var(--c-doc)}
+  body.xray .zn[data-own="ours"]{outline:2px solid var(--accent)}
+  body.xray .zn[data-own="ours"]::after{background:var(--accent)}
+  /* labels sit in gutters the overlay opens up, never on top of the thing
+     they name — a review overlay that hides the pixels is useless */
+  body.xray .slab{padding-top:20px}
+  body.xray .stripzone::after{top:-17px;right:6px;left:auto}
+  body.xray .rows{margin-top:15px}
+  body.xray .rows::after{top:-14px;left:6px}
+  body.xray .gkey{outline:2px dashed rgba(139,146,156,.95);outline-offset:-2px}
+  body.xray .strip .vit{position:relative;z-index:1}
+  /* the never-zone: a label, never a demo [spec 8.9] */
+  .neverbar{display:none;margin:2px 6px 6px;border:1.5px dotted color-mix(in srgb,var(--c-lnk) 70%,transparent);
+    border-radius:11px;padding:7px 11px;font-family:var(--ui);font-size:11px;line-height:1.45;
+    color:var(--c-lnk);background:color-mix(in srgb,var(--c-lnk) 8%,transparent)}
+  body.xray .neverbar{display:block}
+  .feelnote{display:none;margin:0 6px 6px;font-family:var(--ui);font-size:10.5px;color:var(--ink-3);
+    text-align:center;line-height:1.45}
+  body.xray .feelnote{display:block}
+
+  /* ─────────── under the frame ─────────── */
+  .quiet{flex:0 0 auto;padding:2px 18px 4px;text-align:center;font-size:12.5px;color:var(--ink-2);
+    line-height:1.55;max-width:52ch;margin:0 auto}
+  .footrow{flex:0 0 auto;padding:2px 18px 14px;text-align:center;font-size:11px;color:var(--ink-3);
+    line-height:1.5;max-width:70ch;margin:0 auto}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;padding:6px 14px 0;
+    font-size:11px;color:var(--ink-2)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:16px;height:9px;border-radius:3px;display:inline-block}
+  body:not(.xray) .legend{display:none}
+
+  /* desktop: side notes, same arrangement as the other design pages */
+  .desk{display:none}
+  @media (min-width:900px){
+    body{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:center;
+      gap:0 28px;padding:24px;height:auto;min-height:100%}
+    .top{flex-basis:100%;max-width:880px;padding:0 0 6px}
+    .stage{flex:0 0 auto;padding:0}
+    .phone{width:384px;max-width:none;border:9px solid #0B0C0E;border-radius:42px;box-sizing:content-box}
+    body.device-ipad .phone{width:min(820px,calc(100vw - 60px));max-width:none;height:620px;border-radius:26px}
+    .desk{display:block;flex:0 0 320px;max-width:360px}
+    .desk .card{background:var(--surf);border:1px solid var(--hair);border-radius:14px;
+      padding:15px;margin-bottom:12px;box-shadow:var(--shadow-s);font-size:12.5px;color:var(--ink-2);line-height:1.55}
+    .desk h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2);margin:0 0 8px}
+    .desk b{color:var(--ink)}
+    .desk ul{margin:6px 0 0;padding-left:16px}
+    .desk li{margin-bottom:5px}
+    .quiet,.footrow,.legend,.hcost{flex-basis:100%;max-width:880px;order:9}
+  }
+
+  button:focus-visible,.k:focus-visible,.vit:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .field .caret{opacity:1}
+  }
+  svg{display:block}
+</style>
+<meta name="theme-color" content="#F6F6F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1013" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 108 108%22><style>@media(prefers-color-scheme:dark)%7B.i%7Bfill:%23F0F1F3%7D%7D</style><path class=%22i%22 fill=%22%2314161A%22 d=%22M40.5,31.833 A2.5,2.5 0 0 0 38.390,31.871 L28.054,36.912 A2.5,2.5 0 0 0 26.903,40.255 L34.289,55.4 L40.5,55.4 Z%22/><path class=%22i%22 fill=%22%2314161A%22 d=%22M67.5,31.671 Q68.384,31.273 69.610,31.871 L77.699,35.816 L80.001,42.502 L73.711,55.4 L67.5,55.4 Z%22/><path class=%22i%22 fill=%22%2314161A%22 fill-rule=%22evenodd%22 d=%22M44.5,25.5 L58.379,25.5 L64.5,31.621 L64.5,55.4 L43.5,55.4 L43.5,26.5 Q43.5,25.5 44.5,25.5 Z M57.1,28.1 L61.7,32.7 L57.1,32.7 Z%22/><path class=%22i%22 fill=%22%2314161A%22 fill-rule=%22evenodd%22 d=%22M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z%22/></svg>">
+<meta name="description" content="The bothy. keyboard for iPhone, rebuilt in the browser and measured against a real one, key by key. A close look at what a vault inside a keyboard feels like.">
+<link rel="canonical" href="https://nfemmanuel.com/reel/keyboard/">
+</head>
+<body>
+
+<div class="top">
+  <div class="hrow">
+    <h1>The keyboard — an Apple replica with one difference</h1>
+    <span class="ptag">review prototype</span>
+    <div class="ctrls">
+      <div class="crow">
+        <div class="seg" id="themeseg" aria-label="Theme"></div>
+        <div class="seg" id="devseg" aria-label="Device"></div>
+        <div class="seg" id="eraseg" aria-label="Which keyboard the app gets"></div>
+      </div>
+      <div class="crow">
+        <div class="seg" id="stripseg" aria-label="What sits in the suggestions band"></div>
+      </div>
+      <div class="crow">
+        <div class="seg" id="fieldseg" aria-label="What you are typing into"></div>
+        <button class="xbtn" type="button" id="xraybtn"><span class="sw"></span>X-ray</button>
+      </div>
+    </div>
+  </div>
+  <p class="lede">Type on it. Hold a vowel. Double-tap shift. Hold the space bar.
+    Everything here is meant to be indistinguishable from the iPhone keyboard except
+    <b class="us">the strip along the top</b> — that part is ours.
+    Turn on <b>X-ray</b> to see which parts are whose.</p>
+  <p class="lede note2"><b>Two keyboards, both current.</b> Apple ships the flat one and the glass one
+    at the same time and picks between them per app, so this is not a question of which year it is.
+    The page opens on the flat one because that is what your capture shows.
+    <b>Suggested typing:</b> Apple's word suggestions are its own keyboard's and are lent to nobody —
+    but the band they sit in is the band our strip uses, so switching the second control
+    shows you the trade at true size.</p>
+</div>
+
+<div class="stage">
+  <div class="phone">
+    <div class="scr" id="scr"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><i style="background:#6C7480"></i>iOS draws it</span>
+  <span><i style="background:var(--c-doc)"></i>We draw it, to Apple's design</span>
+  <span><i style="background:var(--accent)"></i>Ours — the only difference</span>
+  <span><i style="background:var(--c-lnk)"></i>Apple's alone, permanently</span>
+</div>
+
+<p class="hcost" id="hcost" data-warn="0"></p>
+
+<p class="quiet" id="quiet">Switch to the keyboard and your things are already sitting there.
+  Nothing to set up first, nothing to switch on.</p>
+
+<div class="desk" id="desk"></div>
+
+<p class="footrow">Every dark-mode number here is measured off
+  <b>docs/ios/reference/captures/capture-01-dark-qwerty-with-quicktype.png</b> — iPhone 15/16 Pro class,
+  1179px at @3x = 393pt. Still unverified and marked as such: the light theme (no light capture yet),
+  the balloon and callout heights, delete acceleration, and every iPad measurement. Which numbers are
+  measured and which are still guesses is written out in
+  <b>docs/ios/reference/keyboard-visual-spec.md §4A</b>.</p>
+
+<script>
+'use strict';
+/* ══════════════════════════════════════════════════════════════════════
+   All behaviour below traces to docs/ios/reference/keyboard-visual-spec.md.
+   [spec N.N] markers point at the entry that justifies the line.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── icons: inline SVG, never emoji (house icon contract) ── */
+const I={
+  shift:'<path d="M12 4.6 4.4 12.6h4.1v6.8h7v-6.8h4.1z"/>',
+  del:'<path d="M9.4 5.6h9.2a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H9.4L3.2 12z"/><path d="m11.8 9.6 4.8 4.8M16.6 9.6l-4.8 4.8" stroke-width="1.7"/>',
+  globe:'<circle cx="12" cy="12" r="8.2"/><path d="M12 3.8c2.3 2.2 3.5 5.1 3.5 8.2s-1.2 6-3.5 8.2c-2.3-2.2-3.5-5.1-3.5-8.2S9.7 6 12 3.8z"/><path d="M4.1 12h15.8"/>',
+  ret:'<path d="M19.4 5.6v5.6a2 2 0 0 1-2 2H5.2"/><path d="m9.2 9.2-4 4 4 4"/>',
+  find:'<circle cx="11" cy="11" r="6.4"/><path d="m15.6 15.6 4 4"/>',
+  hide:'<rect x="3.2" y="4.6" width="17.6" height="10.4" rx="2.2"/><path d="M7 8.2h.01M10.4 8.2h.01M13.8 8.2h.01M17.2 8.2h.01M8.4 11.6h7.2"/><path d="M12 17.4v3.2M9.8 18.6 12 20.8l2.2-2.2"/>',
+  txt:'<path d="M5 5.5h14M5 12h14M5 18.5h9"/>',
+  img:'<rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/>',
+  lnk:'<path d="M10.4 13.6a4.1 4.1 0 0 0 5.8 0l2.3-2.3a4.1 4.1 0 0 0-5.8-5.8l-1.2 1.2"/><path d="M13.6 10.4a4.1 4.1 0 0 0-5.8 0l-2.3 2.3a4.1 4.1 0 0 0 5.8 5.8l1.2-1.2"/>',
+  doc:'<path d="M6.5 3h7L18 7.5V21H6.5z"/><path d="M13.3 3v4.6H18"/><path d="M9.2 12.6h5.6M9.2 15.4h5.6M9.2 18.2h3.4"/>',
+  up:'<path d="M12 19.4V5.2"/><path d="m6.6 10.6 5.4-5.4 5.4 5.4"/>',
+  wifi:'<path d="M3.6 9.4a12 12 0 0 1 16.8 0M6.8 12.8a7.4 7.4 0 0 1 10.4 0M10 16.2a3 3 0 0 1 4 0"/><circle cx="12" cy="19.2" r=".9" fill="currentColor"/>',
+  batt:'<rect x="2.6" y="7.6" width="16" height="9" rx="2.6"/><path d="M21 11v2"/><rect x="4.4" y="9.4" width="11" height="5.4" rx="1.3" fill="currentColor" stroke="none"/>',
+  /* The emoji key, TRACED off capture-01 rather than typed as a character.
+     Apple draws it monochrome white with the tray colour knocked out through
+     the eyes and the mouth — the dominant pixel inside that 81px box is
+     rgb(255,255,255). Every proportion below is measured as a fraction of the
+     glyph diameter: eyes 0.111 x 0.136 centred at (.352,.389) and (.648,.389);
+     mouth 0.654 wide, top edge .543-.580, bottom .852 — a near-semicircle.
+     Drawing it as a path (rather than pasting the character) keeps the icon
+     contract intact and renders identically on every platform. [spec 4A.17] */
+  emojiface:'<path fill-rule="evenodd" fill="currentColor" stroke="none" '+
+    'd="M12 0A12 12 0 1 0 12 24 12 12 0 1 0 12 0Z'+
+    'M8.44 7.71a1.33 1.63 0 1 0 0 3.26 1.33 1.63 0 1 0 0-3.26Z'+
+    'M15.56 7.71a1.33 1.63 0 1 0 0 3.26 1.33 1.63 0 1 0 0-3.26Z'+
+    'M4.2 13.3Q12 14.5 19.8 13.3A7.85 7.85 0 0 1 4.2 13.3Z"/>',
+  /* dictation — drawn ONLY as the labelled absence [spec 8.5, 8.9] */
+  mic:'<rect x="8.6" y="1.6" width="6.8" height="13.4" rx="3.4" fill="currentColor" stroke="none"/>'+
+    '<path d="M4.6 11.6v1.6a7.4 7.4 0 0 0 14.8 0v-1.6" stroke-width="1.9"/>'+
+    '<path d="M12 20.6v2.6M7.6 23.4h8.8" stroke-width="1.9"/>'
+};
+const ic=(n,s,w)=>'<svg viewBox="0 0 24 24" width="'+(s||16)+'" height="'+(s||16)+'" fill="none" '+
+  'stroke="currentColor" stroke-width="'+(w||1.7)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[n]+'</svg>';
+/* a key glyph, sized off the MEASURED box rather than a fixed pixel count:
+   shift, delete and return all measure ~20.0 x 17.3pt inside a 43pt key, so
+   the glyph rides --glyph and scales with the frame. [spec 4A.16] */
+const gl=(n,w)=>'<svg viewBox="0 0 24 24" style="width:var(--glyph);height:var(--glyph)" fill="none" '+
+  'stroke="currentColor" stroke-width="'+(w||1.7)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[n]+'</svg>';
+/* the bothy mark, from the app's own pages */
+const MARK='<svg width="15" height="15" viewBox="0 0 108 108" aria-hidden="true">'+
+ '<g transform="rotate(-26 40 50)"><rect x="32.5" y="33" width="16.5" height="27" rx="2.5" fill="currentColor"/></g>'+
+ '<g transform="rotate(26 68 50)"><path d="M61.5,33 L70.5,33 L75.5,38 L75.5,60 L59,60 L59,35.5 Q59,33 61.5,33 Z" fill="currentColor"/></g>'+
+ '<path d="M44.5,24 L59,24 L66,31 L66,62 L42,62 L42,26.5 Q42,24 44.5,24 Z" fill="currentColor"/>'+
+ '<path fill-rule="evenodd" fill="currentColor" d="M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z"/></svg>';
+
+/* ── the demo vault: the same person and things every other design page uses ── */
+const VAULT=[
+  {t:'txt',v:'+1 (614) 555-0164',lb:'+1 (614) 555-0164'},
+  {t:'doc',v:'Alex-Rivera-Resume.pdf',lb:'Resume.pdf'},
+  {t:'lnk',v:'cal.example.com/alex/15min',lb:'cal.example.com'},
+  {t:'txt',v:'482 Maple Grove Ave, Apt 3B, Columbus OH 43210',lb:'Address'},
+  {t:'img',v:'Headshot',lb:'Headshot'},
+  {t:'txt',v:'alex.rivera@example.com',lb:'alex.rivera@example.com'},
+  {t:'txt',v:'PineTree-Guest / autumn2026!',lb:'Wifi'},
+  {t:'lnk',v:'alexrivera.example.com',lb:'alexrivera.example.com'},
+  {t:'txt',v:'Best,\nAlex Rivera',lb:'Sign-off'}
+];
+
+/* ── layouts ──────────────────────────────────────────────────────────
+   Key widths are never hardcoded. They come from the rule that reconciles
+   exactly on two independent devices [spec 4.1]:
+     keyWidth = (W - marginL - marginR - (n-1)*gap) / n
+   Deriving width as W/10 gives touching keycaps and is instantly wrong
+   [spec 4.2]. */
+const LETTERS=[['q','w','e','r','t','y','u','i','o','p'],
+               ['a','s','d','f','g','h','j','k','l'],
+               ['z','x','c','v','b','n','m']];
+const NUMS=[['1','2','3','4','5','6','7','8','9','0'],
+            ['-','/',':',';','(',')','$','&','@','"'],
+            ['.',',','?','!','\'']];
+const SYMS=[['[',']','{','}','#','%','^','*','+','='],
+            ['_','\\','|','~','<','>','\u20AC','\u00A3','\u00A5','\u2022'],
+            ['.',',','?','!','\'']];
+/* alternates behind a long press [spec 5.3] */
+const ALT={a:'aàáâäæãåā',e:'eèéêëēėę',i:'iîïíīįì',o:'oôöòóœøōõ',u:'uûüùúū',
+  y:'yÿ',n:'nñ',c:'cçćč',s:'sśš',z:'zžźż',l:'l£'};
+
+/* ── state ───────────────────────────────────────────────────────────
+   theme, device, field and x-ray persist; a query string overrides all
+   four, which is how the evidence shots are taken deterministically. */
+const qs=new URLSearchParams(location.search);
+const KEYS={t:'design.kb.theme',d:'design.kb.device',f:'design.kb.field',x:'design.kb.xray',
+  e:'design.kb.era',s:'design.kb.strip'};
+const pick=(o,ok,key,def)=>{
+  if(ok.indexOf(o)>=0)return o;
+  try{const s=localStorage.getItem(key);if(ok.indexOf(s)>=0)return s}catch(_){}
+  return def;
+};
+let THEME=pick(qs.get('theme'),['light','dark'],KEYS.t,
+  matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+let DEVICE=pick(qs.get('device'),['iphone','ipad'],KEYS.d,'iphone');
+let FIELD=pick(qs.get('field'),['message','search','password'],KEYS.f,'message');
+let XRAY=pick(qs.get('xray'),['on','off'],KEYS.x,'off')==='on';
+/* ERA defaults to 18 because that is what NF's capture shows — the page should
+   open on the keyboard NF is actually holding, not on the one we trained on. */
+let ERA=pick(qs.get('era'),['18','26'],KEYS.e,'18');
+/* STRIP: what occupies the QuickType band.
+     vault = our strip alone (the v1 plan)
+     both  = suggestions AND the strip — costs a whole extra band of height
+     sugg  = a predictions row alone, which is the thing Apple will not lend us */
+let STRIP=pick(qs.get('strip'),['vault','both','sugg'],KEYS.s,'vault');
+
+let text='', caret=0;
+let layer='letters';           /* letters | nums | syms */
+let shift=1;                   /* 0 off · 1 one-shot · 2 caps lock [spec 5.1.1] */
+let trackpad=false;
+const save=(k,v)=>{try{localStorage.setItem(k,v)}catch(_){}};
+
+/* ── field personality: the return key's meaning is the host's, read off
+      the proxy's returnKeyType [spec 5.7.1, 5.7.3]. In iOS 26 it draws an
+      ICON, not the word [spec 5.7.2]. ── */
+const FIELDS={
+  message:{ph:'iMessage',ret:'ret',retLabel:'return',primary:false,secure:false,
+    title:'Alex',hint:'A normal text field. The return key is just return.'},
+  search:{ph:'Search',ret:'find',retLabel:'search',primary:true,secure:false,
+    title:'Search',hint:'A search field. The host asks for a Search key and the keyboard obeys.'},
+  password:{ph:'Password',ret:'ret',retLabel:'go',primary:true,secure:true,
+    title:'Sign in',hint:'A password field. iOS takes the keyboard away here.'}
+};
+
+/* ══════════ render ══════════ */
+function caseOf(ch){return shift>0?ch.toUpperCase():ch}
+function rowsFor(){
+  if(layer==='nums')return NUMS;
+  if(layer==='syms')return SYMS;
+  return LETTERS;
+}
+
+function fieldHTML(){
+  const f=FIELDS[FIELD];
+  if(!text)return '<span class="ph">'+f.ph+'</span><span class="caret"></span>';
+  const shown=f.secure?'\u2022'.repeat(text.length):text;
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>');
+  return esc(shown.slice(0,caret))+'<span class="caret"></span>'+esc(shown.slice(caret));
+}
+
+function stripHTML(){
+  /* the ownership outline lives on a wrapper, because the strip itself
+     scrolls and would clip its own label */
+  return '<div class="stripzone zn" data-own="ours" data-zn="ours — the only difference">'+
+    '<div class="strip"><span class="stripmark">'+MARK+'</span>'+
+    VAULT.map((v,i)=>'<button class="vit '+v.t+'" type="button" data-vi="'+i+'">'+
+      '<span class="g">'+ic(v.t,14,1.8)+'</span><span class="lb">'+v.lb+'</span></button>').join('')+
+    '</div></div>';
+}
+
+/* ══════════ SUGGESTED TYPING — the honest answer, drawn ══════════
+   NF asked "what about suggested typing?". The answer has two halves and the
+   page has to show both.
+
+   HALF ONE, the hard limit: Apple's QuickType engine is not lent to anybody.
+   A third-party keyboard cannot read it, call it, or display its output. What
+   you see on the strip in the capture is Apple's own keyboard talking to
+   Apple's own predictor.
+
+   HALF TWO, what IS possible: we could ship predictions OF OUR OWN. It is
+   buildable — SwiftKey's whole product is the existence proof — and the
+   parity table rates it PARTIAL/big and rules it OUT of v1, because a
+   mediocre predictor breaks the default-feel spell faster than no predictor
+   does. So this row is drawn as a FUTURE, clearly labelled, at true size.
+
+   The trade NF has to rule on is spatial, not technical: Apple gives word
+   suggestions one band, and that band is exactly the one our strip uses. */
+const SUGG=['I','The','I’m'];
+function suggHTML(future){
+  return '<div class="sugg zn" data-own="'+(future?'clone':'apple')+'" '+
+    'data-zn="'+(future?'ours, if we ever build it':'apple’s predictions')+'">'+
+    SUGG.map(s=>'<div class="s">'+s+'</div>').join('')+
+    (future?'<span class="lbl">not in v1</span>':'')+'</div>';
+}
+
+/* ══════════ THE ACCESSORY ROW ══════════
+   MEASURED off capture-01: Apple lifts emoji and dictation out of the key grid
+   into their own 78.00pt band beneath it. Our clone keeps the band and the
+   emoji key's exact size and position, adds the globe beside it — which is
+   where Apple puts the globe once more than one keyboard is installed — and
+   leaves the dictation slot empty, because the microphone is sealed to
+   extensions in both the open-access and no-open-access states. [spec 8.5] */
+function accHTML(){
+  return '<div class="accrow zn" data-own="clone" data-zn="we draw it, to apple’s design">'+
+    '<button class="acck emoji" type="button" data-a="emoji" aria-label="Emoji">'+
+      '<svg viewBox="0 0 24 24" style="width:var(--emojid);height:var(--emojid)" aria-hidden="true">'+
+      I.emojiface+'</svg></button>'+
+    '<button class="acck" type="button" data-a="globe" aria-label="Next keyboard">'+
+      '<svg viewBox="0 0 24 24" style="width:calc(var(--emojid)*.95);height:calc(var(--emojid)*.95)" '+
+      'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '+
+      'stroke-linejoin="round" aria-hidden="true">'+I.globe+'</svg></button>'+
+    '<span class="never" title="Apple’s dictation key. Sealed to every third-party keyboard.">'+
+      '<svg viewBox="0 0 24 24" style="width:calc(var(--emojid)*.72);height:calc(var(--emojid)*1.05)" '+
+      'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" '+
+      'aria-hidden="true">'+I.mic+'</svg></span>'+
+    '</div>';
+}
+
+function keysHTML(){
+  const f=FIELDS[FIELD];
+  const R=rowsFor();
+  const pad=DEVICE==='ipad';
+  const kk=(label,cls,data)=>'<div class="k '+(cls||'')+'" '+(data||'')+'>'+label+'</div>';
+  let h='<div class="rows zn" id="rows" data-own="clone" data-zn="we draw it, to Apple\'s design">';
+
+  if(!pad){
+    /* iPhone: the shape everybody knows */
+    h+='<div class="krow" data-row="0">'+R[0].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+'</div>';
+    h+='<div class="krow" data-row="1">'+R[1].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+'</div>';
+    const lead=layer==='letters'
+      ? kk(gl('shift',1.9)+(shift===2?'<span class="capsbar"></span>':''),'fn fnw '+(shift>0?'on':''),'data-a="shift"')
+      : kk(layer==='nums'?'#+=':'123','fn fnw','data-a="alt2"');
+    /* MEASURED: shift and delete are 44.17pt against a 32.57pt letter key, and
+       the gap flanking them is 13.67pt — 2.28x the ordinary 6pt gap. That extra
+       air is a real feature of the layout, and space-between reproduces it
+       exactly once the widths are right. [spec 4A.6, 4A.7] */
+    h+='<div class="krow" data-row="2">'+lead+'<div class="krow inner">'+
+      R[2].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+'</div>'+
+      kk(gl('del',1.7),'fn fnw','data-a="del"')+'</div>';
+    /* MEASURED bottom row: 123 at 90.33pt, space at 187.00pt, return at
+       90.67pt, and NO globe key. The capture has one keyboard installed, so
+       Apple draws no globe; when there are several it goes in the accessory
+       row below, which is where ours lives too. [spec 4A.8, deviation D3] */
+    h+='<div class="krow" data-row="3">'+
+      kk(layer==='letters'?'123':'ABC','fn k123','data-a="layer"')+
+      /* MEASURED: the space bar carries NO label. Its interior in the capture
+         is a flat rgb(62,63) with not one pixel of ink in it — Apple stopped
+         writing "space" on it. We were writing it. [spec 4A.20] */
+      kk('','fn wide','data-a="space" aria-label="space"')+
+      kk(gl(f.ret,1.9),'fn kret'+(f.primary?' primary':'')+(!text&&!f.primary?' dim':''),'data-a="ret"')+
+      '</div>';
+  }else{
+    /* iPad: delete and return live on the letter rows, and the bottom row
+       carries .?123 twice plus hide-keyboard. Metrics unverified [spec 7.5]. */
+    h+='<div class="krow" data-row="0">'+R[0].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+
+      kk(gl('del',1.7),'fn wide','data-a="del"')+'</div>';
+    h+='<div class="krow" data-row="1">'+R[1].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+
+      kk(gl(f.ret,1.9),'fn wide'+(f.primary?' primary':''),'data-a="ret"')+'</div>';
+    const sh=lbl=>kk(gl('shift',1.9)+(shift===2?'<span class="capsbar"></span>':''),'fn wide '+(shift>0?'on':''),'data-a="shift"');
+    h+='<div class="krow" data-row="2">'+(layer==='letters'?sh():kk('#+=','fn wide','data-a="alt2"'))+
+      R[2].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+
+      (layer==='letters'?kk(',','ltr','data-c=","')+kk('.','ltr','data-c="."'):'')+
+      (layer==='letters'?sh():kk('#+=','fn wide','data-a="alt2"'))+'</div>';
+    h+='<div class="krow" data-row="3">'+
+      kk(layer==='letters'?'.?123':'ABC','fn wide','data-a="layer"')+
+      kk('space','fn wide','data-a="space"')+
+      kk(layer==='letters'?'.?123':'ABC','fn wide','data-a="layer"')+
+      kk(gl('hide',1.6),'fn','data-a="hide"')+'</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function slabHTML(){
+  if(FIELD==='password'){
+    /* [spec 8.3] custom keyboards are evicted from secure and phone-number
+       fields. Showing the refusal is honest; drawing an autofill bar we can
+       never have would not be [spec 8.9]. */
+    return '<div class="slab pw zn" id="slab" data-own="apple" data-zn="ios draws all of this">'+
+      suggHTML(false)+keysHTML()+accHTML()+
+      '<div class="evict"><b>iOS took the keyboard back.</b>'+
+      '<span>In a password field the system uses its own keyboard and nothing else. '+
+      'Every keyboard that is not Apple\u2019s disappears here \u2014 ours, Gboard, SwiftKey, all of them. '+
+      'The strip is gone with it, and that is correct behaviour rather than a gap.</span></div>'+
+      '<div class="neverbar">Apple\u2019s alone, permanently: the saved-password bar, the code-from-Messages '+
+      'suggestion, and speaking instead of typing. No third-party keyboard has ever been given these, '+
+      'so none of them are drawn here.</div>'+
+      '</div>';
+  }
+  const band=(STRIP==='vault')?stripHTML()
+    :(STRIP==='sugg')?suggHTML(true)
+    :suggHTML(true)+stripHTML();
+  return '<div class="slab zn" id="slab" data-own="apple" data-zn="ios draws this slab">'+
+    band+keysHTML()+accHTML()+
+    '<div class="neverbar">Apple\u2019s alone, permanently: the saved-password bar, the code-from-Messages '+
+    'suggestion, and speaking instead of typing \u2014 none of which appear on this page, because they cannot.</div>'+
+    '<div class="feelnote">The click and the tap you would feel land right here. A web page cannot play either, '+
+    'so they are named rather than faked.</div>'+
+    '</div>';
+}
+
+function render(){
+  const f=FIELDS[FIELD];
+  document.getElementById('scr').innerHTML=
+    '<div class="app">'+
+      '<div class="sbz"><span>9:41</span><span class="cell">'+ic('wifi',14,1.6)+ic('batt',18,1.5)+'</span></div>'+
+      '<div class="navb zn" data-own="apple" data-zn="the app">'+f.title+'</div>'+
+      '<div class="thread">'+
+        '<div class="bub">did the studio ever send the invoice?</div>'+
+        '<div class="bub me">checking now</div>'+
+        '<div class="bub">can you send me your address and the resume too?</div>'+
+        '<div class="lensband"><span>A photo in the thread, running on under the keyboard '+
+        'on purpose — whatever sits behind the glass should tint it and show through it.</span></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="kbwrap" id="kbwrap">'+
+      '<div class="fieldrow"><div class="field'+(f.secure?' secure':'')+'" id="field">'+fieldHTML()+'</div></div>'+
+      slabHTML()+
+    '</div>'+
+    '<div class="homebar"></div>';
+  layout();
+  wire();
+  paintDesk();
+}
+
+/* ── the width rule, applied for real [spec 4.1]:
+      keyWidth = (W - marginL - marginR - (n-1)*gap) / n            ── */
+function layout(){
+  /* ONE assignment now does what thirty lines of flex arithmetic used to.
+     Every cell width, gap, radius, band height and type size in the keyboard
+     is a calc() off --W, using the ratios measured out of capture-01, so the
+     whole thing stays in proportion at any frame size instead of only at the
+     one it happened to be drawn at. */
+  const scr=document.getElementById('scr');
+  if(scr)scr.style.setProperty('--W',scr.clientWidth+'px');
+  const ph=document.querySelector('.phone');
+  if(ph)ph.style.setProperty('--Wp',ph.clientWidth+'px');
+
+  const wrap=document.getElementById('kbwrap');
+  const thread=document.querySelector('.thread');
+  if(thread&&wrap){
+    /* the app's content runs under the keyboard rather than stopping at it */
+    thread.style.paddingBottom=Math.max(0,wrap.offsetHeight-118)+'px';
+  }
+  const rows=document.getElementById('rows');
+  if(!rows)return;
+  const inner=rows.querySelector('.krow.inner');
+  if(inner)inner.style.flex='0 0 auto';
+  const r2=rows.querySelector('[data-row="2"]');
+  /* shift and delete are pushed to the screen edges; the 13.67pt of air that
+     opens beside them is measured, not slop [spec 4A.7] */
+  if(r2)r2.style.justifyContent=DEVICE==='ipad'?'center':'space-between';
+  reportHeight();
+}
+
+/* the height cost of the strip modes, stated in the page's own pixels and in
+   the device points they stand for — because "both rows" is not a free choice */
+function reportHeight(){
+  const slab=document.getElementById('slab'), scr=document.getElementById('scr');
+  const out=document.getElementById('hcost');
+  if(!slab||!scr||!out)return;
+  const pts=slab.offsetHeight/scr.clientWidth*393;
+  const base=STRIP==='both'?' — one whole band taller than either row alone':'';
+  out.textContent='keyboard height '+Math.round(pts)+'pt'+base;
+  out.dataset.warn=STRIP==='both'?'1':'0';
+}
+
+/* ══════════ the balloon [spec 5.2] ══════════ */
+let popEl=null;
+function showPop(key,ch){
+  hidePop();
+  const slab=document.getElementById('slab');if(!slab)return;
+  const kr=key.getBoundingClientRect(), sr=slab.getBoundingClientRect();
+  const kw=kr.width, bw=Math.max(kw*1.55,40), bh=52, neck=10;
+  let left=kr.left-sr.left+kw/2-bw/2;
+  left=Math.max(2,Math.min(left,sr.width-bw-2));      /* edge keys shift inward [spec 5.2.4] */
+  const el=document.createElement('div');
+  el.className='pop';
+  el.style.left=left+'px';
+  el.style.top=(kr.top-sr.top-bh-neck+1)+'px';
+  el.style.width=bw+'px';
+  /* the neck tapers from the balloon down to the key it belongs to, which is
+     why archagon measured the connector separately from the body [spec 4.8] */
+  const dx=(kr.left-sr.left+kw/2)-(left+bw/2);
+  el.innerHTML='<div class="body" style="width:'+bw+'px;height:'+bh+'px">'+ch+'</div>'+
+    '<div class="neck" style="width:'+kw+'px;height:'+neck+'px;'+
+    'clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);'+
+    'margin-left:'+(dx*2)+'px"></div>';
+  slab.appendChild(el);popEl=el;
+}
+function hidePop(){if(popEl&&popEl.parentNode)popEl.parentNode.removeChild(popEl);popEl=null}
+
+/* ══════════ the accent callout [spec 5.3] ══════════ */
+let calloutEl=null;
+function showCallout(key,ch){
+  hidePop();hideCallout();
+  const alts=ALT[ch];if(!alts)return;
+  const slab=document.getElementById('slab');if(!slab)return;
+  const kr=key.getBoundingClientRect(), sr=slab.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='callout';
+  el.innerHTML=[...alts].map((a,i)=>'<b'+(i===0?' class="sel"':'')+' data-alt="'+a+'">'+
+    (shift>0?a.toUpperCase():a)+'</b>').join('');
+  el.style.visibility='hidden';slab.appendChild(el);
+  const w=el.offsetWidth;
+  let left=kr.left-sr.left+kr.width/2-w/2;
+  left=Math.max(3,Math.min(left,sr.width-w-3));
+  el.style.left=left+'px';
+  el.style.top=(kr.top-sr.top-el.offsetHeight-6)+'px';
+  el.style.visibility='';
+  calloutEl=el;
+}
+function hideCallout(){if(calloutEl&&calloutEl.parentNode)calloutEl.parentNode.removeChild(calloutEl);calloutEl=null}
+
+/* ══════════ text model ══════════ */
+function insert(s){
+  text=text.slice(0,caret)+s+text.slice(caret);
+  caret+=s.length;
+  paintField();
+}
+function backspace(word){
+  if(!caret)return;
+  if(word){
+    let i=caret;
+    while(i>0&&/\s/.test(text[i-1]))i--;
+    while(i>0&&!/\s/.test(text[i-1]))i--;
+    text=text.slice(0,i)+text.slice(caret);caret=i;
+  }else{
+    text=text.slice(0,caret-1)+text.slice(caret);caret--;
+  }
+  paintField();
+}
+function paintField(){
+  const el=document.getElementById('field');
+  if(el)el.innerHTML=fieldHTML();
+}
+
+/* ══════════ interaction ══════════ */
+let holdT=null,repT=null,pressed=null,longFired=false,heldFor=0;
+let tpStartX=0;
+
+function keyDown(k,ev){
+  if(FIELD==='password')return;
+  pressed=k;longFired=false;
+  k.classList.add('down');
+  const c=k.dataset.c, a=k.dataset.a;
+
+  if(c!==undefined){
+    /* character preview [spec 5.2.5: function keys raise none] */
+    showPop(k,layer==='letters'?caseOf(c):c);
+    if(ALT[c])holdT=setTimeout(()=>{longFired=true;showCallout(k,c)},480);
+    return;
+  }
+  if(a==='del'){
+    backspace(false);
+    /* acceleration: characters first, then words, faster the longer it is
+       held. Thresholds are FEEL, not measurement [spec 5.4.3]. */
+    heldFor=0;
+    holdT=setTimeout(()=>{
+      repT=setInterval(()=>{heldFor+=110;backspace(heldFor>1400)},110);
+    },420);
+    return;
+  }
+  if(a==='space'){
+    tpStartX=ev&&ev.clientX!==undefined?ev.clientX:0;
+    holdT=setTimeout(()=>{
+      longFired=true;trackpad=true;
+      const rows=document.getElementById('rows');
+      if(rows){rows.classList.add('trackpad');
+        const h=document.createElement('div');h.className='trackhint';
+        h.textContent='slide to move the cursor';h.id='thint';rows.appendChild(h);}
+    },380);
+    return;
+  }
+}
+
+function keyMove(ev){
+  if(trackpad){
+    const dx=ev.clientX-tpStartX;
+    const step=Math.round(dx/9);
+    if(step!==0){
+      caret=Math.max(0,Math.min(text.length,caret+ (step>0?1:-1)));
+      tpStartX=ev.clientX;paintField();
+    }
+    return;
+  }
+  if(calloutEl){
+    const bs=[...calloutEl.children];
+    bs.forEach(b=>{
+      const br=b.getBoundingClientRect();
+      b.classList.toggle('sel',ev.clientX>=br.left&&ev.clientX<=br.right);
+    });
+    if(!bs.some(b=>b.classList.contains('sel')))bs[0].classList.add('sel');
+  }
+}
+
+function keyUp(){
+  clearTimeout(holdT);clearInterval(repT);holdT=repT=null;
+  if(trackpad){
+    trackpad=false;
+    const rows=document.getElementById('rows');
+    if(rows){rows.classList.remove('trackpad');
+      const h=document.getElementById('thint');if(h)h.remove();}
+    if(pressed)pressed.classList.remove('down');
+    pressed=null;hidePop();return;
+  }
+  if(calloutEl){
+    const sel=calloutEl.querySelector('b.sel');
+    if(sel)insert(shift>0?sel.dataset.alt.toUpperCase():sel.dataset.alt);
+    if(shift===1)setShift(0);
+    hideCallout();hidePop();
+    if(pressed)pressed.classList.remove('down');
+    pressed=null;return;
+  }
+  const k=pressed;pressed=null;hidePop();
+  if(!k)return;
+  k.classList.remove('down');
+  if(longFired)return;
+  commit(k);
+}
+
+function commit(k){
+  const c=k.dataset.c,a=k.dataset.a;
+  if(c!==undefined){
+    insert(layer==='letters'?caseOf(c):c);
+    if(shift===1)setShift(0);     /* one-shot falls back [spec 5.1.1] */
+    return;
+  }
+  switch(a){
+    case 'shift':{
+      /* double-tap enters caps lock [spec 5.1.1] */
+      const now=Date.now();
+      if(now-lastShift<340){setShift(2);}
+      else setShift(shift===0?1:0);
+      lastShift=now;break;
+    }
+    case 'del':break;
+    case 'space':{
+      /* double-space ends a sentence [spec 5.6.5] */
+      if(text.slice(caret-1,caret)===' '&&/[^\s.]/.test(text.slice(caret-2,caret-1))){
+        text=text.slice(0,caret-1)+'. '+text.slice(caret);caret++;paintField();
+      }else insert(' ');
+      break;
+    }
+    case 'ret':insert('\n');break;
+    case 'layer':layer=(layer==='letters')?'nums':'letters';redrawKeys();break;
+    case 'alt2':layer=(layer==='nums')?'syms':'nums';redrawKeys();break;
+    case 'globe':note('Tap goes to your next keyboard. Hold opens the picker. Apple\u2019s key, Apple\u2019s job.');break;
+    case 'hide':note('Puts the keyboard away. Apple\u2019s key on iPad.');break;
+  }
+}
+let lastShift=0;
+function setShift(v){shift=v;redrawKeys();}
+function redrawKeys(){
+  const slab=document.getElementById('slab');if(!slab)return;
+  const old=slab.querySelector('#rows');
+  if(!old)return;
+  const tmp=document.createElement('div');tmp.innerHTML=keysHTML();
+  slab.replaceChild(tmp.firstChild,old);
+  layout();wireKeys();
+}
+
+let noteT=null;
+function note(msg){
+  const q=document.getElementById('quiet');
+  if(!q)return;
+  if(!q.dataset.base)q.dataset.base=q.textContent;
+  q.textContent=msg;
+  clearTimeout(noteT);
+  noteT=setTimeout(()=>{q.textContent=q.dataset.base},3600);
+}
+
+function wireKeys(){
+  const rows=document.getElementById('rows');if(!rows)return;
+  [...rows.querySelectorAll('.k')].forEach(k=>{
+    k.addEventListener('pointerdown',e=>{e.preventDefault();
+      if(k.setPointerCapture&&e.pointerId!==undefined){try{k.setPointerCapture(e.pointerId)}catch(_){}}
+      keyDown(k,e);});
+    k.addEventListener('pointermove',keyMove);
+    k.addEventListener('pointerup',keyUp);
+    k.addEventListener('pointercancel',keyUp);
+  });
+}
+function wire(){
+  wireKeys();
+  [...document.querySelectorAll('.acck')].forEach(b=>{
+    b.addEventListener('click',()=>{
+      if(b.dataset.a==='globe')note('Tap goes to your next keyboard. Hold opens the picker. Apple’s key, Apple’s job.');
+      else note('Apple’s emoji keyboard is one tap away. We do not rebuild it — the globe reaches the real one.');
+    });
+  });
+  [...document.querySelectorAll('.sugg .s')].forEach(b=>{
+    b.addEventListener('click',()=>note('Predictions of our own are buildable and deliberately not in v1. '+
+      'Apple’s own suggestions are sealed to every keyboard but Apple’s.'));
+  });
+  [...document.querySelectorAll('.vit')].forEach(b=>{
+    b.addEventListener('click',()=>{
+      const v=VAULT[+b.dataset.vi];
+      if(v.t==='img'||v.t==='doc'){
+        note(v.lb+' \u2014 copied. Paste it wherever it belongs.');
+        b.classList.add('on');setTimeout(()=>b.classList.remove('on'),900);
+        return;
+      }
+      insert(v.v);
+      b.classList.add('on');setTimeout(()=>b.classList.remove('on'),900);
+    });
+  });
+}
+
+/* ══════════ chassis ══════════ */
+function seg(el,items,current,fn){
+  el.innerHTML=items.map(i=>'<button type="button" data-v="'+i[0]+'">'+i[1]+'</button>').join('');
+  [...el.children].forEach(b=>{
+    b.dataset.on=b.dataset.v===current?'1':'0';
+    b.onclick=()=>fn(b.dataset.v);
+  });
+}
+/* Is the real SF Pro actually here? Measure a string in it against the same
+   string in a font that certainly is not it. If they differ, SF won the stack
+   and the weight compensation above applies; if not, Segoe's own 470 is
+   already correct and stroking would double-count. */
+function detectSF(){
+  try{
+    const c=document.createElement('canvas').getContext('2d');
+    const probe=s=>{c.font='400 100px '+s;return c.measureText('QRSTUVWXabcdefg').width};
+    const base=probe('monospace');
+    return Math.abs(probe('"SF Pro Text", monospace')-base)>0.5;
+  }catch(_){return false}
+}
+const HAS_SF=detectSF();
+
+function applyAll(){
+  document.documentElement.dataset.theme=THEME;
+  document.body.dataset.sf=HAS_SF?'1':'0';
+  document.body.dataset.era=ERA;
+  document.body.dataset.strip=STRIP;
+  document.body.classList.toggle('device-ipad',DEVICE==='ipad');
+  document.body.classList.toggle('xray',XRAY);
+  const xb=document.getElementById('xraybtn');xb.dataset.on=XRAY?'1':'0';
+  seg(document.getElementById('themeseg'),[['light','Light'],['dark','Dark']],THEME,v=>{
+    THEME=v;save(KEYS.t,v);applyAll();});
+  seg(document.getElementById('devseg'),[['iphone','iPhone'],['ipad','iPad']],DEVICE,v=>{
+    DEVICE=v;save(KEYS.d,v);applyAll();});
+  seg(document.getElementById('eraseg'),[['18','iOS 18'],['26','iOS 26']],ERA,v=>{
+    ERA=v;save(KEYS.e,v);applyAll();});
+  seg(document.getElementById('stripseg'),
+    [['vault','Vault strip'],['both','Strip + suggestions'],['sugg','Suggestions only']],STRIP,v=>{
+    STRIP=v;save(KEYS.s,v);applyAll();});
+  seg(document.getElementById('fieldseg'),
+    [['message','Message'],['search','Search'],['password','Password']],FIELD,v=>{
+    FIELD=v;save(KEYS.f,v);applyAll();});
+  render();
+}
+document.getElementById('xraybtn').onclick=()=>{XRAY=!XRAY;save(KEYS.x,XRAY?'on':'off');applyAll();};
+
+function paintDesk(){
+  const f=FIELDS[FIELD];
+  document.getElementById('desk').innerHTML=
+  '<div class="card"><h2>Reading this</h2>'+
+  '<b>'+f.hint+'</b><ul>'+
+  '<li>Everything except the strip is meant to be <b>indistinguishable</b> from Apple\u2019s keyboard. '+
+  'That is the whole bar: a replica with one difference.</li>'+
+  '<li>The strip is <b>one row</b> on purpose. It takes the space Apple gives to word suggestions '+
+  'rather than making the keyboard taller.</li>'+
+  '<li>Tap a text item and it lands in the field. Images and documents copy instead \u2014 a keyboard '+
+  'cannot attach a file, and no keyboard can.</li></ul></div>'+
+
+  '<div class="card"><h2>Suggested typing — you asked</h2>'+
+  '<b>Apple’s word suggestions are not lendable.</b> The three words on your phone’s keyboard come '+
+  'from Apple’s own predictor talking to Apple’s own keyboard. No keyboard that is not Apple’s can '+
+  'read them, ask for them, or show them. That is a wall, not a to-do.<ul>'+
+  '<li>Predictions <b>of our own</b> are a different thing, and they are buildable — SwiftKey is the '+
+  'proof. They are out of v1 on purpose: a predictor that is only nearly right breaks the '+
+  'feels-like-default spell faster than having none does.</li>'+
+  '<li>The real decision is <b>space</b>. Apple gives suggestions one band. That band is the one the '+
+  'strip uses. Switch the control above to see all three answers at true size — and when both are on, '+
+  'watch the height number under the phone go up. That is the whole cost, stated honestly.</li></ul></div>'+
+
+  '<div class="card"><h2>Which keyboard, not which year</h2>'+
+  '<b>Your capture is the flat one, so the page opens on the flat one.</b> Apple ships both looks on the '+
+  'same phone at the same time and chooses per app: an app built against the newest SDK gets the glass '+
+  'keyboard, everything else keeps the flat one. So neither toggle position is out of date — they are '+
+  'two things your phone does today, and the real build will match whichever the host app asks for.<ul>'+
+  '<li><b>Flat</b> — every colour is sampled straight out of your screenshot. The tray is '+
+  'rgb(25,25,27), every key is rgb(62,62,64), and there is no translucency anywhere in it.</li>'+
+  '<li><b>Glass</b> — translucent keys, a lit top edge, the tray blurring what is behind it.</li>'+
+  '<li>Both share what did change for good: <b>one colour for every key</b> (shift and delete are no '+
+  'longer darker) and a <b>return key that draws an icon, not the word</b>. Your capture confirms both.</li>'+
+  '</ul></div>'+
+
+  '<div class="card"><h2>What the screenshot moved</h2>'+
+  'Held against your phone this page was close but wrong in ways worth naming.<ul>'+
+  '<li><b>The cells.</b> Keys are 32.6 x 43.0pt with 6.0pt between them and <b>6.5pt</b> of margin at '+
+  'each edge — the old reference said 3pt, and that error alone made every key slightly too wide.</li>'+
+  '<li><b>The tray.</b> It is not a floating rounded slab. It runs the full width, sits flush to the '+
+  'bottom of the screen, and rounds only its top corners. The round bottom in your screenshot is the '+
+  'phone’s own corner, not the keyboard’s.</li>'+
+  '<li><b>The type.</b> Letters are heavier than they were here — measurably medium-weight, not '+
+  'regular — and a capital is exactly half the height of its key.</li>'+
+  '<li><b>The emoji key.</b> It sits in a row of its own below the keys, 27pt across, and it is a plain '+
+  'white face rather than a colour emoji. Both are now matched.</li></ul></div>'+
+
+  '<div class="card"><h2>The slab is Apple\u2019s, not ours</h2>'+
+  'iOS draws a rounded glass tray around any keyboard and sits the keyboard inside it. Developers '+
+  'filed bugs about a \u201Cgrey bar\u201D above their keyboards; it was the tray, working as intended. '+
+  'That is why the keyboard here floats with rounded corners instead of sitting flush to the bottom, '+
+  'and why our own background has to be <b>nothing at all</b>.</div>'+
+
+  '<div class="card"><h2>What we are not showing</h2>'+
+  'No saved-password bar. No code-from-Messages suggestion. No talking instead of typing. Those belong '+
+  'to Apple\u2019s keyboard permanently and demoing them would be a lie the review would catch. '+
+  'Switch the field to <b>Password</b> to watch iOS take the keyboard away \u2014 that happens to every '+
+  'keyboard that is not Apple\u2019s.</div>'+
+
+  '<div class="card"><h2>Where the colours came from</h2>'+
+  'Key and tray greys derive from Apple\u2019s published system greys; the blue is systemBlue. '+
+  'The <b>transparency amounts are ours</b> \u2014 Apple publishes no figure, so those are the first '+
+  'thing a real screenshot will correct. The strip uses only the app\u2019s own palette; nothing in it '+
+  'was invented for this page.</div>'+
+
+  '<div class="card"><h2>What a web page cannot do</h2><ul>'+
+  '<li>Real glass <b>bends</b> light. A browser can only blur it.</li>'+
+  '<li>Apple\u2019s highlights move as you tilt the phone. Here the highlight is painted on.</li>'+
+  '<li>The click and the tap you would feel are named on the page, not faked.</li>'+
+  '<li><b>Letterforms</b> — '+(HAS_SF
+    ? 'this machine has the real <b>SF Pro</b> installed, so the letters you are looking at are Apple’s '+
+      'own, not an imitation. One gap remains: Apple’s medium weight is missing from the local install, '+
+      'so the keys draw as regular with a hairline added to make up the measured difference. Close, and '+
+      'named rather than hidden.'
+    : 'this machine does <b>not</b> have SF Pro installed, so the page is drawing in Segoe UI. Sizes and '+
+      'weights are still exact — they are scaled to the measured cap height — but the shapes are not: '+
+      'Segoe’s Q, R, J, 1 and apostrophe are visibly its own, and it has none of SF’s optical spacing. '+
+      'Install SF Pro from developer.apple.com/fonts and this line changes.')+'</li>'+
+  '<li>Press-and-hold timings are set by feel. Slow-motion video of a real phone replaces them.</li>'+
+  '</ul></div>'+
+
+  '<div class="card"><h2>The promise underneath</h2>'+
+  '<b>No accounts. No servers of ours. Nothing you save is uploaded to us.</b> The strip fills itself '+
+  'the moment you switch to the keyboard, with no setup step in between.</div>';
+}
+
+/* the key widths are derived from the real container width, so they have to
+   be recomputed whenever that width changes — a window resize event alone
+   misses the first paint and the theme/device swaps */
+addEventListener('resize',layout);
+if(window.ResizeObserver){
+  let lastW=0;
+  new ResizeObserver(()=>{
+    const p=document.querySelector('.phone');
+    if(!p)return;
+    const w=p.clientWidth;
+    if(Math.abs(w-lastW)<0.5)return;
+    lastW=w;layout();
+  }).observe(document.querySelector('.phone'));
+}
+requestAnimationFrame(layout);
+addEventListener('pointerup',()=>{if(pressed||trackpad||calloutEl)keyUp()});
+applyAll();
+</script>
+</body>
+</html>
