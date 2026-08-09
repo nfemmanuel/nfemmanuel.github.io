@@ -6,12 +6,13 @@
      Do not hand-edit this file. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reel &#8212; the job application, one gesture at a time</title>
+<title>bothy. &#8212; the job application, one gesture at a time</title>
 <meta name="description" content="An interactive prototype: fill a fake job application using only saved text, links and files, summoned from an edge dial or a vault keyboard. Everything stays in your browser.">
-<meta property="og:title" content="Reel &#8212; try a faster way to fill forms">
+<meta property="og:title" content="bothy. &#8212; try a faster way to fill forms">
 <meta property="og:description" content="An interactive prototype: fill a fake job application using only saved text, links and files, summoned from an edge dial or a vault keyboard. Everything stays in your browser.">
-<meta name="theme-color" content="#0E8C7F">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%231A1F26%22 stroke=%22%23333B45%22 stroke-width=%228%22/><rect x=%2246%22 y=%228%22 width=%228%22 height=%2224%22 rx=%224%22 fill=%22%23FF4D4D%22/></svg>">
+<meta name="theme-color" content="#F6F6F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1013" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 108 108%22><style>@media(prefers-color-scheme:dark)%7B.i%7Bfill:%23F0F1F3%7D%7D</style><path class=%22i%22 fill=%22%2314161A%22 d=%22M40.5,31.833 A2.5,2.5 0 0 0 38.390,31.871 L28.054,36.912 A2.5,2.5 0 0 0 26.903,40.255 L34.289,55.4 L40.5,55.4 Z%22/><path class=%22i%22 fill=%22%2314161A%22 d=%22M67.5,31.671 Q68.384,31.273 69.610,31.871 L77.699,35.816 L80.001,42.502 L73.711,55.4 L67.5,55.4 Z%22/><path class=%22i%22 fill=%22%2314161A%22 fill-rule=%22evenodd%22 d=%22M44.5,25.5 L58.379,25.5 L64.5,31.621 L64.5,55.4 L43.5,55.4 L43.5,26.5 Q43.5,25.5 44.5,25.5 Z M57.1,28.1 L61.7,32.7 L57.1,32.7 Z%22/><path class=%22i%22 fill=%22%2314161A%22 fill-rule=%22evenodd%22 d=%22M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z%22/></svg>">
 </head>
 <body>
 <!doctype html>
@@ -19,8 +20,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Reel — extensions prototype</title>
-<link rel="icon" href="data:,">
+<title>bothy. — extensions prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -40,6 +40,8 @@
   --field:#F6F6F7; --field-line:#DFE1E5;
   --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
   --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
+  /* the room register's 1px top-edge rim light (depth-study.html --rim) */
+  --rim:rgba(255,255,255,.55);
   --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
   --accent:var(--c-doc); --accent-soft:#356BA622;
   /* x-ray ownership tints (2026-08-06): three hues from the same palette family —
@@ -54,6 +56,7 @@
   --field:#131519; --field-line:#2E333A;
   --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.3);
   --shadow-m:0 2px 6px rgba(0,0,0,.4),0 14px 36px rgba(0,0,0,.55);
+  --rim:rgba(255,255,255,.06);
   --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
   --accent-soft:#8FC6FF26;
   --xr-ours:#6FD79B; --xr-apple:#8FC6FF; --xr-sealed:#FFA184;
@@ -63,6 +66,7 @@
   --field:#131519; --field-line:#2E333A;
   --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.3);
   --shadow-m:0 2px 6px rgba(0,0,0,.4),0 14px 36px rgba(0,0,0,.55);
+  --rim:rgba(255,255,255,.06);
   --c-txt:#FFC978; --c-img:#C6A8FF; --c-doc:#8FC6FF; --c-lnk:#FFA184;
   --accent-soft:#8FC6FF26;
   --xr-ours:#6FD79B; --xr-apple:#8FC6FF; --xr-sealed:#FFA184;
@@ -72,6 +76,8 @@
   --field:#F6F6F7; --field-line:#DFE1E5;
   --shadow:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
   --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
+  /* the room register's 1px top-edge rim light (depth-study.html --rim) */
+  --rim:rgba(255,255,255,.55);
   --c-txt:#B4761C; --c-img:#7B55B4; --c-doc:#356BA6; --c-lnk:#BA5138;
   --accent-soft:#356BA622;
   --xr-ours:#2C8A56; --xr-apple:#356BA6; --xr-sealed:#BA5138;
@@ -173,13 +179,12 @@ body.device-tablet .phone,body.device-ipad .phone{max-width:960px;height:auto;mi
 
 /* ═══ site chrome: the same nav and footer on every page under /reel/ ═══
    Built from this page's own tokens so it inherits both themes for free.
-   The wordmark's knob is the shared mark; nav targets are 44px tall. */
+   The fanned-files mark is shared across pages; nav targets are 44px tall. */
 .sitenav{max-width:920px;margin:0 auto;padding:6px 16px 0;display:flex;align-items:center;gap:4px 14px;flex-wrap:wrap}
 .sn-home{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;color:var(--ink);
   font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.025em}
-.sn-knob{width:17px;height:17px;border-radius:50%;background:#1A1F26;border:1.6px solid #333B45;position:relative;flex:0 0 auto}
-.sn-knob::after{content:"";position:absolute;top:.5px;left:50%;width:1.6px;height:4.6px;background:#FF4D4D;
-  transform:translateX(-50%);border-radius:2px}
+.sn-mark{width:17px;height:17px;flex:0 0 auto;display:block}
+.sn-dot{font-size:1.15em}
 .sn-links{display:flex;align-items:center;flex-wrap:wrap;gap:0 2px;margin-left:auto}
 .sn-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;border-radius:99px;
   font-size:12.5px;font-weight:500;color:var(--dim);text-decoration:none;transition:color .18s}
@@ -319,7 +324,11 @@ body.device-ipad .app .task .drop,body.device-ipad .app .task .chatlog{break-ins
 @media (prefers-reduced-motion: reduce){#pastechip.pop{animation:none}}
 #receipt{position:absolute;z-index:62;left:50%;transform:translateX(-50%) translateY(6px) scale(.92);
   background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:99px;
-  padding:9px 16px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);
+  padding:9px 16px;font-size:12.5px;font-weight:600;
+  /* SEATED, room register: --shadow (whose light half is functionally
+     invisible over a bright host app) gives way to the --shadow-m pair
+     plus the top-edge rim. The 1px --line border stays, as P1 has it. */
+  box-shadow:var(--shadow-m),inset 0 1px 0 var(--rim);
   opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;max-width:88%;overflow:hidden;text-overflow:ellipsis}
 #receipt.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
 #dialpulse{position:absolute;z-index:61;width:84px;height:84px;border-radius:50%;
@@ -349,25 +358,34 @@ body.dialing #dialsvg{pointer-events:auto}
   width:max-content;max-width:86%;pointer-events:none;display:none;
   --gc:var(--dim);
   background:var(--card);border:1px solid color-mix(in srgb,var(--gc) 35%,transparent);border-radius:19px;
-  box-shadow:0 10px 30px rgba(10,14,20,.16),
+  /* SEATED, room register (depth-study.html §5, P1): the single seat layer
+     becomes the app's own --shadow-m key+ambient pair, and a 1px rim light
+     lands on the top edge. THE AURA IS UNTOUCHED - "identity is ambient" is a
+     standing PRD 004 ruling - so the glow now says WHICH TYPE while the shadow
+     says HOW HIGH, instead of one object trying to do both. */
+  box-shadow:var(--shadow-m),
     0 0 10px color-mix(in srgb,var(--gc) 18%,transparent),
-    0 0 26px color-mix(in srgb,var(--gc) 8%,transparent);
+    0 0 26px color-mix(in srgb,var(--gc) 8%,transparent),
+    inset 0 1px 0 var(--rim);
   transition:box-shadow .16s linear,border-color .16s linear;
   font-family:var(--ui);overflow:hidden}
 #dialprev.gl-txt{--gc:var(--c-txt)}#dialprev.gl-lnk{--gc:var(--c-lnk)}
 #dialprev.gl-img{--gc:var(--c-img)}#dialprev.gl-sens{--gc:var(--dim)}
 @media (prefers-color-scheme: dark){#dialprev{
-  box-shadow:0 10px 30px rgba(0,0,0,.38),
+  box-shadow:var(--shadow-m),
     0 0 10px color-mix(in srgb,var(--gc) 30%,transparent),
-    0 0 26px color-mix(in srgb,var(--gc) 14%,transparent)}}
+    0 0 26px color-mix(in srgb,var(--gc) 14%,transparent),
+    inset 0 1px 0 var(--rim)}}
 :root[data-theme="dark"] #dialprev{
-  box-shadow:0 10px 30px rgba(0,0,0,.38),
+  box-shadow:var(--shadow-m),
     0 0 10px color-mix(in srgb,var(--gc) 30%,transparent),
-    0 0 26px color-mix(in srgb,var(--gc) 14%,transparent)}
+    0 0 26px color-mix(in srgb,var(--gc) 14%,transparent),
+    inset 0 1px 0 var(--rim)}
 :root[data-theme="light"] #dialprev{
-  box-shadow:0 10px 30px rgba(10,14,20,.16),
+  box-shadow:var(--shadow-m),
     0 0 10px color-mix(in srgb,var(--gc) 18%,transparent),
-    0 0 26px color-mix(in srgb,var(--gc) 8%,transparent)}
+    0 0 26px color-mix(in srgb,var(--gc) 8%,transparent),
+    inset 0 1px 0 var(--rim)}
 #dialprev.show{display:block;animation:dpin .22s cubic-bezier(.2,.9,.3,1.18)}
 #dialprev.out{animation:dpout .18s ease-in forwards}
 @keyframes dpin{from{transform:translateX(-50%) translateY(-24px);opacity:0}
@@ -727,8 +745,8 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
 </head>
 <body class="on-dial device-phone">
 
-<nav class="sitenav" aria-label="Reel">
-  <a class="sn-home" href="../"><span class="sn-knob" aria-hidden="true"></span>reel</a>
+<nav class="sitenav" aria-label="bothy.">
+  <a class="sn-home" href="../"><svg class="sn-mark" aria-hidden="true" width="17" height="17" viewBox="0 0 108 108"><g transform="rotate(-26 40 50)"><rect x="32.5" y="33" width="16.5" height="27" rx="2.5" fill="currentColor"/></g><g transform="rotate(26 68 50)"><path d="M61.5,33 L70.5,33 L75.5,38 L75.5,60 L59,60 L59,35.5 Q59,33 61.5,33 Z" fill="currentColor"/></g><path d="M44.5,24 L59,24 L66,31 L66,62 L42,62 L42,26.5 Q42,24 44.5,24 Z" fill="currentColor" stroke="var(--surf,transparent)" stroke-width="3.0"/><path d="M57.1,28.1 L61.7,32.7 L57.1,32.7 Z" fill="var(--surf,transparent)"/><path d="M31.5,58 L76.5,58" stroke="var(--surf,transparent)" stroke-width="5.2"/><path fill-rule="evenodd" fill="currentColor" d="M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z"/><rect x="46.7" y="70.7" width="14.6" height="3.6" rx="1.8" fill="var(--accent-c,transparent)"/></svg><span class="sn-word">bothy<span class="sn-dot">.</span></span></a>
   <div class="sn-links">
     <a href="../">Home</a>
     <a href="../app/">The app</a>
@@ -746,7 +764,7 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
       <div class="crow"><div class="seg" id="devseg" aria-label="Device"></div></div>
     </div>
   </div>
-  <p class="lede">Both extensions on simulated glass. The phone below is inside some other app — a job form, a recruiter thread — and Reel rides over it: the <b>overlay</b> on Android, the <b>keyboard</b> on iOS. The vault comes preloaded as <b>Alex Rivera</b>, a demo applicant; anything you add stays in <b>this browser only</b>. A webpage can't reach into real apps, so judge the speed and the feel here, not the reach.</p>
+  <p class="lede">Both extensions on simulated glass. The phone below is inside some other app — a job form, a recruiter thread — and bothy. rides over it: the <b>overlay</b> on Android, the <b>keyboard</b> on iOS. The vault comes preloaded as <b>Alex Rivera</b>, a demo applicant; anything you add stays in <b>this browser only</b>. A webpage can't reach into real apps, so judge the speed and the feel here, not the reach.</p>
 </header>
 
 <div class="wrap">
@@ -775,8 +793,8 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
           <label>Email</label><input type="text" placeholder="Email — it's pinned on the overlay">
           <label>Portfolio URL</label><input type="text" placeholder="Portfolio — the link is on the overlay">
           <label>Why Northbeam?</label><textarea rows="3" placeholder="There's an opener for this on the overlay…"></textarea>
-          <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
-          <label>Headshot — optional (image)</label><div class="drop" data-accept="img" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/></svg> Tap to attach — Reel shows up as a source</div>
+          <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — bothy. shows up as a source</div>
+          <label>Headshot — optional (image)</label><div class="drop" data-accept="img" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/></svg> Tap to attach — bothy. shows up as a source</div>
         </div>
         <div class="task">
           <div class="co"><div class="logo" style="background:#7A4BC9">R</div>
@@ -808,7 +826,7 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
           </div>
           <label>Create a password</label><input type="password" placeholder="Quick apply wants an account, of course">
           <label>Tell us about something you shipped</label><textarea rows="3" placeholder="Saved a line on the overlay page? It's in the strip."></textarea>
-          <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source</div>
+          <label>Resume (PDF)</label><div class="drop" data-accept="doc" tabindex="0"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — bothy. shows up as a source</div>
         </div>
         <div class="task">
           <div class="co"><div class="logo" style="background:#2E7D6B">M</div>
@@ -878,7 +896,7 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
   <section data-page="dial">
     <div class="eyebrow">The overlay · Android <span class="ptag" style="margin-left:6px">Being built · simulated here</span></div>
     <h2 class="lead" id="dialLead">Apply to Northbeam using only the overlay</h2>
-    <p class="pintro">The phone is inside Northbeam's careers app. The round button on its edge is Reel — it floats over whatever app you're in. Fill the whole application without ever leaving the form.</p>
+    <p class="pintro">The phone is inside Northbeam's careers app. The round button on its edge is bothy. — it floats over whatever app you're in. Fill the whole application without ever leaving the form.</p>
     <!-- iPad only: iOS has no overlay API — no AccessibilityService, no
          SYSTEM_ALERT_WINDOW equivalent — so a floating dial cannot exist there.
          This card replaces the frame and the demo. A statement, not an apology. -->
@@ -914,6 +932,9 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
         <div class="prow"><span class="plabel">New copies</span>
           <div class="dseg" id="segCatch"><button type="button" data-v="auto">Keep them</button><button type="button" data-v="ask">Ask first</button></div></div>
         <p class="pnote">On a real phone the overlay copies and the box grows a <b>Paste</b> chip — one tap finishes it. Filling the box outright is a demo convenience, so the speed is easy to feel here.</p>
+        <div class="prow"><span class="plabel">Where you are</span>
+          <div class="dseg" id="segField"><button type="button" data-v="on">In a text box</button><button type="button" data-v="off">Just looking</button></div></div>
+        <p class="pnote"><b>Just looking</b> is the overlay with nothing to type into: links and files come forward and picking one opens it, and plain text steps off the ring entirely so the slots stay full of things you can actually use. The one exception is something you have just caught — that stays, so you can see it arrive. Your phone works this out on its own — there is no switch on the real thing. Opening here shows a line, because a browser cannot actually appear inside the frame.</p>
       </div>
       <div class="pgroup span">
         <h3 class="pglabel">What it shows</h3>
@@ -936,7 +957,7 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
           <button type="button" class="labbtn" id="addfile1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Add a file of your own</button>
         </div>
         <p class="pnote">The first pretends you copied something elsewhere; the second replays the one-time permission moment. Add a photo and it joins the overlay; add a document and it shows up when you attach inside the form — the file never leaves this browser, only its name is remembered.</p>
-        <p class="pnote" style="margin-bottom:2px">Select any text on this page and a <b>Save to Reel</b> chip appears — write a line of your own cover letter, save it, then reuse it on the keyboard page.</p>
+        <p class="pnote" style="margin-bottom:2px">Select any text on this page and a <b>Save to bothy.</b> chip appears — write a line of your own cover letter, save it, then reuse it on the keyboard page.</p>
       </div>
     </div>
   </section>
@@ -982,13 +1003,13 @@ button:focus-visible,a:focus-visible,.drop:focus-visible{outline:2px solid var(-
 
 <footer class="sitefoot">
   <div class="sf-links">
-    <a href="../">Reel home</a><a href="../app/">The app</a><a href="../ios/">On iPhone</a><a href="../privacy/">Privacy</a><button type="button" class="linkbtn" id="resetbtn">Reset demo data</button>
+    <a href="../">bothy. home</a><a href="../app/">The app</a><a href="../ios/">On iPhone</a><a href="../privacy/">Privacy</a><button type="button" class="linkbtn" id="resetbtn">Reset demo data</button>
   </div>
   <p>Built in public — a Shipaton 2026 project. Everything you do here is saved in this browser only; nothing is uploaded and there is no account.</p>
 </footer>
 
 <input type="file" id="filepick" multiple hidden>
-<div id="savechip"><b>＋</b> Save to Reel</div>
+<div id="savechip"><b>＋</b> Save to bothy.</div>
 
 <script>
 'use strict';
@@ -1114,6 +1135,35 @@ let CATCH=(()=>{try{const v=localStorage.getItem(CATCHKEY);return v==='auto'||v=
    the native contract (copy + receipt) is unchanged. Key is v2 so devices that
    stored the old default land on the new one. */
 let EGRESS=(()=>{try{const v=localStorage.getItem(EGRESSKEY);return v==='insert'||v==='copy'?v:'insert'}catch(_){return 'insert'}})();
+/* ═══ context-aware egress (owner ruling 2026-08-08) ═══
+   "selecting a link when there isn't an active textbox should open the link…
+   if the overlay is open but there is no active field, it should show only
+   links and files, and selecting them would cause them to open. opening the
+   overlay when there is an active field causes it to appear and act the way it
+   already does."
+   FIELD='on' is that unchanged ring and stays the default. FIELD='off' brings
+   files onto the ring and opens what you pick — and TEXT IS GONE FROM IT, not
+   dimmed. The dimmed compromise was overruled by the owner on 2026-08-08:
+   "docs and files don't seem to replace plain text (no need to replace links
+   because they open the link) when there isn't an active input field." The
+   window backfills from deeper in the stream so slots never sit empty. On a
+   phone this is not a switch at all: the overlay reads it off keyboard
+   visibility. Here it is a toggle so the difference can be felt. */
+const FIELDKEY='reel.dial.field.v1';
+let FIELD=(()=>{try{const v=localStorage.getItem(FIELDKEY);return v==='off'?'off':'on'}catch(_){return 'on'}})();
+/* ═══ what this open's ring may carry ═══
+   With a field: everything but docs — "a slot you cannot insert is a dead end".
+   Without one: what can be OPENED, so docs come back and text goes away.
+   THE ONE EXEMPTION is the item CAUGHT on this open (CAUGHT holds its id): the
+   receipt says it was saved, so a ring that then hides it makes automatic catch
+   read as a black hole. It shows at full strength and lands at the index; its
+   TAP still cannot copy (there is nowhere to paste), so it answers with the
+   ring's refusal tick, and it is still drag-reachable. The exemption dies with
+   the open. */
+let CAUGHT=null;
+function reachable(it){return FIELD==='on'?it.type!=='doc':(it.id===CAUGHT||it.type!=='txt')}
+/* On the ring but not takeable by tap — in practice only that caught item. */
+function dimItem(it){return FIELD==='off'&&it.type==='txt'}
 /* Preview: where you READ what the dial has up. 'top' is the idea under test —
    the thumb is the input, the top of the screen is the output — so it defaults on. */
 const PREVKEY='reel.dial.preview.v1';
@@ -1217,8 +1267,11 @@ function stageClip(){
 function doCatch(content){
   const now=Date.now();
   const type=/^https?:\/\//.test(content)?'url':'txt';
-  vault.push({id:'c'+now,type,label:content.slice(0,24)+(content.length>24?'…':''),content,
+  const id='c'+now;
+  vault.push({id,type,label:content.slice(0,24)+(content.length>24?'…':''),content,
     use_count:0,last_used_at:0,captured_at:now,source:'catch',pin_order:null,is_sensitive:0});
+  CAUGHT=id;                          // exempt for THIS open only — see `reachable`
+  markSettle();                       // capture is the brand verb reversed
   save(vault);refreshKb();
   DIAL.tOut=0;DIAL.rawOut=0;          // the caught item lands at the index mark
   DIAL.offer=null;stagedClip=null;
@@ -1226,6 +1279,7 @@ function doCatch(content){
   fanStart();                         // the fan re-sweeps: what moved, said out loud
 }
 function catchOnOpen(){
+  CAUGHT=null;                         // a new open, a new (empty) exemption
   if(!stagedClip)return;
   if(CATCH==='auto')doCatch(stagedClip);
   else DIAL.offer=stagedClip;          // center offer; ignoring it drops it
@@ -1290,8 +1344,8 @@ function openPerm(){
   permEl.innerHTML=`<div class="pm-scrim"></div>
    <div class="pm-sheet">
     <div class="pm-grip"></div>
-    <div class="pm-title">Let Reel float</div>
-    <p class="pm-copy">Reel draws a small handle over other apps. Android will ask you to allow it.</p>
+    <div class="pm-title">Let bothy. float</div>
+    <p class="pm-copy">bothy. draws a small handle over other apps. Android will ask you to allow it.</p>
     <div class="pm-mini"><svg width="230" height="120" viewBox="0 0 230 120" aria-hidden="true">
       <rect x="60" y="6" width="110" height="108" rx="12" fill="none" stroke="var(--line)" stroke-width="2"/>
       <rect x="76" y="22" width="74" height="7" rx="3.5" fill="var(--line)"/>
@@ -1326,6 +1380,7 @@ function bindSeg(id,get,set){
 }
 bindSeg('segCatch',()=>CATCH,v=>{CATCH=v;persist(CATCHKEY,v);});
 bindSeg('segEgress',()=>EGRESS,v=>{EGRESS=v;persist(EGRESSKEY,v);});
+bindSeg('segField',()=>FIELD,v=>{FIELD=v;persist(FIELDKEY,v);drawDial();});  // the ring's contents change, so redraw now
 bindSeg('segPreview',()=>PREVIEW,v=>{PREVIEW=v;persist(PREVKEY,v);syncPeekNote();});  // the loop re-syncs live
 bindSeg('segStyle',()=>STYLE,v=>{STYLE=v;persist(STYLEKEY,v);});       // redraws next frame, live
 bindSeg('segPeek',()=>PEEK,v=>{PEEK=v;persist(PEEKKEY,v);syncPeekNote();});
@@ -1347,12 +1402,12 @@ document.addEventListener('focusin',e=>{
   if((el.matches('input[type=text],textarea'))&&el.closest('.task')){T.field=el;
     if(pendingPaste)showPasteChip();}
 });
-/* Upload spots open a picker where Reel appears as a SOURCE — the Files-provider
+/* Upload spots open a picker where bothy. appears as a SOURCE — the Files-provider
    mechanic, simulated honestly. Documents never ride the dial or the keyboard:
    a slot holding a PDF you cannot insert is a dead end. This is their surface. */
 const DROP_LABEL={
-  doc:'<svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — Reel shows up as a source',
-  img:'<svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/></svg> Tap to attach — Reel shows up as a source'};
+  doc:'<svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16.5 6.8 9 14.3a2.6 2.6 0 0 0 3.7 3.7l7.8-7.8a4.4 4.4 0 0 0-6.2-6.2L6.4 11.9a6.2 6.2 0 0 0 8.8 8.8l6-6"/></svg> Tap to attach — bothy. shows up as a source',
+  img:'<svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.6"/><circle cx="8.7" cy="10.2" r="1.5"/><path d="m4.5 16.4 4-4a1.6 1.6 0 0 1 2.2 0l2.3 2.3M13.6 15.4l2-2a1.6 1.6 0 0 1 2.2 0l1.7 1.7"/></svg> Tap to attach — bothy. shows up as a source'};
 let pickTarget=null;
 document.addEventListener('click',e=>{
   const d=e.target.closest('.drop');
@@ -1371,7 +1426,7 @@ function openPicker(drop){
   p.innerHTML=`<div class="pk-scrim"></div>
    <div class="pk-sheet">
     <div class="pk-grip"></div>
-    <div class="pk-head">Add ${t==='doc'?'a document':'an image'}<span class="pk-sub">Reel · your ${t==='doc'?'documents':'images'}</span></div>
+    <div class="pk-head">Add ${t==='doc'?'a document':'an image'}<span class="pk-sub">bothy. · your ${t==='doc'?'documents':'images'}</span></div>
     ${items.length?items.map(i=>`<div class="pk-row" data-id="${i.id}">
       <span class="pk-badge">${t==='doc'?'PDF':'IMG'}</span>
       <span class="pk-name">${i.label}</span></div>`).join('')
@@ -1422,6 +1477,31 @@ function useItem(it,via){
     tick();setTimeout(tick,70);return true;
   }
   return false;   // docs never reach the rings; the upload picker is their surface
+}
+/* ═══ THE RING'S TAKE (owner ruling 2026-08-08) ═══
+   With a field in front of you, taking is handing over and nothing here has
+   changed. With no field, taking is OPENING — the ring does the obvious thing
+   with what you picked. Text is refused with the ring's own tick and nothing
+   else: no clip, no receipt, no close, and it stays exactly where your finger
+   already is. Dragging a dim slot out still works, which is the whole reason
+   text stays on the ring instead of being hidden.
+
+   Only the RING routes through here. Double-tap keeps its copy semantics in
+   both modes (it never opens the ring, so it never has a mode), and catch-on-
+   open is capture rather than egress and is untouched either way. */
+function dialTake(it){
+  if(!it)return false;
+  if(FIELD==='on')return useItem(it,'dial');
+  if(dimItem(it)){tick();return false;}
+  markLift();                          // a take: the sheet takes its beat
+  touch(it);
+  /* The app shows NO receipt for an open — the browser arriving IS the receipt.
+     Nothing can arrive inside this frame, so the demo says the line instead and
+     the panel note says that it is saying it. */
+  receipt(it.type==='url'?'Opened in your browser':`Opened · ${it.label}`);
+  dialPulse(typeInk(it.type));
+  tick();
+  return true;
 }
 /* double-tap = the most recent thing, no dial. Its effect must be LEGIBLE:
    the receipt names the item every time, and in honest mode the paste chip
@@ -1819,7 +1899,7 @@ function openKbAccess(){
    <div class="kp-sheet">
     <div class="kp-grip"></div>
     <div class="kp-title">Reach your vault from here</div>
-    <p class="kp-copy">To reach your vault, iOS needs you to allow Full Access. Everything still stays on this phone — nothing goes online.</p>
+    <p class="kp-copy">To reach your vault, iOS needs you to allow Full Access. It changes nothing about the promise — no accounts, no servers of ours, and nothing you save is uploaded to us.</p>
     <div class="kp-mini"><svg width="230" height="112" viewBox="0 0 230 112" aria-hidden="true">
       <rect x="36" y="6" width="158" height="100" rx="14" fill="none" stroke="var(--line)" stroke-width="2"/>
       <rect x="52" y="20" width="86" height="7" rx="3.5" fill="var(--line)"/>
@@ -1978,7 +2058,7 @@ function kclick(){
 }
 let kcFlashT=null;
 function kcFlashName(){
-  KC.flash='Reel';
+  KC.flash='bothy.';
   clearTimeout(kcFlashT);
   kcFlashT=setTimeout(()=>{KC.flash='';
     const sp=kckeys.querySelector('.kc-sp span');if(sp)sp.textContent='space';},700);
@@ -2157,6 +2237,9 @@ const glidechip=document.getElementById('glidechip');
    in dialItems(), and the two-zone glide in zoneFor(). The single ring keeps
    its 'Out' name below so that return is a diff, not a rename. */
 const DIAL={enabled:false,mode:'closed',open:0,openT:0,
+  /* the bloom's clock: what openT was last frame, where the ease started from,
+     when it started, and which of the two durations/easings it is running */
+  openTPrev:0,openFrom:0,openAt:0,openDur:200,openEase:null,
   sOut:0,tOut:0,rawOut:0,grab:null,downBand:null,
   lastA:0,moved:0,downT:0,tapTimer:null,holdTimer:null,lastTapAt:0,glideY:0,glideZone:null,
   offer:null,dockX:0,dockY:0,
@@ -2167,7 +2250,11 @@ const DIAL={enabled:false,mode:'closed',open:0,openT:0,
      explicit swipe on the handle. */
   tucked:HANDLE==='sliver',tuck:HANDLE==='sliver'?1:0,tuckT:HANDLE==='sliver'?1:0,
   downX:0,downY:0,onHandleDown:false,sliverPtr:null,
-  cru:null,cruT:null,cruZone:null,cruised:false,vel:null,fliT:null};
+  cru:null,cruT:null,cruZone:null,cruised:false,vel:null,fliT:null,
+  /* the living mark: mkDy is where the sheet is, mkRest where it returns to,
+     and mkFrom/mkAt/mkDur/mkTo/mkBeat are one tween (a beat is out and back on
+     one clock, so it ends exactly where it started) */
+  mkDy:0,mkRest:0,mkFrom:0,mkAt:0,mkDur:0,mkTo:0,mkBeat:false};
 const DEADBAND=0.55;                                   // >0.5 so it can't flicker on the boundary
 const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
 /* Discord-overlay parity (owner ask, 2026-08-06): Discord's mobile overlay
@@ -2265,6 +2352,86 @@ const LENS_LIGHT={
 };
 /* the live finish — drawDial points this at LENS or LENS_LIGHT per theme */
 let LF=LENS;
+
+/* ═══ the four TYPE GLYPHS the slot marks engrave (owner ruling, 2026-08-07) ═══
+   NF: "change them to input type logos like pdf or txt." Recorded in
+   docs/design-decisions.md, "The ring's marks say what they are".
+
+   This is the NATIVE build's TypeGlyphs.kt, ported — same source coordinates,
+   same box, same simplifications, same weights. The demo used to show plain
+   marks with a pin head on the pinned two; that was a real parity gap, and
+   this closes it. Keep the two in step.
+
+   TEXT, IMAGE and FILE are the BRAND's own page language, transcribed from
+   design/icon-exploration.html's `#page-lines`, `#page-mountain` and
+   `#page-blank` — one A4-proportioned dog-eared page, three printings. Every
+   coordinate below is that file's 36x36 viewBox value, unchanged; only the
+   printing is simplified, and only where 36 units of room become sixteen:
+     - the page outline and its dog-ear are verbatim (the outline, plus the two
+       edges of the fold the hero page cuts into itself);
+     - `#page-lines` rules THREE lines; at this size the third closes to under a
+       pixel and the three read as a smudge, so this draws TWO — one full, one
+       short — keeping the brand's long-then-short cadence in the same band;
+     - `#page-mountain`'s ridge has two notches 1.7 units apart, which merge
+       here, so the ridge keeps its two summits and loses the notch between
+       them. The sun stays at the brand's own centre and diameter.
+   LINK has no brand page — the file language is about pages and a link is not
+   one — so it is the Material Symbols "link" READING drawn as geometry: two
+   rounded capsules overlapping along a 45-degree axis. Paths only. Nothing
+   here is ever a glyph from a typeface, and never an emoji.
+
+   Sized in frame pixels, which the dial treats 1:1 with dp — the native's
+   `half` of 19/12 is this file's 19/12 — so the dp constants port unchanged. */
+const GLYPH_H=16,            // the page's height; everything else derives from it
+      GLYPH_W=1.2,           // ink weight
+      GLYPH_CUT_W=1.35,      // the fatter cut under it
+      GLYPH_CUT_DY=.7;       // and its lift
+const GLYPH=(()=>{
+  const SRC_H=28.3,SRC_CX=18,SRC_CY=17.15,s=GLYPH_H/SRC_H;   // page bounds x 8..28, y 3..31.3
+  const x=u=>+((u-SRC_CX)*s).toFixed(3), y=u=>+((u-SRC_CY)*s).toFixed(3);
+  /* `#page-blank` verbatim — the rounded A4 body with the top-right corner cut
+     — then the two edges of the fold. Without the fold the cut corner reads as
+     a chamfer; with it the page is dog-eared, which is the whole language. */
+  const page=`M${x(10.5)} ${y(3)}Q${x(8)} ${y(3)} ${x(8)} ${y(5.5)}`
+    +`L${x(8)} ${y(28.8)}Q${x(8)} ${y(31.3)} ${x(10.5)} ${y(31.3)}`
+    +`L${x(25.5)} ${y(31.3)}Q${x(28)} ${y(31.3)} ${x(28)} ${y(28.8)}`
+    +`L${x(28)} ${y(9)}L${x(22)} ${y(3)}Z`
+    +`M${x(22)} ${y(3)}L${x(22)} ${y(9)}L${x(28)} ${y(9)}`;
+  const rule=(x0,x1,yy)=>`M${x(x0)} ${y(yy)}L${x(x1)} ${y(yy)}`;
+  const ridge=`M${x(11)} ${y(26.5)}L${x(15.2)} ${y(20.5)}L${x(18.6)} ${y(24.2)}`
+    +`L${x(20.6)} ${y(21.3)}L${x(24.8)} ${y(26.5)}`;
+  const SUN_R=.62;                        // the brand's 4.4-unit disc, halved, in dp
+  const sun=`M${x(21.5)-SUN_R} ${y(13.5)}a${SUN_R} ${SUN_R} 0 1 0 ${2*SUN_R} 0`
+    +`a${SUN_R} ${SUN_R} 0 1 0 ${-2*SUN_R} 0`;
+  /* the chain: two capsules on one axis, overlapping in the middle, the pair
+     rotated to 45 degrees. Its span is sized off the page's height so a link
+     mark carries the same visual weight as a page mark beside it. */
+  const h=.30*GLYPH_H,w=.145*GLYPH_H,c=.175*GLYPH_H;
+  const cap=cx=>`<rect x="${(cx-h).toFixed(3)}" y="${(-w).toFixed(3)}" `
+    +`width="${(2*h).toFixed(3)}" height="${(2*w).toFixed(3)}" rx="${w}" ry="${w}"/>`;
+  return {
+    txt:`<path d="${page+rule(11.5,24.5,16.5)+rule(11.5,19.5,22.5)}"/>`,
+    img:`<path d="${page+ridge+sun}"/>`,
+    doc:`<path d="${page}"/>`,
+    url:`<g transform="rotate(-45)">${cap(-c)}${cap(c)}</g>`,
+  };
+})();
+/* The glyph machined into a mark: the cut sits GLYPH_CUT_DY proud of the ink in
+   the finish's own shadow colour, the ink lands on top — the same two-pass
+   engraving the scale marks and the fan's labels use, so a glyph reads as a
+   groove in the barrel rather than a symbol printed on it. It inverts with the
+   finish exactly as every other engraving does: light ink over a dark cut on
+   the prime, dark ink over a light cut on the white telephoto.
+   Drawn upright, never rotated with its slot — the native does the same. */
+const engraveGlyph=(type,p,strength)=>{
+  const g=GLYPH[type];
+  if(!g||strength<=0)return '';
+  const pen=`fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+  return `<g transform="translate(${p.x},${p.y-GLYPH_CUT_DY})" ${pen} stroke="${LF.engraveShadow}" `
+    +`stroke-width="${GLYPH_CUT_W}" opacity="${(.55*strength).toFixed(3)}">${g}</g>`
+    +`<g transform="translate(${p.x},${p.y})" ${pen} stroke="${LF.engrave}" `
+    +`stroke-width="${GLYPH_W}" opacity="${strength.toFixed(3)}">${g}</g>`;
+};
 /* ═══ frame-local geometry (chassis conversion) ═══
    VW/VH are the FRAME's inner dimensions, FW===VW (the frame IS the device),
    and AX sits on the frame's own left or right wall. The SVG overlays the
@@ -2332,13 +2499,18 @@ function slots(list,s,step,win){
 }
 /* pins live at the arc's edge extremes — fixed positions, global across collections */
 const PIN_OFF=64, WIN_ROT=38;
-function pinnedItems(){return vault.filter(i=>i.pin_order!=null&&!i.deleted_at)
+/* the two fixed slots take the top two pins THIS MODE CAN HAND OVER: a pinned
+   text slot in no-field mode would be the empty fixed slot all over again */
+function pinnedItems(){return vault.filter(i=>i.pin_order!=null&&!i.deleted_at&&reachable(i))
   .sort((a,b)=>a.pin_order-b.pin_order).slice(0,2)}
 /* ONE ring holds everything: docs stay off (a slot you cannot insert is a dead
    end), pins lift out to their fixed slots, the rest mixes newest-first.
    (A type filter would re-enter here if categories return — see the seam.) */
 function dialItems(){const pins=new Set(pinnedItems().map(p=>p.id));
-  return vault.filter(i=>i.type!=='doc'&&!pins.has(i.id)&&!i.deleted_at)
+  /* …except with no field in front of you: "a slot you cannot insert is a dead
+     end" is true of a text box and false of a file handler, so docs come back
+     onto the ring the moment opening is what a tap does (2026-08-08). */
+  return vault.filter(i=>reachable(i)&&!pins.has(i.id)&&!i.deleted_at)
     .sort((a,b)=>b.captured_at-a.captured_at)}
 /* selection reads the COMMITTED detent (tOut), not the easing sOut — a release
    right after a click can no longer take the neighbour it just left */
@@ -2412,6 +2584,23 @@ prevEl.addEventListener('pointerdown',e=>{
    lands (the caught thing is at the mark; the sweep says what moved). */
 const FAN={t0:0};
 function fanStart(){if(PEEK==='fan')FAN.t0=performance.now();}
+/* The label's chip needs the ink's width, and the draw loop may not measure
+   text — so it is measured once per string on a canvas carrying the same face
+   and size, and cached. (The app does the same thing one layer earlier, on the
+   IO thread that cut the string: RingItem.fanLabelW.) The pad is the halo's own
+   stroke width, so the chip can never be narrower than the outline on top. */
+const FAN_CHIP_PAD=2.4;
+const fanTextW=(()=>{
+  const ctx=document.createElement('canvas').getContext('2d');const cache=new Map();
+  return s=>{
+    let w=cache.get(s);
+    if(w==null){
+      ctx.font=`8.5px ${getComputedStyle(document.body).fontFamily||'sans-serif'}`;
+      w=ctx.measureText(s).width;cache.set(s,w);
+    }
+    return w;
+  };
+})();
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function syncPreview(){
   const want=DIAL.enabled&&PREVIEW==='top'&&DIAL.openT>0;
@@ -2426,15 +2615,102 @@ function syncPreview(){
   }else if(want)renderPreview(false);
 }
 
+/* ═══ the engraved brand mark (naming landed, 2026-08-07) ═══
+   The bothy. glyph — one dog-eared file over the open box — transcribed
+   verbatim from design/icon-exploration.html §5 (#mark-glyph: a 108-unit box,
+   6.5 stroke, round caps and joins). Pure stroke, never the filled fan.
+   It is CUT, not printed: the same two-pass the chip type and the scale ticks
+   already use — the finish's cut-shadow copy offset .7 up, the ink laid over
+   it — and it is deliberately quiet, the thing you notice second. Never a hit
+   target: the cap and the tab keep the targets they had, the mark only rides
+   them. */
+const MARK_DOC=['M44,28 L57,28 L64,35 L64,57','M44,28 L44,57','M57,28 L57,35 L64,35',
+  'M48.5,45 L59.5,45'];
+const MARK_BOX=['M30,57 L78,57','M34,57 L34,71 Q34,78 41,78 L67,78 Q74,78 74,71 L74,57'];
+const MARK_D=[...MARK_DOC,...MARK_BOX];
+/* ═══ fitting the hub's mark inside the VISIBLE half (owner ruling 2026-08-08:
+   "fix the way the logo looks when it's open") ═══
+   The hub is a full circle centred ON THE WALL, so only its room-facing half is
+   ever on screen and a mark drawn on that centre lost half of itself. It now
+   sits far enough into the room that its wall-side outer edge is exactly on the
+   wall, and it is SIZED so that pushing it there does not send it out through
+   the far side of the glass. OW/OH are the ink half-extents plus half a stroke;
+   LIFT is the document's travel and is one stroke width — the smallest number
+   the glyph itself offers; MAXUP includes a take's second lift. */
+const MARK_FIT={OW:30.5,OH:31.5,LIFT:6.5};
+MARK_FIT.MAXUP=MARK_FIT.OH+2*MARK_FIT.LIFT;
+MARK_FIT.HYP=Math.hypot(2*MARK_FIT.OW,MARK_FIT.MAXUP);
+/* the glyph's ink box (strokes counted) is 54.5 x 56.5 about (54,53), so
+   `size` is that ink HEIGHT in frame px — callers think in "how big on the
+   face", not in glyph units. The .7 cut offset is un-scaled on purpose: the
+   cut is a constant hairline everywhere on the instrument. */
+/* the closed handle's own cut (owner ruling 2026-08-08 — see handleSVG). Every
+   value is another surface's: `ink` is the ring's engraved-glyph height, `w` is
+   the handle groove's own stroke, `cutW` is the glyph cut's, and op/cutOp are
+   the half-detent scale ticks' .5/.55. All in px, none scaled with the mark —
+   one tool, one width, which is what separates machining from a printed stamp. */
+const MARK_TAB={ink:16,w:1.2,cutW:1.35,op:.5,cutOp:.55};
+/* wPx/cutWPx/cutOp are optional and ABSOLUTE: pass them and the stroke stops
+   scaling with the mark (px are converted back into glyph units by /k). Omit
+   them and this is the hub's original call, byte for byte. */
+function markSVG(cx,cy,size,ink,cut,op,wPx,cutWPx,cutOp){
+  const k=size/56.5,body=MARK_D.map(d=>`<path d="${d}"/>`).join('');
+  const w =wPx   ==null?6.5:wPx/k;
+  const cw=cutWPx==null?w  :cutWPx/k;
+  const co=cutOp ==null?.75*op:cutOp;
+  return `<g pointer-events="none" fill="none" stroke-linecap="round" stroke-linejoin="round" `
+    +`transform="translate(${cx},${cy}) scale(${k}) translate(-54,-53)">`
+    +`<g stroke="${cut}" stroke-width="${cw}" opacity="${co}" transform="translate(0,${-.7/k})">${body}</g>`
+    +`<g stroke="${ink}" stroke-width="${w}" opacity="${op}">${body}</g></g>`;
+}
+/* ═══ the hub's mark, with the document alive in it ═══
+   The icon's own motion thesis, finally where it came from
+   (docs/analysis/animation-map.md §0: lift out = retrieval, settle in =
+   capture). The SHEET moves; the BOX never does, because a box that moved would
+   be the room moving rather than the thing being taken out of it. */
+function hubMarkSVG(cx,cy,rIn,ink,cut,op,docDy){
+  const k=rIn/MARK_FIT.HYP;
+  /* docDy arrives in px; the group is already scaled by k, so it converts back */
+  const g=(arr,dy)=>`<g transform="translate(0,${(dy||0)/k})">`
+    +arr.map(d=>`<path d="${d}"/>`).join('')+`</g>`;
+  const body=g(MARK_BOX,0)+g(MARK_DOC,docDy);
+  const off=MARK_FIT.OW*k;                       // clear of the wall, exactly
+  return `<g pointer-events="none" fill="none" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" `
+    +`transform="translate(${cx-EDGE*off},${cy}) scale(${k}) translate(-54,-53)">`
+    +`<g stroke="${cut}" opacity="${.75*op}" transform="translate(0,${-.7/k})">${body}</g>`
+    +`<g stroke="${ink}" opacity="${op}">${body}</g></g>`;
+}
 function handleSVG(bx,by){
-  /* the closed handle is a plain machined pull-tab (owner ruling, 2026-08-06):
-     charcoal body, full-turn knurl ribs, one dark machined groove — no tick,
-     no glyph, no logo motif. Branding waits for a name; when one lands, the
-     OPEN hub's engraved glass cap is its natural home, not this tab. */
+  /* the closed handle: charcoal body, full-turn knurl ribs, one dark machined
+     groove — and, since the owner's ruling of 2026-08-08 ("when the overlay
+     isn't opened, the logo still isn't there and it just looks like an empty
+     camera wheel"), the mark CUT INTO the disc that groove encloses. This
+     supersedes the de-red amendment's "no tick, no glyph" for the button face.
+     The SLIVER stays bare — it is near-flush by design and the complaint is
+     about the visible wheel.
+
+     An earlier attempt put the mark here and it read as a printed STAMP, for
+     two reasons that are both fixed: it was sized like the HUB's mark (55% of
+     the face) and its stroke scaled with that size, so a fat outline sat on a
+     small disc. Real machining is the other way round — one tool, one width,
+     and shallow marks lighten instead of thickening. So the mark is cut at
+     MARK_TAB.ink px tall (the ring's own engraved-glyph height) with the
+     GROOVE'S OWN 1.2 stroke, in the finish's dim engraving at the half-detent
+     scale ticks' .5/.55 — every number borrowed from a surface that already
+     reads as metal, none of them chosen here. And unlike the hub, the tab's
+     metal genuinely inverts, so the pair comes from the live finish. */
   let s=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="${LF.tab}" stroke="${LF.tabEdge}" stroke-width="2"/>`;
   for(let a=0,i=0;a<360;a+=8,i++){const p1=P2(bx,by,BTN_R-6,a),p2=P2(bx,by,BTN_R-1.5,a);
     s+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${i%2?LF.knDark:LF.knLight}" stroke-width="1.4" stroke-linecap="round" opacity=".9"/>`;}
   s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-7.5}" fill="none" stroke="${LF.tabGroove}" stroke-width="1.2" opacity=".85"/>`;
+  s+=markSVG(bx,by,MARK_TAB.ink,LF.engraveDim,LF.engraveShadow,MARK_TAB.op,MARK_TAB.w,MARK_TAB.cutW,MARK_TAB.cutOp);
+  /* THE GLEAM, over all of it — the knurl, the groove and the engraved mark all
+     ride underneath unchanged. The closed button is where the logo lives nine
+     tenths of the time, so it is where the sheen ruling is most literally about,
+     and it is the one metal surface the ring's own centre-anchored sheen cannot
+     reach. Its copy is objectBoundingBox, so it follows the button to either
+     wall for free. */
+  s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="url(#sheentab)"/>`;
   return s;
 }
 /* ═══ the sliver — the tucked handle (owner ruling, 2026-08-06) ═══
@@ -2451,9 +2727,75 @@ function sliverSVG(op){
     +`<line x1="${gx}" y1="${CY-SLIVER.HALF+10}" x2="${gx}" y2="${CY+SLIVER.HALF-10}" stroke="${LF.tabGroove}" stroke-opacity=".5"/>`
     +`</g>`;
 }
+/* ═══ THE SHEEN, AND THE ROOM CAST — the depth-metal defs ═══
+   Owner ruling, 2026-08-08, verbatim: "I want the logo and UI especially for
+   the android overlay to kinda look shiny. not super shiny, but to kind of
+   gleam, have something of a thin sheen over it"
+
+   ONE gradient serves the barrel band AND every slot mark, because it is
+   centred on AX,CY — the point the ring turns about — and a radial gradient
+   about the centre of rotation is ROTATION-INVARIANT: turning the ring maps it
+   onto itself, so it never rebuilds as the ring turns. That is the finding that
+   makes M3 affordable (design/depth-study.html §4) and it is the same reason
+   the native RingView builds one RadialGradient beside its five existing
+   shaders instead of one linear gradient per mark inside the frame loop.
+
+   The same invariance disqualifies it from the hub: a gradient about that
+   centre is CONSTANT along every circle about it, so on a disc sitting ON the
+   centre it is a flat tint. The hub's gleam is `rimg` instead, which is the
+   instrument's own top light and does vary across the glass.
+
+   CEILINGS: #fff .20 where the metal takes the light, #000 .16 where it shades
+   — the study's two stop opacities, shared between the finishes by the LENS
+   objects' OWN aniso weights (aniso[0] = a finish's white in-opacity,
+   aniso[3] its black out-opacity). The telephoto keeps its hot top highlight,
+   the prime its deep shade. Neither ceiling is ever exceeded: that is "not
+   super shiny" written as a number.
+
+   The tab's copy is objectBoundingBox, so it centres on whatever circle it is
+   filling — the closed handle moves with the dock and its gleam follows for
+   free. The native handle carries the same gleam from its own shader, built on
+   the button's centre.
+
+   `castm` is the room register's key+ambient pair (--shadow-m / the study's
+   --cast-m) for SVG surfaces that cannot take a CSS box-shadow; `fanseat` is
+   the fan chip's seat, blur 4 dy 2 at .30 dark / .10 light. SVG stdDeviation is
+   half the CSS blur, the same conversion the native port uses. */
+const SHEEN_CEIL_LIGHT=.20, SHEEN_CEIL_SHADE=.16;
+function SHEEN_DEFS(){
+  const dark=LF===LENS;
+  const shW=(SHEEN_CEIL_LIGHT*(LF.aniso[0]/LENS_LIGHT.aniso[0])).toFixed(3);
+  const shK=(SHEEN_CEIL_SHADE*(LF.aniso[3]/LENS.aniso[3])).toFixed(3);
+  const r=OUT1+LENS.knGap+LENS.knDepth+2, mid=((OUT0+r)/2/r).toFixed(3);
+  const cast=dark?'#000000':'#14161A';
+  return `<radialGradient id="sheen" gradientUnits="userSpaceOnUse" cx="${AX}" cy="${CY}" r="${r}">
+      <stop offset="${(OUT0/r).toFixed(3)}" stop-color="#000000" stop-opacity="${shK}"/>
+      <stop offset="${mid}" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="${shW}"/></radialGradient>
+    <radialGradient id="sheentab">
+      <stop offset="0" stop-color="#000000" stop-opacity="${shK}"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="${shW}"/></radialGradient>
+    <filter id="fanseat" x="-40%" y="-80%" width="180%" height="260%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="${dark?.30:.10}"/></filter>
+    <filter id="castm" x="-60%" y="-60%" width="220%" height="240%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="${cast}" flood-opacity="${dark?.40:.07}"/>
+      <feDropShadow dx="0" dy="14" stdDeviation="${dark?18:17}" flood-color="${cast}" flood-opacity="${dark?.55:.09}"/></filter>`;
+}
 function drawDial(){
   if(!DIAL.enabled){svg.innerHTML='';return;}
-  const f=DIAL.open,o=x=>x*(0.55+0.45*f);
+  /* ═══ the bloom (2026-08-08) ═══
+     The growth used to live here, in `o()` — radii breathing 55%→100% off an
+     untimed .18 ease. It has moved into ONE view transform about the wall
+     anchor, so the ring grows out of the edge you pulled it from instead of
+     inflating about its own middle, and the same growth now carries the
+     strokes, the engraving, the hub mark and the offer with it. 0.55 is the
+     very number `o()` started from; only its address changed. `o` stays as an
+     identity so the geometry below reads as it always did.
+     `f` is the fade and is clamped, because --spring overshoots past 1 on
+     purpose — the bounce belongs to the size, never to the opacity. */
+  const bloom=0.55+0.45*DIAL.open;
+  const f=Math.max(0,Math.min(1,DIAL.open)),o=x=>x;
   const themeAttr=document.documentElement.dataset.theme;
   const darkPage=themeAttr?themeAttr==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
   /* ═══ two finishes, one object (owner ruling, 2026-08-06) ═══
@@ -2498,6 +2840,7 @@ function drawDial(){
     <stop offset="0" stop-color="#6E5694"/><stop offset="1" stop-color="#352A4E"/></linearGradient>
     <filter id="dsh" x="-40%" y="-40%" width="180%" height="180%">
       <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#000000" flood-opacity="${darkPage?.55:.30}"/></filter>
+    ${SHEEN_DEFS()}
   </defs>`;
   if(DIAL.mode==='dock'){
     /* the handle rides the finger; the NEAREST side wall shows the dashed
@@ -2555,6 +2898,9 @@ function drawDial(){
     }
     svg.innerHTML=h;return;
   }
+  /* everything from here down is the RING, and only the ring takes the bloom:
+     the handle and the sliver returned above, at their own size. */
+  const beforeRing=h;h='';
   const kn0=o(OUT1)+LENS.knGap,kn1=kn0+LENS.knDepth;
   /* the glass backdrop hugs the ring now (owner ruling, 2026-08-06): the old
      +22 spill past the metal was free visual bulk. The touch-catch is the
@@ -2583,6 +2929,10 @@ function drawDial(){
   /* anisotropic light falling across the ribbed metal + outer rim highlight */
   h+=`<path d="${seg(kn0-1,kn1+1.5,A0,A1)}" fill="url(#aniso)" opacity="${f}"/>`;
   h+=`<path d="${arcAt(kn1+2,A0,A1)}" fill="none" stroke="url(#rimg)" stroke-width="1.2" opacity="${f}"/>`;
+  /* THE SHEEN over the whole barrel — the same gradient the slot marks take.
+     It goes down after all the metal and before every engraving, so the sheen
+     is a property of the BARREL and never a film over the marks cut into it. */
+  h+=`<path d="${seg(o(OUT0),kn1+2,A0,A1)}" fill="url(#sheen)" opacity="${f}"/>`;
   /* engraved scale marks along the inner edge, riding the ring's rotation */
   {const ss=-(DIAL.sOut*STEP_OUT)%(STEP_OUT/2);
    for(let a=A0+4;a<=A1-4;a+=STEP_OUT/2){
@@ -2643,18 +2993,51 @@ function drawDial(){
   };
   /* Floating-preview mode: the ring sheds its text and becomes an instrument.
      Items are clean type-coloured segments — count and position stay legible,
-     the focused one brightens at the index mark, pins keep their mark — and
-     the READING happens at the top of the screen. Eyes up, thumb down. */
+     the focused one brightens at the index mark — and the READING happens at
+     the top of the screen. Eyes up, thumb down.
+
+     Each mark carries its type's engraved GLYPH (owner ruling, 2026-08-07,
+     design-decisions "The ring's marks say what they are"). Pins carry their
+     item's glyph like everything else and no longer wear a pin head: their
+     fixed position at the arc's extremes already says pinned, and the mark was
+     spending its one piece of engraving repeating that instead of saying what
+     the item IS. Dim neighbours keep their dim AND their glyph, so the
+     five-slot window reads as five KINDS of thing rather than five anonymous
+     recesses. A mark still carries no VALUE — the pill does the reading — so
+     masked items need nothing special: the type is not the secret.
+
+     Strength is 1 focused, .78 otherwise, exactly as the native mark's is; the
+     enclosing group already carries `op`, which is where the native multiplies
+     it in. */
   const tickSeg=(it,a,foc,op,pinned)=>{
     const col=MKC[it.type]||LF.neutral;
     const w=STEP_OUT*(foc?.56:.42);
     const half=foc?19:12,r0=midO-half,r1=midO+half;   // a band of ticks, not full-height slabs
+    /* ═══ M3, INLAID ENAMEL (design/depth-study.html §4, the recommendation) ═══
+       The study's diagnosis of this exact element: "the glyph engraved on the
+       mark has two-pass depth, and the plate it is engraved into has none" — a
+       sticker with a beautiful engraving on it. Four passes answer it, and the
+       type colours are IDENTITY and are untouched by all of them. */
+    const a0=a-w/2,a1=a+w/2,d=seg(r0,r1,a0,a1);
     let s=`<g opacity="${op}">`;
-    s+=`<path d="${seg(r0,r1,a-w/2,a+w/2)}" fill="${col}" fill-opacity="${foc?.9:pinned?.5:.3}"
-      stroke="${col}" stroke-opacity="${foc?1:.6}" stroke-width="1"/>`;
-    if(pinned){const p=P(midO,a);
-      s+=`<g stroke="#10141A" stroke-width="1.3" stroke-linecap="round" fill="none">
-        <circle cx="${p.x}" cy="${p.y-2.5}" r="2.4"/><path d="M${p.x} ${p.y-.1}v4"/></g>`;}
+    /* M1 — the two-pass SEAT: the plate's own silhouette as a cut, offset -1 on
+       Y, which is the identical idiom the glyph inside it already uses. */
+    s+=`<g transform="translate(0,-1)"><path d="${d}" fill="${LF.engraveShadow}" fill-opacity=".5"/></g>`;
+    /* the plate. The same-colour outline is GONE: "an outline in the fill's own
+       colour adds no information and no depth — it only thickens the swatch." */
+    s+=`<path d="${d}" fill="${col}" fill-opacity="${foc?.9:pinned?.5:.3}"/>`;
+    /* M3 — the shared sheen, the one gradient the barrel is also wearing */
+    s+=`<path d="${d}" fill="url(#sheen)"/>`;
+    /* M2 — the bevel pair AS ARCS AT RADII, which is how this instrument
+       expresses a bevel everywhere else: the cut at the plate's outer radius,
+       the rim light at its inner one. */
+    s+=`<path d="${arcAt(r1,a0,a1)}" fill="none" stroke="${LF.bevelCut}" stroke-opacity=".8"/>`;
+    s+=`<path d="${arcAt(r0,a0,a1)}" fill="none" stroke="#FFFFFF" stroke-opacity="${darkPage?.06:.30}"/>`;
+    /* M3 — the specular, on the FOCUSED mark and nowhere else. The study insets
+       its arc 1.1 degrees on a mark 8.4 degrees wide; carried as that fraction. */
+    if(foc){const ins=w*(1.1/8.4);
+      s+=`<path d="${arcAt(r1-4,a0+ins,a1-ins)}" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-opacity=".18" stroke-linecap="round"/>`;}
+    s+=engraveGlyph(it.type,P(midO,a),foc?1:.78);
     return s+`</g>`;
   };
   const floating=PREVIEW==='top';
@@ -2712,14 +3095,18 @@ function drawDial(){
     :STYLE==='dots'?dotMark(it,a,foc,op,pinned)
     :floating?tickSeg(it,a,foc,op,pinned)
     :card(it,a,pinned?1:foc?1.14:1,op,pinned);
+  /* A slot that is out of reach this open wears the page's own `.off` rule —
+     the dimmed slot is gone with it: what the mode cannot hand over is simply
+     not on the ring (see `reachable`). */
+  const markC=(it,a,foc,op,pinned,num)=>mark(it,a,foc,op,pinned,num);
   const its=dialItems();
   slots(its,DIAL.sOut,STEP_OUT,WIN_ROT).forEach(({i,off})=>{
     const foc=Math.abs(off)<STEP_OUT*.45;
     const op=Math.max(0,Math.min(1,1-(Math.abs(off)-WIN_ROT+8)/14))*f;
-    h+=mark(its[i],CA+off,foc,op,false,i+1);
+    h+=markC(its[i],CA+off,foc,op,false,i+1);
   });
   pinnedItems().forEach((pn,k)=>{const a=CA+(k===0?-PIN_OFF:PIN_OFF);
-    h+=mark(pn,a,false,f,true,0);});
+    h+=markC(pn,a,false,f,true,0);});
   if(STYLE!=='chips'&&its.length>3){
     /* scroll-reveal cue: a half-faded chip used to imply "more past the edge";
        a fine tick can't. So the scale trails off instead — three diminishing
@@ -2808,10 +3195,27 @@ function drawDial(){
       const lab=sl.it.is_sensitive?'••••'
         :(s=>s.slice(0,12)+(s.length>12?'…':''))
           ((sl.it.type==='url'?(sl.it.title||sl.it.label):sl.it.label).replace(/\s+/g,' ').trim());
+      /* the label's own ground (owner 2026-08-08: they need "a slight
+         background" — engraved grey and a halo are enough on metal and are not
+         enough on a photograph). It is the ROOM card, var(--card), because that
+         is what the preview pill and the travelling chip are made of and this
+         has their job: be readable on top of somebody else's screen. It
+         therefore inverts with the page, as it must — the ink is LF.engrave,
+         which is near-white on the prime and near-black on the telephoto.
+         0.8 is not a taste call: on the phone this window is NOT_TOUCHABLE, so
+         the system caps its alpha at the maximum obscuring opacity and the chip
+         is translucent because the platform makes it so. The demo says the same
+         number out loud to show the same picture. */
+      const lw=fanTextW(lab),fh=8.5*1.25+FAN_CHIP_PAD*2,fx=EDGE===1?p.x-lw-FAN_CHIP_PAD:p.x-FAN_CHIP_PAD;
+      /* SEATED (depth-study.html §5): "THE ANSWER IS A SHADOW, NOT A BORDER. A
+         seat shadow adds depth WITHOUT ADDING A SINGLE UNIT OF INK, so the
+         constraint that killed the hairline does not apply to it." The refusal
+         of the hairline survives untouched, and so does the halo. */
+      const chip=`<rect x="${fx}" y="${p.y-fh/2}" width="${lw+FAN_CHIP_PAD*2}" height="${fh}" rx="${fh/2}" style="fill:var(--card)" opacity=".8" filter="url(#fanseat)"/>`;
       /* fan labels bloom OFF the metal onto the room: on a light room the
          engraved grey needs a dark halo to read — halo, never a recolor */
       const fanHalo=darkPage?'':`<text x="${p.x}" y="${p.y}" font-size="8.5" dominant-baseline="central" fill="none" stroke="${LF.engraveShadow}" stroke-width="2.4" stroke-linejoin="round" opacity=".5">${escq(lab)}</text>`;
-      h+=`<g opacity="${op}" text-anchor="${EDGE===1?'end':'start'}">`+fanHalo
+      h+=`<g opacity="${op}" text-anchor="${EDGE===1?'end':'start'}">`+chip+fanHalo
         +eng(p.x,p.y,8.5,escq(lab),`dominant-baseline="central"`,LF.engrave)+`</g>`;
     });
   }
@@ -2821,25 +3225,52 @@ function drawDial(){
        neutral ink — chrome never wears type colour (de-red ruling) */
     const HO=HUB+13;
     const sn=DIAL.offer.replace(/\s+/g,' ').slice(0,11)+(DIAL.offer.length>11?'…':'');
-    h+=`<circle cx="${AX}" cy="${CY}" r="${HO}" fill="url(#lensg)" stroke="${LF.engraveDim}" stroke-width="2" opacity="${f}"/>`;
+    /* SEATED, ROOM register (owner ruling 2026-08-08), which deliberately
+       overrides depth-study.html §6's lens-register card for this element: no
+       collar bevel, no two-pass ink, no sheen — a layered cast and a rim. What
+       is on this disc is the user's CONTENT being offered, not instrument.
+       The rim is the HUB's own `rimg` at .8/.6 and not the room's white,
+       because this disc is the same near-black glass on BOTH barrels, so
+       anything on it keys off the SUBSTRATE — the study's own recorded
+       correction for the offer's two inks, applied again here. */
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HO}" fill="url(#lensg)" stroke="${LF.engraveDim}" stroke-width="2" opacity="${f}" filter="url(#castm)"/>`;
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HO-.8}" fill="none" stroke="url(#rimg)" stroke-width=".8" opacity="${.6*f}"/>`;
     h+=`<text x="${AX-EDGE*HO*.48}" y="${CY-7}" font-size="11.5" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#F0F1F3" opacity="${f}">Catch?</text>`;
     h+=`<text x="${AX-EDGE*HO*.48}" y="${CY+8}" font-size="8" text-anchor="middle" dominant-baseline="central" fill="#98A3B0" opacity="${f}">${escq(sn)}</text>`;
   }else{
     /* the hub is a lens element: coated near-black glass, two dim cool
        reflection arcs (mirrored with the dock), a hair-thin bevel collar.
        NO close glyph (owner ruling, 2026-08-06): the whole cap is the
-       tap-to-close target, and the coach says so once. The empty engraved
-       glass is also the natural home for a future logo once naming lands. */
+       tap-to-close target, and the coach says so once. The naming landed
+       (2026-08-07), so the glass is no longer empty: the bothy. mark is
+       machined into it — and the cap is still, entirely, tap-to-close. */
     h+=`<circle cx="${AX}" cy="${CY}" r="${HUB+1.6}" fill="none" stroke="#0A0C0F" opacity="${.7*f}"/>`;
     h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#lensg)" stroke="#262C33" stroke-width="1.2" opacity="${f}"/>`;
     h+=`<circle cx="${AX}" cy="${CY}" r="${HUB-.8}" fill="none" stroke="url(#rimg)" stroke-width=".8" opacity="${.6*f}"/>`;
     const ra0=EDGE===1?-72:8,ra1=EDGE===1?-8:72;
     h+=`<path d="${arcAt(HUB*.62,ra0,ra1)}" fill="none" stroke="#5E7186" stroke-width="1.3" opacity="${.3*f}"/>`;
     h+=`<path d="${arcAt(HUB*.40,ra0-EDGE*108,ra1-EDGE*108)}" fill="none" stroke="#46586A" opacity="${.18*f}"/>`;
+    /* the mark, ~55% of the hub diameter, riding the same `f` as every other
+       hub detail so it arrives and leaves with the glass. It takes the PRIME's
+       engraving pair in both finishes, exactly as `lensg` takes LF.glass —
+       which is byte-identical dark glass on both barrels, and the same reason
+       the knurl geometry above reads off LENS directly. Dark cut, light ink:
+       the telephoto's dark ink would vanish here. */
+    h+=hubMarkSVG(AX,CY,HUB-1.2,LENS.engrave,LENS.engraveShadow,.5*f,DIAL.mkDy);
+    /* AND THE SHEEN OVER THE HUB — `rimg`, not `sheen`: a gradient about the
+       centre of rotation is constant on a disc sitting ON that centre, so the
+       barrel's sheen would be a flat tint here and buy nothing. This goes down
+       LAST, over the mark, because the ruling asks for a sheen over the LOGO:
+       the living mark rides underneath, entirely unchanged. The glass is the
+       same near-black on both barrels, so this one does not take the finish's
+       weighting — the same reason the hub's mark and the offer's inks do not
+       theme. */
+    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#rimg)" opacity="${SHEEN_CEIL_LIGHT*f}"/>`;
   }
   /* glide's hint is the HTML glidechip riding the finger — ONE voice; the SVG
      duplicate that used to sit by the ring was cut (dedup, 2026-08-06) */
-  svg.innerHTML=h;
+  svg.innerHTML=beforeRing
+    +`<g transform="translate(${AX} ${CY}) scale(${bloom}) translate(${-AX} ${-CY})">${h}</g>`;
 }
 
 /* ═══ tuck state + the once-per-session teach (collapse-to-sliver) ═══ */
@@ -2867,12 +3298,48 @@ function handleModeApply(){
   drawDial();
 }
 
+/* The two page easings, solved in JS so one fraction can drive both the SVG
+   transform and the opacities in the same frame (a CSS transition on the <svg>
+   would ease the size on a second clock). Values are :root's own, unchanged:
+   --spring cubic-bezier(.34,1.56,.5,1) and --glide cubic-bezier(.2,.85,.3,1).
+   Newton on x, then evaluate y — the standard solve, six iterations. */
+function bez(x1,y1,x2,y2){
+  const cx=3*x1,bx=3*(x2-x1)-cx,ax=1-cx-bx;
+  const cy=3*y1,by=3*(y2-y1)-cy,ay=1-cy-by;
+  const fx=t=>((ax*t+bx)*t+cx)*t, dfx=t=>(3*ax*t+2*bx)*t+cx;
+  return x=>{
+    let t=x;
+    for(let i=0;i<6;i++){const e=fx(t)-x;if(Math.abs(e)<1e-4)break;
+      const d=dfx(t);if(Math.abs(d)<1e-6)break;t-=e/d;}
+    return ((ay*t+by)*t+cy)*t;
+  };
+}
+const EASE_SPRING=bez(.34,1.56,.5,1),EASE_GLIDE=bez(.2,.85,.3,1);
+
 /* physics loop */
 let prevOut=0;
 (function loop(){
   const D=DIAL;
-  D.open+=(D.openT-D.open)*.18;
-  if(Math.abs(D.openT-D.open)<.005)D.open=D.openT;
+  /* ═══ the ring's open and close, on the clock (2026-08-08) ═══
+     Was an untimed exponential ease with no citation. Now: --m-lift 200ms on
+     --spring to open, --m-tuck 120ms on --glide to close, the same pair the app
+     runs, and one fraction drives both the bloom's scale and the fade. --spring
+     overshoots past 1 by design — the recorded taste ruling in one number: an
+     arrival may bounce at the MOMENT OF CREATION and never after meaning has
+     arrived, so the open bounces and the close does not. Reduced motion lands
+     on the end state and nothing between. */
+  if(D.openT!==D.openTPrev){
+    if(D.openT>0)markOpen();else markClose();
+    D.openTPrev=D.openT;D.openFrom=D.open;D.openAt=performance.now();
+    D.openDur=D.openT>0?200:120;D.openEase=D.openT>0?EASE_SPRING:EASE_GLIDE;
+  }
+  if(RM)D.open=D.openT;
+  else if(D.open!==D.openT||D.openAt){
+    const t=Math.min(1,(performance.now()-(D.openAt||0))/(D.openDur||200));
+    D.open=D.openFrom+(D.openT-D.openFrom)*(D.openEase||EASE_SPRING)(t);
+    if(t>=1){D.open=D.openT;D.openAt=0;}
+  }
+  markStep();
   // Always ease toward the committed detent, dragging included — never rest part-way.
   // Rate .5 + a .004 landing threshold puts a step on screen in ~8 frames (~130ms):
   // fast enough to read as a mechanical click, slow enough not to look like a teleport.
@@ -2891,6 +3358,34 @@ let prevOut=0;
   if(D.enabled)drawDial();
   requestAnimationFrame(loop);
 })();
+
+/* ═══ the living mark (owner ruling 2026-08-08) ═══
+   "I had wanted the animaations thaat were designed originally for the way the
+   logo looks as you intereact with the overlay, that was where it really came
+   from." So the brand's one verb runs on the brand's own mark: the sheet LIFTS
+   out of the box on open and stays out (a retrieval has begun), takes one
+   further lift when something is taken, SETTLES into the box when a catch is
+   kept (capture is the verb reversed), and settles home as the ring tucks.
+   Durations are the app's own: --m-lift 200, --m-settle 260, --m-tuck 120. */
+const MK_LIFT=200,MK_SETTLE=260,MK_TUCK=120;
+function markTravel(){return MARK_FIT.LIFT*((HUB-1.2)/MARK_FIT.HYP);}
+function markMove(to,ms){const D=DIAL;
+  D.mkFrom=D.mkDy;D.mkTo=to;D.mkDur=ms;D.mkBeat=false;D.mkAt=performance.now();
+  if(RM){D.mkDy=to;D.mkAt=0;}}
+function markBeat(to,ms){const D=DIAL;
+  if(RM)return;                       // a beat's end state IS its start
+  D.mkFrom=D.mkRest;D.mkTo=to;D.mkDur=ms;D.mkBeat=true;D.mkAt=performance.now();}
+function markOpen(){const D=DIAL;D.mkRest=-markTravel();markMove(D.mkRest,MK_LIFT);}
+function markClose(){const D=DIAL;D.mkRest=0;markMove(0,MK_TUCK);}
+function markLift(){markBeat(DIAL.mkRest-markTravel(),MK_LIFT);}
+function markSettle(){markBeat(DIAL.mkRest+markTravel(),MK_SETTLE);}
+function markStep(){
+  const D=DIAL;if(!D.mkAt)return;
+  const p=Math.min(1,(performance.now()-D.mkAt)/(D.mkDur||MK_LIFT));
+  const t=D.mkBeat?(p<.5?p*2:(1-p)*2):p;
+  D.mkDy=D.mkFrom+(D.mkTo-D.mkFrom)*EASE_GLIDE(t);
+  if(p>=1){D.mkDy=D.mkBeat?D.mkRest:D.mkTo;D.mkAt=0;}
+}
 
 /* ═══ cruise — "hold, and the ring comes to you" (owner gripe, 2026-08-06) ═══
    One direction rule, dock-agnostic: dir = sign(rel). Two zones:
@@ -3109,7 +3604,7 @@ addEventListener('pointerup',e=>{
     const z=D.glideZone;
     D.mode='closed';D.glideZone=null;glidechip.style.display='none';
     settle('Out');                                    // already on whole detents; just resync raw
-    if(z==='Out'){useItem(focusedItem(),'dial');D.openT=0;}  // release on the ring takes the item
+    if(z==='Out'){const took=dialTake(focusedItem());if(took||FIELD==='on')D.openT=0;}  // release on the ring takes the item
     else{D.openT=1;}                                  // released short of the ring: stay open to browse
     return;
   }
@@ -3134,14 +3629,14 @@ addEventListener('pointerup',e=>{
   const rel=wrapDeg(a-CA),hit=band(d);
   if(hit==='Out'&&Math.abs(Math.abs(rel)-PIN_OFF)<13){   // pinned slot: use immediately
     const pn=pinnedItems()[rel>0?1:0];
-    if(pn){const okd=useItem(pn,'dial');if(okd)D.openT=0;}
+    if(pn){const okd=dialTake(pn);if(okd)D.openT=0;}
     D.downBand=null;return;
   }
   if(hit&&hit===D.downBand){
     const dd=rel/STEP_OUT;
     if(Math.abs(rel)<=WIN_ROT+STEP_OUT*.6){
       if(Math.abs(dd)<.45){
-        const okd=useItem(focusedItem(),'dial');
+        const okd=dialTake(focusedItem());
         if(okd)D.openT=0;
       }else{D.tOut=Math.round(D.tOut+dd);D.rawOut=D.tOut;}
     }

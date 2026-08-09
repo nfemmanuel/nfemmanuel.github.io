@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Reel — working prototype</title>
+<title>bothy. — working prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -16,6 +16,14 @@
   --c-lnk:#BA5138;  --t-lnk:#FAEAE5;
   --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
   --shadow-m:0 2px 6px rgba(16,20,26,.07),0 14px 34px rgba(16,20,26,.09);
+  /* THE ROOM REGISTER (depth-study.html §8): off the metal, depth is a layered
+     key+ambient cast and a 1px rim light — no machining. --rim is the study's own
+     value; on the dark finish it is the dial's rim-light alpha (Lens/RingView). */
+  --rim:rgba(255,255,255,.55);
+  --room-edge:inset 0 1px 0 var(--rim),inset 0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparent);
+  /* the lit sheet's top-light: monochrome, so it adds no hue */
+  --lit:linear-gradient(180deg,color-mix(in srgb,var(--ink) 0%,transparent),
+        color-mix(in srgb,var(--ink) 5%,transparent));
   --display:"Bricolage Grotesque",system-ui,sans-serif;
   --ui:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
   --spring:cubic-bezier(.34,1.56,.5,1); --glide:cubic-bezier(.2,.85,.3,1);
@@ -35,7 +43,14 @@
   --c-img:#C6A8FF; --t-img:#432D73;
   --c-doc:#8FC6FF; --t-doc:#0F4275;
   --c-lnk:#FFA184; --t-lnk:#66301F;
-  --shadow-s:0 1px 2px rgba(0,0,0,.35); --shadow-m:0 14px 36px rgba(0,0,0,.55);
+  /* THE DARK AMBIENT FIX (depth-study.html §8, "the one thing to decide first"):
+     dark --shadow-s was one tight key layer with no ambient at all, and dark
+     --shadow-m was one wide ambient with no key. Both now carry the pair, at the
+     study's own --cast-s / --cast-m values. Light is unchanged — its two tokens are
+     already byte-identical to the study's casts. */
+  --shadow-s:0 1px 2px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.30);
+  --shadow-m:0 2px 6px rgba(0,0,0,.40),0 14px 36px rgba(0,0,0,.55);
+  --rim:rgba(255,255,255,.06);
   --f-pdf:#FF8A80; --f-doc:#8CB9FF; --f-txt:#A7B1BD; --f-sheet:#6FD79B;
   --f-deck:#FFB265; --f-code:#BBA8F5; --f-zip:#E3C57E; --f-vid:#FF9FE0; --f-aud:#6FD4D6;
   --fmix:17%;
@@ -56,9 +71,8 @@ header{padding:10px 16px 0;flex:0 0 auto}
 .sitenav{flex:0 0 auto;padding:4px 16px 0;display:flex;align-items:center;gap:4px 14px;flex-wrap:wrap}
 .sn-home{display:inline-flex;align-items:center;gap:8px;min-height:40px;text-decoration:none;color:var(--ink);
   font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.025em}
-.sn-knob{width:17px;height:17px;border-radius:50%;background:#1A1F26;border:1.6px solid #333B45;position:relative;flex:0 0 auto}
-.sn-knob::after{content:"";position:absolute;top:.5px;left:50%;width:1.6px;height:4.6px;background:#FF4D4D;
-  transform:translateX(-50%);border-radius:2px}
+.sn-mark{width:17px;height:17px;flex:0 0 auto;display:block}
+.sn-dot{font-size:1.15em}
 .sn-links{display:flex;align-items:center;flex-wrap:wrap;gap:0 2px;margin-left:auto}
 .sn-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;border-radius:99px;
   font-size:12.5px;font-weight:500;color:var(--ink-2);text-decoration:none;transition:color .18s}
@@ -122,26 +136,31 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .big{font-family:var(--display);letter-spacing:-.04em;line-height:.95;margin:0;padding:6px 20px 0}
 .sub{color:var(--ink-3);font-size:13px;margin-top:6px;padding:0 20px}
 .sect{font-size:12px;font-weight:600;color:var(--ink-3);padding:20px 20px 10px}
-.hunt{margin:14px 16px 4px;display:flex;align-items:center;gap:12px;cursor:pointer;
+/* The bottom margin is 9px, not 4px, for the same reason `.lens` padding-bottom is:
+   a --shadow-s cast needs floor under it. The chip recess round gave the raised chip
+   its 9px ("padding bottom 3 -> 9, so the raised chip has floor under its cast") and
+   left the pill above the track at 4px. That was invisible while the track was bare
+   ground — 4px + `.lens` 13px read as one 17px void. Once the track grew a face and
+   an inset top lip, 4px was the whole gap, the pill's own cast landed on the lip, and
+   the two dark bands merged into one: the row read as flush. Same cast, same floor. */
+.hunt{margin:14px 16px 9px;display:flex;align-items:center;gap:12px;cursor:pointer;
   transition:transform .3s var(--spring)}
 .hunt:active{transform:scale(.985)}
-.md .hunt{height:58px;border-radius:29px;background:var(--surf);padding:0 20px;box-shadow:var(--shadow-s);
+.md .hunt{height:58px;border-radius:29px;background:var(--surf);padding:0 20px;box-shadow:var(--shadow-s),var(--room-edge);
   font-size:16px;color:var(--ink-3)}
 .ios .hunt{height:44px;border-radius:13px;padding:0 14px;font-size:16px;color:var(--ink-3);
   background:color-mix(in srgb,var(--surf) 74%,transparent);backdrop-filter:blur(24px) saturate(1.7);
   -webkit-backdrop-filter:blur(24px) saturate(1.7);border:.5px solid var(--hair)}
-.dark .md .hunt{border:1px solid var(--hair)}
 .hunt.active{cursor:default}
 .hunt input{flex:1;min-width:0;font:inherit;font-size:16px;border:none;outline:none;
   background:transparent;color:var(--ink)}
 .hunt input::placeholder{color:var(--ink-3)}
 .hunt .cancel{flex:0 0 auto;font-size:14px;font-weight:600;color:var(--ink-2);cursor:pointer}
 
-.card{background:var(--surf);box-shadow:var(--shadow-s);cursor:pointer;overflow:hidden;position:relative;
+.card{background:var(--surf);box-shadow:var(--shadow-s),var(--room-edge);cursor:pointer;overflow:hidden;position:relative;
   margin:0 16px 11px;transition:transform .3s var(--spring)}
 .card:active{transform:scale(.975)}
 .md .card{border-radius:22px} .ios .card{border-radius:16px}
-.dark .card{border:1px solid var(--hair)}
 .card .in{padding:15px 16px}
 .pin{position:absolute;top:13px;right:13px;color:var(--ink-3);opacity:.55;display:flex}
 
@@ -152,11 +171,18 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
    auto-capture buffer is capped, so this list is short by design. */
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:0 16px}
 .grid.g3{grid-template-columns:1fr 1fr 1fr;gap:9px}
-.gc{position:relative;aspect-ratio:1;background:var(--surf);box-shadow:var(--shadow-s);
+/* THE LIT SHEET (depth-study.html §7 "Item tiles"): the layered cast, a 1px top rim
+   light and the ink hairline as insets, and the top-light gradient in the background
+   stack so it sits under every face. The PAPER GRAIN is deliberately NOT here — the
+   recommendation card defers it ("treat the paper grain as a separate, later
+   decision, because it is the one idea here with a real Compose cost"), and parity
+   means the prototype does not ship what the app cannot. Dark's hairline-instead-of-
+   shadow rule is gone: it has a real cast now, and --room-edge carries its edge. */
+.gc{position:relative;aspect-ratio:1;background:var(--lit),var(--surf);
+  box-shadow:var(--shadow-s),var(--room-edge);
   cursor:pointer;overflow:hidden;transition:transform .3s var(--spring)}
 .gc:active{transform:scale(.965)}
 .md .gc{border-radius:24px} .ios .gc{border-radius:18px}
-.dark .gc{border:1px solid var(--hair)}
 .gc .face{position:absolute;inset:0;padding:14px;display:flex}
 /* every text face centres vertically, at every length. The auto margins fall to zero
    when a value genuinely overflows, so long text stays readable from its first line
@@ -188,7 +214,7 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
   font-size:12.5px;font-weight:600;letter-spacing:-.01em;
   background:linear-gradient(transparent,rgba(0,0,0,.66))}
 /* files: the file type is the cover art */
-.gc.doc{background:color-mix(in srgb,var(--fc) var(--fmix),var(--surf))}
+.gc.doc{background:var(--lit),color-mix(in srgb,var(--fc) var(--fmix),var(--surf))}
 .gc.doc .face{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
   padding-bottom:36px;color:var(--fc)}
 .gc .ext{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
@@ -223,13 +249,23 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
    small, mono, never the accent — on a selected chip they take the chip's own
    colour dimmed, which holds up in both themes. The rail scrolls sideways on the
    narrowest frames rather than shrinking the type below legibility. */
-.lens{display:flex;gap:6px;padding:13px 16px 3px;overflow-x:auto;scrollbar-width:none}
+/* RECESSED TRACK, RAISED SELECTION (depth-study.html §7, recommendation card:
+   "Recess the track and raise the selected chip, which adds a non-colour channel to
+   a state currently carried by colour alone"). Selection stops being a pure colour
+   swap — which matters most in light theme, where --t-doc #E6EFF8 sits on a #F6F6F7
+   ground and the wash is nearly invisible. Chip height stays 33px: the touch target
+   does not move. */
+.lens{display:flex;gap:6px;padding:13px 16px 9px;overflow-x:auto;scrollbar-width:none;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 5%,var(--ground)),var(--ground));
+  box-shadow:inset 0 1px 2px color-mix(in srgb,var(--ink) 8%,transparent)}
 .lens::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:33px;padding:0 12px;
-  border-radius:99px;background:var(--surf);border:1px solid var(--hair);font-size:13px;
+  border-radius:99px;background:var(--surf);
+  border:1px solid color-mix(in srgb,var(--ink) 7%,transparent);font-size:13px;
   font-weight:600;color:var(--ink-2);cursor:pointer;transition:transform .25s var(--spring)}
 .chip:active{transform:scale(.93)}
 .chip .cnt{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink-3)}
+.chip.on{box-shadow:var(--shadow-s),inset 0 1px 0 var(--rim)}
 .chip.on .cnt{color:inherit;opacity:.62}
 
 .tbar{position:absolute;top:36px;left:0;right:0;height:46px;display:flex;align-items:center;
@@ -237,30 +273,46 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .md .tbar{background:linear-gradient(var(--ground) 62%,transparent)}
 .ios .tbar{background:color-mix(in srgb,var(--ground) 60%,transparent);
   backdrop-filter:blur(22px) saturate(1.8);-webkit-backdrop-filter:blur(22px) saturate(1.8)}
+/* Buttons have "no treatment of their own — they inherit the tile rule, which is the
+   point of having a register rather than a list of fixes" (depth-study.html §8). */
 .tbtn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:var(--surf);border:1px solid var(--hair);cursor:pointer;color:var(--ink-2);flex:0 0 auto}
+  background:var(--surf);box-shadow:var(--shadow-s),var(--room-edge);
+  cursor:pointer;color:var(--ink-2);flex:0 0 auto}
 .ios .tbtn{background:color-mix(in srgb,var(--surf) 70%,transparent);backdrop-filter:blur(18px);
   -webkit-backdrop-filter:blur(18px);border:.5px solid var(--hair)}
 .tbtn.wide{width:auto;padding:0 15px;border-radius:99px;font-size:14.5px;font-weight:600;gap:6px;height:36px}
 
 .scrim{position:absolute;inset:0;background:rgba(8,10,14,.45);z-index:7;animation:fade .25s}
 @keyframes fade{from{opacity:0}}
-.sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;background:var(--surf);animation:rise .38s var(--spring)}
+/* LIFTED, WITH ENGRAVED SEAMS (depth-study.html §7, recommendation card: "Make it a
+   real Surface with elevation and give the dividers the two-pass seam; it currently
+   has zero elevation of any kind"). The sheet met a 45% black scrim with a pure value
+   step; it now casts upward over it and its top edge takes the rim, which replaces
+   the dark-only hairline that used to stand in for elevation. */
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;background:var(--surf);animation:rise .38s var(--spring);
+  box-shadow:0 -2px 6px rgba(0,0,0,.10),0 -18px 44px rgba(0,0,0,.26),inset 0 1px 0 var(--rim)}
 .md .sheet{border-radius:30px 30px 0 0;padding:10px 0 22px}
 .ios .sheet{border-radius:14px 14px 0 0;padding:8px 0 20px;
   background:color-mix(in srgb,var(--surf) 94%,transparent);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
-.dark .sheet{border-top:1px solid var(--hair)}
 @keyframes rise{from{transform:translateY(26px);opacity:0}to{transform:none;opacity:1}}
-.grip{width:36px;height:4px;border-radius:2px;background:var(--hair);margin:0 auto 14px}
+.grip{width:36px;height:4px;border-radius:2px;margin:0 auto 14px;
+  background:color-mix(in srgb,var(--ink) 14%,transparent);
+  box-shadow:inset 0 1px 1px color-mix(in srgb,var(--ink) 20%,transparent),0 1px 0 var(--rim)}
+/* the primary action inherits the tile rule too — cast and rim, but no ink hairline:
+   over a saturated fill an ink inset only muddies the colour it sits on. */
 .act{margin:0 16px;height:52px;display:flex;align-items:center;justify-content:center;gap:9px;
-  font-weight:600;font-size:16px;cursor:pointer;transition:transform .3s var(--spring);color:#fff}
+  font-weight:600;font-size:16px;cursor:pointer;transition:transform .3s var(--spring);color:#fff;
+  box-shadow:var(--shadow-s),inset 0 1px 0 var(--rim)}
 .act:active{transform:scale(.97)}
 .md .act{border-radius:26px} .ios .act{border-radius:14px}
 .opt{display:flex;align-items:center;gap:13px;padding:14px 20px;font-size:15px;cursor:pointer}
-.opt+.opt{border-top:1px solid var(--hair)}
+/* the two-pass seam: a cut, with the rim light immediately under it — the same idiom
+   the ring uses for every seam it has. In forced colours the rim half disappears and
+   a normal 1px divider is left, which is a clean degradation. */
+.opt+.opt{border-top:1px solid color-mix(in srgb,var(--ink) 9%,transparent);
+  box-shadow:inset 0 1px 0 var(--rim)}
 .opt .t{flex:1} .opt .v{color:var(--ink-3);font-size:13.5px}
-.gauge{margin:0 16px 11px;padding:15px 16px;background:var(--surf);box-shadow:var(--shadow-s)}
-.dark .gauge{border:1px solid var(--hair)}
+.gauge{margin:0 16px 11px;padding:15px 16px;background:var(--surf);box-shadow:var(--shadow-s),var(--room-edge)}
 .md .gauge{border-radius:24px} .ios .gauge{border-radius:16px}
 .gauge .row{display:flex;justify-content:space-between;align-items:baseline}
 .gauge .num{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.04em}
@@ -268,14 +320,13 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .gauge .track{height:6px;border-radius:99px;background:var(--hair);margin-top:11px;overflow:hidden}
 .gauge .track i{display:block;height:100%;border-radius:99px}
 /* just-arrived items get a brief ring so you can see what landed */
-.gc.fresh{box-shadow:0 0 0 2px var(--c-doc),var(--shadow-s)}
+.gc.fresh{box-shadow:0 0 0 2px var(--c-doc),var(--shadow-s),var(--room-edge)}
 /* the clipboard watcher — always the slim quiet row, never a pitch. It sits under
    the last section as a gauge and a door to Settings; the real switch lives there.
    Working-state chrome is grey: accent announces, grey reassures. */
 .catch{margin:18px 16px 0;height:44px;padding:0 16px;cursor:pointer;display:flex;align-items:center;
-  gap:10px;background:var(--surf);box-shadow:var(--shadow-s);transition:transform .3s var(--spring)}
+  gap:10px;background:var(--surf);box-shadow:var(--shadow-s),var(--room-edge);transition:transform .3s var(--spring)}
 .md .catch{border-radius:22px} .ios .catch{border-radius:13px}
-.dark .catch{border:1px solid var(--hair)}
 .catch:active{transform:scale(.985)}
 .catch .slabel{flex:1;font-size:13.5px;font-weight:600;color:var(--ink)}
 .catch .cntnum{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
@@ -308,9 +359,8 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
 .note .nx:active{background:var(--hair)}
 .note .ntxt b{color:var(--ink-2);font-weight:600}
 /* settings: grouped cards, one idea per row — the calm end of the app */
-.set{margin:0 16px 11px;background:var(--surf);box-shadow:var(--shadow-s);overflow:hidden}
+.set{margin:0 16px 11px;background:var(--surf);box-shadow:var(--shadow-s),var(--room-edge);overflow:hidden}
 .md .set{border-radius:24px} .ios .set{border-radius:16px}
-.dark .set{border:1px solid var(--hair)}
 .set .row{display:flex;align-items:center;gap:13px;padding:16px 18px;cursor:pointer}
 .set .row+.row{border-top:1px solid var(--hair)}
 .set .row.inert{cursor:default}
@@ -402,9 +452,8 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
 .device-tablet .grid,.device-tablet .grid.g3{grid-template-columns:repeat(3,1fr)}
 .dockempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;color:var(--ink-3);font-size:14px}
-.dock{margin:16px 22px 22px;background:var(--surf);box-shadow:var(--shadow-s);padding:8px 0 14px}
+.dock{margin:16px 22px 22px;background:var(--surf);box-shadow:var(--shadow-s),var(--room-edge);padding:8px 0 14px}
 .md .dock{border-radius:26px}.ios .dock{border-radius:16px}
-.dark .dock{border:1px solid var(--hair)}
 .dockhead{display:flex;align-items:center;gap:10px;padding:8px 20px 2px}
 .dockhead .dtitle{flex:1;font-size:13px;font-weight:600;color:var(--ink-3)}
 .device-tablet .sheet{right:58%}
@@ -423,11 +472,10 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
 .ftime{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink-2)}
 .fgrid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
   gap:9px;padding:2px 11px 11px}
-.fcell{position:relative;background:var(--surf);box-shadow:var(--shadow-s);cursor:pointer;overflow:hidden;
+.fcell{position:relative;background:var(--surf);box-shadow:var(--shadow-s),var(--room-edge);cursor:pointer;overflow:hidden;
   display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;
   transition:transform .3s var(--spring)}
 .md .fcell{border-radius:20px}.ios .fcell{border-radius:16px}
-.dark .fcell{border:1px solid var(--hair)}
 .fcell:active{transform:scale(.94)}
 .fcell .ftx{font-size:11px;line-height:1.35;font-weight:500;word-break:break-word;
   display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
@@ -517,11 +565,14 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 svg{display:block}
 </style>
+<meta name="theme-color" content="#F6F6F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1013" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 108 108%22><style>@media(prefers-color-scheme:dark)%7B.i%7Bfill:%23F0F1F3%7D%7D</style><path class=%22i%22 fill=%22%2314161A%22 d=%22M40.5,31.833 A2.5,2.5 0 0 0 38.390,31.871 L28.054,36.912 A2.5,2.5 0 0 0 26.903,40.255 L34.289,55.4 L40.5,55.4 Z%22/><path class=%22i%22 fill=%22%2314161A%22 d=%22M67.5,31.671 Q68.384,31.273 69.610,31.871 L77.699,35.816 L80.001,42.502 L73.711,55.4 L67.5,55.4 Z%22/><path class=%22i%22 fill=%22%2314161A%22 fill-rule=%22evenodd%22 d=%22M44.5,25.5 L58.379,25.5 L64.5,31.621 L64.5,55.4 L43.5,55.4 L43.5,26.5 Q43.5,25.5 44.5,25.5 Z M57.1,28.1 L61.7,32.7 L57.1,32.7 Z%22/><path class=%22i%22 fill=%22%2314161A%22 fill-rule=%22evenodd%22 d=%22M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z%22/></svg>">
 </head>
 <body class="md">
 
-<nav class="sitenav" aria-label="Reel">
-  <a class="sn-home" href="../"><span class="sn-knob" aria-hidden="true"></span>reel</a>
+<nav class="sitenav" aria-label="bothy.">
+  <a class="sn-home" href="../"><svg class="sn-mark" aria-hidden="true" width="17" height="17" viewBox="0 0 108 108"><g transform="rotate(-26 40 50)"><rect x="32.5" y="33" width="16.5" height="27" rx="2.5" fill="currentColor"/></g><g transform="rotate(26 68 50)"><path d="M61.5,33 L70.5,33 L75.5,38 L75.5,60 L59,60 L59,35.5 Q59,33 61.5,33 Z" fill="currentColor"/></g><path d="M44.5,24 L59,24 L66,31 L66,62 L42,62 L42,26.5 Q42,24 44.5,24 Z" fill="currentColor" stroke="var(--surf,transparent)" stroke-width="3.0"/><path d="M57.1,28.1 L61.7,32.7 L57.1,32.7 Z" fill="var(--surf,transparent)"/><path d="M31.5,58 L76.5,58" stroke="var(--surf,transparent)" stroke-width="5.2"/><path fill-rule="evenodd" fill="currentColor" d="M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z"/><rect x="46.7" y="70.7" width="14.6" height="3.6" rx="1.8" fill="var(--accent-c,transparent)"/></svg><span class="sn-word">bothy<span class="sn-dot">.</span></span></a>
   <div class="sn-links">
     <a href="../">Home</a>
     <a href="../app/" aria-current="page">The app</a>
@@ -548,7 +599,7 @@ svg{display:block}
 
 <footer class="sitefoot">
   <div class="sf-links">
-    <a href="../">Reel home</a><a href="../extensions/">Extensions</a><a href="../ios/">On iPhone</a><a href="../privacy/">Privacy</a>
+    <a href="../">bothy. home</a><a href="../extensions/">Extensions</a><a href="../ios/">On iPhone</a><a href="../privacy/">Privacy</a>
   </div>
   <p>Built in public &#8212; a Shipaton 2026 project. Everything you do here is saved in this browser only; nothing is uploaded and there is no account.</p>
 </footer>
@@ -1209,7 +1260,7 @@ add:()=>`${sbar()}${tbar("go('vault')",'New',
         display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic('img',19)}</span>
       <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">Attach a picture</b>
       <span style="font-size:13px;color:var(--ink-3)">a screenshot from your photos</span></span>${ic('next',17)}</div></div>
-    <div class="sect">Reel works the rest out</div>
+    <div class="sect">bothy. works the rest out</div>
     <div class="card" style="cursor:default"><div class="in" style="display:flex;align-items:center;gap:13px">
       <span style="width:38px;height:38px;border-radius:13px;background:var(--t-lnk);color:var(--c-lnk);
         display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic('lnk',19)}</span>
@@ -1245,7 +1296,7 @@ you:()=>`${sbar()}${tbar("go('vault')",'','')}
         <span class="tt"><b>Theme</b></span>
         <span class="val">${st.theme==='system'?'System':st.theme==='light'?'Light':'Dark'}</span></div>
       <div class="row" onclick="toggleWatch()">
-        <span class="tt"><b>Watch my clipboard</b><span>everything stays on this phone</span></span>
+        <span class="tt"><b>Watch my clipboard</b><span>nothing you save is uploaded to us</span></span>
         <span class="sw${st.watch?' on':''}"></span></div>
     </div>
 
@@ -1326,7 +1377,7 @@ setup:()=>`${sbar()}${tbar("go('reach')",PLAT==='ios'?'Back Tap':'Floating overl
       <div class="sub">about 40 seconds, once</div></div>
     ${(PLAT==='ios'
       ?[['Open Settings','Accessibility, then Touch, then Back Tap'],
-        ['Choose Double Tap','pick Reel from the list'],
+        ['Choose Double Tap','pick bothy. from the list'],
         ['Try it','double-tap the back of your phone']]
       :[['Allow it to float','one permission, so the dial can sit over other apps'],
         ['Pick an edge','left or right, wherever your thumb rests'],
@@ -1343,9 +1394,13 @@ plan:()=>`${sbar()}${tbar("go('you')",'','')}
     <div><h1 class="big" style="font-size:33px">Remove<br>the limits</h1>
       <div class="sub">one payment, no subscription</div></div>
     <div class="sect">What changes</div>
+    <!-- "Search inside images" used to be a third row here. It came out on
+         2026-08-08 (PRD 007): recognition has always run for everyone, free, on
+         every intake path, so listing it as a thing the upgrade changes was
+         selling something the user already has. Deleted from the app in the
+         same commit. -->
     ${[['pin','Pin as many as you like',`you are using ${pinned().length} of ${st.pinCap}`,'lnk'],
-       ['img','Unlimited files and images','20 today','doc'],
-       ['find','Search inside images','find text in a screenshot','img']]
+       ['img','Unlimited files and images','20 today','doc']]
       .map(r=>`<div class="card"><div class="in" style="display:flex;align-items:center;gap:13px">
         <span style="width:38px;height:38px;border-radius:13px;background:var(--t-${r[3]});color:var(--c-${r[3]});
           display:flex;align-items:center;justify-content:center;flex:0 0 auto">${ic(r[0],19)}</span>
@@ -1360,7 +1415,7 @@ ideas:()=>{const back="go('"+(st.arg==='vault'?'vault':'you')+"')";
   return `${sbar()}${tbar(back,'Ideas','')}
   <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:33px">Worth<br>building?</h1>
-      <div class="sub">yes, no or later — your taps stay on this phone</div></div>
+      <div class="sub">yes, no or later — nothing you tap is uploaded to us</div></div>
     <div class="sect">Ten ideas</div>
     ${IDEAS.map((d,i)=>`<div class="card" style="cursor:default"><div class="in">
       <b style="display:block;font-size:15.5px;font-weight:600">${d[0]}</b>
@@ -1514,7 +1569,7 @@ function flipCover(){
       <span class="ftx${it.code?' code':''}">${label}</span>
       ${st.flipFlash===it.id?'<span class="fchip">Copied</span>':''}</div>`;
   }).join('');
-  return `<div class="fbar"><span class="fmark">Reel</span><span class="ftag">concept</span>
+  return `<div class="fbar"><span class="fmark">bothy.</span><span class="ftag">concept</span>
     <span class="ftime">9:41</span></div><div class="fgrid">${cells}</div>`;
 }
 function flipCopy(id){const it=find(id); if(!it)return; touchItem(it);
