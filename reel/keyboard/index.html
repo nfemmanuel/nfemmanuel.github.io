@@ -1184,7 +1184,19 @@ function panelHTML(){
    emoji key's exact size and position, adds the globe beside it — which is
    where Apple puts the globe once more than one keyboard is installed — and
    leaves the dictation slot empty, because the microphone is sealed to
-   extensions in both the open-access and no-open-access states. [spec 8.5] */
+   extensions in both the open-access and no-open-access states. [spec 8.5]
+
+   WHAT SHIPS IS NOT WHAT THIS BAND DRAWS, and NOTES.txt asked the page to say
+   so. PRD 005 rules the built keyboard draws NO microphone in any state: a key
+   that cannot be pressed is a lie shaped like a control, and the dimmed one
+   here is documentation of where Apple puts theirs. The emoji key is the same
+   class of thing pending one experiment. NF asked (2026-08-09) whether it could
+   simply switch to Apple's emoji board and back. Coming back is free, because
+   that board's ABC key returns to whichever keyboard you came from. Going there
+   is the constrained half: the API advances to the NEXT keyboard in the user's
+   own order and cannot name emoji as a destination, so the key is honest only
+   when emoji happens to sit next to us. A real-phone spike at the end of slice
+   5 decides it. Until then the globe is the only route we claim. */
 function accHTML(){
   return '<div class="accrow zn" data-own="clone" data-zn="we draw it, to Apple’s design">'+
     '<button class="acck emoji" type="button" data-a="emoji" aria-label="Emoji">'+
@@ -1667,7 +1679,7 @@ function wire(){
   [...document.querySelectorAll('.acck')].forEach(b=>{
     b.addEventListener('click',()=>{
       if(b.dataset.a==='globe')note('Tap goes to your next keyboard. Hold opens the picker. Apple’s key, Apple’s job.');
-      else note('Apple’s emoji keyboard is one tap away. We do not rebuild it, and the globe reaches the real one.');
+      else note('This key is on the page, not in the build. Apple’s emoji keyboard has an ABC key that comes back to us for free, but a keyboard can only advance to the next one in your list, never name emoji directly. A key that lands somewhere else would be a lie, so ours ships only if a real phone proves the trip honest.');
     });
   });
   wireSugg();
