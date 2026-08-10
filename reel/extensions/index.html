@@ -2661,11 +2661,42 @@ const MARK_BOX='M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L7
      · the front sheet rises OUT through it until its own bottom edge clears it
        (OUT = 60.5 - 55.4, solved, not chosen — at that instant the clip is a
        no-op and the sheet is out whole);
-     · the two behind it sink DOWN through it and are eaten by it (SINK = 55.4
-       minus the higher back sheet's topmost ink, 31.511).
-   Neither ever crosses into the 2.6 gap, so no cut fuses mid-flight. What is
-   left over the open box is ONE sheet: the composition §5's #mark-glyph shows,
-   reached by moving R3's own parts and drawing no new ones.
+     · the two behind it settle DOWN through it by the same OUT, and the clip
+       trims what passes below, so their visible bottoms stay ON the mouth line.
+
+   ═══ THE COMPARATIVE POSE (owner ruling, 2026-08-09 — "the word") ═══
+   SINK used to be 23.889 (= 55.4 - 31.511, the mouth minus the higher back
+   sheet's topmost ink), which sank the two back sheets until the box had EATEN
+   them. That is the number this file shipped and the owner rejected twice on a
+   real phone. The diagnosis that carried the argument: R3's identity is the
+   26-degree fan of THREE sheets, and eating two of them left a plain rectangle
+   over a plain box — a silhouette that is neither the bothy mark nor anything
+   else. NF ruled the comparative reading of their own sentence: all three
+   sheets stay visible, and the middle one is drawn out THE MOST.
+
+   So SINK is now OUT. That is one number, the mark's own solved travel, spent
+   in both directions — animation-map §0's verb pair, lift out and settle in,
+   on §0's own picture. Be honest about which half is which: the MAGNITUDE is
+   solved (OUT is), and spending it downward as well is a SYMMETRY, not a second
+   independent solve. The mark offers no number for "partly eaten", and inventing
+   one would be exactly the chosen constant this file refuses everywhere else.
+
+   What the pose then is, and every line of it falls out of the geometry:
+     · the fan's vertical step opens from 6.011 (= 31.511 - 25.5) to 16.211
+       (= 6.011 + 2*OUT), so the middle stands proud of its neighbours by
+       nearly three times what it did, without either wing being lost;
+     · the wings keep 18.789 of their 23.889 units of body above the mouth —
+       79% of their height — so they read as the fan and not as debris;
+     · and ALL THREE sheets still meet the mouth line. The front's restored
+       bottom lands exactly on it (that is what OUT means); the wings' bottoms
+       were already on it and the clip holds them there while their tops drop.
+       The continuous mouth line across the fan's full width is what says the
+       sheets are in the box, and it survives the whole transform.
+   No cut can fuse: the two cuts that could close are between the front sheet's
+   vertical edges (43.5, 64.5) and the wings' own vertical edges (40.5, 67.5),
+   both 3.0 units and both unaffected by any vertical travel. What is left over
+   the open box is the mark's own fan, rearranged — R3's parts moved, no new
+   ones drawn.
 
    PLATE/SAFE are the launcher's own relationship — ink radius 31.445 inside a
    half-box of 54 — and they are what lets the handle size itself against the
@@ -2679,7 +2710,13 @@ const MARK_BOX='M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L7
    poses. A logo that changed size mid-transform would be the swap animation-map
    §7 forbids. */
 const MARK_FIT={PLATE:54,SAFE:31.445,MOUTH:55.4,OUT:60.5-55.4,FLOOR:2.6,UP:28.5};
-MARK_FIT.SINK=MARK_FIT.MOUTH-31.511;
+MARK_FIT.SINK=MARK_FIT.OUT;   // the comparative pose — see the block above
+/* MAXUP is untouched by the pose ruling, and that is worth saying rather than
+   leaving to be noticed: the topmost ink is the FRONT sheet's and the front
+   sheet's travel did not change, so the fit proof below still holds verbatim.
+   The wings only moved DOWN, and the clip trims them before they can reach for
+   the bottom, so the box's own floor (27.5 below centre) is still the lowest
+   ink in every pose. */
 MARK_FIT.MAXUP=MARK_FIT.UP+MARK_FIT.OUT+MARK_FIT.FLOOR;
 /* the fit the handle's groove has to clear, in mark units: the drawn-out
    corner's distance from the mark's own centre. */
@@ -3421,13 +3458,16 @@ let prevOut=0;
    originally for the way the logo looks as you intereact with the overlay, that
    was where it really came from." Owner ruling 2026-08-09 (ledger OQ15): the
    two POSES themselves — closed it is R3, the mark the launcher wears; open,
-   one sheet has been drawn out of it. The animation is the sentence between
-   them, in animation-map §7's register: A TUCK, NOT A BLINK. Nothing
-   cross-fades, nothing swaps; parts of one object move.
+   the SAME FAN with the middle sheet drawn out the most (owner ruling
+   2026-08-09, the comparative reading: all three sheets stay). The animation is
+   the sentence between them, in animation-map §7's register: A TUCK, NOT A
+   BLINK. Nothing cross-fades, nothing swaps; parts of one object move.
 
      open    mkT 0 -> 1  the front sheet rises out through the box's mouth until
-                         its own bottom edge clears it; the two behind it sink
-                         down through the same line and are eaten by it.
+                         its own bottom edge clears it; the two behind it settle
+                         down by the same distance, and the clip holds their
+                         visible bottoms on the mouth line rather than eating
+                         them. The fan opens; it never loses a sheet.
      close   mkT 1 -> 0  and back, as the ring tucks.
      a take              the drawn-out sheet lifts one cut floor further and back.
      a keep              it dips one floor INTO the box and back.
