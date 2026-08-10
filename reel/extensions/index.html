@@ -2252,10 +2252,12 @@ const DIAL={enabled:false,mode:'closed',open:0,openT:0,
   tucked:HANDLE==='sliver',tuck:HANDLE==='sliver'?1:0,tuckT:HANDLE==='sliver'?1:0,
   downX:0,downY:0,onHandleDown:false,sliverPtr:null,
   cru:null,cruT:null,cruZone:null,cruised:false,vel:null,fliT:null,
-  /* the living mark: mkDy is where the sheet is, mkRest where it returns to,
-     and mkFrom/mkAt/mkDur/mkTo/mkBeat are one tween (a beat is out and back on
-     one clock, so it ends exactly where it started) */
-  mkDy:0,mkRest:0,mkFrom:0,mkAt:0,mkDur:0,mkTo:0,mkBeat:false};
+  /* the living mark, on TWO clocks: mkT is the pose (0 closed, 1 open) with its
+     own mkFrom/mkAt/mkDur/mkTo, and mkBeatDy is a take's or a keep's extra
+     travel on the drawn-out sheet alone, with its own mkBTo/mkBAt/mkBDur (out
+     and back on one clock, so it ends exactly where it started) */
+  mkT:0,mkFrom:0,mkAt:0,mkDur:0,mkTo:0,
+  mkBeatDy:0,mkBTo:0,mkBAt:0,mkBDur:0};
 const DEADBAND=0.55;                                   // >0.5 so it can't flicker on the boundary
 const detent=(raw,cur)=>Math.abs(raw-cur)>DEADBAND?Math.round(raw):cur;
 /* Discord-overlay parity (owner ask, 2026-08-06): Discord's mobile overlay
@@ -2455,6 +2457,12 @@ function sizes(){
      off R, so Compact is the same dial smaller — never a rearranged one.
      Finger-physical constants (hit slop, hysteresis, tap radius) stay put. */
   R=Math.min(FW*0.46,205)*SIZE_SCALE[SIZE];
+  /* HUB no longer DRAWS anything — the lens cap it used to describe was retired
+     on 2026-08-09 when the owner ruled the handle stays and the dial wraps
+     around it. It survives as a pure ZONE radius: the glide neutral boundary
+     ((HUB+OUT0)/2), the band's lower slop, and the catch offer's disc. The
+     handle occupies 0..2·BTN_R from the wall, and 2·BTN_R (48) clears OUT0
+     (63.2 on a compact phone) by 15.2px, so nothing in the ring had to move. */
   HUB=R*.20;OUT0=R*.40;OUT1=R*.84;   // one wide band; the knurling rides outside OUT1
   /* The handle slides freely along its edge: CY comes from the persisted
      per-device y-fraction, clamped to the safe rail — below the floating-pill
@@ -2616,70 +2624,110 @@ function syncPreview(){
   }else if(want)renderPreview(false);
 }
 
-/* ═══ the engraved brand mark (naming landed, 2026-08-07) ═══
-   The bothy. glyph — one dog-eared file over the open box — transcribed
-   verbatim from design/icon-exploration.html §5 (#mark-glyph: a 108-unit box,
-   6.5 stroke, round caps and joins). Pure stroke, never the filled fan.
-   It is CUT, not printed: the same two-pass the chip type and the scale ticks
-   already use — the finish's cut-shadow copy offset .7 up, the ink laid over
-   it — and it is deliberately quiet, the thing you notice second. Never a hit
-   target: the cap and the tab keep the targets they had, the mark only rides
-   them. */
-const MARK_DOC=['M44,28 L57,28 L64,35 L64,57','M44,28 L44,57','M57,28 L57,35 L64,35',
-  'M48.5,45 L59.5,45'];
-const MARK_BOX=['M30,57 L78,57','M34,57 L34,71 Q34,78 41,78 L67,78 Q74,78 74,71 L74,57'];
-const MARK_D=[...MARK_DOC,...MARK_BOX];
-/* ═══ fitting the hub's mark inside the VISIBLE half (owner ruling 2026-08-08:
-   "fix the way the logo looks when it's open") ═══
-   The hub is a full circle centred ON THE WALL, so only its room-facing half is
-   ever on screen and a mark drawn on that centre lost half of itself. It now
-   sits far enough into the room that its wall-side outer edge is exactly on the
-   wall, and it is SIZED so that pushing it there does not send it out through
-   the far side of the glass. OW/OH are the ink half-extents plus half a stroke;
-   LIFT is the document's travel and is one stroke width — the smallest number
-   the glyph itself offers; MAXUP includes a take's second lift. */
-const MARK_FIT={OW:30.5,OH:31.5,LIFT:6.5};
-MARK_FIT.MAXUP=MARK_FIT.OH+2*MARK_FIT.LIFT;
-MARK_FIT.HYP=Math.hypot(2*MARK_FIT.OW,MARK_FIT.MAXUP);
-/* the glyph's ink box (strokes counted) is 54.5 x 56.5 about (54,53), so
-   `size` is that ink HEIGHT in frame px — callers think in "how big on the
-   face", not in glyph units. The .7 cut offset is un-scaled on purpose: the
-   cut is a constant hairline everywhere on the instrument. */
-/* the closed handle's own cut (owner ruling 2026-08-08 — see handleSVG). Every
-   value is another surface's: `ink` is the ring's engraved-glyph height, `w` is
-   the handle groove's own stroke, `cutW` is the glyph cut's, and op/cutOp are
-   the half-detent scale ticks' .5/.55. All in px, none scaled with the mark —
-   one tool, one width, which is what separates machining from a printed stamp. */
-const MARK_TAB={ink:16,w:1.2,cutW:1.35,op:.5,cutOp:.55};
-/* wPx/cutWPx/cutOp are optional and ABSOLUTE: pass them and the stroke stops
-   scaling with the mark (px are converted back into glyph units by /k). Omit
-   them and this is the hub's original call, byte for byte. */
-function markSVG(cx,cy,size,ink,cut,op,wPx,cutWPx,cutOp){
-  const k=size/56.5,body=MARK_D.map(d=>`<path d="${d}"/>`).join('');
-  const w =wPx   ==null?6.5:wPx/k;
-  const cw=cutWPx==null?w  :cutWPx/k;
-  const co=cutOp ==null?.75*op:cutOp;
-  return `<g pointer-events="none" fill="none" stroke-linecap="round" stroke-linejoin="round" `
-    +`transform="translate(${cx},${cy}) scale(${k}) translate(-54,-53)">`
-    +`<g stroke="${cut}" stroke-width="${cw}" opacity="${co}" transform="translate(0,${-.7/k})">${body}</g>`
-    +`<g stroke="${ink}" stroke-width="${w}" opacity="${op}">${body}</g></g>`;
+/* ═══ the engraved brand mark — R3, THE APP'S ACTUAL MARK ═══
+   Owner ruling 2026-08-09 (ledger OQ15), verbatim: "I'm really not comfortable
+   with the overlay logo icon. It could look much better and the logo on it is
+   so different from the one we use for the actual app... when the dial is
+   closed the overlay logo looks like it does regular but when you open the
+   overlay the logo transforms into a version that looks like one has been drawn
+   out."
+
+   So the overlay stops wearing the STROKE derivative (#mark-glyph) and wears R3
+   itself. These four paths are ic_mono.xml's four, verbatim — the launcher's own
+   monochrome layer, which is also the deploy script's favicon and the 17px nav
+   mark. The mono cut is the right one and not a convenience: its separations are
+   TRUE HOLES rather than plate-coloured paint (OQ11 -> OQ12), and machined metal
+   has no plate to paint with.
+
+   Still CUT, not printed: the same two-pass the chip type and the scale ticks
+   use — the finish's cut-shadow copy offset .7 up, the ink laid over it — now in
+   fills rather than strokes, which is the inlaid slot mark's own seat
+   (depth-study §4, M1). Never a hit target: the handle and the tab keep the
+   targets they had, the mark only rides them. (It used to say "the cap and the
+   tab". There is no cap any more — see "THE HUB IS THE HANDLE" in drawDial.) */
+const MARK_BACK_L='M40.5,31.833 A2.5,2.5 0 0 0 38.390,31.871 L28.054,36.912 A2.5,2.5 0 0 0 26.903,40.255 L34.289,55.4 L40.5,55.4 Z';
+const MARK_BACK_R='M67.5,31.671 Q68.384,31.273 69.610,31.871 L77.699,35.816 L80.001,42.502 L73.711,55.4 L67.5,55.4 Z';
+/* the ONE path that is not verbatim: ic_mono clips the front sheet's bottom at
+   the seam (55.4) because a launcher icon is a still picture. Here the sheet
+   MOVES, so its body is restored — 55.4 -> 60.5 in both places, which is R3's own
+   front-sheet bottom (62) carrying ic_mono's own 1.5 inset, and nothing else
+   differs. The mouth CLIP below then makes the two identical at rest. */
+const MARK_FRONT='M44.5,25.5 L58.379,25.5 L64.5,31.621 L64.5,60.5 L43.5,60.5 L43.5,26.5 Q43.5,25.5 44.5,25.5 Z M57.1,28.1 L61.7,32.7 L57.1,32.7 Z';
+const MARK_BOX='M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z';
+/* ═══ ONE LINE DOES THE WHOLE TRANSFORM: the box's mouth ═══
+   R3's seam — the 5.2 cut at y=58 whose lower half the box overpaints, so the
+   pages stop at 55.4 and the page-to-box gap is the 2.6 floor (OQ13's finding).
+   ic_mono bakes it in as a clip; here it is a live one, and then:
+     · the front sheet rises OUT through it until its own bottom edge clears it
+       (OUT = 60.5 - 55.4, solved, not chosen — at that instant the clip is a
+       no-op and the sheet is out whole);
+     · the two behind it sink DOWN through it and are eaten by it (SINK = 55.4
+       minus the higher back sheet's topmost ink, 31.511).
+   Neither ever crosses into the 2.6 gap, so no cut fuses mid-flight. What is
+   left over the open box is ONE sheet: the composition §5's #mark-glyph shows,
+   reached by moving R3's own parts and drawing no new ones.
+
+   PLATE/SAFE are the launcher's own relationship — ink radius 31.445 inside a
+   half-box of 54 — and they are what lets the handle size itself against the
+   disc its machined groove already encloses. FLOOR is the mark's own smallest
+   dimension (OQ12's cut floor) and is the beat. MAXUP includes it, and it is
+   now the whole fit test, because THE ONLY STAGE THE MARK HAS IS THE HANDLE'S
+   FACE (owner ruling 2026-08-09, "the hub is the handle"): the open pose plus a
+   take's beat must still sit inside the groove disc that already holds the
+   closed one. At the shipped proportion (16.5/54) it does, with room — ink
+   radius 13.8px inside a 16.5px groove — so the mark NEVER RESIZES between the
+   poses. A logo that changed size mid-transform would be the swap animation-map
+   §7 forbids. */
+const MARK_FIT={PLATE:54,SAFE:31.445,MOUTH:55.4,OUT:60.5-55.4,FLOOR:2.6,UP:28.5};
+MARK_FIT.SINK=MARK_FIT.MOUTH-31.511;
+MARK_FIT.MAXUP=MARK_FIT.UP+MARK_FIT.OUT+MARK_FIT.FLOOR;
+/* the fit the handle's groove has to clear, in mark units: the drawn-out
+   corner's distance from the mark's own centre. */
+MARK_FIT.RPOSE=Math.hypot(27.097,MARK_FIT.MAXUP);
+/* `up`/`down` are in MARK UNITS, not px — the group is already scaled, and a
+   pose expressed in the mark's own units is a pose you can read. The box is
+   outside the clip, always: the clip's whole job is to BE the box's mouth, and
+   a box clipped at its own mouth would be a lid. */
+function markBody(up,down){
+  return `<g clip-path="url(#markmouth)">`
+    +`<g transform="translate(0,${up})"><path fill-rule="evenodd" d="${MARK_FRONT}"/></g>`
+    +`<g transform="translate(0,${down})"><path d="${MARK_BACK_L}"/><path d="${MARK_BACK_R}"/></g>`
+    +`</g><path fill-rule="evenodd" d="${MARK_BOX}"/>`;
 }
-/* ═══ the hub's mark, with the document alive in it ═══
-   The icon's own motion thesis, finally where it came from
-   (docs/analysis/animation-map.md §0: lift out = retrieval, settle in =
-   capture). The SHEET moves; the BOX never does, because a box that moved would
-   be the room moving rather than the thing being taken out of it. */
-function hubMarkSVG(cx,cy,rIn,ink,cut,op,docDy){
-  const k=rIn/MARK_FIT.HYP;
-  /* docDy arrives in px; the group is already scaled by k, so it converts back */
-  const g=(arr,dy)=>`<g transform="translate(0,${(dy||0)/k})">`
-    +arr.map(d=>`<path d="${d}"/>`).join('')+`</g>`;
-  const body=g(MARK_BOX,0)+g(MARK_DOC,docDy);
-  const off=MARK_FIT.OW*k;                       // clear of the wall, exactly
-  return `<g pointer-events="none" fill="none" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" `
-    +`transform="translate(${cx-EDGE*off},${cy}) scale(${k}) translate(-54,-53)">`
-    +`<g stroke="${cut}" opacity="${.75*op}" transform="translate(0,${-.7/k})">${body}</g>`
-    +`<g stroke="${ink}" opacity="${op}">${body}</g></g>`;
+/* the two-pass cut. The .7 lift is un-scaled on purpose: the cut is a constant
+   hairline everywhere on the instrument. */
+function markGroup(cx,cy,k,ink,cut,op,cutOp,up,down){
+  const body=markBody(up,down);
+  return `<g pointer-events="none" transform="translate(${cx},${cy}) scale(${k}) translate(-54,-54)">`
+    +`<g fill="${cut}" opacity="${cutOp}" transform="translate(0,${-.7/k})">${body}</g>`
+    +`<g fill="${ink}" opacity="${op}">${body}</g></g>`;
+}
+/* the closed handle's own cut — see handleSVG. op/cutOp are the ring's
+   half-detent scale ticks' .5/.55, another surface's numbers. */
+const MARK_TAB={op:.5,cutOp:.55};
+/* ═══ THE ONLY MARK: the handle's face, in whichever pose the dial is in ═══
+   Owner ruling 2026-08-09, verbatim: "I was hoping that the circle remained as
+   it was, but an animation on the inside plays where the logo goes from fanned
+   out docs fanning out from a box, to what appears to be the middle document
+   sticking out of the box the most. that is the only thing that changes about
+   the circle icon. the dial wraps around the circle icon as it does now."
+
+   So there is no second stage. The half-disc glass hub is retired; `mkT` drives
+   the mark HERE, on the face it was already engraved into, and the circle it is
+   engraved into does not change at all between closed and open — same radius,
+   same knurl, same seat, same metal, same position. `beat` is a take's or a
+   keep's extra travel on the drawn-out sheet alone. The BOX never moves, in any
+   pose: a box that moved would be the room moving rather than the thing being
+   taken out of it. */
+function markSVG(bx,by){
+  /* THE GROOVE DISC IS THE PLATE. The launcher fits the mark's ink inside its
+     plate's circle; this face has a plate too and it is already drawn. So the
+     scale is the groove's radius over the launcher's half-box, and there is no
+     third number in it — and it is ONE scale for both poses (MARK_FIT.RPOSE
+     above is the proof the open one still fits it). */
+  const D=DIAL,t=D.mkT||0;
+  return markGroup(bx,by,(BTN_R-7.5)/MARK_FIT.PLATE,LF.engraveDim,LF.engraveShadow,
+    MARK_TAB.op,MARK_TAB.cutOp,-MARK_FIT.OUT*t+(D.mkBeatDy||0),MARK_FIT.SINK*t);
 }
 function handleSVG(bx,by){
   /* the closed handle: charcoal body, full-turn knurl ribs, one dark machined
@@ -2690,21 +2738,26 @@ function handleSVG(bx,by){
      The SLIVER stays bare — it is near-flush by design and the complaint is
      about the visible wheel.
 
-     An earlier attempt put the mark here and it read as a printed STAMP, for
-     two reasons that are both fixed: it was sized like the HUB's mark (55% of
-     the face) and its stroke scaled with that size, so a fat outline sat on a
-     small disc. Real machining is the other way round — one tool, one width,
-     and shallow marks lighten instead of thickening. So the mark is cut at
-     MARK_TAB.ink px tall (the ring's own engraved-glyph height) with the
-     GROOVE'S OWN 1.2 stroke, in the finish's dim engraving at the half-detent
-     scale ticks' .5/.55 — every number borrowed from a surface that already
-     reads as metal, none of them chosen here. And unlike the hub, the tab's
-     metal genuinely inverts, so the pair comes from the live finish. */
+     WHICH mark it is changed on 2026-08-09 (ledger OQ15): the app's actual one,
+     R3, not the stroke derivative. "The logo on it is so different from the one
+     we use for the actual app" — and it was, because the overlay wore the
+     understudy while the launcher, the store, the nav and the favicon all wore
+     R3.
+
+     An earlier attempt put a mark here and it read as a printed STAMP, for two
+     reasons: it was sized like the HUB's mark (55% of the face) and its stroke
+     scaled with that size, so a fat outline sat on a small disc. The stroke half
+     of that lesson is now moot in the happiest way — a silhouette has no stroke
+     to get fat. What survives is the other half: nothing here may be a number
+     somebody chose. The size is the launcher's own proportion transplanted onto
+     the one circle this face already had (see markSVG), and the inks are the
+     ring's half-detent scale ticks' .5/.55. And unlike the hub, the tab's metal
+     genuinely inverts, so the pair comes from the live finish. */
   let s=`<circle cx="${bx}" cy="${by}" r="${BTN_R}" fill="${LF.tab}" stroke="${LF.tabEdge}" stroke-width="2"/>`;
   for(let a=0,i=0;a<360;a+=8,i++){const p1=P2(bx,by,BTN_R-6,a),p2=P2(bx,by,BTN_R-1.5,a);
     s+=`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${i%2?LF.knDark:LF.knLight}" stroke-width="1.4" stroke-linecap="round" opacity=".9"/>`;}
   s+=`<circle cx="${bx}" cy="${by}" r="${BTN_R-7.5}" fill="none" stroke="${LF.tabGroove}" stroke-width="1.2" opacity=".85"/>`;
-  s+=markSVG(bx,by,MARK_TAB.ink,LF.engraveDim,LF.engraveShadow,MARK_TAB.op,MARK_TAB.w,MARK_TAB.cutW,MARK_TAB.cutOp);
+  s+=markSVG(bx,by);
   /* THE GLEAM, over all of it — the knurl, the groove and the engraved mark all
      ride underneath unchanged. The closed button is where the logo lives nine
      tenths of the time, so it is where the sheen ruling is most literally about,
@@ -2842,6 +2895,11 @@ function drawDial(){
     <filter id="dsh" x="-40%" y="-40%" width="180%" height="180%">
       <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#000000" flood-opacity="${darkPage?.55:.30}"/></filter>
     ${SHEEN_DEFS()}
+    <!-- the box's mouth. Declared in MARK UNITS and referenced from inside the
+         mark's own scaled group, so it is the same 55.4 the paths are drawn in:
+         the sheets live above it, the box is drawn outside it. -->
+    <clipPath id="markmouth" clipPathUnits="userSpaceOnUse">
+      <rect x="-200" y="-200" width="600" height="${200+MARK_FIT.MOUTH}"/></clipPath>
   </defs>`;
   if(DIAL.mode==='dock'){
     /* the handle rides the finger; the NEAREST side wall shows the dashed
@@ -2899,8 +2957,11 @@ function drawDial(){
     }
     svg.innerHTML=h;return;
   }
-  /* everything from here down is the RING, and only the ring takes the bloom:
-     the handle and the sliver returned above, at their own size. */
+  /* everything from here down is the RING, and ONLY the ring takes the bloom.
+     The sliver returned above; the handle does not return here any more, it is
+     appended after the ring group at its own size — see "THE HUB IS THE HANDLE"
+     below. That is the whole shape of the 2026-08-09 ruling in one line: the
+     bloom is the dial's, and the circle is not the dial's. */
   const beforeRing=h;h='';
   const kn0=o(OUT1)+LENS.knGap,kn1=kn0+LENS.knDepth;
   /* the glass backdrop hugs the ring now (owner ruling, 2026-08-06): the old
@@ -3238,40 +3299,35 @@ function drawDial(){
     h+=`<circle cx="${AX}" cy="${CY}" r="${HO-.8}" fill="none" stroke="url(#rimg)" stroke-width=".8" opacity="${.6*f}"/>`;
     h+=`<text x="${AX-EDGE*HO*.48}" y="${CY-7}" font-size="11.5" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#F0F1F3" opacity="${f}">Catch?</text>`;
     h+=`<text x="${AX-EDGE*HO*.48}" y="${CY+8}" font-size="8" text-anchor="middle" dominant-baseline="central" fill="#98A3B0" opacity="${f}">${escq(sn)}</text>`;
-  }else{
-    /* the hub is a lens element: coated near-black glass, two dim cool
-       reflection arcs (mirrored with the dock), a hair-thin bevel collar.
-       NO close glyph (owner ruling, 2026-08-06): the whole cap is the
-       tap-to-close target, and the coach says so once. The naming landed
-       (2026-08-07), so the glass is no longer empty: the bothy. mark is
-       machined into it — and the cap is still, entirely, tap-to-close. */
-    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB+1.6}" fill="none" stroke="#0A0C0F" opacity="${.7*f}"/>`;
-    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#lensg)" stroke="#262C33" stroke-width="1.2" opacity="${f}"/>`;
-    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB-.8}" fill="none" stroke="url(#rimg)" stroke-width=".8" opacity="${.6*f}"/>`;
-    const ra0=EDGE===1?-72:8,ra1=EDGE===1?-8:72;
-    h+=`<path d="${arcAt(HUB*.62,ra0,ra1)}" fill="none" stroke="#5E7186" stroke-width="1.3" opacity="${.3*f}"/>`;
-    h+=`<path d="${arcAt(HUB*.40,ra0-EDGE*108,ra1-EDGE*108)}" fill="none" stroke="#46586A" opacity="${.18*f}"/>`;
-    /* the mark, ~55% of the hub diameter, riding the same `f` as every other
-       hub detail so it arrives and leaves with the glass. It takes the PRIME's
-       engraving pair in both finishes, exactly as `lensg` takes LF.glass —
-       which is byte-identical dark glass on both barrels, and the same reason
-       the knurl geometry above reads off LENS directly. Dark cut, light ink:
-       the telephoto's dark ink would vanish here. */
-    h+=hubMarkSVG(AX,CY,HUB-1.2,LENS.engrave,LENS.engraveShadow,.5*f,DIAL.mkDy);
-    /* AND THE SHEEN OVER THE HUB — `rimg`, not `sheen`: a gradient about the
-       centre of rotation is constant on a disc sitting ON that centre, so the
-       barrel's sheen would be a flat tint here and buy nothing. This goes down
-       LAST, over the mark, because the ruling asks for a sheen over the LOGO:
-       the living mark rides underneath, entirely unchanged. The glass is the
-       same near-black on both barrels, so this one does not take the finish's
-       weighting — the same reason the hub's mark and the offer's inks do not
-       theme. */
-    h+=`<circle cx="${AX}" cy="${CY}" r="${HUB}" fill="url(#rimg)" opacity="${SHEEN_CEIL_LIGHT*f}"/>`;
   }
+  /* ═══ THE HUB IS THE HANDLE (owner ruling, 2026-08-09) ═══
+     There is no hub element any more. The half-disc lens cap — near-black
+     glass, reflection arcs, bevel collar, its own copy of the mark, its own
+     sheen — is GONE, all of it, because the owner looked at it on a real phone
+     twice and ruled: "It is still weird." What replaces it is nothing new: the
+     round handle the owner is already fine with simply stays put. Same circle,
+     same knurl, same machined seat, same radius, same centre — the ring blooms
+     around it and it does not move, resize, fade or re-render. The one thing
+     that changes when the dial opens is the POSE OF THE MARK CUT INTO IT, and
+     that is `markSVG` reading `DIAL.mkT`.
+
+     TWO CONSEQUENCES OF THAT, both deliberate:
+
+     · It is drawn AFTER the ring group and OUTSIDE the bloom transform. Outside,
+       because the circle "remained as it was" — a handle that grew 55%→100%
+       with the ring would be a different circle. After, because the ring's own
+       glass backdrop (r = kn1+6) covers this ground and would otherwise bury it.
+     · It is the SAME CALL the closed state makes, `handleSVG(AX-EDGE*BTN_R,CY)`,
+       at the same coordinates. Not a copy of it, not a scaled variant: literally
+       the same object continuing to exist. That is the ruling written as code. */
+  const hubIsHandle=DIAL.offer?''
+    :`<g${ROOM.seat}>`+handleSVG(AX-EDGE*BTN_R,CY)+`</g>`
+     +`<circle cx="${AX-EDGE*BTN_R}" cy="${CY}" r="${BTN_R+11}" fill="transparent" style="pointer-events:auto;cursor:pointer"/>`;
   /* glide's hint is the HTML glidechip riding the finger — ONE voice; the SVG
      duplicate that used to sit by the ring was cut (dedup, 2026-08-06) */
   svg.innerHTML=beforeRing
-    +`<g transform="translate(${AX} ${CY}) scale(${bloom}) translate(${-AX} ${-CY})">${h}</g>`;
+    +`<g transform="translate(${AX} ${CY}) scale(${bloom}) translate(${-AX} ${-CY})">${h}</g>`
+    +hubIsHandle;
 }
 
 /* ═══ tuck state + the once-per-session teach (collapse-to-sliver) ═══ */
@@ -3360,32 +3416,58 @@ let prevOut=0;
   requestAnimationFrame(loop);
 })();
 
-/* ═══ the living mark (owner ruling 2026-08-08) ═══
-   "I had wanted the animaations thaat were designed originally for the way the
-   logo looks as you intereact with the overlay, that was where it really came
-   from." So the brand's one verb runs on the brand's own mark: the sheet LIFTS
-   out of the box on open and stays out (a retrieval has begun), takes one
-   further lift when something is taken, SETTLES into the box when a catch is
-   kept (capture is the verb reversed), and settles home as the ring tucks.
-   Durations are the app's own: --m-lift 200, --m-settle 260, --m-tuck 120. */
+/* ═══ the living mark — ONE mark, two poses, animated between ═══
+   Owner ruling 2026-08-08: "I had wanted the animaations thaat were designed
+   originally for the way the logo looks as you intereact with the overlay, that
+   was where it really came from." Owner ruling 2026-08-09 (ledger OQ15): the
+   two POSES themselves — closed it is R3, the mark the launcher wears; open,
+   one sheet has been drawn out of it. The animation is the sentence between
+   them, in animation-map §7's register: A TUCK, NOT A BLINK. Nothing
+   cross-fades, nothing swaps; parts of one object move.
+
+     open    mkT 0 -> 1  the front sheet rises out through the box's mouth until
+                         its own bottom edge clears it; the two behind it sink
+                         down through the same line and are eaten by it.
+     close   mkT 1 -> 0  and back, as the ring tucks.
+     a take              the drawn-out sheet lifts one cut floor further and back.
+     a keep              it dips one floor INTO the box and back.
+
+   THE POSE AND THE BEAT ARE TWO CLOCKS, deliberately: they drive different
+   values and can never fight over one, so a take landing mid-open no longer
+   strands the pose wherever it had got to.
+
+   What does NOT move, each a rule rather than an omission: the box, ever; the
+   fan's 26-degree splay, because animating it would walk the mark through
+   angles nobody ruled (OQ12 ruled 26); and the mark's LANGUAGE — a pose change
+   may not become a language change, which is why the open pose is the filled
+   silhouette and not §5's stroke glyph.
+
+   Durations are the app's own: --m-lift 200, --m-settle 260, --m-tuck 120.
+   Reduced motion: the end pose on the first frame, and a beat — whose end state
+   IS its start — simply does not happen. */
 const MK_LIFT=200,MK_SETTLE=260,MK_TUCK=120;
-function markTravel(){return MARK_FIT.LIFT*((HUB-1.2)/MARK_FIT.HYP);}
 function markMove(to,ms){const D=DIAL;
-  D.mkFrom=D.mkDy;D.mkTo=to;D.mkDur=ms;D.mkBeat=false;D.mkAt=performance.now();
-  if(RM){D.mkDy=to;D.mkAt=0;}}
+  D.mkFrom=D.mkT;D.mkTo=to;D.mkDur=ms;D.mkAt=performance.now();
+  if(RM){D.mkT=to;D.mkAt=0;}}
 function markBeat(to,ms){const D=DIAL;
   if(RM)return;                       // a beat's end state IS its start
-  D.mkFrom=D.mkRest;D.mkTo=to;D.mkDur=ms;D.mkBeat=true;D.mkAt=performance.now();}
-function markOpen(){const D=DIAL;D.mkRest=-markTravel();markMove(D.mkRest,MK_LIFT);}
-function markClose(){const D=DIAL;D.mkRest=0;markMove(0,MK_TUCK);}
-function markLift(){markBeat(DIAL.mkRest-markTravel(),MK_LIFT);}
-function markSettle(){markBeat(DIAL.mkRest+markTravel(),MK_SETTLE);}
+  D.mkBTo=to;D.mkBDur=ms;D.mkBAt=performance.now();}
+function markOpen(){markMove(1,MK_LIFT);}
+function markClose(){markMove(0,MK_TUCK);}
+function markLift(){markBeat(-MARK_FIT.FLOOR,MK_LIFT);}
+function markSettle(){markBeat(MARK_FIT.FLOOR,MK_SETTLE);}
 function markStep(){
-  const D=DIAL;if(!D.mkAt)return;
-  const p=Math.min(1,(performance.now()-D.mkAt)/(D.mkDur||MK_LIFT));
-  const t=D.mkBeat?(p<.5?p*2:(1-p)*2):p;
-  D.mkDy=D.mkFrom+(D.mkTo-D.mkFrom)*EASE_GLIDE(t);
-  if(p>=1){D.mkDy=D.mkBeat?D.mkRest:D.mkTo;D.mkAt=0;}
+  const D=DIAL;
+  if(D.mkAt){
+    const p=Math.min(1,(performance.now()-D.mkAt)/(D.mkDur||MK_LIFT));
+    D.mkT=D.mkFrom+(D.mkTo-D.mkFrom)*EASE_GLIDE(p);
+    if(p>=1){D.mkT=D.mkTo;D.mkAt=0;}
+  }
+  if(D.mkBAt){
+    const p=Math.min(1,(performance.now()-D.mkBAt)/(D.mkBDur||MK_LIFT));
+    D.mkBeatDy=D.mkBTo*EASE_GLIDE(p<.5?p*2:(1-p)*2);
+    if(p>=1){D.mkBeatDy=0;D.mkBAt=0;}
+  }
 }
 
 /* ═══ cruise — "hold, and the ring comes to you" (owner gripe, 2026-08-06) ═══
@@ -3625,7 +3707,12 @@ addEventListener('pointerup',e=>{
     return;
   }
   if(D.offer&&d<=HUB+21){doCatch(D.offer);D.downBand=null;return;}   // the center offer
-  if(d<=HUB+8){D.openT=0;return;}
+  /* TAP-TO-CLOSE IS THE HANDLE (owner ruling, 2026-08-09). The wall-centred hub
+     disc it used to be does not exist any more, so the target moves onto the
+     circle that is actually there — the same circle that opened the dial, in
+     the same place. BTN_R+4 rather than the closed state's BTN_R+11: open, the
+     band's inner edge is only OUT0-10 away and a 35px target would eat into it. */
+  if(Math.hypot(px-(AX-EDGE*BTN_R),py-CY)<=BTN_R+4){D.openT=0;return;}
   if(d>OUT1+24){D.openT=0;return;}
   const rel=wrapDeg(a-CA),hit=band(d);
   if(hit==='Out'&&Math.abs(Math.abs(rel)-PIN_OFF)<13){   // pinned slot: use immediately
@@ -3669,7 +3756,7 @@ function dialCoach(){
   if((location.hash||'#dial')!=='#dial'||DEV==='ipad')return;
   let wait=600;
   if(!localStorage.getItem('reel.coach.dial')){
-    setTimeout(()=>toast('Tap the round handle at the phone’s edge — tap the glass to close'),wait);
+    setTimeout(()=>toast('Tap the round handle at the phone’s edge — tap it again to close'),wait);
     localStorage.setItem('reel.coach.dial','1');wait+=3300;
   }
   if(!localStorage.getItem('reel.coach.cruise')){
