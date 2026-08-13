@@ -223,8 +223,10 @@ a:focus-visible{outline:2px solid var(--ink-2);outline-offset:2px;border-radius:
     Android's rule, not mine: nothing may float over your screen without telling you it
     is there. The notification is not used to send you messages.</p>
   <p>Picking an item from the ring copies it onto your clipboard so you can paste it
-    where you need it. The shortcut only ever puts things on your clipboard. It has no
-    ability to be shown what is already there.</p>
+    where you need it. The ring also looks at your clipboard once, in the moment you
+    open it, so it can offer to keep whatever you copied last. That is the only time
+    it looks. While the ring is closed it cannot see your clipboard at all, because
+    Android does not let it.</p>
 
   <h2 id="clipboard">Your clipboard</h2>
   <p>If you turn on clipboard watching, the app saves what you copy so you can find it
