@@ -368,6 +368,13 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
 .set .tt b{display:block;font-size:15.5px;font-weight:600}
 .set .tt span{display:block;font-size:13px;color:var(--ink-3);margin-top:2px;line-height:1.45}
 .set .val{font-size:14px;font-weight:500;color:var(--ink-3);flex:0 0 auto}
+/* a two-choice pair: both options visible, picked, never cycled (the theme-row
+   ruling, honored at two options too). Same shape the app's SegPair draws. */
+.sp{display:flex;gap:3px;padding:3px;border-radius:99px;flex:0 0 auto;
+  background:color-mix(in srgb,var(--hair) 55%,transparent)}
+.sp span{padding:7px 12px;border-radius:99px;font-size:13px;font-weight:500;color:var(--ink-2);
+  cursor:pointer;white-space:nowrap;transition:.15s var(--glide)}
+.sp span.on{background:var(--ink);color:var(--ground);font-weight:600}
 .sw{position:relative;width:46px;height:27px;border-radius:99px;background:var(--hair);flex:0 0 auto;
   transition:background .2s var(--glide)}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;
@@ -655,7 +662,16 @@ const DEVICES_IOS=[['phone','Phone'],['tablet','iPad']];
 let firstOpen=true;   /* the settle bounce plays once, on launch — not on every navigation */
 const st={view:'vault',arg:null,filter:'all',sheet:null,q:'',searching:false,toast:null,pinCap:2,
   noteDismissed:false,tagEdit:false,watch:true,theme:'system',themePicker:false,perm:'unknown',
-  flipFlash:null,fillsim:null};
+  flipFlash:null,fillsim:null,
+  /* the overlay's own settings, mirrored from the app's defaults (compact size,
+     sliver handle, ask before keeping a new copy). The handle itself is not drawn
+     here — the extensions prototype is where it lives — but the page that
+     configures it has to exist, because that is the page being judged. */
+  ovl:true,ovlSize:'compact',ovlHandle:'sliver',ovlCatch:'ask',
+  /* where the plan page goes back to: it is reached from the gauges under What it
+     keeps AND from the third pin out in the vault, and back has to be honest about
+     which one it was. */
+  planBack:'vault'};
 const SEED=[
   {id:1,t:'txt',v:'alex.rivera@example.com',pin:1},
   {id:2,t:'txt',v:'Best,\nAlex Rivera',pin:2},
@@ -742,6 +758,10 @@ try{
       if(j.filter==='all'||TYPE[j.filter])st.filter=j.filter;   /* junk heals to All */
       st.noteDismissed=j.noteDismissed===true;
       if(j.profile&&typeof j.profile==='object'&&!Array.isArray(j.profile))PROFILE=j.profile;
+      if(typeof j.ovl==='boolean')st.ovl=j.ovl;
+      if(j.ovlSize==='regular'||j.ovlSize==='compact')st.ovlSize=j.ovlSize;
+      if(j.ovlHandle==='button'||j.ovlHandle==='sliver')st.ovlHandle=j.ovlHandle;
+      if(j.ovlCatch==='ask'||j.ovlCatch==='auto')st.ovlCatch=j.ovlCatch;
     }}
 }catch(_){}
 if(!ITEMS)ITEMS=SEED.map(i=>({...i,src:'seed'}));
@@ -766,7 +786,8 @@ SEED.forEach(s=>{ if(!s.title)return;
   if(held)held.title=s.title; });
 function saveStore(){try{localStorage.setItem(KEY,
   JSON.stringify({v:1,items:ITEMS,watch:st.watch,theme:st.theme,device:DEVICE,votes:VOTES,
-    filter:st.filter,noteDismissed:st.noteDismissed,profile:PROFILE}))}catch(_){}}
+    filter:st.filter,noteDismissed:st.noteDismissed,profile:PROFILE,
+    ovl:st.ovl,ovlSize:st.ovlSize,ovlHandle:st.ovlHandle,ovlCatch:st.ovlCatch}))}catch(_){}}
 /* ── inference: the app works out the type, it never asks ── */
 const isUrl=v=>/^(https?:\/\/|www\.)/i.test(v.trim())||/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v.trim());
 const isCode=v=>{const s=v.trim();
@@ -797,7 +818,7 @@ function toast(m){st.toast=m;render();clearTimeout(toast._t);toast._t=setTimeout
 function togglePin(id){
   const it=find(id);
   if(it.pin){it.pin=0;toast('Unpinned');}
-  else if(pinned().length>=st.pinCap){st.sheet=null;go('plan');toast('That is your third pin');return;}
+  else if(pinned().length>=st.pinCap){st.sheet=null;openPlan('vault');toast('That is your third pin');return;}
   else {it.pin=nextPin();it.auto=0;toast('Pinned — this one stays');}
   render();
 }
@@ -966,6 +987,17 @@ async function startWatch(){
 function stopWatch(){st.watch=false;clearInterval(watchTimer);watchTimer=null;render();toast('Stopped watching');}
 function toggleWatch(){st.watch?stopWatch():startWatch();}
 
+/* ── the overlay's settings ──
+   Nothing floats in a browser tab, so these only move the preference and say so.
+   The app wires the same four to the running handle, which re-dresses live. */
+function toggleOverlay(){st.ovl=!st.ovl;render();
+  toast(st.ovl?'The handle waits at the screen\'s edge':'Overlay off');}
+function setOvl(key,v){st[key]=v;render();
+  if(key==='ovlHandle'&&v==='sliver')toast('Swipe the handle toward the edge to tuck it');}
+/* the plan page is reached from the gauges and from the third pin, and back
+   returns to whichever one it was */
+function openPlan(from){st.planBack=from||'vault';go('plan');}
+
 addEventListener('focus',()=>{if(st.watch)grabClip(false)});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&st.watch)grabClip(false)});
 navigator.permissions?.query({name:'clipboard-read'}).then(p=>{
@@ -1056,6 +1088,12 @@ const tbar=(back,title,right)=>`<div class="tbar">
   ${back?`<span class="tbtn" onclick="${back}">${ic('back',17)}</span>`:'<span style="width:36px"></span>'}
   ${title?`<span style="font-weight:600;font-size:15px">${title}</span>`:'<span></span>'}
   ${right||'<span style="width:36px"></span>'}</div>`;
+/* a settings row whose control is a two-choice pair. The row itself is inert —
+   the two words are the target, so neither choice can be reached by accident. */
+const sprow=(title,sub,opts,sel,key)=>`<div class="row inert">
+  <span class="tt"><b>${title}</b>${sub?`<span>${sub}</span>`:''}</span>
+  <span class="sp">${opts.map(o=>`<span class="${o[0]===sel?'on':''}"
+    onclick="setOvl('${key}','${o[0]}')">${o[1]}</span>`).join('')}</span></div>`;
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const eatt=s=>esc(s).replace(/"/g,'&quot;');   /* for value="" attributes */
 const extOf=v=>{const m=v.match(/\.(\w{1,5})$/);return m?m[1].toUpperCase():'FILE'};
@@ -1285,6 +1323,12 @@ edit:()=>{const it=find(st.arg); if(!it)return V.vault();
       <div class="e2">Change a web address to something that isn't one and it moves itself to Text. The other way round too.</div></div>
   </div>`},
 
+/* SETTINGS, regrouped 2026-08-13 (owner: "everything just hanging out in the
+   open"). A short top level and three doors, the way One UI's own settings work:
+   the two things touched often stay live at the root, and everything that is
+   configured once sits behind a row that names its own state.
+   The clipboard switch never moves off this first screen — it is the most
+   consequential switch in the app and the vault's watcher row lands here. */
 you:()=>`${sbar()}${tbar("go('vault')",'','')}
   <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:33px">Settings</h1>
@@ -1292,17 +1336,72 @@ you:()=>`${sbar()}${tbar("go('vault')",'','')}
 
     <div class="sect">The everyday</div>
     <div class="set">
-      <div class="row" onclick="go('profile')">
-        <span class="tt"><b>Your profile</b><span>fill a form in one tap</span></span>${ic('next',17)}</div>
+      <div class="row" onclick="toggleWatch()">
+        <span class="tt"><b>Watch my clipboard</b>
+          <span>${st.watch?`On - holding ${autoItems().length} of ${AUTO_CAP}`:'Off'}</span></span>
+        <span class="sw${st.watch?' on':''}"></span></div>
       <div class="row" onclick="openThemePicker()">
         <span class="tt"><b>Theme</b></span>
         <span class="val">${st.theme==='system'?'System':st.theme==='light'?'Light':'Dark'}</span></div>
-      <div class="row" onclick="toggleWatch()">
-        <span class="tt"><b>Watch my clipboard</b><span>nothing you save is uploaded to us</span></span>
-        <span class="sw${st.watch?' on':''}"></span></div>
     </div>
 
     <div class="sect">More</div>
+    <div class="set">
+      ${PLAT==='md'?`<div class="row" onclick="go('sov')">
+        <span class="tt"><b>The floating overlay</b>
+          <span>${st.ovl?"On - the handle waits at the screen's edge":'Off'}</span></span>${ic('next',17)}</div>`:''}
+      <div class="row" onclick="go('keep')">
+        <span class="tt"><b>What it keeps</b><span>what stays, and what drops off</span></span>${ic('next',17)}</div>
+      <div class="row" onclick="go('reach')">
+        <span class="tt"><b>Reach</b><span>ways in without opening this</span></span>${ic('next',17)}</div>
+      <div class="row" onclick="go('profile')">
+        <span class="tt"><b>Your profile</b><span>fill a form in one tap</span></span>${ic('next',17)}</div>
+    </div>
+
+    <div class="set">
+      <div class="row" onclick="go('about')">
+        <span class="tt"><b>About</b><span>version, feedback and licenses</span></span>${ic('next',17)}</div>
+    </div>
+
+    <div class="ideasrow" onclick="go('ideas')">Ideas - vote yes or no</div>
+  </div>`,
+
+/* The overlay's own page. Android only: there is no floating overlay on iPhone,
+   and the row that opens this is not drawn there either. */
+sov:()=>{if(PLAT!=='md')return V.you();
+  return `${sbar()}${tbar("go('you')",'','')}
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:33px">The floating<br>overlay</h1>
+      <div class="sub">your things at any screen's edge</div></div>
+    <div class="set">
+      <div class="row" onclick="toggleOverlay()">
+        <span class="tt"><b>Floating overlay</b>
+          <span>${st.ovl?"On - the handle waits at the screen's edge":'Off - tap to turn it on'}</span></span>
+        <span class="sw${st.ovl?' on':''}"></span></div>
+    </div>
+    <div class="set">
+      ${sprow('Size',null,[['regular','Regular'],['compact','Compact']],st.ovlSize,'ovlSize')}
+      ${sprow('Handle',st.ovlHandle==='sliver'?'Swipe it toward the edge to tuck':null,
+        [['button','Button'],['sliver','Sliver']],st.ovlHandle,'ovlHandle')}
+      ${sprow('New copies',st.ovlCatch==='auto'
+        ?'Opening the overlay keeps whatever you just copied'
+        :'Opening the overlay offers whatever you just copied',
+        [['ask','Ask first'],['auto','Keep them']],st.ovlCatch,'ovlCatch')}
+    </div>
+    <div class="set">
+      <div class="row inert"><span class="tt"><b>Where it shows</b>
+        <span>Over your other apps, never over this one - except on this screen, so you can see your changes</span></span></div>
+    </div>
+    <div class="empty" style="padding:18px 34px"><div class="e2">The handle itself is drawn on the
+      <a href="/reel/extensions/" style="color:var(--ink-2)">extensions prototype</a>.</div></div>
+  </div>`},
+
+/* What it keeps: how much room there is, what drops off, and how the grid looks.
+   The two gauges are the only doors to the plan page from inside settings. */
+keep:()=>`${sbar()}${tbar("go('you')",'','')}
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:33px">What it<br>keeps</h1>
+      <div class="sub">what stays, and what drops off</div></div>
     <div class="set">
       <div class="row" onclick="toast('When the ${AUTO_CAP} fill up, the one you use least drops off. Pins and kept things never leave.')">
         <span class="tt"><b>Auto-clean</b><span>Keeps the newest ${AUTO_CAP} you have not used</span></span></div>
@@ -1310,25 +1409,34 @@ you:()=>`${sbar()}${tbar("go('vault')",'','')}
         <span class="tt"><b>Layout</b></span>
         <span class="val">3 across</span></div>
     </div>
-    <div class="gauge" onclick="go('plan')"><div class="row">
+    <div class="gauge" onclick="openPlan('keep')"><div class="row">
       <span style="font-size:15.5px;font-weight:600">Pinned things</span>
       <span class="num" style="color:var(--c-lnk)">${pinned().length}<i>/${st.pinCap}</i></span></div>
       <div class="track"><i style="width:${Math.min(100,pinned().length/st.pinCap*100)}%;background:var(--c-lnk)"></i></div></div>
-    <div class="gauge" onclick="go('plan')"><div class="row">
+    <div class="gauge" onclick="openPlan('keep')"><div class="row">
       <span style="font-size:15.5px;font-weight:600">Files and images</span>
       <span class="num" style="color:var(--c-doc)">${byType('img').length+byType('doc').length}<i>/20</i></span></div>
       <div class="track"><i style="width:${(byType('img').length+byType('doc').length)/20*100}%;background:var(--c-doc)"></i></div></div>
-    <div class="set">
-      <div class="row" onclick="go('reach')">
-        <span class="tt"><b>Reach</b><span>ways in without opening this</span></span>${ic('next',17)}</div>
-    </div>
+  </div>`,
+
+about:()=>`${sbar()}${tbar("go('you')",'','')}
+  <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
+    <div><h1 class="big" style="font-size:33px">About</h1>
+      <div class="sub">the build you are holding</div></div>
     <div class="set">
       <div class="row inert">
+        <span class="tt"><b>App</b></span><span class="val">bothy.</span></div>
+      <div class="row inert">
         <span class="tt"><b>Version</b></span><span class="val">0.1 - prototype</span></div>
+    </div>
+    <div class="set">
+      <div class="row" onclick="toast('That would open your mail app, with your version already filled in')">
+        <span class="tt"><b>Send feedback</b><span>opens your mail app, nothing is sent from here</span></span>${ic('next',17)}</div>
+    </div>
+    <div class="set">
       <div class="row" onclick="toast('Bricolage Grotesque and IBM Plex, under the SIL Open Font License')">
         <span class="tt"><b>Fonts and licenses</b></span>${ic('next',17)}</div>
     </div>
-
     <div class="sect">More prototypes</div>
     <div class="set">
       ${[['Hub','/reel/'],['Extensions','/reel/extensions/'],['iOS','/reel/ios/'],['Island','/reel/island/']]
@@ -1336,8 +1444,6 @@ you:()=>`${sbar()}${tbar("go('vault')",'','')}
           <span class="tt"><b style="font-weight:500;color:var(--ink-2)">${l[0]}</b></span>
           <span style="color:var(--ink-3);display:flex">${ic('next',15)}</span></a>`).join('')}
     </div>
-
-    <div class="ideasrow" onclick="go('ideas')">Ideas - vote yes or no</div>
   </div>`,
 
 reach:()=>`${sbar()}${tbar("go('you')",'Reach','')}
@@ -1391,7 +1497,7 @@ setup:()=>`${sbar()}${tbar("go('reach')",PLAT==='ios'?'Back Tap':'Floating overl
     <div class="empty" style="padding:20px 34px"><div class="e2">You can change or turn this off at any time.</div></div>
   </div>`,
 
-plan:()=>`${sbar()}${tbar("go('you')",'','')}
+plan:()=>`${sbar()}${tbar("go('"+(st.planBack||'vault')+"')",'','')}
   <div class="roll ${firstOpen?'settle':''}" style="padding-top:46px">
     <div><h1 class="big" style="font-size:33px">Remove<br>the limits</h1>
       <div class="sub">one payment, no subscription</div></div>
@@ -1409,7 +1515,7 @@ plan:()=>`${sbar()}${tbar("go('you')",'','')}
         <span style="flex:1"><b style="display:block;font-size:15px;font-weight:600">${r[1]}</b>
         <span style="font-size:13px;color:var(--ink-3)">${r[2]}</span></span></div></div>`).join('')}
     <div style="padding:10px 0 0"><div class="act" style="background:var(--ink);color:var(--ground)"
-      onclick="st.pinCap=99;toast('Unlocked in the prototype');go('you')">Unlock · one payment</div></div>
+      onclick="st.pinCap=99;toast('Unlocked in the prototype');go(st.planBack||'vault')">Unlock · one payment</div></div>
     <div class="empty" style="padding:18px 34px"><div class="e2">Everything you already saved stays exactly where it is.</div></div>
   </div>`,
 
@@ -1659,7 +1765,7 @@ function render(){
     <p>Tap a <b>chip</b> to put a lens on the one stream — Pinned narrows too, nothing navigates · tap any <b>card</b> for its sheet, then <b>Tags</b> · <b>Pin</b> and watch the Vault reorder · try pinning a <b>third</b> thing · tap the <b>search pill</b> and type "cal", "pdf" or a tag — the lens keeps filtering while you search · the <b>gear</b> opens Settings.</p>
     <h3>One screen, search-first</h3>
     <p><b>Vault:</b> home, inline search, filter chips, the item sheet, manual add — no bottom nav. The head (title, pill, chips) stays fixed; only the stream scrolls. The clipboard watcher is on by default and sits at the bottom as a quiet gauge row; tapping it opens Settings, where the real switch lives.<br>
-       <b>Settings</b> (gear, top-right): The everyday (Theme, clipboard watch) up top, everything else under More — and the <b>Ideas</b> page, ten proposals with yes / no / later votes that stick.</p>
+       <b>Settings</b> (gear, top-right): a short first screen. The two things you touch often stay live on it — the clipboard switch and Theme — and everything set up once sits behind a door that names its own state: <b>The floating overlay</b>, <b>What it keeps</b>, <b>Reach</b>, <b>Your profile</b>, and <b>About</b> at the foot. Plus the <b>Ideas</b> page, ten proposals with yes / no / later votes that stick.</p>
     <h3>New in this build</h3>
     <p><b>Types are lenses now:</b> the By-type section is gone. Chips under the search pill narrow the full stream in place, the choice survives a relaunch, and All takes the lens off. Search <b>"otter"</b> — a screenshot turns up because the words live <b>inside the picture</b>; open it for the found text and its own Copy. Save the <b>same text twice</b> from the plus, or attach the same picture twice: the original bumps to the top instead of duplicating. <b>Your profile</b> lives in Settings now — fill it once, then <b>Try it on a job form</b>: tap a field, take the offer, and everything the profile knows lands at once. Android draws the chip; we supply the answer — and the field it does not know stays empty.</p>
     <h3>What the paywall does</h3>
@@ -1677,6 +1783,7 @@ function renderKeepFocus(){
 }
 Object.assign(window,{go,goVault,setFilter,vaultEdge,openSearch,closeSearch,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
   saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch,dismissNote,attachSim,copyOcr,
+  toggleOverlay,setOvl,openPlan,
   openThemePicker,closeThemePicker,setTheme,vote,openTags,closeTags,addTag,removeTag,flipCopy,
   simShareIn,closeShare,pfSet,pfSetC,pfClear,fsFocus,fsFillAll,fsFillOne});
 render();
