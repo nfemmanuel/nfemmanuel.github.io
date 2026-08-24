@@ -6,6 +6,17 @@ const cardsContainer = document.querySelector('.project-cards');
 const wrapper = document.querySelector('.carousel-wrapper');
 const totalSlides = originalCards.length;
 
+// This script is included on every page via a shared <script> tag, but the
+// carousel markup (.project-card / .project-cards / .carousel-wrapper) only
+// exists on the homepage. Without this guard, measureLayout() below reads
+// originalCards[0].offsetWidth on an empty NodeList and every other page
+// throws on load, uncaught, before it ever reaches the keydown listener or
+// the mouseenter/mouseleave handlers further down that also assume the
+// carousel exists (found in the 2026-08-24 prod check). One derivation,
+// one guard, at the point the carousel's own existence is first known.
+carousel: {
+if (!cardsContainer || !wrapper || totalSlides === 0) break carousel;
+
 let currentSlide = 0;
 let autoScrollInterval;
 
@@ -274,3 +285,4 @@ if (cardsContainer) {
         startAutoScroll();
     }, { passive: true });
 }
+}  // end "carousel" guard block
