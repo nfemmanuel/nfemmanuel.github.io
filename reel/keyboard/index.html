@@ -106,6 +106,82 @@
      Everything the fidelity round measured survives untouched: the geometry,
      the era toggle, both themes, the password eviction, the four-owner x-ray.
 
+     ── PARITY ROUND, 2026-08-17: BUILD 21 CATCHES UP ───────────────────
+     Build 21 shipped three things on NF's own phone that this page did not
+     yet draw, and the standing rule says the prototype and the app move
+     together. All three are now here, each traced to the thing that shipped:
+
+     1. THE BOTTOM ROW CARRIES FOUR KEYS: 123, the emoji key, space, return.
+        Measured off NF's second capture (§4A.72-4A.77): space and return do
+        not move; the whole emoji key comes out of the 123 slot, which splits
+        into two equal halves around one ordinary gap. Drawn as that
+        derivation, (numbersKeyWidth − gap) / 2, never as stored halves —
+        the same remainder discipline the space bar already follows. The
+        key's face is the §4A.31 monochrome path this page already had; the
+        app ported it FROM here, so the glyph was never out of step.
+
+     2. THE EMOJI KEY OPENED A PANEL, drawn to iosApp/Keyboard/
+        KeyboardEmojiPanel.swift: the vault panel's twin in material and
+        motion, differing in one deliberate way — it stopped at the top of
+        the bottom row, so the key that closed it stayed visible and wore
+        ABC while it was open, which is what Apple's own emoji keyboard puts
+        on the key that leaves it. Recents row when there were any, one
+        scrolling grid of the app's own 186-face set, square cells derived
+        from the content width. RETIRED two days later — see "THE EMOJI KEY
+        HANDS OFF" below.
+
+     3. THE ROW SHARES: vault matches lead, word suggestions fill the cells
+        the vault did not take, three cells total (PRD 018's arbitration,
+        iosApp/Keyboard/KeyboardSuggestions.swift). The one visual tell is
+        alignment: your things anchor to the leading edge, dictionary words
+        float centred. Words come from three sources in a fixed order — the
+        person's own text replacements, then words they type, then a bundled
+        frequency list — and a tap inserts the word plus a space.
+
+     AND THE GLOBE LEFT THE BUILDING: on a Face ID phone iOS draws its OWN
+     globe-and-microphone bar under every third-party keyboard (NF's 4:37am
+     capture, apple-kb-full-iphone16-dark-ios26-system-bar.jpeg), so build
+     17+ draws no globe, no microphone and no accessory band — the keyboard
+     is 275pt, and the strip below it here is drawn as what it is: Apple's.
+
+     ── THE EMOJI KEY HANDS OFF, 2026-08-19 ──────────────────────────────
+     NF ruled the panel above out one day after build 21 shipped it, in the
+     plainest terms: "the emoji button on our keyboard should lead to the
+     emoji of the phone, not our own personal keyboard." The ruling is
+     docs/design-decisions.md, entry "The emoji key leads to the phone's
+     emoji, not ours", and it is law for this file. It restores PRD 005's
+     original reasoning: a second emoji keyboard "costs a CLDR data bundle
+     and buys a worse version of something they already have." The phone's
+     own emoji keyboard already has search, categories, recents, stickers,
+     Memoji and Genmoji; ours had 186 hand-picked faces in six groups and no
+     way to search them. It was never going to win and did not need to.
+
+     RETIRED: the panel view, the curated 186-face set, the skin-tone
+     callout, and the recents file — from the app and from this page.
+     KeyboardEmojiPanel.swift is deleted.
+
+     WHAT STAYS: the emoji KEY, its measured monochrome face, and its exact
+     place in the four-key bottom row. All three came from Apple's own
+     measured layout and the ruling never touched them — it is about where
+     the key LEADS, not what it looks like or where it sits.
+
+     WHERE IT LEADS NOW: iOS gives a third-party keyboard no way to name a
+     destination keyboard. advanceToNextInputMode() jumps to whatever is
+     next in the person's own rotation; handleInputModeList() opens the
+     system's own keyboard picker. The key calls the latter, and its
+     accessibility label says exactly that — "Opens the list of keyboards"
+     — never "Opens Emoji", because Emoji is a keyboard a person can remove
+     in Settings and the app has no way to know whether they have. A person
+     taps Emoji from the list themselves, the same as reaching any other
+     keyboard they have installed. That costs one tap more than Apple's own
+     emoji key, and buys back an entire emoji keyboard's worth of
+     capability this page's old panel never had.
+
+     ON THIS PAGE: there is no system keyboard list for a web page to hand
+     off to, so tapping the key shows a short note in the app's own voice
+     instead, saying plainly what the real key does. See commit(), case
+     'emoji'.
+
      Self-contained: no external requests, so headless screenshots and
      offline review both behave.
      ═══════════════════════════════════════════════════════════════════ -->
@@ -182,7 +258,9 @@
     --r-qt:.132316;        /* QuickType band  156px   52.00pt */
     --r-acc:.198473;       /* accessory band  234px   78.00pt */
     --r-slabr:.067854;     /* slab top radius  80px   26.67pt */
-    --r-k123:.229856;      /* 123 key         271px   90.33pt */
+    --r-k123:.229856;      /* the UNDIVIDED 123 slot  271px  90.33pt — the
+                              four-key row's 123 and emoji keys are both
+                              derived from it, never stored [spec 4A.77] */
     --r-kret:.230704;      /* return key      272px   90.67pt */
     --r-qtfs:.042189;      /* suggestion size  16.58pt from an 11.69pt cap */
     --r-sepw:.002545;      /* separator width   3px    1.00pt */
@@ -350,8 +428,26 @@
     --rowgap:calc(var(--W) * var(--r-rowgap));
     --fnw:calc(var(--kw) * var(--r-fnw));
     --qth:calc(var(--W) * var(--r-qt));
-    --acch:calc(var(--W) * var(--r-acc));
     --slabr:calc(var(--W) * var(--r-slabr));
+    /* THE FOUR-KEY ROW'S TWO LEFT KEYS, as the §4A.77 derivation and never as
+       stored halves: the measured three-key 123 slot, less one ordinary gap,
+       split evenly. 42.17pt at 393; the capture's own halves are 126.03 and
+       127.03px, ±0.5px around this — a JPEG's edge precision, not an
+       asymmetry Apple drew. Same remainder discipline as the space bar. */
+    --splitw:calc((var(--W) * var(--r-k123) - var(--gap)) / 2);
+    /* THE NUMBER AND DECIMAL PAD'S COLUMN. Three columns spanning the content
+       width on the ordinary gap, so the grid closes exactly at every width:
+       122.67pt at 393. DERIVED, not measured — there is no capture of an Apple
+       number pad in this repository, and §4A's "still not measured" list has
+       never had a pad in it. Photograph a real .numberPad and check this
+       against it. */
+    --padw:calc((var(--W) - 2 * var(--m) - 2 * var(--gap)) / 3);
+    /* what our keyboard keeps of §4A.13's 78pt band when iOS supplies the
+       switch key: the bottom 18.00pt, which §4A.30 names as the home
+       indicator's space — it was never the globe's and stays inside our
+       275pt. The 16pt of air and the 44pt touch row go with the globe. */
+    --clearh:calc(var(--W) * .045802);
+    --sysrowh:calc(var(--W) * .111959);   /* the system bar's 44pt touch row */
     /* Type, sized off the MEASURED cap height, not a nominal point size. The
        caps were re-measured by coverage integration (antialiasing-free) and the
        cap ratio is the REAL SF Pro's, read off the installed OTF: 0.7050, not
@@ -377,7 +473,23 @@
   /* the app fills the screen; the keyboard floats OVER it, which is the only
      way translucency means anything — content has to be behind the glass */
   .app{position:absolute;inset:0;display:flex;flex-direction:column;z-index:1}
+  /* ONE-HANDED. The keyboard is the SAME keyboard called at a narrower --W and
+     moved sideways, not a second layout — which is why nothing below this line
+     knows the mode exists. .82 is the ratio the app uses; the glyph ratio sizes
+     the chevron inside the restore disc. */
+  .scr{--one-handed-shrink:.82;--one-handed-glyph:.40}
   .kbwrap{position:absolute;left:0;right:0;bottom:0;z-index:5}
+  /* The tab occupies the WHOLE empty column, so the target is a thumb-sized
+     strip rather than the disc it paints. Same rule the app follows. */
+  .handtab{position:absolute;bottom:0;top:auto;z-index:6;display:none;
+    align-items:center;justify-content:center;background:transparent;border:0;
+    padding:0;cursor:pointer}
+  body.hand-left .handtab,body.hand-right .handtab{display:flex}
+  .handtab .disc{width:var(--fnw);height:var(--fnw);border-radius:50%;
+    background:var(--fnkey,var(--key));display:flex;align-items:center;
+    justify-content:center;box-shadow:var(--keyshadow,none)}
+  .handtab .disc svg{width:calc(var(--fnw) * var(--one-handed-glyph));
+    height:calc(var(--fnw) * var(--one-handed-glyph));fill:var(--ink)}
 
   /* status bar */
   .sbz{flex:0 0 auto;height:44px;display:flex;align-items:flex-end;justify-content:space-between;
@@ -475,19 +587,31 @@
     width:var(--sepw);height:var(--seph);background:var(--sug-sep);border-radius:1px}
 
   /* ── the suggestion row. Drawn to the capture's QuickType metrics so it is
-        judged at true size: equal thirds, hairline separators 3px @3x =
+        judged at true size: equal shares, hairline separators 3px @3x =
         1.00pt wide and 72px = 24.00pt tall, text at a measured 11.69pt cap.
         [spec 4A.12, 4A.37]
 
-        What goes IN it is the honest part. Apple lends its predictor to
-        nobody and ours is out of v1, so this row carries matches from the
-        things you saved. When nothing matches it stays quiet, which is also
-        what Apple's row does before it has anything to say. ── */
+        What goes IN it is the build-21 arbitration (PRD 018, ported from
+        iosApp/Keyboard/KeyboardSuggestions.swift): the vault's matches take
+        the leading cells, exactly as they always did, and WORD suggestions
+        fill the cells the vault did not use — three cells total, equal
+        shares of however many the row is offering, so one offer alone fills
+        the row rather than sitting in a third of it looking abandoned.
+
+        THE ONE VISUAL TELL IS ALIGNMENT, and it is doing real work: a saved
+        thing anchors to the leading edge with its picture or file glyph
+        beside it, and a dictionary word floats centred in its cell, which is
+        where Apple's own QuickType puts words and what lets the row read at
+        a glance with no label explaining itself. Same type, same colour —
+        a bolder neighbour would read as a claim about which offer is more
+        correct, which is not a claim this keyboard can make. ── */
   .sugg{flex:1 1 auto;display:flex;align-items:stretch;position:relative;min-width:0}
-  .sugg .s{flex:1 1 0;display:flex;align-items:center;justify-content:center;gap:5px;
+  .sugg .s{flex:1 1 0;display:flex;align-items:center;justify-content:flex-start;gap:5px;
     font-family:var(--apple);font-size:var(--qtfs);font-weight:450;color:var(--sug-ink);
     font-size-adjust:cap-height .705;cursor:pointer;position:relative;min-width:0;
     padding:0 6px;background:transparent;border:0;overflow:hidden}
+  /* a word is centred; the vault's cell is not. The whole difference. */
+  .sugg .s.w{justify-content:center}
   .sugg .s+.s::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
     width:var(--sepw);height:var(--seph);background:var(--sug-sep);border-radius:1px}
   .sugg .s:active{background:rgba(128,128,132,.22);border-radius:6px}
@@ -526,25 +650,125 @@
     transform:translateY(calc(var(--W) * .014));
     transition:opacity .17s var(--glide),transform .17s var(--glide)}
   .panel[data-open="1"]{opacity:1;pointer-events:auto;transform:none}
+  /* ── THE PANEL'S OWN ROOM, 2026-08-21 ─────────────────────────────────
+     The panel used to be exactly the key area and the keyboard was one height
+     open or closed. NF asked three rounds running for the other thing: "I wish
+     in the bothy clipboard you could expand it when it is open, it looks kinda
+     cramped", and on build 28 "still wish that you could expand the clipboard
+     so that it takes up more of the screen". So the key zone grows a strip of
+     padding at the top while the panel is open, and since the keyboard is
+     pinned to the bottom of the screen, growing is upward: the band above rises
+     by --pexp and the keys, which the panel covers anyway, hold still.
+
+     The panel is inset:0 of the PADDED box, so it takes the new strip and the
+     key area together — the same "band bottom to key bottom" span the Swift
+     draws. --pexp is 0 until setPanel() computes it, so a page that never opens
+     the panel is the page that always was, to the pixel.
+     Swift: KeyboardLayout.panelExpansion / .panelOpenTotalHeight.
+
+     The transition is on .keyzone alone and NOT on .rows: .rows already carries
+     a transition for its own opacity below, and a second declaration of the
+     shorthand here would replace it rather than add to it, which would silently
+     retire the keys' dimming. */
+  .keyzone{--pexp:0px;transition:padding-top .17s var(--glide)}
+  .keyzone[data-open="1"]{padding-top:var(--pexp)}
   .rows{transition:opacity .17s var(--glide)}
   /* the keys stay where they are and read as a ghost through the panel. Low
      enough that the panel's own text is never fighting a letter for the same
      pixels, high enough that the keyboard has clearly not gone anywhere. */
   .keyzone[data-open="1"] .rows{opacity:.09;pointer-events:none}
-  .phead{flex:0 0 auto;display:flex;align-items:center;gap:8px;
+  .phead{position:relative;flex:0 0 auto;display:flex;align-items:center;gap:8px;
     height:calc(var(--W) * .066);font-family:var(--ui);font-size:calc(var(--W) * .0295);
     font-weight:600;color:var(--ink-3);letter-spacing:.01em}
   .phead .pclose{margin-left:auto;background:transparent;border:0;padding:0 2px;cursor:pointer;
     color:var(--ink-3);display:flex;align-items:center}
+  /* ── THE GRABBER, 2026-08-21 ──────────────────────────────────────────
+     NF, build 29: "I like that the clipboard has a larger display but it feels
+     too large, I wanted it expandable, little by default but able to grow
+     should I want it to."
+
+     Apple's own sheet handle: a 36x5 capsule at a 5px inset from the top,
+     centred. Those three numbers are the platform's, not ours, which is the
+     whole argument for the idiom over an invented control - every iPhone owner
+     has already learned what it does.
+
+     Drawn at 36x5 and PRESSED at the whole header row that is not the chevron,
+     because 5px is a quarter of Apple's 44pt minimum and a control the user
+     cannot do without must not be a hairline. It sits in the header's empty
+     middle - title left, chevron right - so it costs the panel no height at
+     all.
+
+     ── THE TARGET IS THE ROW, 2026-08-22 ──
+     It was 88 wide (var(--W) * .2239) until NF reported for the FOURTH time
+     that the handle answers nothing on his phone. 88 was defended on the axis
+     that was never the problem: the row is 341 across and 25.9 tall, so 88
+     left three quarters of a row that means exactly one thing doing nothing
+     when it is pressed. It is now the row minus a chevron's square at EACH
+     end - symmetric, so the capsule stays dead centre, and stopping exactly on
+     the chevron's leading edge rather than over it. 328.12 at 393.
+
+     The bar also stops being drawn at .55: the Swift draws it at the full
+     tertiary ink and this file was the only place the fade existed.
+
+     Swift: KeyboardLayout.panelGrabberWidth and friends. */
+  .phead .pgrab{position:absolute;left:50%;top:0;transform:translateX(-50%);
+    width:calc(100% - 2 * var(--W) * .066);height:calc(var(--W) * .066);
+    background:transparent;border:0;padding:0;cursor:pointer;touch-action:none;
+    display:flex;align-items:flex-start;justify-content:center}
+  .phead .pgrab .pgrabbar{display:block;width:calc(var(--W) * .0916);
+    height:calc(var(--W) * .0127);margin-top:calc(var(--W) * .0127);
+    border-radius:999px;background:var(--ink-3)}
+  /* ── THE TILE IS SQUARE, 2026-08-21 ───────────────────────────────────
+     NF, build 28: "the image kinda appeared weird in the clipboard". Nothing
+     squeezed the picture — the app and the keyboard both fill-and-crop with
+     the aspect kept — but the row used to be `calc(var(--W) * .218)`, which
+     made the tile 1.426:1. A portrait screenshot is 0.461:1, so a centre crop
+     showed 32% of its height where the app's square tile shows 46%.
+
+     app-mockup.html's `.gc` is square and the app's grid is three columns on a
+     phone, same as this one, so the two tiles were already the same width and
+     only the height disagreed. `grid-auto-rows:auto` with `aspect-ratio:1` on
+     the tile makes it square at whatever the column comes out as, which is the
+     same thing Swift does by returning panelTileWidth from panelTileHeight
+     rather than by naming a ratio near .311 that would round to nearly square.
+
+     Every kind of tile grows, because there is one row height for all of them,
+     and that is the app's uniform square grid rather than a side effect.
+     Swift: KeyboardLayout.panelTileHeight. */
   .pgrid{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);
-    gap:calc(var(--W) * .0172);grid-auto-rows:calc(var(--W) * .218);
+    gap:calc(var(--W) * .0172);grid-auto-rows:auto;
     align-content:start;scrollbar-width:none;padding-bottom:2px}
   .pgrid::-webkit-scrollbar{display:none}
   /* there are more things below the fold and the panel has to say so without
      drawing a scrollbar. The app uses the same fade on tiles that overflow. */
   .pfade{position:absolute;left:0;right:0;bottom:0;height:calc(var(--W) * .05);
     pointer-events:none;background:linear-gradient(transparent,var(--kb-slab))}
-  .pit{position:relative;background:var(--kb-tile);border:1px solid var(--kb-tile-line);
+  /* ── THE RECEIPT, 2026-08-21 ──────────────────────────────────────────
+     NF, build 28: "you can't upload files and images from the clipboard, which
+     is weird". Tapping a picture or a document now puts the ORIGINAL bytes on
+     the system clipboard, and this is the one sentence that says so.
+
+     It wears the PANEL's own slab rather than a tile's face, because it floats
+     over tiles and a tile-coloured pill would be invisible on the very thing it
+     has to be legible over. The tiles' own hairline gives it an edge. No
+     invented colour, no shadow: nothing else on this surface casts one.
+
+     Opacity only, never movement — a pill that slid would be motion over a grid
+     somebody is reading, and a cross-fade is what Reduce Motion asks for
+     anyway. It takes no pointer events, so a tile underneath is still a tile
+     while the sentence is up, and the panel does not close.
+
+     Swift: KeyboardPanelView.showReceipt, KeyboardVoice.onYourClipboard. */
+  .pconf{position:absolute;left:50%;bottom:calc(var(--W) * .012 + var(--W) * .0172);
+    transform:translateX(-50%);white-space:nowrap;pointer-events:none;
+    padding:0 calc(var(--W) * .042);height:calc(var(--W) * .0873);
+    display:flex;align-items:center;border-radius:calc(var(--W) * .0437);
+    background:var(--kb-slab);border:1px solid var(--kb-tile-line);color:var(--ink);
+    font-family:var(--ui);font-size:calc(var(--W) * .0295);font-weight:600;
+    opacity:0;visibility:hidden;transition:opacity .28s var(--glide)}
+  .pconf[data-on="1"]{opacity:1;visibility:visible;transition-duration:.18s}
+  @media (prefers-reduced-motion:reduce){.pconf{transition-duration:0s}}
+  .pit{position:relative;aspect-ratio:1;background:var(--kb-tile);border:1px solid var(--kb-tile-line);
     border-radius:calc(var(--W) * .041);color:var(--ink);cursor:pointer;overflow:hidden;
     display:flex;padding:calc(var(--W) * .026) calc(var(--W) * .028);
     font-family:var(--ui);text-align:left;
@@ -582,6 +806,23 @@
   .pit.doc .fname{position:absolute;left:0;right:0;bottom:0;padding:0 9px 9px;text-align:center;
     font-size:calc(var(--W) * .0270);font-weight:600;color:var(--ink-2);
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* ── THE PINNED MARK, 2026-08-21 ──────────────────────────────────────
+     NF, 08-20: "pinned items aren't even marked in there". The panel already
+     ORDERED by pinned and never drew it, so a pinned thing sat at the front of
+     the grid looking like everything else at the front of the grid.
+
+     Every value here is app-mockup.html's `.gc .pin` / `.gc.img .pin`, copied
+     rather than chosen: 11px in from the top and the right, tertiary ink at
+     half strength, and white at .92 over a photograph because nothing else
+     survives an arbitrary picture. The 11px inset IS this tile's own padding
+     (--W * .028 = 11.00 at 393), so the mark lands on the padding the tile
+     already has. Swift: KeyboardLayout.panelPinMarkSize. */
+  .pit .pin{position:absolute;top:calc(var(--W) * .028);right:calc(var(--W) * .028);
+    color:var(--ink-3);opacity:.5;display:flex;pointer-events:none}
+  .pit.img .pin{color:#fff;opacity:.92}
+  /* and a pinned tile keeps its words clear of the mark — .gc .tx.ind's 17px
+     against the same 13px pin, carried across as the same ratio */
+  .pit .pv.ind,.pit .tit.ind .d{padding-right:calc(var(--W) * .0331 * 17 / 13)}
   .pit.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
   .pempty{grid-column:1/-1;color:var(--ink-3);font-family:var(--ui);
     font-size:calc(var(--W) * .0308);padding:14px;text-align:center}
@@ -619,8 +860,18 @@
   .k.down{background:var(--key-down)}
   .k.wide{flex:1 1 auto}
   .k.fnw{flex:0 0 var(--fnw)}                       /* shift & delete: 1.356 x a letter key */
-  .k.k123{flex:0 0 calc(var(--W) * var(--r-k123))}  /* 90.33pt */
+  /* the four-key row's 123 and emoji keys: two equal halves of the measured
+     123 slot, split around one ordinary gap [spec 4A.72, 4A.73, 4A.77] */
+  .k.ksplit{flex:0 0 var(--splitw)}
   .k.kret{flex:0 0 calc(var(--W) * var(--r-kret))}  /* 90.67pt */
+  /* a number or decimal pad's cell — one of three columns. The empty cell in a
+     number pad's bottom row is `.k.kpad.spacer`, which keeps the column and
+     takes no touches. */
+  .k.kpad{flex:0 0 var(--padw)}
+  /* the emoji key's face: the §4A.31 traced path at the §4A.43 measured
+     diameter — the same 26.80pt disc the accessory row used to carry, now on
+     the key the app actually ships it on */
+  .k .eface{width:var(--emojid);height:var(--emojid)}
   .k.dim{color:var(--ret-dim)}                      /* the empty-field return, measured */
   /* MEASURED CORRECTION. The old build inverted the whole shift key when shift
      was engaged. The capture says no: the shift key stays rgb(62,62,64) like
@@ -640,42 +891,44 @@
   body.device-ipad .scr{--kh:calc(var(--W) * .064);--kr:calc(var(--W) * .011)}
   body.device-ipad .pit .pv{font-size:calc(var(--W) * .026)}
 
-  /* ── the accessory row · MEASURED ─────────────────────────────────────
-     Apple moved emoji and dictation OUT of the key grid and onto their own
-     row below it. The capture measures that band at 234px = 78.00pt: a 44pt
-     touch row with 16pt above and 18pt below, the lower part of which is the
-     home-indicator's space. The emoji glyph is 81px = 27.00pt across, its
-     centre 127px = 42.33pt from the left screen edge. [spec 4A.16-4A.18]
+  /* ── under the keys: our 18pt, then the SYSTEM'S OWN BAR ──────────────
+     Build 17 retired the accessory band. On a Face ID phone iOS draws its
+     own globe-and-microphone bar under every third-party keyboard — NF saw
+     two globes and a stripe of dead space on the first hardware build — so
+     the app keeps only §4A.13's bottom 18.00pt, which §4A.30 names as the
+     home indicator's space, and hands the other 60pt back.
 
-     It is drawn as a WHITE monochrome face, not a colour emoji — the capture's
-     dominant pixel there is rgb(255,255,255) with the tray colour showing
-     through the eyes and mouth. So it is an SVG here, like every other glyph
-     on the page, and the icon contract holds without an exception. */
-  .accrow{height:var(--acch);padding:calc(var(--W) * .0407) var(--m) calc(var(--W) * .0458);
-    display:flex;align-items:center;gap:calc(var(--W) * .022);position:relative}
+     What sits BELOW that 18pt here is Apple's bar, drawn because NF's own
+     capture shows it (captures/apple-kb-full-iphone16-dark-ios26-system-bar
+     .jpeg: globe bottom-left, dictation bottom-right, same tray) and because
+     a page judged against the phone cannot leave a hole where the phone has
+     controls. Its CONTENTS are at measured positions — the globe in the
+     §4A.43 emoji slot, which is where Apple parks the globe once more than
+     one keyboard is installed, and the microphone at §4A.18's 42.83pt from
+     the right — and its ENVELOPE is §4A.13's own recipe re-used: a 44pt
+     touch row with 18pt below. The one INFERRED thing is the split — where
+     our view ends and the system's begins is not photographable from inside
+     a keyboard — and the total it produces, 18 + 44 + 18 under the keys,
+     sits 2pt over the 16 + 44 + 18 Apple draws for itself. Flagged, not
+     hidden. The microphone is at FULL strength now: it is Apple's own key
+     in Apple's own bar, which is the one place dictation has ever lived. */
+  .clear18{height:var(--clearh)}
+  .sysbar{height:calc(var(--sysrowh) + var(--clearh));padding-bottom:var(--clearh);
+    display:flex;align-items:center;position:relative}
   .acck{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
     width:calc(var(--W) * .112);height:100%;color:var(--key-ink);cursor:pointer;
     background:transparent;border:0;padding:0}
   .acck:active{opacity:.55}
-  .acck.emoji{margin-left:calc(var(--emojicx) - var(--m) - var(--W) * .056)}
-  /* the dictation slot. Its centre is MEASURED at 42.83pt in from the right
-     screen edge, so it is positioned from the right rather than floated there.
-     It stays DIMMED because it stays sealed: Apple's capability lists exclude
-     the microphone in both access states, so this key can be drawn accurately
-     and can never be made to work. [spec 8.5, 4A.18] */
-  .accrow .never{margin-left:auto;display:flex;align-items:center;justify-content:center;
-    width:calc(var(--miccr) * 2);height:100%;opacity:.32;color:var(--ink-3);
-    margin-right:calc(0px - var(--m))}
-  body.xray .accrow .never{outline:2px dotted color-mix(in srgb,var(--c-lnk) 80%,transparent);
-    outline-offset:-4px;border-radius:10px;opacity:.7}
+  .acck.globe{margin-left:calc(var(--emojicx) - var(--W) * .056)}
+  .sysbar .micslot{margin-left:auto;display:flex;align-items:center;justify-content:center;
+    width:calc(var(--miccr) * 2);height:100%;color:var(--key-ink)}
+  body.xray .sysbar::after{top:-15px;left:6px}
 
   /* trackpad mode: "the keyboard turns light grey and the letters
      disappear" [spec 5.6.1] */
   .rows.trackpad .k{color:transparent!important;background:rgba(var(--sys-label),.06)!important;
     box-shadow:none!important}
   .rows.trackpad .k svg,.rows.trackpad .k .capsbar{opacity:0}
-  .trackhint{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:11.5px;
-    color:var(--ink-3);font-family:var(--ui);pointer-events:none}
 
   /* ── the character-preview balloon [spec 5.2] ── */
   .pop{position:absolute;z-index:30;pointer-events:none;display:flex;flex-direction:column;
@@ -686,6 +939,7 @@
     justify-content:center;font-family:var(--apple);font-size:calc(var(--kfs) * 1.55);
     font-weight:470;font-size-adjust:cap-height .705;color:var(--key-ink);
     box-shadow:0 6px 18px rgba(0,0,0,.18),inset 0 .5px 0 var(--key-edge)}
+  .pop.multi .body{font-size:calc(var(--fnfs) * 1.35)}
   .pop .neck{background:var(--pop);margin-top:-1px}
   /* the accent callout: a horizontal row of alternates [spec 5.3] */
   .callout{position:absolute;z-index:31;background:var(--pop);border-radius:12px;padding:5px;
@@ -696,6 +950,9 @@
     border-radius:var(--kr);font-family:var(--apple);font-size:var(--kfs);font-weight:470;
     font-size-adjust:cap-height .705;color:var(--key-ink);cursor:pointer}
   .callout b.sel{background:var(--sys-blue);color:#fff}
+  /* the `.com` key's callout: whole endings rather than single glyphs, so the
+     cell is wider and the label wears the `#+=` size the `.com` key wears */
+  .callout.multi b{width:calc(var(--kw) * 1.9);font-size:var(--fnfs)}
 
   /* eviction: the honest refusal [spec 8.3]. The system keyboard is still
      drawn, because that is what actually happens — an annotation card
@@ -805,13 +1062,23 @@
     </div>
   </div>
   <p class="lede">Type on it. Hold a vowel. Double-tap shift. Hold the space bar.
+    Hold <b>123</b> and slide onto a symbol. Tap the face
+    beside <b>123</b> for a note about where it leads now.
     Everything here is meant to be indistinguishable from the iPhone keyboard except
     <b class="us">the small mark at the top left</b>, which is ours.
     Tap it and your things come up over the keys. Turn on <b>X-ray</b> to see which parts are whose.</p>
-  <p class="lede note2"><b>The row beside the mark.</b> It fills with things you saved as you type
-    past the third letter of one, and it stays empty the rest of the time, which is what your phone's
-    own row does before it has anything to say. Press <b>Play a line</b> to watch it happen, or type
-    <b>resu</b> or <b>head</b> yourself.
+  <p class="lede note2"><b>The row of field chips changes what the keyboard is asked for.</b>
+    A field tells the keyboard what it is for, and the keyboard answers.
+    <b>Email</b> brings the at sign and the full stop onto the bottom row.
+    <b>Address</b> brings the full stop, the slash and a <b>.com</b> key, and gives up the
+    emoji key to fit them on a 393pt phone; hold <b>.com</b> for the other endings.
+    <b>Number</b> and <b>Decimal</b> put a three-column pad there instead, with no letters
+    at all. The keyboard is exactly the same height in every one of them.</p>
+  <p class="lede note2"><b>The row beside the mark.</b> Things you saved lead it from the third
+    letter that starts a word inside one, anchored to the left edge; word suggestions fill the cells
+    they leave, floating centred, from the second letter of any word. Three cells, and it stays empty
+    when neither has anything to say, which is what your phone's own row does too. Press
+    <b>Play a line</b> to watch, or type <b>resu</b>, <b>head</b> or <b>omw</b> yourself.
     <b>Two keyboards, both current:</b> Apple ships the flat one and the glass one at the same time and
     picks between them per app, so this is not a question of which year it is. The page opens on the
     flat one because that is what your capture shows.</p>
@@ -837,12 +1104,15 @@
 
 <div class="desk" id="desk"></div>
 
-<p class="footrow">Every dark-mode number here is measured off
-  <b>docs/ios/reference/captures/capture-01-dark-qwerty-with-quicktype.png</b>, an iPhone 15/16 Pro class
-  phone at 1179px @3x = 393pt. Still unverified and marked as such: the light theme (there is no light
-  capture yet), the vault panel (there is no capture of anyone's panel), the balloon and callout heights,
-  delete acceleration, and every iPad measurement. Which numbers are measured and which are still guesses
-  is written out in <b>docs/ios/reference/keyboard-visual-spec.md §4A</b>.</p>
+<p class="footrow">Every dark-mode number here is measured off NF's own captures at 1179px @3x = 393pt:
+  <b>capture-01-dark-qwerty-with-quicktype.png</b> for the grid, the band and the type, and
+  <b>apple-kb-four-key-row-iphone16-dark-1179w.jpeg</b> for the four-key bottom row (§4A.72-4A.77).
+  The system bar below the keyboard appears in <b>apple-kb-full-iphone16-dark-ios26-system-bar.jpeg</b>
+  and is drawn from §4A.13's band recipe pending its own integration; the split between our view and
+  the system's is inferred and says so. Still unverified and marked as such: the light theme (there is
+  no light capture yet), both panels (there is no capture of anyone's panel), the balloon and callout
+  heights, delete acceleration, and every iPad measurement. Which numbers are measured and which are
+  still guesses is written out in <b>docs/ios/reference/keyboard-visual-spec.md §4A</b>.</p>
 
 <script>
 'use strict';
@@ -963,7 +1233,13 @@ Object.assign(I,{
   fZip:'<rect x="4.2" y="5.4" width="15.6" height="4.2" rx="1.4"/><path d="M5.8 9.6v9a1.6 1.6 0 0 0 1.6 1.6h9.2a1.6 1.6 0 0 0 1.6-1.6v-9"/><path d="M10.3 13.6h3.4"/>',
   fVid:'<rect x="3.2" y="5.4" width="17.6" height="13.2" rx="2.8"/><path d="m10.3 9.3 5.2 2.7-5.2 2.7z"/>',
   fAud:'<path d="M3.6 11.1v1.8M7.2 8.6v6.8M10.8 5.8v12.4M14.4 9.2v5.6M18 10.6v3.2M21.2 11.4v1.6"/>',
-  chev:'<path d="m6.4 9.6 5.6 5.6 5.6-5.6"/>'
+  chev:'<path d="m6.4 9.6 5.6 5.6 5.6-5.6"/>',
+  /* the pinned mark, and NOT a fresh drawing of it: these two paths are the
+     `pin` entry of design/app-mockup.html verbatim, because the vault screen
+     and this panel have to mark a pinned thing the same way or the two
+     surfaces are two products. iOS resolves the same `pin` token to pin.fill.
+     [NF 2026-08-20: "pinned items aren't even marked in there"] */
+  pin:'<path d="M9.5 3h5v5.6l2.3 3.1v2.1H7.2v-2.1L9.5 8.6z"/><path d="M12 13.8V21"/>'
 });
 /* the same extension-to-family map the app uses, so a .pptx is a deck on both */
 const FILE=[
@@ -989,12 +1265,18 @@ const kindOf=v=>{const e=extOf(v).toLowerCase(),h=FILE.find(f=>f[0].test(e));
    this page now shows the thing itself. Editable names a person could assign
    in-app are a real idea and are PARKED, recorded in design-decisions so the
    idea survives without being built here. */
+/* Two of these are pinned, and both marks are here on purpose: the ink one
+   over a tile face and the white one over a photograph are the two cases
+   `.pit .pin` and `.pit.img .pin` draw, so a glance at this page checks both.
+   The list is not sorted here — the app's projection arrives pins-first out of
+   core, and re-sorting it in a mockup would model a rule this page does not
+   own. [NF 08-20: "pinned items aren't even marked in there"] */
 const VAULT=[
-  {t:'txt',v:'+1 (614) 555-0164',code:1},
+  {t:'txt',v:'+1 (614) 555-0164',code:1,pin:1},
   {t:'doc',v:'Alex-Rivera-Resume.pdf'},
   {t:'lnk',v:'cal.example.com/alex/15min',title:'Book 15 minutes with Alex'},
   {t:'txt',v:'482 Maple Grove Ave, Apt 3B, Columbus OH 43210'},
-  {t:'img',v:'Headshot',g:'linear-gradient(135deg,#7B55B4,#3E2C5E)'},
+  {t:'img',v:'Headshot',g:'linear-gradient(135deg,#7B55B4,#3E2C5E)',pin:2},
   {t:'txt',v:'alex.rivera@example.com'},
   {t:'txt',v:'PineTree-Guest / autumn2026!',code:1},
   {t:'lnk',v:'alexrivera.example.com',title:'Alex Rivera - Product Designer'},
@@ -1003,6 +1285,58 @@ const VAULT=[
   {t:'doc',v:'Rate-card.xlsx'},
   {t:'doc',v:'Case-study.pptx'}
 ];
+
+/* ── the word sources — iosApp/Keyboard/KeyboardSuggestions.swift ────────
+   Three, ranked by whose word it is, and the order IS the product decision:
+
+     1. The person's own iOS Text Replacements. Somebody who set up `omw` in
+        Settings stated a preference in the plainest way iOS offers, so it
+        wins, inserted VERBATIM — never re-cased, because they wrote that
+        capital O and that exclamation mark on purpose. Offered from a
+        prefix, which is a deliberate widening of Apple's expand-on-complete:
+        strictly more useful, and it cannot misfire because nothing is ever
+        substituted without a tap.
+     2. Words this person actually types, counted on-device by the
+        extension's own store once they clear a threshold. Seeded here with
+        the demo persona's working vocabulary, which is what that store
+        would have learned from the thread on this page.
+     3. A bundled frequency list. The app ships a real lexicon; this page
+        carries a small stand-in with the same contract — lowercase entries,
+        frequency-ordered, matched on prefix, re-cased to what was typed.
+
+   De-duplicated on the text that would be inserted, highest tier kept, and
+   never offering back exactly what has been typed. */
+const REPLACEMENTS=[{s:'omw',p:'On my way!'}];
+const LEARNED=['resume','headshot','invoice','portfolio','studio','rivera',
+  'deliverables','deposit','columbus','maple'];
+const LEXICON=['the','and','you','that','was','for','are','with','his','they',
+  'this','have','from','one','had','not','but','what','all','were','when','your',
+  'can','said','there','use','each','which','she','how','their','will','other',
+  'about','out','many','then','them','these','some','her','would','make','like',
+  'him','into','time','has','look','two','more','write','see','number','way',
+  'could','people','than','first','water','been','call','who','its','now','find',
+  'long','down','day','did','get','come','made','may','part','over','new','sound',
+  'take','only','little','work','know','place','year','live','back','give','most',
+  'very','after','thing','our','just','name','good','sentence','man','think',
+  'say','great','where','help','through','much','before','line','right','too',
+  'mean','old','any','same','tell','boy','follow','came','want','show','also',
+  'around','form','three','small','set','put','end','does','another','well',
+  'large','must','big','even','such','because','turn','here','why','ask','went',
+  'men','read','need','land','different','home','move','try','kind','hand',
+  'picture','again','change','off','play','spell','air','away','animal','house',
+  'point','page','letter','mother','answer','found','study','still','learn',
+  'should','world','high','every','near','add','food','between','own','below',
+  'country','plant','last','school','father','keep','tree','never','start',
+  'city','earth','eye','light','thought','head','under','story','saw','left',
+  'few','while','along','might','close','something','seem','next','hard','open',
+  'example','begin','life','always','those','both','paper','together','got',
+  'group','often','run','important','until','children','side','feet','car',
+  'mile','night','walk','white','sea','began','grow','took','river','four',
+  'carry','state','once','book','hear','stop','without','second','later','miss',
+  'idea','enough','eat','face','watch','far','really','almost','let','above',
+  'girl','sometimes','mountain','cut','young','talk','soon','list','song',
+  'being','leave','family','result','checking','ready','address','thanks',
+  'sending','meeting','today','tomorrow'];
 
 /* ── layouts ──────────────────────────────────────────────────────────
    Key widths are never hardcoded. They come from the rule that reconciles
@@ -1020,8 +1354,58 @@ const SYMS=[['[',']','{','}','#','%','^','*','+','='],
             ['_','\\','|','~','<','>','\u20AC','\u00A3','\u00A5','\u2022'],
             ['.',',','?','!','\'']];
 /* alternates behind a long press [spec 5.3] */
-const ALT={a:'aàáâäæãåā',e:'eèéêëēėę',i:'iîïíīįì',o:'oôöòóœøōõ',u:'uûüùúū',
-  y:'yÿ',n:'nñ',c:'cçćč',s:'sśš',z:'zžźż',l:'l£'};
+/* **The alternates table, and it is the SAME table the app ships.**
+   `iosApp/Keyboard/KeyboardAlternates.swift` carries these sets character for
+   character; the two are meant to be diffed against each other, and
+   `KeyboardGestureTests` counts them so a drift shows up as a number. Each
+   string leads with its own base character, which is what makes a long press
+   you change your mind about type the plain letter when you lift.
+   PRD 021 asks for the English US accent set - roughly 164 variants since
+   iOS 17 - plus the punctuation alternates. This is 184 variants across 52 keys,
+   236 options with the bases; it was 180 across 51, 231 with the bases, before
+   the address bar's `.com` key brought its endings. Counted in the page, not
+   estimated. */
+const ALT={
+  a:'aàáâäæãåāăą',
+  c:'cçćĉċč', d:'dďđð',
+  e:'eèéêëēĕėęě', f:'fƒ',
+  g:'gĝğġģ', h:'hĥħ',
+  i:'iìíîïĩīĭįı',
+  j:'jĵ', k:'kķ', l:'lĺļľł',
+  n:'nñńņňŋ',
+  o:'oòóôõöøōŏőœ',
+  p:'pþ', r:'rŕŗř', s:'sśŝşšß',
+  t:'tţťŧ',
+  u:'uùúûüũūŭůűų',
+  w:'wŵ', y:'yýŷÿ', z:'zźżž',
+  '0':'0°',
+  '-':'-–—•', '/':'/\\', '(':'([{<', ')':')]}>',
+  '$':'$¢£€¥₩₽₹₪₫',
+  '&':'&§', '"':'"“”„«»',
+  '.':'.…', '?':'?¿', '!':'!¡',
+  "'":"'‘’‚‹›",
+  '[':'[{(<', ']':']})>', '{':'{[(<', '}':'}])>',
+  '%':'%‰', '*':'*†‡', '+':'+±', '=':'=≠≈',
+  '_':'_—–', '\\':'\\/', '|':'|¦', '~':'~≈',
+  '<':'<≤«‹', '>':'>≥»›',
+  '€':'€¢£¥₩₽₹$',
+  '£':'£¢€¥₩₽₹$',
+  '¥':'¥¢£€₩₽₹$',
+  '•':'•·‣◦',
+  /* **THE ONE ENTRY THAT IS A LIST OF WORDS RATHER THAN A STRING OF
+     CHARACTERS**, and the only reason the table below is read with a spread
+     rather than by index: `[...'abc']` and `[...['a','bc']]` both give an
+     array, so one callout draws either kind.
+
+     The `.com` key exists only on an address bar, and holding it offers the
+     other endings, exactly as Apple's own does. THE SET IS APPLE'S en-US ONE
+     AS FAR AS I COULD ESTABLISH IT WITHOUT A DEVICE, and it is written here so
+     it can be reconciled against the app's: `.com .net .org .edu .us`. If the
+     app ships a different list, the app is the oracle and this line follows
+     it. Base first, like every other entry, so a long press you change your
+     mind about still types the plain `.com` when you lift. */
+  '.com':['.com','.net','.org','.edu','.us']
+};
 
 /* ── state ───────────────────────────────────────────────────────────
    theme, device, field and x-ray persist; a query string overrides all
@@ -1037,7 +1421,16 @@ const pick=(o,ok,key,def)=>{
 let THEME=pick(qs.get('theme'),['light','dark'],KEYS.t,
   matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
 let DEVICE=pick(qs.get('device'),['iphone','ipad'],KEYS.d,'iphone');
-let FIELD=pick(qs.get('field'),['message','search','password'],KEYS.f,'message');
+/* Which side the keyboard sits on. `hand=left|centre|right`, defaulting to
+   centre, so every screenshot route that already exists keeps producing the
+   picture it produced before this line was written. `center` is accepted for
+   the same reason the app accepts it. */
+let HAND=pick((qs.get('hand')==='center'?'centre':qs.get('hand')),
+  ['left','centre','right'],'design.kb.hand','centre');
+/* The order is the order the chips sit in: the two ordinary fields, then the
+   four the host's keyboardType changes, then the one iOS takes off us. */
+const FIELD_ORDER=['message','search','email','url','number','decimal','password'];
+let FIELD=pick(qs.get('field'),FIELD_ORDER,KEYS.f,'message');
 let XRAY=pick(qs.get('xray'),['on','off'],KEYS.x,'off')==='on';
 /* ERA defaults to 18 because that is what NF's capture shows — the page should
    open on the keyboard NF is actually holding, not on the one we trained on. */
@@ -1058,17 +1451,86 @@ const save=(k,v)=>{try{localStorage.setItem(k,v)}catch(_){}};
 /* ── field personality: the return key's meaning is the host's, read off
       the proxy's returnKeyType [spec 5.7.1, 5.7.3]. In iOS 26 it draws an
       ICON, not the word [spec 5.7.2]. ── */
+/* ══════════ WHAT THE FIELD'S keyboardType ASKS THE KEYBOARD TO DRAW ══════════
+   The host's field declares a `keyboardType`, and the app now answers it with a
+   different bottom row or with a pad instead of a QWERTY. The data below is the
+   same data `KeyboardFieldPlan` carries in
+   `iosApp/Keyboard/KeyboardLayout.swift`, and the two are meant to be diffed
+   against each other.
+
+   PROMOTED KEY is the one coined word here, and this is its definition, taken
+   from the app: a character that already exists on the `123` layer, given a key
+   of its own on the bottom row so nobody has to change layer to type the one
+   character the field is made of. `@` and `.` on an email box, `.`, `/` and
+   `.com` on an address bar.
+
+   A promoted slot is written `p:` and then the character, so a slot is always a
+   plain string and the drop rule below can compare slots with `===`. */
+const PRO='p:';
+const BOTTOM_QWERTY=['layer','emoji','space','ret'];
+const BOTTOM_EMAIL=['layer','emoji','p:@','p:.','space','ret'];
+const BOTTOM_URL=['layer','emoji','p:.','p:/','p:.com','space','ret'];
+
+/* The pads: `1 2 3 / 4 5 6 / 7 8 9` and then a fourth row, exactly as
+   `KeyboardPadPlan` has them. `c` is the column, counted from the left, and a
+   column with no cell is a hole rather than a key. Delete is not in the rows:
+   it is the keyboard's own delete key moved into a cell, so hold-to-repeat and
+   word acceleration come with it instead of being built a second time. */
+const DIGIT_ROWS=[
+  [{c:0,t:'1'},{c:1,t:'2'},{c:2,t:'3'}],
+  [{c:0,t:'4'},{c:1,t:'5'},{c:2,t:'6'}],
+  [{c:0,t:'7'},{c:1,t:'8'},{c:2,t:'9'}]
+];
+/* The app puts the LOCALE's decimal separator in the bottom-left cell, so a
+   German field gets a comma. This page is drawn in en-US and shows the full
+   stop; the locale rule lives in `KeyboardFieldPlan.decimalPad(separator:)`. */
+const NUMBER_PAD={rows:DIGIT_ROWS.concat([[{c:1,t:'0'}]]),del:2};
+const DECIMAL_PAD={rows:DIGIT_ROWS.concat([[{c:0,t:'.'},{c:1,t:'0'}]]),del:2};
+
+/* ── field personality: the return key's meaning is the host's, read off
+      the proxy's returnKeyType [spec 5.7.1, 5.7.3]. In iOS 26 it draws an
+      ICON, not the word [spec 5.7.2]. The `bottom` and `pad` keys are the
+      SECOND thing a field decides, and they are independent of the first: a
+      field's keyboardType picks the keys, its returnKeyType picks the return
+      key's meaning. ──
+
+   ALL `hint` AND `ph` COPY BELOW IS PENDING VOICE REVIEW. */
 const FIELDS={
   message:{ph:'iMessage',ret:'ret',retLabel:'return',primary:false,secure:false,
     title:'Alex',hint:'A normal text field. The return key is just return.'},
   search:{ph:'Search',ret:'find',retLabel:'search',primary:true,secure:false,
     title:'Search',hint:'A search field. The host asks for a Search key and the keyboard obeys.'},
+  /* `primary` is the blue return key, and the rule this page already follows is
+     that anything but a plain `return` gets it: Search has it, Go has it, and
+     a sign-up box asking for Next has it too. */
+  email:{ph:'name@example.com',ret:'ret',retLabel:'next',primary:true,secure:false,
+    title:'Sign up',bottom:BOTTOM_EMAIL,
+    hint:'An email box. The at sign and the full stop come up onto the bottom row, so neither is a layer away.'},
+  url:{ph:'Search or enter website name',ret:'ret',retLabel:'go',primary:true,secure:false,
+    title:'Safari',bottom:BOTTOM_URL,
+    hint:'An address bar. The full stop, the slash and a .com key take the row, and on a 393pt phone the emoji key gives up its slot to make room. Hold .com for the other endings.'},
+  number:{ph:'0',ret:'ret',retLabel:'done',primary:false,secure:false,
+    title:'Quantity',pad:NUMBER_PAD,
+    hint:'A field that only takes digits. Nine of them, a zero, and delete. No letters at all, and the keyboard is exactly as tall as it was.'},
+  decimal:{ph:'0.00',ret:'ret',retLabel:'done',primary:false,secure:false,
+    title:'Amount',pad:DECIMAL_PAD,
+    hint:'The number pad with a decimal point beside the zero. The app puts your own locale\u2019s separator there, so a comma where a comma is what people type.'},
   password:{ph:'Password',ret:'ret',retLabel:'go',primary:true,secure:true,
     title:'Sign in',hint:'A password field. iOS takes the keyboard away here.'}
 };
 
 /* ══════════ render ══════════ */
-function caseOf(ch){return shift>0?ch.toUpperCase():ch}
+/* **Shift has something to say about a key only when the key is ONE LETTER.**
+   The same rule as `KeyboardInputModel.rendered` and `takesShiftCase`, and it
+   is here for the same bug: `".com".toUpperCase()` is `".COM"`, so an address
+   bar with shift armed drew a key whose face said `.com` and inserted `.COM`.
+   Two conditions rather than one, because either alone is wrong — `@` is one
+   character with no case, and `.com` begins with a character that is not a
+   letter but is not one letter either. */
+const takesShiftCase=b=>[...b].length===1&&/\p{L}/u.test(b);
+function caseOf(ch){
+  return layer==='letters'&&shift>0&&takesShiftCase(ch)?ch.toUpperCase():ch;
+}
 function rowsFor(){
   if(layer==='nums')return NUMS;
   if(layer==='syms')return SYMS;
@@ -1084,20 +1546,93 @@ function fieldHTML(){
 }
 
 /* ══════════ WHAT THE SUGGESTION ROW ACTUALLY KNOWS ══════════
-   Apple does not lend its predictor to anybody, and a predictor of our own is
-   out of v1 on purpose. So the row is not guessing at language. It is looking
-   at what you already saved.
+   Two kinds of offer share one row, and the rule between them is SPATIAL
+   (PRD 018, iosApp/Keyboard/KeyboardSuggestions.swift). NF's brief, verbatim:
+   "don't let it be a cost." Neither degraded.
 
-   The rule is deliberately dumb and completely explainable: take the word you
-   are in the middle of typing, and if any word inside a saved thing STARTS
-   with it, offer that thing. Three letters minimum, so ordinary short words
-   never set it off. Files and pictures match on the names they already carry.
-   Nothing is inferred, nothing is learned, and nothing is sent anywhere.
+   THE VAULT'S MATCHES are untouched — same trigger, same order, same count,
+   same tap. Take the run you are in the middle of typing, and if any word
+   inside a saved thing STARTS with it, offer that thing. Three characters
+   minimum, so ordinary short words never set it off. Files and pictures
+   match on the names they already carry. Matches-as-you-type is the
+   product's wedge, and moving them to word boundaries — the tidy-sounding
+   alternative — would have silently repealed it.
 
-   When nothing matches, the row stays empty. That is not a placeholder state:
-   iOS does the same, and a row that always has something in it would be
-   pretending. */
+   WORDS FILL THE CELLS THE VAULT DID NOT USE, three cells total. So: no
+   matches, three words (the ordinary case while typing); one match, two
+   words; three matches, no words. Every state the band could reach before
+   it still reaches, and cells that were blank now carry words.
+
+   THE TWO SCANS DISAGREE ON PURPOSE. The vault scans [letters digits . @ + -]
+   and needs three, because it is looking for something that could prefix a
+   filename or an address — alex.rivera@example.com must stay one token that
+   `alex` can reach. A WORD is letters and interior apostrophes only, and
+   needs two, because offering `there` when `th` has been typed is the entire
+   point — while one letter's completions are noise above a keyboard.
+   Unifying them would change when vault matches appear, which is forbidden
+   in as many words.
+
+   When neither has anything, the row stays empty. That is not a placeholder
+   state: iOS does the same, and a row that always has something in it would
+   be pretending. */
 const MINFRAG=3;
+const WMIN=2, WMAX=32;   /* a run past 32 is a URL, a token or a password
+                            manager's output; no completion is worth offering */
+const isApos=c=>c==="'"||c==='’';
+/* the word in flight before the caret, or null at a boundary — after a
+   space, after punctuation, at the start of a field — which is what makes
+   "words while a word is in flight" true by construction */
+function wordFragment(){
+  const m=text.slice(0,caret).match(/[\p{L}'’]+$/u);
+  if(!m)return null;
+  let w=m[0];
+  if(w.length>WMAX)return null;
+  if(!/\p{L}/u.test(w))return null;          /* a run of apostrophes is not a word */
+  if(isApos(w[0])){w=w.slice(1)}             /* `'quoted` matches nothing; `quoted` does */
+  return w.length>=WMIN?w:null;
+}
+/* how the fragment was capitalised, so a suggestion comes back wearing the
+   same shape — being offered `alex` after typing `Alex` reads as a bug */
+function casingOf(f){
+  const L=[...f].filter(c=>/\p{L}/u.test(c));
+  if(!L.length)return 'lower';
+  if(L.length>=2&&L.every(c=>c===c.toUpperCase()&&c!==c.toLowerCase()))return 'upper';
+  if(L[0]!==L[0].toLowerCase()&&L[0]===L[0].toUpperCase())return 'capitalized';
+  return 'lower';
+}
+function applyCasing(cas,w){
+  if(cas==='upper')return w.toUpperCase();
+  if(cas==='capitalized')return w?w[0].toUpperCase()+w.slice(1):w;
+  return w;
+}
+/* the merge: replacements verbatim (exact shortcut first, then the shortest
+   shortcut this fragment is heading towards), then learned, then the list —
+   de-duplicated on the insert text, never offering back what was typed */
+function wordsFor(room){
+  if(room<=0)return [];
+  const f=wordFragment();
+  if(!f)return [];
+  const folded=f.toLowerCase(), cas=casingOf(f);
+  const out=[], seen={};
+  const offer=t=>{
+    if(out.length>=room)return;
+    const k=t.toLowerCase();
+    if(seen[k]||k===folded)return;
+    seen[k]=1;out.push(t);
+  };
+  const exact=[],partial=[];
+  REPLACEMENTS.forEach(r=>{
+    const s=r.s.toLowerCase();
+    if(!s||!r.p)return;
+    if(s===folded)exact.push(r);
+    else if(s.indexOf(folded)===0)partial.push(r);
+  });
+  partial.sort((a,b)=>a.s.length===b.s.length?(a.s<b.s?-1:1):a.s.length-b.s.length);
+  exact.concat(partial).forEach(r=>offer(r.p));
+  LEARNED.forEach(w=>{if(w.indexOf(folded)===0)offer(applyCasing(cas,w))});
+  LEXICON.forEach(w=>{if(w.indexOf(folded)===0)offer(applyCasing(cas,w))});
+  return out;
+}
 const tokensOf=v=>String(v).split(/[\s/\\,;:()"'<>\[\]{}]+/).filter(Boolean);
 function fragment(s){
   const m=String(s).slice(0,caret).match(/[\w.@+-]+$/);
@@ -1131,89 +1666,240 @@ function matchPreview(v){
       '<span class="val">'+esc(v.v)+'</span>';}
   return '<span class="val">'+esc(v.v.replace(/\n/g,' '))+'</span>';
 }
+let SHOWNWORDS=[];   /* what the word cells are drawing, for their taps */
 function suggHTML(){
   const ms=matchesFor();
+  /* the arbitration: the vault's cells lead, words take what is left */
+  SHOWNWORDS=wordsFor(3-ms.length);
   /* no zn of its own: the band around it already carries the ownership label,
      and two purple OURS tags stacked on one row is noise rather than an x-ray */
   return '<div class="sugg">'+
     ms.map(m=>'<button class="s" type="button" data-mi="'+m.i+'">'+matchPreview(m.v)+'</button>').join('')+
+    SHOWNWORDS.map((w,i)=>'<button class="s w" type="button" data-wi="'+i+'">'+
+      '<span class="val">'+esc(w)+'</span></button>').join('')+
     '</div>';
 }
 
 /* ══════════ THE VAULT PANEL ══════════
-   The mark opens it over the keys. The keys stay where they are underneath and
-   the keyboard does not change height, which is the whole reason this shape
-   was chosen over a second band.
+   The mark opens it over the keys. The keys stay where they are underneath,
+   which is the whole reason this shape was chosen over a second band. The
+   keyboard used to stay one height too; since 2026-08-21 it grows upward while
+   the panel is open, on NF's own third asking. See the --pexp block in the
+   stylesheet and KeyboardLayout.panelOpenScreenHeightFraction in the app.
 
    Tiles are the app's own: a saved thing shows itself. Text shows its words at
    the app's size tiers, a link leads with its address, a picture is its own
    tile, a file wears its kind and its name. No type-name labels anywhere. */
 function tileHTML(v,i){
   const open='type="button" data-vi="'+i+'"';
+  /* the mark, and the label that carries it to anyone who cannot see it. The
+     projection has always had this bit (VaultCard.pinned); the panel just never
+     drew it. [NF 08-20] */
+  const pin=v.pin?'<span class="pin">'+ic('pin',13,1.9)+'</span>':'';
+  const say=x=>eatt(v.pin?'Pinned. '+x:x);
+  const ind=v.pin?' ind':'';
   if(v.t==='img')
-    return '<button class="pit img" '+open+' aria-label="'+eatt(v.v)+'">'+
+    return '<button class="pit img" '+open+' aria-label="'+say(v.v)+'">'+
       '<span class="shot" style="background:'+v.g+'"></span>'+
-      '<span class="cap">'+esc(v.v)+'</span></button>';
+      '<span class="cap">'+esc(v.v)+'</span>'+pin+'</button>';
   if(v.t==='doc'){const k=kindOf(v.v);
-    return '<button class="pit doc" style="--fc:'+k.c+'" '+open+' aria-label="'+eatt(v.v)+'">'+
+    return '<button class="pit doc" style="--fc:'+k.c+'" '+open+' aria-label="'+say(v.v)+'">'+
       ic(k.g,30,1.5)+'<span class="ext">'+extOf(v.v)+'</span>'+
-      '<span class="fname">'+esc(v.v.replace(/\.\w{1,5}$/,''))+'</span></button>';}
+      '<span class="fname">'+esc(v.v.replace(/\.\w{1,5}$/,''))+'</span>'+pin+'</button>';}
   if(v.t==='lnk'){
     const dom=v.v.replace(/^https?:\/\//,''), cut=dom.indexOf('/');
     const body=cut<0?'<b>'+esc(dom)+'</b>'
       :'<b>'+esc(dom.slice(0,cut))+'</b>'+esc(dom.slice(cut));
-    return '<button class="pit" '+open+'><span class="tit"><span class="d">'+body+'</span>'+
-      (v.title?'<span class="t">'+esc(v.title)+'</span>':'')+'</span></button>';}
+    return '<button class="pit" '+open+' aria-label="'+say(dom)+'">'+
+      '<span class="tit'+ind+'"><span class="d">'+body+'</span>'+
+      (v.title?'<span class="t">'+esc(v.title)+'</span>':'')+'</span>'+pin+'</button>';}
   const n=v.v.length, size=n<=26?' s1':n<=58?' s2':'';
-  return '<button class="pit" '+open+'><span class="pv'+size+(v.code?' code':'')+'">'+
-    esc(v.v)+'</span></button>';
+  return '<button class="pit" '+open+' aria-label="'+say(v.v)+'"><span class="pv'+size+
+    (v.code?' code':'')+ind+'">'+esc(v.v)+'</span>'+pin+'</button>';
 }
 function panelHTML(){
   return '<div class="panel zn" id="panel" data-own="ours" data-zn="ours, shape inferred" data-open="'+(PANEL?'1':'0')+'"'+
     (PANEL?'':' aria-hidden="true"')+'>'+
     '<div class="phead"><span>Your things</span>'+
+      /* the grabber. Apple's sheet handle, in the header row's empty middle so
+         it costs the panel no height, which matters most in the compact detent
+         people will actually live in. */
+      '<button class="pgrab" type="button" id="pgrab" aria-label="Make this bigger" '+
+        'aria-expanded="false"><span class="pgrabbar"></span></button>'+
       '<button class="pclose" type="button" aria-label="Close">'+ic('chev',18,2)+'</button></div>'+
     '<div class="pgrid">'+
       (VAULT.length?VAULT.map(tileHTML).join(''):'<div class="pempty">Nothing saved yet.</div>')+
-    '</div><span class="pfade"></span></div>';
+    '</div><span class="pfade"></span>'+
+    /* the receipt. Drawn always, shown only after a picture or a document has
+       actually gone to the clipboard — see .pconf and copyOut() below. */
+    '<span class="pconf" id="pconf">On your clipboard. Paste it wherever you like.</span>'+
+    '</div>';
 }
 
-/* ══════════ THE ACCESSORY ROW ══════════
-   MEASURED off capture-01: Apple lifts emoji and dictation out of the key grid
-   into their own 78.00pt band beneath it. Our clone keeps the band and the
-   emoji key's exact size and position, adds the globe beside it — which is
-   where Apple puts the globe once more than one keyboard is installed — and
-   leaves the dictation slot empty, because the microphone is sealed to
-   extensions in both the open-access and no-open-access states. [spec 8.5]
 
-   WHAT SHIPS IS NOT WHAT THIS BAND DRAWS, and NOTES.txt asked the page to say
-   so. PRD 005 rules the built keyboard draws NO microphone in any state: a key
-   that cannot be pressed is a lie shaped like a control, and the dimmed one
-   here is documentation of where Apple puts theirs. The emoji key is the same
-   class of thing pending one experiment. NF asked (2026-08-09) whether it could
-   simply switch to Apple's emoji board and back. Coming back is free, because
-   that board's ABC key returns to whichever keyboard you came from. Going there
-   is the constrained half: the API advances to the NEXT keyboard in the user's
-   own order and cannot name emoji as a destination, so the key is honest only
-   when emoji happens to sit next to us. A real-phone spike at the end of slice
-   5 decides it. Until then the globe is the only route we claim. */
-function accHTML(){
-  return '<div class="accrow zn" data-own="clone" data-zn="we draw it, to Apple’s design">'+
-    '<button class="acck emoji" type="button" data-a="emoji" aria-label="Emoji">'+
-      '<svg viewBox="0 0 24 24" style="width:var(--emojid);height:var(--emojid)" aria-hidden="true">'+
-      I.emojiface+'</svg></button>'+
-    '<button class="acck" type="button" data-a="globe" aria-label="Next keyboard">'+
-      '<svg viewBox="0 0 24 24" style="width:calc(var(--emojid)*.95);height:calc(var(--emojid)*.95)" '+
+/* ══════════ UNDER THE KEYS: OUR 18pt, THEN THE SYSTEM'S OWN BAR ══════════
+   Build 17 retired the accessory band, and the reason is NF's own phone: on a
+   Face ID device iOS draws its OWN globe-and-microphone bar under every
+   third-party keyboard, so our globe was the second globe on the screen,
+   sitting in a 78pt band whose only content was a duplicate of a control the
+   system had already provided. The app now keeps §4A.13's bottom 18pt — the
+   home indicator's space, which was never the globe's — and hands back the
+   60pt that held a control. The keyboard is 275pt where it was 335.
+
+   The bar drawn below that air is APPLE'S, and it is drawn because NF's
+   4:37am capture shows it (captures/apple-kb-full-iphone16-dark-ios26-
+   system-bar.jpeg): globe bottom-left in the §4A.43 emoji slot, dictation
+   bottom-right at §4A.18's measured position, same tray, live. Dictation
+   lives THERE now — in Apple's bar, the one place it has ever lived, at full
+   strength because it is Apple's key doing Apple's job — so the old dimmed
+   in-keyboard microphone documentation is retired with the band that held
+   it. The envelope re-uses §4A.13's measured recipe (44pt row, 18pt below);
+   the SPLIT between our view and the system's is the one INFERRED thing, and
+   the CSS comment carries the 2pt it costs. */
+function sysbarHTML(){
+  return '<div class="clear18"></div>'+
+    '<div class="sysbar zn" id="sysbar" data-own="apple" data-zn="iOS draws it, under every keyboard">'+
+    '<button class="acck globe" type="button" data-a="globe" aria-label="Next keyboard">'+
+      '<svg viewBox="0 0 24 24" style="width:var(--emojid);height:var(--emojid)" '+
       'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '+
       'stroke-linejoin="round" aria-hidden="true">'+I.globe+'</svg></button>'+
     /* the microphone rides its own viewBox, in capture pixels, because its four
        parts were measured separately and squeezing them into the shared 24x24
        grid is what made the old one wrong. [spec 4A.18, 4A.44] */
-    '<span class="never" title="Apple’s dictation key. Sealed to every third-party keyboard.">'+
+    '<span class="micslot" title="Apple’s dictation key, in Apple’s own bar. No third-party keyboard has ever had it.">'+
       '<svg viewBox="0 0 54.38 83.17" style="width:var(--micw);height:var(--mich)" '+
       'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" '+
       'aria-hidden="true">'+I.mic+'</svg></span>'+
     '</div>';
+}
+
+/* ══════════ THE BOTTOM ROW, FOR WHATEVER THE FIELD ASKED FOR ══════════
+   One function decides the row, so the picture and the arithmetic under it
+   cannot disagree about a width. This is `KeyboardLayout.bottomRowFrames(for:)`
+   said in fractions of the screen width instead of in points.
+
+   FRACTIONS, NOT POINTS, and that is deliberate: --W is the screen width and
+   every measure in the stylesheet is a calc() off it, so a rule written as a
+   fraction of W is the same rule at any frame size — which is also why the
+   app's own version is arithmetic against the real width rather than a device
+   check. The ratios are the measured ones already declared at the top of this
+   file; they are repeated here as numbers because JavaScript cannot read a
+   calc().
+
+   The widths are all existing §4A numbers. The `123` key takes §4A.8's
+   undivided 90.33pt on a plain three-key row and §4A.77's 42.17pt half as soon
+   as anything else joins the row. A promoted key takes the same 42.17pt half,
+   because it is the same kind of small bottom-row key and a second width for it
+   would be a number nobody could source. Return takes 90.67pt. Space takes the
+   remainder, which is what closes the row exactly at every width instead of
+   only at 393. */
+const R_MARGIN=.016539, R_GAP=.015267, R_K123=.229856, R_KRET=.230704;
+const R_SPLIT=(R_K123-R_GAP)/2;          /* 42.17pt at 393 */
+const R_CONTENT=1-2*R_MARGIN;
+const R_MINTOUCH=44/393;                 /* 44pt, at the reference width */
+
+function slotRatio(slot,keys){
+  if(slot==='ret')return R_KRET;
+  /* the undivided slot only on a row of exactly `123`, space and return */
+  if(slot==='layer'&&keys.length===3)return R_K123;
+  return R_SPLIT;                        /* layer-as-half, emoji, every promoted */
+}
+function spaceRatio(keys){
+  let used=0;
+  keys.forEach(s=>{if(s!=='space')used+=slotRatio(s,keys)});
+  return R_CONTENT-(keys.length-1)*R_GAP-used;
+}
+/* **THE DROP RULE, AND WHY THERE HAS TO BE ONE.** An address bar wants `123`,
+   emoji, `.`, `/`, `.com`, space and return, and at 393pt those seven do not
+   fit: the space bar comes out at 42.5pt, under the 44pt touch target, and a
+   space bar a thumb cannot reliably hit is a broken keyboard rather than a
+   cramped one. So keys are dropped until the space bar clears 44pt — the emoji
+   key first, because a web address does not take emoji and the address
+   punctuation is what the field is for, and then promoted keys from the right,
+   `.com` before `/` before `.`. At 393 it fires exactly once, on the address
+   bar, and leaves `. / .com` with a 90.67pt space bar, the same width as the
+   return key beside it. It comes back on its own above about 407pt, every Plus
+   and Max phone, because the rule is arithmetic and not a device check.
+
+   THIS IS PARITY, NOT A COMPROMISE. Apple's own address-bar keyboard spends
+   that row on the dot, the slash and the `.com` too, and our emoji key hands
+   off to the phone's own keyboards rather than opening anything of ours, so
+   nothing of ours becomes unreachable. */
+function bottomKeys(f){
+  const keys=(f.bottom||BOTTOM_QWERTY).slice();
+  while(spaceRatio(keys)<R_MINTOUCH){
+    const e=keys.indexOf('emoji');
+    if(e>=0){keys.splice(e,1);continue}
+    let last=-1;
+    for(let i=0;i<keys.length;i++)if(keys[i].slice(0,2)===PRO)last=i;
+    if(last<0)break;   /* nothing left that may be dropped */
+    keys.splice(last,1);
+  }
+  return keys;
+}
+/* The space bar is painted by `flex:1 1 auto` rather than by a computed width,
+   which gives it the same remainder the arithmetic above computes — the
+   arithmetic is what decides WHICH keys are in the row, and flex is what fills
+   it. Two ways of saying one number, and they agree because both are
+   "everything the fixed keys did not take". */
+function bottomRowHTML(f,kk){
+  const keys=bottomKeys(f);
+  const cells=keys.map(slot=>{
+    if(slot==='layer')
+      return kk(layer==='letters'?'123':'ABC','fn ksplit','data-a="layer"');
+    if(slot==='emoji')
+      return kk('<svg viewBox="0 0 24 24" class="eface" aria-hidden="true">'+I.emojiface+'</svg>',
+        'fn ksplit','data-a="emoji" aria-label="Opens the list of keyboards"');
+    if(slot==='space')
+      /* MEASURED: the space bar carries NO label. Its interior in the capture is
+         a flat rgb(62,63) with not one pixel of ink in it. [spec 4A.20] */
+      return kk('','fn wide','data-a="space" aria-label="space"');
+    if(slot==='ret')
+      return kk(gl(f.ret,1.9),'fn kret'+(f.primary?' primary':'')+(!text&&!f.primary?' dim':''),
+        'data-a="ret"');
+    /* a promoted key. More than one glyph wears the smaller `#+=` label size,
+       because `.com` at the letter size very nearly touches both edges of a
+       42.17pt key. VoiceOver gets the characters themselves for the single
+       ones — iOS localises "." to "period" or "full stop" by the reader's own
+       settings, and a hard-coded English word would be worse in every locale
+       including the two English ones — and "dot com" for the one nobody reads
+       out as "period c o m". */
+    const t=slot.slice(PRO.length);
+    const many=[...t].length>1;
+    return kk(caseOf(t),'ksplit'+(many?' fn':''),
+      'data-c="'+t+'" aria-label="'+(t==='.com'?'dot com':t)+'"');
+  }).join('');
+  return '<div class="krow" data-row="3">'+cells+'</div>';
+}
+/* ══════════ THE PADS ══════════
+   Three columns spanning the content width on the ordinary gap, so the grid
+   closes exactly at every width: 122.67pt a column at 393. DERIVED, not
+   measured — no capture of an Apple number pad exists in this repository, and
+   the app's own comment says the same. Capture-checklist material.
+
+   Four rows, the same four row tops and the same key height the QWERTY uses,
+   so a field that asks for digits gets a keyboard of exactly the same height. A
+   keyboard that changed height when the focus moved from a message box to a
+   quantity box would be the loudest possible way to look home-made. */
+function padRowsHTML(p,kk){
+  let h='';
+  const lastRow=p.rows.length-1;
+  for(let r=0;r<p.rows.length;r++){
+    const cells=p.rows[r];
+    let row='';
+    for(let c=0;c<3;c++){
+      if(r===lastRow&&c===p.del){
+        row+=kk(gl('del',1.7),'fn kpad','data-a="del"');
+        continue;
+      }
+      const cell=cells.filter(x=>x.c===c)[0];
+      row+=cell
+        ?kk(cell.t,'kpad','data-c="'+cell.t+'"')
+        :kk('','kpad spacer');
+    }
+    h+='<div class="krow" data-row="'+r+'">'+row+'</div>';
+  }
+  return h;
 }
 
 function keysHTML(){
@@ -1225,7 +1911,18 @@ function keysHTML(){
      is a second thing living in the same box and each needs its own outline */
   let h='<div class="rows" id="rows">';
 
-  if(!pad){
+  if(f.pad){
+    /* A digits field: the three-column grid instead of the QWERTY. Shift, the
+       `123` key, the emoji key and return are not hidden here, they are simply
+       never built — a pad has no layers to change and no return key, and a key
+       that cannot be pressed is still a key somebody has to look past.
+
+       Drawn on the iPad too, and that is a judgement rather than a measurement:
+       no iPad metric on this page is measured (spec 7.5), and drawing three
+       columns of digits in a field that takes only digits is less wrong than
+       drawing a keyboard full of letters in it. */
+    h+=padRowsHTML(f.pad,kk);
+  }else if(!pad){
     /* iPhone: the shape everybody knows */
     h+='<div class="krow" data-row="0">'+R[0].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+'</div>';
     h+='<div class="krow" data-row="1">'+R[1].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+'</div>';
@@ -1239,18 +1936,29 @@ function keysHTML(){
     h+='<div class="krow" data-row="2">'+lead+'<div class="krow inner">'+
       R[2].map(c=>kk(layer==='letters'?caseOf(c):c,'ltr','data-c="'+c+'"')).join('')+'</div>'+
       kk(gl('del',1.7),'fn fnw','data-a="del"')+'</div>';
-    /* MEASURED bottom row: 123 at 90.33pt, space at 187.00pt, return at
-       90.67pt, and NO globe key. The capture has one keyboard installed, so
-       Apple draws no globe; when there are several it goes in the accessory
-       row below, which is where ours lives too. [spec 4A.8, deviation D3] */
-    h+='<div class="krow" data-row="3">'+
-      kk(layer==='letters'?'123':'ABC','fn k123','data-a="layer"')+
-      /* MEASURED: the space bar carries NO label. Its interior in the capture
-         is a flat rgb(62,63) with not one pixel of ink in it — Apple stopped
-         writing "space" on it. We were writing it. [spec 4A.20] */
-      kk('','fn wide','data-a="space" aria-label="space"')+
-      kk(gl(f.ret,1.9),'fn kret'+(f.primary?' primary':'')+(!text&&!f.primary?' dim':''),'data-a="ret"')+
-      '</div>';
+    /* MEASURED bottom row, four keys [spec 4A.72-4A.77]: space at 187.00pt
+       and return at 90.67pt exactly where the three-key row had them, and
+       the whole emoji key carved out of the 123 slot — two equal halves of
+       90.33pt around one ordinary gap, 42.17pt each, drawn as the derivation
+       so the row closes exactly at every width. This is the row NF's own
+       four-key capture shows and the row build 21 ships on a Face ID phone,
+       where iOS supplies the switch key itself; on a home-button phone the
+       app keeps the undivided three-key row and its globe, and that case is
+       not drawn here because NF's phone is the oracle.
+
+       The emoji key's face is the §4A.31 traced path — the app ported it
+       FROM this page. It no longer wears a second state: a tap hands off
+       to iOS's own list of keyboards rather than opening anything of ours,
+       so the face never changes and the label says what the tap actually
+       does — "Opens the list of keyboards", never "Emoji" — see docs/
+       design-decisions.md, "The emoji key leads to the phone's emoji, not
+       ours".
+
+       The row is built by `bottomRowHTML` now rather than written out here,
+       because the field's keyboardType can add keys to it. An ordinary field
+       resolves to exactly these four, at exactly these widths — the four-key
+       case is `BOTTOM_QWERTY` and nothing about it moved. */
+    h+=bottomRowHTML(f,kk);
   }else{
     /* iPad: delete and return live on the letter rows, and the bottom row
        carries .?123 twice plus hide-keyboard. Metrics unverified [spec 7.5]. */
@@ -1285,11 +1993,12 @@ function slabHTML(){
   if(FIELD==='password'){
     /* [spec 8.3] custom keyboards are evicted from secure and phone-number
        fields. Showing the refusal is honest; drawing an autofill bar we can
-       never have would not be [spec 8.9]. */
+       never have would not be [spec 8.9]. The words in Apple's row here are
+       the ones NF's own four-key capture shows it offering. */
     return '<div class="slab pw zn" id="slab" data-own="apple" data-zn="ios draws all of this">'+
       '<div class="qtband zn" data-own="apple" data-zn="apple\u2019s own row"><div class="sugg">'+
-        ['I','The','My'].map(s=>'<div class="s">'+s+'</div>').join('')+'</div></div>'+
-      '<div class="keyzone">'+keysHTML()+'</div>'+accHTML()+
+        ['I','The','I\u2019m'].map(s=>'<div class="s w">'+s+'</div>').join('')+'</div></div>'+
+      '<div class="keyzone">'+keysHTML()+'</div>'+sysbarHTML()+
       '<div class="evict"><b>iOS took the keyboard back.</b>'+
       '<span>In a password field the system uses its own keyboard and nothing else. '+
       'Every keyboard that is not Apple\u2019s disappears here, ours and Gboard and SwiftKey alike. '+
@@ -1303,9 +2012,11 @@ function slabHTML(){
     bandHTML()+
     '<div class="keyzone zn" id="keyzone" data-own="clone" data-zn="we draw it, to Apple\u2019s design" '+
       'data-open="'+(PANEL?'1':'0')+'">'+keysHTML()+panelHTML()+'</div>'+
-    accHTML()+
+    sysbarHTML()+
     '<div class="neverbar">Apple\u2019s alone, permanently: the saved-password bar, the code-from-Messages '+
-    'suggestion, and speaking instead of typing. None of those appear on this page, because they cannot.</div>'+
+    'suggestion, and speaking instead of typing. The last one is on the screen now: the microphone '+
+    'below the keys sits in iOS\u2019s own bar, outside every third-party keyboard, and that is why ours '+
+    'draws no globe and no microphone of its own.</div>'+
     '<div class="feelnote">The click and the tap you would feel land right here. A web page cannot play either, '+
     'so they are named rather than faked.</div>'+
     '</div>';
@@ -1325,11 +2036,18 @@ function render(){
         'on purpose, so whatever sits behind the glass has something to tint.</span></div>'+
       '</div>'+
     '</div>'+
+    '<button class="handtab" id="handtab" type="button" '+
+      'aria-label="Put the keyboard back to full width">'+
+      '<span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true">'+
+      '<path d="M8.6 5.4 15.2 12l-6.6 6.6-1.4-1.4L12.4 12 7.2 6.8z"/>'+
+      '</svg></span></button>'+
     '<div class="kbwrap" id="kbwrap">'+
       '<div class="fieldrow"><div class="field'+(f.secure?' secure':'')+'" id="field">'+fieldHTML()+'</div></div>'+
       slabHTML()+
     '</div>'+
     '<div class="homebar"></div>';
+  document.body.classList.remove('hand-left','hand-centre','hand-right');
+  document.body.classList.add('hand-'+HAND);
   layout();
   wire();
   paintDesk();
@@ -1344,7 +2062,39 @@ function layout(){
      whole thing stays in proportion at any frame size instead of only at the
      one it happened to be drawn at. */
   const scr=document.getElementById('scr');
-  if(scr)scr.style.setProperty('--W',scr.clientWidth+'px');
+  const wrapEl=document.getElementById('kbwrap');
+  const tab=document.getElementById('handtab');
+  if(scr){
+    const W=scr.clientWidth;
+    /* **--W GOES ON .scr, NOT ON .kbwrap, AND THAT IS THE WHOLE TRICK.**
+       Every measure in the keyboard is a calc() off --W declared ON .scr
+       (--kw, --gap, --kh and the rest), and a calc() resolves against the
+       element that DECLARES it. Overriding --W further down inherits the
+       number and changes nothing, because --kw was already computed upstairs.
+       That version drew a full-size keyboard inside a narrowed box.
+       Setting it here is safe: every selector that reads --W or anything
+       derived from it is a keyboard or vault-panel part. The app content
+       above (.navb, .thread, .bub) reads none of them, so nothing but the
+       keyboard moves. */
+    const shrink=(HAND==='centre')?1:
+      (parseFloat(getComputedStyle(scr).getPropertyValue('--one-handed-shrink'))||.82);
+    const kbW=W*shrink;
+    scr.style.setProperty('--W',kbW+'px');
+    const offset=(HAND==='right')?(W-kbW):0;
+    if(wrapEl){
+      wrapEl.style.width=kbW+'px';
+      wrapEl.style.right='auto';
+      wrapEl.style.left=offset+'px';
+    }
+    /* The tab fills the column the keyboard left behind, and the chevron
+       points back towards the keys. In centre there is no column and no tab. */
+    if(tab){
+      tab.style.left=(HAND==='right')?'0px':kbW+'px';
+      tab.style.width=(W-kbW)+'px';
+      tab.style.height=(wrapEl?wrapEl.offsetHeight:0)+'px';
+      tab.style.transform=(HAND==='right')?'scaleX(-1)':'none';
+    }
+  }
   const ph=document.querySelector('.phone');
   if(ph)ph.style.setProperty('--Wp',ph.clientWidth+'px');
 
@@ -1366,34 +2116,48 @@ function layout(){
 }
 
 /* ── the height readout ─────────────────────────────────────────────────
-   It used to say what the old three-way control cost, because "suggestions AND
-   the strip" bought a second band and made the keyboard taller than Apple's.
-   The inverted design removes that choice, so the number is now a claim rather
-   than a warning:
+   Build 17 moved the claim. The keyboard our app asks iOS for is now:
 
      52pt  the suggestion band, which is Apple's own band, holding our row
-   + 205pt the keys, three letter rows and the bottom row with their gaps
-   +  78pt the accessory band under them
-   = 335pt exactly what the capture measures  [spec 4A.19]
+   + 205pt the keys, three letter rows and the four-key bottom row
+   +  18pt the home indicator's space, §4A.13's bottom slice [spec 4A.30]
+   = 275pt — and the 60pt down to the old 335 went back to the system,
+             which spends it on its own globe-and-microphone bar below us.
 
-   The vault panel opens INSIDE the key area, so an open panel adds nothing.
-   The warning still exists and now watches for that: if any state ever pushes
-   past the measured height the number goes amber, because a keyboard taller
-   than Apple's is the most visible tell there is [spec 8.7]. */
-const KBPT=335;
+   THE PANEL opens INSIDE the key area, so an open panel adds nothing. The
+   warning watches for exactly that: if any state ever pushes past the
+   measured height the number goes amber, because a keyboard taller than
+   Apple's is the most visible tell there is [spec 8.7]. The readout counts
+   OUR keyboard only — the system's bar is measured out of the total, the
+   same way iOS accounts it. */
+const KBPT=275;
 function reportHeight(){
   const slab=document.getElementById('slab'), scr=document.getElementById('scr');
   const out=document.getElementById('hcost');
   if(!slab||!scr||!out)return;
-  const pts=slab.offsetHeight/scr.clientWidth*393;
+  const sys=document.getElementById('sysbar');
+  /* ours stops where the system's bar begins; in the password state the
+     whole picture is Apple's own keyboard, bar included, so nothing is
+     subtracted and the number is its 335 (plus the 2pt the inferred split
+     costs, which the CSS comment carries) */
+  const oursPx=FIELD==='password'
+    ?slab.offsetHeight
+    :slab.offsetHeight-(sys?sys.offsetHeight:0);
+  const pts=oursPx/scr.clientWidth*393;
   /* the x-ray deliberately opens gutters between the zones so its labels have
      somewhere to sit, so the keyboard is taller in that mode on purpose and the
      warning has to stay quiet there */
-  const over=DEVICE==='iphone'&&!XRAY&&pts>KBPT+5;
+  /* the panel deliberately makes the keyboard taller since 2026-08-21, so the
+     "taller than the phone measures" warning has to stay quiet while it is
+     open — the same exemption the x-ray gutters already get, and for the same
+     reason: the extra height is the point, not a drift */
+  const over=DEVICE==='iphone'&&!XRAY&&!PANEL&&FIELD!=='password'&&pts>KBPT+5;
   const tail=XRAY?', with the x-ray gutters added'
     :DEVICE!=='iphone'?' (iPad, and no iPad measurement exists yet)'
+    :FIELD==='password'?' of Apple’s own keyboard, ours evicted'
     :over?', taller than the phone measures'
-    :PANEL?', panel open, the same as closed':', panel open or closed';
+    :PANEL?', panel open — 0.64 of the screen on purpose, plus the system’s bar'
+    :', panel closed, plus the system’s own bar below';
   out.textContent='keyboard height '+Math.round(pts)+'pt'+tail;
   out.dataset.warn=over?'1':'0';
 }
@@ -1404,11 +2168,15 @@ function showPop(key,ch){
   hidePop();
   const slab=document.getElementById('slab');if(!slab)return;
   const kr=key.getBoundingClientRect(), sr=slab.getBoundingClientRect();
-  const kw=kr.width, bw=Math.max(kw*1.55,40), bh=52, neck=10;
+  /* A key carrying more than one glyph — only `.com` today — needs a wider
+     balloon and the smaller label size, or the preview clips the ending it is
+     supposed to be previewing. */
+  const many=[...ch].length>1;
+  const kw=kr.width, bw=Math.max(kw*(many?2.3:1.55),40), bh=52, neck=10;
   let left=kr.left-sr.left+kw/2-bw/2;
   left=Math.max(2,Math.min(left,sr.width-bw-2));      /* edge keys shift inward [spec 5.2.4] */
   const el=document.createElement('div');
-  el.className='pop';
+  el.className='pop'+(many?' multi':'');
   el.style.left=left+'px';
   el.style.top=(kr.top-sr.top-bh-neck+1)+'px';
   el.style.width=bw+'px';
@@ -1431,15 +2199,33 @@ function showCallout(key,ch){
   const slab=document.getElementById('slab');if(!slab)return;
   const kr=key.getBoundingClientRect(), sr=slab.getBoundingClientRect();
   const el=document.createElement('div');
-  el.className='callout';
-  el.innerHTML=[...alts].map((a,i)=>'<b'+(i===0?' class="sel"':'')+' data-alt="'+a+'">'+
-    (shift>0?a.toUpperCase():a)+'</b>').join('');
+  /* An option wider than one glyph gets a wider cell and the smaller label
+     size, for the reason the `.com` KEY gets them: `.net` at the letter size in
+     a cell 1.05 key-widths across would touch both edges. */
+  const opts=[...alts];
+  const many=opts.some(a=>[...a].length>1);
+  el.className='callout'+(many?' multi':'');
+  el.innerHTML=opts.map((a,i)=>'<b'+(i===0?' class="sel"':'')+' data-alt="'+a+'">'+
+    caseOf(a)+'</b>').join('');
   el.style.visibility='hidden';slab.appendChild(el);
+  /* A long set does not fit: `a` offers ten alternates, so eleven options at
+     1.05 key widths is wider than the phone. Shrink the options rather than
+     let the row run off, which is what Apple's own long callouts do. The app
+     applies the identical rule in `calloutOptionWidth`. */
+  const n=opts.length, maxW=sr.width-6;
+  if(el.offsetWidth>maxW){
+    const bw=(maxW-10-(n-1)*2)/n;
+    [...el.children].forEach(b=>{b.style.width=bw+'px'});
+  }
   const w=el.offsetWidth;
   let left=kr.left-sr.left+kr.width/2-w/2;
   left=Math.max(3,Math.min(left,sr.width-w-3));
   el.style.left=left+'px';
-  el.style.top=(kr.top-sr.top-el.offsetHeight-6)+'px';
+  /* **Never above the keyboard's own top edge.** A third-party keyboard may
+     draw only inside its input view, so a top-row callout is clamped down onto
+     our own band instead of floating over the app the way Apple's does. It is
+     the one geometric thing on this keyboard nobody can match. */
+  el.style.top=Math.max(0,kr.top-sr.top-el.offsetHeight-6)+'px';
   el.style.visibility='';
   calloutEl=el;
 }
@@ -1483,6 +2269,10 @@ function wireSugg(){
     b.addEventListener('pointerdown',e=>e.preventDefault());
     b.onclick=()=>takeItem(VAULT[+b.dataset.mi],b,true);
   });
+  [...document.querySelectorAll('.sugg .s[data-wi]')].forEach(b=>{
+    b.addEventListener('pointerdown',e=>e.preventDefault());
+    b.onclick=()=>takeWord(SHOWNWORDS[+b.dataset.wi],b);
+  });
 }
 
 /* ── taking a thing ──────────────────────────────────────────────────────
@@ -1491,8 +2281,18 @@ function wireSugg(){
    on iOS, so the page says it plainly rather than pretending otherwise. */
 function takeItem(v,el,fromRow){
   if(el){el.classList.add('on');setTimeout(()=>el.classList.remove('on'),900);}
+  /* ── A PICTURE OR A DOCUMENT GOES TO THE CLIPBOARD, 2026-08-21 ────────
+     This branch used to say "<name> is copied. Paste it wherever it belongs."
+     and it had been WRONG here since slice 6: the Swift deleted that sentence
+     on NF's 2026-08-09 ruling because nothing was copied, and the prototype
+     went on saying it to nobody's knowledge. It is true now, which is the only
+     reason the words are allowed back.
+
+     The sentence is the ruled one and it names nothing: a receipt that read the
+     file's name back would be labelling the thing the person just chose, and
+     the tile they tapped is still right there. Swift: KeyboardVaultCopy. */
   if(v.t==='img'||v.t==='doc'){
-    note(v.v+' is copied. Paste it wherever it belongs.');
+    copyOut();
     return;
   }
   if(fromRow){
@@ -1505,28 +2305,136 @@ function takeItem(v,el,fromRow){
   insert(v.v);
   if(PANEL)setPanel(false);
 }
+/* The receipt: show it, hold it, take it away. Restarting rather than queueing,
+   so two quick copies leave one sentence that lasts a little longer instead of
+   a flicker. The panel stays open the whole time and the grid keeps taking
+   taps. Swift: KeyboardPanelView.showReceipt, and the three durations are the
+   same three floats. */
+let CONFT=null;
+function copyOut(){
+  const c=document.getElementById('pconf');
+  if(!c)return;
+  clearTimeout(CONFT);
+  c.dataset.on='1';
+  CONFT=setTimeout(()=>{c.dataset.on='0';},1900);
+}
+/* a word replaces the WORD you were in the middle of — its own scan, not the
+   vault's — already wearing the shape you typed it in, and brings a trailing
+   space with it: Apple's contract, which people have twenty years of muscle
+   memory for. A replacement phrase goes in verbatim, space included. */
+function takeWord(w,el){
+  if(el){el.classList.add('on');setTimeout(()=>el.classList.remove('on'),900);}
+  const wf=wordFragment();
+  if(wf){text=text.slice(0,caret-wf.length)+text.slice(caret);caret-=wf.length;}
+  insert(w+' ');
+}
 
 /* ── the panel ──────────────────────────────────────────────────────────
    Calm and fast: 170ms, a short rise and a fade, the keys dropping back
    underneath rather than being torn away. Reduced motion turns the whole thing
    into a swap, which the stylesheet handles for every transition on the page. */
+/* **How much taller the keyboard is while the panel is open** — the prototype's
+   half of KeyboardLayout.panelExpansion, and the same subtraction: whatever is
+   left between the closed keyboard and 0.64 of the screen, and never less than
+   nothing. Measured off the live elements rather than recomputed from the
+   ratios, because the closed height here is the sum of everything the page has
+   already laid out and re-deriving it would be a second opinion about a number
+   the DOM already knows.
+
+   The strip is applied to .keyzone, so it has to come off the CLOSED keyboard's
+   height: the slab is measured with the padding already removed by the caller
+   setting --pexp to 0 first.
+
+   **Measured against OUR height, with the system's bar taken off, because that
+   is the height the extension can actually see.** KeyboardLayout gets a screen
+   height and its own totalHeight and nothing else — Apple's globe bar sits
+   BELOW our input view and no API reports it. So the fraction is of our view
+   alone here too, and the bar is another ~62pt of screen on top of it, which
+   docs/design-decisions.md states rather than hides. Measuring the whole slab
+   here would have modelled a keyboard 62pt shorter than the one that ships.
+   Same subtraction reportHeight() below already makes, for the same reason. */
+const PANEL_SCREEN_FRACTION=0.64;
+function panelExpansionPx(){
+  const slab=document.getElementById('slab'), scr=document.getElementById('scr');
+  if(!slab||!scr)return 0;
+  const sys=document.getElementById('sysbar');
+  const ours=slab.offsetHeight-(sys?sys.offsetHeight:0);
+  return Math.max(0, scr.clientHeight*PANEL_SCREEN_FRACTION - ours);
+}
+/* ── TWO DETENTS, COMPACT ON EVERY OPEN, 2026-08-21 ────────────────────
+   NF, build 29: "I like that the clipboard has a larger display but it feels
+   too large, I wanted it expandable, little by default but able to grow should
+   I want it to." So opening no longer grows the keyboard — PEXP does, and the
+   grabber at the top of the panel is what sets it.
+
+   Cleared on open AND on close, deliberately. Clearing only on close would make
+   the choice persist for the life of the page, which is a setting nobody asked
+   for wearing the clothes of a state machine. Whether it SHOULD persist is a
+   recorded open question for dogfooding, not a preference to build now.
+
+   Swift: KeyboardSurfaceView.panelIsExpanded / setPanelExpanded. */
+let PEXP=false;
+function setPanelExpanded(on){
+  /* **A MOVE TO WHERE IT ALREADY IS COSTS NOTHING, 2026-08-22.** The Swift
+     guards this (KeyboardSurfaceView.setPanelExpanded's first line) and this
+     did not, which stopped mattering the moment a PULL could ask for the same
+     detent twice: the expansion below is measured from the slab's CURRENT
+     height, and a height mid-transition measures as already-tall, so asking to
+     expand an expanded panel wrote a zero and collapsed it. */
+  if(!!on===PEXP)return;
+  PEXP=!!on;
+  const z=document.getElementById('keyzone'),g=document.getElementById('pgrab');
+  if(!z)return;
+  z.style.setProperty('--pexp','0px');
+  if(PANEL&&PEXP)z.style.setProperty('--pexp',panelExpansionPx()+'px');
+  if(g){
+    g.setAttribute('aria-expanded',PEXP?'true':'false');
+    /* the handle is wordless, so this is the only thing that says what it does,
+       and it names the NEXT state rather than the current one */
+    g.setAttribute('aria-label',PEXP?'Make this smaller':'Make this bigger');
+  }
+  reportHeight();
+}
 function setPanel(open){
   PANEL=!!open;
   const p=document.getElementById('panel'),z=document.getElementById('keyzone'),
         m=document.getElementById('markbtn');
   if(!p||!z||!m)return;
+  /* zero first, then measure, then set: the strip is part of the slab's own
+     height, so measuring while a previous one is still applied would compound.
+     Every open starts compact, so this is now a plain zero and the grabber is
+     the only thing that ever writes a number here. */
+  PEXP=false;
+  z.style.setProperty('--pexp','0px');
+  const g0=document.getElementById('pgrab');
+  if(g0){g0.setAttribute('aria-expanded','false');g0.setAttribute('aria-label','Make this bigger');}
   p.dataset.open=PANEL?'1':'0';
   z.dataset.open=PANEL?'1':'0';
   m.dataset.open=PANEL?'1':'0';
   m.setAttribute('aria-expanded',PANEL?'true':'false');
   if(PANEL)p.removeAttribute('aria-hidden');else p.setAttribute('aria-hidden','true');
   hidePop();hideCallout();
+  /* twice, and the second one is not belt and braces. reportHeight() MEASURES
+     the slab, and the slab is 170ms into growing when this runs, so the first
+     call would report the height the keyboard is leaving rather than the one it
+     is going to. The readout is a number a designer reads off this page and it
+     has to be true, so it is taken again once the transition has landed. */
   reportHeight();
+  setTimeout(reportHeight,190);
 }
 
 /* ══════════ interaction ══════════ */
 let holdT=null,repT=null,pressed=null,longFired=false,heldFor=0;
 let tpStartX=0;
+/* The momentary layer shift's state: which modifier is held, whether the finger
+   has left it, and the rect that answers the second question. */
+let momentary=null,momentaryLeft=false,momentaryRect=null;
+/* **Glide typing is deliberately NOT modelled here.** It is the fourth of PRD
+   021's gestures and the only one this page does not carry, because the half
+   that matters is a decoder - path to word against a large lexicon - and a
+   JavaScript reimplementation would be a second decoder to keep in step rather
+   than a design anybody can look at. The app's path capture lives in
+   `KeyboardSurfaceView.touchesMoved` and the decoder in `KeyboardGlide`. */
 
 function keyDown(k,ev){
   if(FIELD==='password')return;
@@ -1552,34 +2460,72 @@ function keyDown(k,ev){
   }
   if(a==='space'){
     tpStartX=ev&&ev.clientX!==undefined?ev.clientX:0;
+    /* 600ms, not the 380 this page used to carry. PRD 021 and the app both
+       name 600 - it is the slot a retired probe used to occupy - and 380 is
+       short enough to be tripped by a pause at the end of a sentence, which
+       would blank the whole keyboard on somebody who was only thinking.
+       No hint line either: Apple draws none, and spec 5.6.1's whole
+       description of the appearance is grey keys with the letters gone. */
     holdT=setTimeout(()=>{
       longFired=true;trackpad=true;
       const rows=document.getElementById('rows');
-      if(rows){rows.classList.add('trackpad');
-        const h=document.createElement('div');h.className='trackhint';
-        h.textContent='slide to move the cursor';h.id='thint';rows.appendChild(h);}
-    },380);
+      if(rows)rows.classList.add('trackpad');
+    },600);
+    return;
+  }
+  if(a==='layer'||a==='alt2'||a==='shift'){
+    /* **The momentary layer shift [PRD 021].** The change a HOLD makes is the
+       same one a tap makes, which is why this is `commit(k)` rather than a
+       second code path; what makes it momentary is that the finger has not
+       lifted. `commit` redraws the keys, so the element under the finger is
+       replaced and `pressed` is dropped - `keyMove` picks up what is there
+       now. */
+    momentaryRect=k.getBoundingClientRect();
+    holdT=setTimeout(()=>{
+      longFired=true;momentary=a;momentaryLeft=false;
+      commit(k);pressed=null;
+    },480);
     return;
   }
 }
 
 function keyMove(ev){
   if(trackpad){
-    const dx=ev.clientX-tpStartX;
-    const step=Math.round(dx/9);
+    /* Nine points per character, and the REMAINDER is kept: rounding a delta
+       per move and forgetting what is left of it is how a long slow drag ends
+       up short of where the finger went. The app recomputes from the origin,
+       which is the same arithmetic said the other way round. */
+    const step=Math.trunc((ev.clientX-tpStartX)/9);
     if(step!==0){
-      caret=Math.max(0,Math.min(text.length,caret+ (step>0?1:-1)));
-      tpStartX=ev.clientX;paintField();
+      caret=Math.max(0,Math.min(text.length,caret+step));
+      tpStartX+=step*9;paintField();
+    }
+    return;
+  }
+  if(momentary){
+    /* Hold 123 or shift, slide onto a key: it becomes the pressed key, and
+       releasing types it and gives the letters back. */
+    const r=momentaryRect;
+    if(r&&(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom))
+      momentaryLeft=true;
+    const el=document.elementFromPoint(ev.clientX,ev.clientY);
+    const over=el&&el.closest?el.closest('.k'):null;
+    const hit=over&&over.dataset.c!==undefined?over:null;
+    if(hit!==pressed){
+      if(pressed)pressed.classList.remove('down');
+      pressed=hit;
+      if(pressed)pressed.classList.add('down');
     }
     return;
   }
   if(calloutEl){
+    /* CLAMPED at both ends rather than falling back to the first option: a
+       finger that slides past the last one meant the last one, and the two end
+       options would be nearly unpickable if overshooting jumped to the base. */
     const bs=[...calloutEl.children];
-    bs.forEach(b=>{
-      const br=b.getBoundingClientRect();
-      b.classList.toggle('sel',ev.clientX>=br.left&&ev.clientX<=br.right);
-    });
-    if(!bs.some(b=>b.classList.contains('sel')))bs[0].classList.add('sel');
+    let idx=0;
+    bs.forEach((b,i)=>{if(ev.clientX>=b.getBoundingClientRect().left)idx=i});
+    bs.forEach((b,i)=>b.classList.toggle('sel',i===idx));
   }
 }
 
@@ -1588,14 +2534,33 @@ function keyUp(){
   if(trackpad){
     trackpad=false;
     const rows=document.getElementById('rows');
-    if(rows){rows.classList.remove('trackpad');
-      const h=document.getElementById('thint');if(h)h.remove();}
+    if(rows)rows.classList.remove('trackpad');
     if(pressed)pressed.classList.remove('down');
+    /* No space is typed. The finger asked to move the cursor and moving the
+       cursor is what it got. */
     pressed=null;hidePop();return;
+  }
+  if(momentary){
+    const mode=momentary,left=momentaryLeft,k=pressed;
+    momentary=null;momentaryLeft=false;momentaryRect=null;
+    if(k)k.classList.remove('down');
+    pressed=null;hidePop();
+    /* A hold with no slide is an ordinary tap, and Apple leaves you on the
+       layer it put you on. Undoing it here would make a slow tap on 123 do
+       nothing at all. */
+    if(!left)return;
+    if(k&&k.dataset.c!==undefined)commit(k);
+    /* Shift needs no undo: the one-shot was consumed by the letter above,
+       exactly as a tapped shift would be. The layer keys do. */
+    if(mode!=='shift'&&layer!=='letters'){layer='letters';redrawKeys();}
+    return;
   }
   if(calloutEl){
     const sel=calloutEl.querySelector('b.sel');
-    if(sel)insert(shift>0?sel.dataset.alt.toUpperCase():sel.dataset.alt);
+    /* `caseOf`, not a second copy of the shift rule: the option has to go in
+       wearing exactly what the callout drew, and `.NET` off a cell that said
+       `.net` is the same bug the `.com` key had. */
+    if(sel)insert(caseOf(sel.dataset.alt));
     if(shift===1)setShift(0);
     hideCallout();hidePop();
     if(pressed)pressed.classList.remove('down');
@@ -1634,6 +2599,11 @@ function commit(k){
     case 'ret':insert('\n');break;
     case 'layer':layer=(layer==='letters')?'nums':'letters';redrawKeys();break;
     case 'alt2':layer=(layer==='nums')?'syms':'nums';redrawKeys();break;
+    /* no destination to name: iOS lets a keyboard advance to whatever is
+       next in rotation, or open its own keyboard list — never jump to one
+       chosen keyboard by name. This key opens the list, same as a held
+       globe would; a web page has no such list to open, so it says so. */
+    case 'emoji':note('Opens the list of keyboards. Emoji is one of the choices in it. Only iOS can jump straight to it, not this key.');break;
     case 'globe':note('Tap goes to your next keyboard. Hold opens the picker. Apple\u2019s key, Apple\u2019s job.');break;
     case 'hide':note('Puts the keyboard away. Apple\u2019s key on iPad.');break;
   }
@@ -1676,10 +2646,22 @@ function wireKeys(){
 }
 function wire(){
   wireKeys();
+  /* THE RESTORE TAB. It puts the keyboard back to full width and does nothing
+     else — in the app it cannot write the choice back either, because the
+     settings file runs one way, app writes and keyboard reads. */
+  const ht=document.getElementById('handtab');
+  if(ht){
+    ht.addEventListener('click',()=>{
+      HAND='centre';
+      try{localStorage.setItem('design.kb.hand','centre')}catch(_){}
+      document.body.classList.remove('hand-left','hand-right');
+      document.body.classList.add('hand-centre');
+      layout();
+    });
+  }
   [...document.querySelectorAll('.acck')].forEach(b=>{
     b.addEventListener('click',()=>{
-      if(b.dataset.a==='globe')note('Tap goes to your next keyboard. Hold opens the picker. Apple’s key, Apple’s job.');
-      else note('This key is on the page, not in the build. Apple’s emoji keyboard has an ABC key that comes back to us for free, but a keyboard can only advance to the next one in your list, never name emoji directly. A key that lands somewhere else would be a lie, so ours ships only if a real phone proves the trip honest.');
+      note('Apple’s globe, in Apple’s own bar under every third-party keyboard. Tap goes to the next keyboard, hold opens the picker. That bar is why ours draws no globe of its own any more.');
     });
   });
   wireSugg();
@@ -1692,6 +2674,33 @@ function wire(){
   }
   const pc=document.querySelector('.pclose');
   if(pc){pc.addEventListener('pointerdown',e=>e.preventDefault());pc.onclick=()=>setPanel(false);}
+  /* The handle: two detents, no free-form resize. A TAP toggles, and since
+     2026-08-22 a PULL also works, because the idiom this control borrowed is
+     the one thing on iOS everybody drags - NF reported the tap-only handle as
+     answering nothing, four rounds running, and a finger that travels leaves a
+     25.9-tall control almost at once. Up is bigger: the keyboard is pinned to
+     the bottom of the screen and grows into the room above it. 10px is what a
+     scroller spends before it calls a touch a movement.
+     Swift: KeyboardPanelView.grabberPulled / pullThreshold. */
+  const pg=document.getElementById('pgrab');
+  if(pg){
+    let from=null,pulled=false;
+    pg.addEventListener('pointerdown',e=>{
+      e.preventDefault();from=e.clientY;pulled=false;
+      if(pg.setPointerCapture)pg.setPointerCapture(e.pointerId);
+    });
+    pg.addEventListener('pointermove',e=>{
+      if(from===null)return;
+      const dy=e.clientY-from;
+      if(Math.abs(dy)<10)return;
+      from=e.clientY;pulled=true;setPanelExpanded(dy<0);
+    });
+    const done=()=>{from=null;};
+    pg.addEventListener('pointerup',done);
+    pg.addEventListener('pointercancel',done);
+    /* a pull already answered; a click after one would undo it */
+    pg.onclick=()=>{if(pulled){pulled=false;return;}setPanelExpanded(!PEXP);};
+  }
   [...document.querySelectorAll('.pit')].forEach(b=>{
     b.addEventListener('pointerdown',e=>e.preventDefault());
     b.onclick=()=>takeItem(VAULT[+b.dataset.vi],b,false);
@@ -1733,18 +2742,32 @@ function applyAll(){
     DEVICE=v;save(KEYS.d,v);applyAll();});
   seg(document.getElementById('eraseg'),[['18','iOS 18'],['26','iOS 26']],ERA,v=>{
     ERA=v;save(KEYS.e,v);applyAll();});
+  /* Seven chips now, and the row wraps rather than growing: `.seg` and `.crow`
+     both carry `flex-wrap:wrap` already, which is what stops the extra four
+     pushing the frame off-centre on a phone. */
   seg(document.getElementById('fieldseg'),
-    [['message','Message'],['search','Search'],['password','Password']],FIELD,v=>{
-    FIELD=v;save(KEYS.f,v);applyAll();});
+    [['message','Message'],['search','Search'],['email','Email'],['url','Address'],
+     ['number','Number'],['decimal','Decimal'],['password','Password']],FIELD,v=>{
+    FIELD=v;save(KEYS.f,v);
+    /* A field is adopted, not merely selected: the keyboard goes back to its
+       letters and drops any one-shot shift, which is what the app does through
+       `KeyboardFieldPlan.openingLayer` when the plan changes. No field here
+       opens on the `123` layer — `.numbersAndPunctuation` is the type that
+       does, and it is not one of the seven. Shift is left exactly as it was:
+       it is a state of the person's hand, not of the field. */
+    layer='letters';
+    applyAll();});
   render();
 }
 document.getElementById('xraybtn').onclick=()=>{XRAY=!XRAY;save(KEYS.x,XRAY?'on':'off');applyAll();};
 
 /* ── Play a line ────────────────────────────────────────────────────────
    One sentence, typed a letter at a time, so the suggestion row can be watched
-   doing the thing it does. The line is chosen to show both halves of the
-   honest answer: "resu" finds the resume, "head" finds the headshot, and
-   everything else in it finds nothing and leaves the row empty.
+   doing the thing it does. The line shows the whole arbitration: "resu" puts
+   the saved resume at the left WITH the word "resume" filling a cell beside
+   it, "head" does the same with the headshot, and in between the row carries
+   plain word completions — three cells, vault leading, words taking what is
+   left, empty only when neither has anything.
 
    Reduce Motion gets the finished sentence instead of the performance, which
    is the same rule the rest of the page follows. */
@@ -1781,17 +2804,20 @@ function paintDesk(){
   'attach a file on iOS, and that is true of every keyboard rather than just ours.</li></ul></div>'+
 
   '<div class="card"><h2>What the top row knows</h2>'+
-  '<b>It is not guessing at words. It is looking at what you saved.</b> '+
-  'Apple\u2019s word suggestions come from Apple\u2019s own predictor talking to Apple\u2019s own keyboard, '+
-  'and no other keyboard can read them, ask for them or show them. A predictor of our own is buildable '+
-  'and is out of v1 on purpose, because one that is only nearly right breaks the feels-like-default '+
-  'spell faster than having none does.<ul>'+
-  '<li>So the row does the honest job instead. Type three letters that start a word inside something '+
-  'you saved, and that thing is offered. Files and pictures match on the names they already carry.</li>'+
-  '<li>When nothing matches, the row is <b>empty</b>. That is deliberate. Your own keyboard\u2019s row '+
-  'is blank until it has something to say, and a row that always has something in it would be pretending.</li>'+
-  '<li>Nothing is learned and nothing is sent anywhere. The match happens against your own things, '+
-  'on your own phone.</li></ul></div>'+
+  '<b>Two kinds of offer share it now, and your brief was \u201cdon\u2019t let it be a cost.\u201d</b> '+
+  'The answer is spatial: your saved things lead the row exactly as before, same trigger, same '+
+  'order, same tap, and word suggestions fill whichever of the three cells they leave.<ul>'+
+  '<li><b>The tell is alignment.</b> A saved thing anchors left with its picture or file glyph beside '+
+  'it; a plain word floats centred in its cell, which is where Apple puts words and how the row reads '+
+  'with no badge explaining itself.</li>'+
+  '<li><b>Words come from three places, in a fixed order:</b> your own iOS Text Replacements first '+
+  '(type <b>om</b> and \u201cOn my way!\u201d is already there, inserted exactly as you wrote it), then '+
+  'words you actually type, learned on the phone, then a built-in frequency list re-cased to what you '+
+  'typed. A tapped word replaces the one in flight and brings its own space.</li>'+
+  '<li>Apple\u2019s own predictor is lent to nobody, and none of this pretends otherwise: the sources '+
+  'are your settings, your typing and a list, matched by prefix, nothing sent anywhere.</li>'+
+  '<li>When neither side has anything, the row is <b>empty</b>. Your own keyboard\u2019s row is blank '+
+  'until it has something to say, and a row that always has something in it would be pretending.</li></ul></div>'+
 
   '<div class="card"><h2>The panel is a guess, and here is which part</h2>'+
   '<b>Everything about the keys is measured. Nothing about the panel is.</b> '+
@@ -1802,6 +2828,28 @@ function paintDesk(){
   'header sits, whether the keys dim or vanish underneath, and the exact curve it opens on.</li>'+
   '<li>The tiles themselves are not a guess. They are the app\u2019s own, same three columns and same '+
   'content rules, so a thing you saved looks the same wherever you meet it.</li></ul></div>'+
+
+  '<div class="card"><h2>The bottom row grew a key</h2>'+
+  '<b>Your second screenshot settled the shape:</b> with emoji in the rotation, Apple\u2019s bottom row '+
+  'carries four keys, and the whole emoji key comes out of the 123 slot; space and return do not '+
+  'move by a pixel. The two halves are drawn as that split, 42.17pt each, so the row closes exactly '+
+  'at any width.<ul>'+
+  '<li><b>The face used to open a panel of ours.</b> Build 21 shipped one \u2014 186 hand-picked faces '+
+  'in six groups, no search, no categories \u2014 and you ruled it out a day later: your phone already '+
+  'has an emoji keyboard with every emoji, search, categories, recents, stickers and Genmoji, so ours '+
+  'was never going to be the better choice. The panel, the curated set, the skin-tone callout and the '+
+  'recents file are gone, from the app and from this page.</li>'+
+  '<li><b>Now it hands off.</b> iOS gives a keyboard no way to name a destination keyboard, only a '+
+  'next-in-rotation jump or the system\u2019s own keyboard list. So the key opens that list \u2014 the '+
+  'same one a held globe opens \u2014 and its label says exactly that, \u201cOpens the list of '+
+  'keyboards,\u201d never \u201cEmoji.\u201d This page has no real keyboard list to open, so tapping '+
+  'the key shows a note instead, in the app\u2019s own voice, saying where the tap actually goes.</li>'+
+  '<li>The face itself no longer changes. There is no <b>ABC</b> state to swap into, because there is '+
+  'no panel left here to close.</li>'+
+  '<li><b>And the globe is gone from our keyboard</b>, because on your phone iOS draws its own '+
+  'globe-and-microphone bar under every third-party keyboard. Ours is 275pt tall now; the bar below '+
+  'it is Apple\u2019s, drawn here because your 4:37am screenshot shows it and labelled as theirs in the '+
+  'x-ray.</li></ul></div>'+
 
   '<div class="card"><h2>Your things show themselves</h2>'+
   '<b>Nothing on this page is labelled with the name of its type.</b> '+
@@ -1832,15 +2880,18 @@ function paintDesk(){
   'your screenshot rather than adjusted by eye.<ul>'+
   '<li><b>The face.</b> The first trace drew a plain half-disc for the mouth. Your phone draws a grin: '+
   'an open mouth with a white lip band across the top of it, which is the thing your eye actually uses '+
-  'to tell the two apart. The eyes were a shade tall and sat a shade high; both moved.</li>'+
+  'to tell the two apart. The eyes were a shade tall and sat a shade high; both moved. That same '+
+  'traced path now sits on the emoji key in the bottom row; the app ported it from this page, so the '+
+  'two cannot drift.</li>'+
   '<li><b>The microphone.</b> The reference had one line for it, and that line turned out to be the '+
   'outer box around four separate parts. The capsule, the cradle under it, the stem and the base bar '+
   'are each measured now, and the whole glyph is 18.1 by 27.7pt with its centre 42.8pt in from the '+
   'right edge of the screen.</li>'+
-  '<li><b>It stays grey.</b> Apple\u2019s capability lists leave the microphone out whether or not a '+
-  'keyboard has full access, so no keyboard but Apple\u2019s has ever had dictation and none can be '+
-  'given it. Drawing the key properly and greying it is the honest way to show something that belongs '+
-  'to somebody else.</li></ul></div>'+
+  '<li><b>It is Apple\u2019s, visibly.</b> Apple\u2019s capability lists leave the microphone out whether or '+
+  'not a keyboard has full access, so no keyboard but Apple\u2019s has ever had dictation and none can be '+
+  'given it. On your phone it now sits in iOS\u2019s own bar below every third-party keyboard, so it is '+
+  'drawn there at full strength: Apple\u2019s live key in Apple\u2019s own strip, not a greyed promise inside '+
+  'ours.</li></ul></div>'+
 
   '<div class="card"><h2>What the screenshot moved</h2>'+
   'Held against your phone this page was close but wrong in ways worth naming.<ul>'+
@@ -1851,8 +2902,9 @@ function paintDesk(){
   'phone\u2019s own corner, not the keyboard\u2019s.</li>'+
   '<li><b>The type.</b> Letters are heavier than they were here, measurably medium-weight rather than '+
   'regular, and a capital is exactly half the height of its key.</li>'+
-  '<li><b>The emoji key.</b> It sits in a row of its own below the keys, 26.8pt across, and it is a '+
-  'plain white face rather than a colour emoji.</li></ul></div>'+
+  '<li><b>The emoji key.</b> A plain white face rather than a colour emoji, 26.8pt across. Your '+
+  'second screenshot moved it again, off the accessory row and into the bottom row beside 123, where '+
+  'it now lives here too.</li></ul></div>'+
 
   '<div class="card"><h2>The slab is Apple\u2019s, not ours</h2>'+
   'iOS draws a rounded tray around any keyboard and sits the keyboard inside it. Developers '+
@@ -1907,7 +2959,7 @@ if(window.ResizeObserver){
   }).observe(document.querySelector('.phone'));
 }
 requestAnimationFrame(layout);
-addEventListener('pointerup',()=>{if(pressed||trackpad||calloutEl)keyUp()});
+addEventListener('pointerup',()=>{if(pressed||trackpad||calloutEl||momentary)keyUp()});
 applyAll();
 </script>
 </body>

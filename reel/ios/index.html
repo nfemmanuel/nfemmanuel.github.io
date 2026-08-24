@@ -20,10 +20,12 @@
      is native per platform — Liquid Glass here, Material there.
      Page accent is --c-img, the tint the hub gives this exhibit.
 
-     Self-contained by rule: no external requests. The family names stay
-     first in the font stacks and fall back to system faces; in-frame
-     content uses the Apple system stack, which is the honest choice for
-     an iOS depiction anyway.
+     Self-contained apart from the two web fonts in the head, and that
+     sentence used to read "no external requests" while the head fetched
+     them, which is exactly the kind of stale line this file must not
+     carry. The family names stay first in the font stacks and fall back
+     to system faces if the fetch fails; in-frame content uses the Apple
+     system stack, which is the honest choice for an iOS depiction anyway.
      ═══════════════════════════════════════════════════════════════════ */
   :root{
     color-scheme:light;
@@ -330,6 +332,56 @@
   .pend{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);
     border:1px solid var(--hair);border-radius:99px;padding:3px 8px;flex:0 0 auto}
 
+  /* ─────────── About, and the keyboard's own switches ───────────
+     `KeyboardSettingsScreen` and `AboutSheet` say in their own comments that
+     they invent no visual language: the card is `VaultTheme.surf` on a 16pt
+     continuous corner with a `hair` border and 16pt of padding, a `headline`
+     title and a `subheadline` or `caption` body in ink and ink2. That is what
+     `.kcard` is, in this page's tokens, and nothing below adds a colour. */
+  .kcard{margin:0 14px 16px;border-radius:16px;background:var(--surf);
+    border:1px solid var(--hair);padding:16px}
+  .kcard h3{margin:0 0 12px;font-family:var(--apple);font-size:16px;font-weight:600;color:var(--ink)}
+  .kcard .lede2{margin:0 0 12px;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+  /* one switch and its sentence. The hairline sits BETWEEN rows and never
+     above the first one, which is the rule both Swift cards follow. */
+  .swrow{display:flex;align-items:flex-start;gap:14px;padding:11px 0}
+  .swrow+.swrow{border-top:1px solid var(--hair)}
+  .swrow .tt{flex:1;min-width:0}
+  .swrow .tt b{display:block;font-size:15px;font-weight:500;color:var(--ink)}
+  .swrow .tt span{display:block;font-size:12.5px;color:var(--ink-2);margin-top:3px;line-height:1.45}
+  /* THE SWITCH. 51x31 with a 27 knob, which is UIKit's own switch, and the
+     travel is the arithmetic (51 - 27 - 2 - 2) rather than a number typed in.
+
+     ON IS THE PAGE ACCENT AND NOT APPLE'S GREEN, DELIBERATELY. The app uses a
+     plain `.toggleStyle(.switch)` with no tint, so on a phone it draws
+     systemGreen. This page has no green token and the rule here is that a
+     colour is copied from the prototype palette or not used at all, so the
+     switch wears `--accent`. The shape, the size and the travel are right; the
+     hue is ours rather than Apple's, and that is a known and deliberate
+     difference rather than an oversight. */
+  .sw{flex:0 0 auto;width:51px;height:31px;border-radius:31px;position:relative;cursor:pointer;
+    background:color-mix(in srgb,var(--ink) 16%,transparent);
+    transition:background .2s var(--glide)}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;
+    background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.2),0 0 1px rgba(0,0,0,.2);
+    transition:transform .2s var(--glide)}
+  .sw.on{background:var(--accent)}
+  .sw.on::after{transform:translateX(20px)}
+  /* the three-way card's control: a segmented picker across the card's width,
+     which is what `.pickerStyle(.segmented)` draws */
+  .miniseg.wide{width:100%;display:flex;padding:2px;border-radius:9px}
+  .miniseg.wide i{flex:1;text-align:center;padding:6px 0;font-size:13px;cursor:pointer}
+  /* the row that leads somewhere inside the app: title, then Apple's own
+     chevron. Never a drawn arrow of ours, and never an emoji. */
+  .linkrow{display:flex;align-items:center;gap:12px;padding:12px 0 2px;font-size:15px;
+    color:var(--ink);cursor:pointer}
+  .linkrow .ch{margin-left:auto;color:var(--ink-3);display:flex}
+  /* the quiet control on the forget card: a label, not a sentence */
+  .quietbtn{display:inline-flex;align-items:center;margin-top:4px;font-size:15px;
+    font-weight:500;color:var(--sys-blue);cursor:pointer}
+  .timing{margin:0 18px 26px;font-size:12.5px;color:var(--ink-3);line-height:1.5}
+  .kintro{margin:0 18px 16px;font-size:13.5px;color:var(--ink-2);line-height:1.5}
+
   /* ─────────── wallpaper scenes: widgets and Spotlight ─────────── */
   .wall{position:absolute;inset:0;background:linear-gradient(165deg,#2b3a44,#151b21)}
   .wall::after{content:"";position:absolute;inset:0;
@@ -458,14 +510,18 @@
 
 <div class="top">
   <div class="hrow">
-    <h1>On iPhone — 8 screens</h1>
+    <h1 id="scount">On iPhone, ten screens</h1>
     <span class="ptag">picture tour</span>
     <div class="ctrls">
       <div class="crow"><div class="seg" id="themeseg" aria-label="Theme"></div></div>
       <div class="crow"><div class="seg" id="devseg" aria-label="Device"></div></div>
     </div>
   </div>
-  <p class="lede">Nothing here runs — it is a picture tour of the iOS design, current to the latest rulings. Pick a screen below. <b class="us">Purple</b> = screens we design. <b class="sys">Grey</b> = iOS draws them, our things just appear in them.</p>
+  <!-- This line used to say "Nothing here runs", and the keyboard settings
+       screen made that untrue: its switches really flip. The sentence is
+       corrected rather than the screen dulled, because a switch you cannot move
+       is a switch whose off position nobody has seen. -->
+  <p class="lede">Almost nothing here runs: it is a picture tour of the iOS design, current to the latest rulings. The keyboard&#8217;s own switches are the exception, and they really flip. Pick a screen below. <b class="us">Purple</b> = screens we design. <b class="sys">Grey</b> = iOS draws them, our things just appear in them.</p>
 </div>
 
 <div class="chips" id="chips"></div>
@@ -490,7 +546,7 @@
   <div class="sf-links">
     <a href="../">bothy. home</a><a href="../app/">The app</a><a href="../extensions/">Extensions</a><a href="../privacy/">Privacy</a>
   </div>
-  <p>Built in public &#8212; a Shipaton 2026 project. This page is a picture tour: nothing here runs, nothing is stored, and there is no account.</p>
+  <p>Built in public &#8212; a Shipaton 2026 project. This page is a picture tour: nothing you do here is sent anywhere, and there is no account.</p>
 </footer>
 
 <script>
@@ -513,6 +569,10 @@ const I={
   open:'<path d="M9.4 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3.4"/><path d="M13.6 4.4h6v6"/><path d="M19.6 4.4 11 13"/>',
   ok:'<path d="m4.8 12.4 4.8 4.8L19.2 7.6"/>',
   back:'<path d="M14.4 5.6 8 12l6.4 6.4"/>',
+  /* the chevron on a row that leads somewhere inside the app. Apple's own
+     `chevron.right`, mirrored from `back` above and copied from the Android
+     prototype's `next`, so the two pages draw one shape. */
+  next:'<path d="m9.6 5.6 6.4 6.4-6.4 6.4"/>',
   cloud:'<path d="M7.2 18.6a4.3 4.3 0 0 1-.7-8.5 5.5 5.5 0 0 1 10.8 1.1 3.7 3.7 0 0 1-.7 7.4z"/>',
   folder:'<path d="M3.4 6.4a1.8 1.8 0 0 1 1.8-1.8h4.1l2 2.3h7.5a1.8 1.8 0 0 1 1.8 1.8v8.9a1.8 1.8 0 0 1-1.8 1.8H5.2a1.8 1.8 0 0 1-1.8-1.8z"/>',
   mail:'<rect x="3.4" y="5.4" width="17.2" height="13.2" rx="2.4"/><path d="m4.6 7.6 7.4 5.4 7.4-5.4"/>',
@@ -634,7 +694,61 @@ const sbz=`<div class="sbz"><span>9:41</span><span class="cell">5G
   </span></div>`;
 const homebar=`<div class="homebar"></div>`;
 
-/* ═══ the eight screens ═══
+/* ══════════ THE KEYBOARD'S OWN SWITCHES ══════════
+   Every behaviour here is one iOS lets a person turn off for Apple's keyboard
+   and lets no third-party keyboard read. Somebody who switched smart
+   punctuation off system-wide gets curly quotes back the moment they pick ours,
+   and until this screen existed the only way out was to stop using the
+   keyboard. `iosApp/Sources/KeyboardSettingsScreen.swift` carries the real one;
+   this is its picture, with the sentences copied across word for word.
+
+   ALL OF THE COPY BELOW IS LIFTED FROM THAT FILE AND IS PENDING VOICE REVIEW
+   THERE. It is not rewritten here — a second wording of a switch label is a
+   second thing to keep in step, and the two are meant to be diffed.
+
+   The state is live rather than a picture, which is a departure from the rest
+   of this page and a deliberate one: a switch IS its state, and a settings
+   screen where the off position cannot be seen has not drawn the control. It
+   is not persisted; a reload gives the app's own opening position, which is
+   everything on. */
+const KB={slide:true,fix:true,quotes:true,twospace:true,capitals:true,capslock:true,
+  preview:true,haptic:true,reach:'centre'};
+function kbToggle(k){KB[k]=!KB[k];render();}
+function kbReach(v){KB.reach=v;render();}
+window.kbToggle=kbToggle;window.kbReach=kbReach;
+
+/* One switch, described rather than built, in the order a person meets these
+   while typing: the gesture, then the word, then the punctuation, then the
+   sentence, then shift. Same order as `typingChoices`. */
+const KB_TYPING=[
+  ['slide','Slide to type',
+   'Slide your finger from letter to letter and I will put in the word you traced. Lift your finger to tap keys one at a time instead.'],
+  ['fix','Fix your spelling',
+   'When you finish a word, I swap it for the one I think you meant. One tap on backspace always puts your own spelling back.'],
+  ['quotes','Curly quotes and long dashes',
+   'Your quote marks come out curled the right way round, and two hyphens in a row become one long dash.'],
+  ['twospace','Two spaces end the sentence',
+   'Tap the space bar twice and I finish the sentence with a full stop.'],
+  ['capitals','Capital at the start',
+   'The first letter of a sentence arrives as a capital without you reaching for shift.'],
+  ['capslock','Double tap for caps lock',
+   'Two quick taps on shift hold it down until you tap it again.']
+];
+/* The two that are about the keyboard under the finger rather than about the
+   words coming out of it. Same order as `feelChoices`. */
+const KB_FEEL=[
+  ['preview','Show the letter above your finger',
+   'The letter you are pressing shows just above it, where your finger is not in the way.'],
+  ['haptic','A small tap as you type',
+   'You feel a light tap under your finger each time a key goes in.']
+];
+const swRow=c=>`<div class="swrow">
+  <span class="tt"><b>${c[1]}</b><span>${c[2]}</span></span>
+  <span class="sw${KB[c[0]]?' on':''}" role="switch" aria-checked="${KB[c[0]]?'true':'false'}"
+    aria-label="${c[1]}" onclick="kbToggle('${c[0]}')"></span></div>`;
+const kbCard=(heading,rows)=>`<div class="kcard"><h3>${heading}</h3>${rows.map(swRow).join('')}</div>`;
+
+/* ═══ the ten screens ═══
    own:1 = we design it. own:0 = iOS draws it; our things just appear.
    Collection and the in-app dial are gone — see the footnote row. */
 const SCREENS={
@@ -647,7 +761,7 @@ const SCREENS={
     cap:'Search composes with the lens instead of replacing it — Links is on, the query narrows inside it. Filters and search are one gesture family, not modes.',
     html:()=>{const res=ALL.filter(i=>i.t==='lnk'&&i.v.includes('alex'));
       return `<div class="roll" id="vroll" onscroll="vaultEdge(this)"><div class="inwrap">
-        <div class="sect">${res.length} results</div>${grid(res,false)}
+        <div class="sect">${res.length} result${res.length===1?'':'s'}</div>${grid(res,false)}
       </div></div>
       ${glassHead({live:1,lens:'lnk',q:'alex'})}`}},
 
@@ -687,6 +801,59 @@ const SCREENS={
       </div>
     </div></div>
     <div class="backpill">${ic('back',15,2)}</div>`},
+
+  /* THE DOOR. The About sheet is longer than this in the app — the setup steps,
+     the Full Access walk, the copy help, the rows and the footer are all above
+     and below what is drawn here. This screen draws the part that matters to
+     the keyboard: the card that leads to its switches, and the card beside it
+     about what it learns. Every sentence is `AboutSheet.swift`'s own. */
+  about:{own:1,name:'About',sb:'ink',
+    cap:'Behind About, and the reason it is here: the row that leads to the keyboard’s own switches. The sheet is longer than this in the app (setup steps, the Full Access walk, the footer), and this draws the two cards that belong to the keyboard. Tap Keyboard settings.',
+    html:()=>`${vaultBack()}<div class="scrim"></div>
+      <div class="lg-sheet tall lg-glass">
+        <div class="grab"></div>
+        <div class="pnav"><span style="width:44px"></span><b>About</b><span class="sysb">Done</span></div>
+        <div class="psc">
+          <h2 class="bigt" style="padding-top:6px">bothy.</h2>
+          <div style="padding:0 18px 18px;font-size:12.5px;color:var(--ink-3)">The build you are holding</div>
+          <div class="kcard">
+            <h3>How the keyboard types</h3>
+            <p class="lede2">Sliding to type, fixing spelling, curly quotes, capitals and the rest. Anything here you would rather I left alone, you can switch off.</p>
+            <div class="linkrow" onclick="go('keyboard')">Keyboard settings<span class="ch">${ic('next',15,2.2)}</span></div>
+          </div>
+          <div class="kcard">
+            <h3>What the keyboard learns</h3>
+            <p class="lede2">My keyboard keeps a private list of the words you type often, so it can offer them back while you write. That list lives inside the keyboard itself, where even I cannot read it.</p>
+            <span class="quietbtn">Forget those words</span>
+          </div>
+        </div>
+      </div>`},
+
+  /* NINE CONTROLS: eight switches and one three-way. Pushed from the row above,
+     which is why it wears a back chevron rather than a Done. */
+  keyboard:{own:1,name:'Keyboard settings',sb:'ink',
+    cap:'The switches iOS will not let a third-party keyboard read, given back. Eight of them plus where the keys sit, and every sentence says what you will notice rather than what the code does. These ones are live, so flip them.',
+    html:()=>`${vaultBack()}<div class="scrim"></div>
+      <div class="lg-sheet tall lg-glass">
+        <div class="grab"></div>
+        <div class="pnav"><span class="sysb" style="display:flex;align-items:center;gap:3px;cursor:pointer"
+          onclick="go('about')">${ic('back',15,2.2)}About</span><b>Keyboard</b><span style="width:64px"></span></div>
+        <div class="psc">
+          <p class="kintro">Everything here starts switched on. Turn off anything you would rather my keyboard did not do for you.</p>
+          ${kbCard('While you type',KB_TYPING)}
+          ${kbCard('How it feels',KB_FEEL)}
+          <div class="kcard">
+            <h3>Where it sits</h3>
+            <p class="lede2">Slide the keys over to one side so they sit closer together. There is an arrow in the empty space to bring them back.</p>
+            <div class="miniseg wide" role="radiogroup" aria-label="Where it sits">
+              ${[['left','Left'],['centre','Full width'],['right','Right']].map(o=>
+                `<i class="${KB.reach===o[0]?'on':''}" role="radio" aria-checked="${KB.reach===o[0]?'true':'false'}"
+                  onclick="kbReach('${o[0]}')">${o[1]}</i>`).join('')}
+            </div>
+          </div>
+          <p class="timing">Changes here take effect the next time the keyboard comes up.</p>
+        </div>
+      </div>`},
 
   widgets:{own:1,name:'Widgets',sb:'lite',
     cap:'Pins on the home screen, wearing the glass the shelf itself wears. Tap one and it is copied — the app never opens. The receipt is the whole ceremony.',
@@ -781,7 +948,7 @@ const SCREENS={
       </div>
       <div class="receipt up">Saved</div>`},
 };
-const ORDER=['vault','search','item','you','widgets','spotlight','files','share'];
+const ORDER=['vault','search','item','you','about','keyboard','widgets','spotlight','files','share'];
 
 /* ── state: screen, theme, device. Theme and device persist; a query string
    (?screen=&theme=&device=) overrides both, which is how evidence shots are
@@ -825,6 +992,13 @@ function sizeVault(){const h=document.getElementById('glasshead'),r=document.get
   if(h&&r)r.style.paddingTop=(h.offsetHeight+6)+'px';}
 
 function render(){
+  /* The headline counts ORDER rather than trusting a number somebody typed.
+     It said eight while ORDER held ten, which is the second time this page
+     has gone stale that way, so it is derived now and cannot go stale again. */
+  const words=['zero','one','two','three','four','five','six','seven','eight',
+               'nine','ten','eleven','twelve'];
+  const h=document.getElementById('scount');
+  if(h)h.textContent='On iPhone, '+(words[ORDER.length]||ORDER.length)+' screens';
   const s=SCREENS[cur];
   /* only the Vault (and its search state) genuinely re-lays for iPad width */
   const wide=DEVICE==='ipad'&&(cur==='vault'||cur==='search');
@@ -841,9 +1015,15 @@ function render(){
   const on=document.querySelector(`.pick[data-k="${cur}"]`);
   if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
   document.getElementById('desk').innerHTML=`<div class="card"><h2>Reading this</h2>
-    Five screens are <b>ours to design</b>: the vault, its search, the item sheet, You, widgets.
+    Seven screens are <b>ours to design</b>: the vault, its search, the item sheet, You, About,
+    the keyboard's own settings, widgets.
     Three belong to Apple — <b>Spotlight, the Files picker, the share sheet</b>. Those work the
     moment the app is installed; nothing to enable, our things simply appear in them.</div>
+    <div class="card"><h2>The one live screen</h2>
+    Every other screen here is a picture. <b>Keyboard settings</b> is not: its switches really flip,
+    because a switch is its state and a settings screen that cannot show you the off position has
+    not drawn the control. Nothing is remembered, so a reload puts them all back on, which is the
+    app's own opening position.</div>
     <div class="card"><h2>Current screen</h2><span class="tag" style="background:${own?'var(--accent)':'var(--ink-3)'}">${own?'ours':'iOS'}</span>${s.cap}</div>
     <div class="card"><h2>One product, two coats</h2>
     Same product as Android at a glance — same colours, same square tiles, same chips with the

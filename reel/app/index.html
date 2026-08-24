@@ -169,8 +169,19 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
    shape and colour before you read a word of it, so you can skip most of the grid
    instead of reading all of it. Costs density — affordable only because the
    auto-capture buffer is capped, so this list is short by design. */
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:0 16px}
-.grid.g3{grid-template-columns:1fr 1fr 1fr;gap:9px}
+/* THREE ACROSS, ALWAYS — the owner's ruling of 2026-08-05, executed here on
+   2026-08-16. `design-decisions.md`: the dense/wide split (dense only when a
+   section was ALL text/link, else one column fewer) "made Recents render
+   2-across the moment a single file or image sat in it — inconsistent and
+   confusing in practice. Owner: 'three in a row, always.'"
+   The app followed that day. This file did not, and for eleven days the iOS
+   build read this stale default and shipped two across while Android shipped
+   three. The `.g3` modifier's three columns are now simply what a grid is; the
+   rule that used to switch it on is gone from the script below too.
+   GAP STAYS 11px. `.g3` said 9, but both shipped apps space tiles by 11dp/11pt
+   and have since the ruling, so 11 is what a person actually holds. The 9 was
+   never built and is not worth a third opinion. */
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;padding:0 16px}
 /* THE LIT SHEET (depth-study.html §7 "Item tiles"): the layered cast, a 1px top rim
    light and the ink hairline as insets, and the top-light gradient in the background
    stack so it sits under every face. The PAPER GRAIN is deliberately NOT here — the
@@ -191,25 +202,34 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 /* Type scales to content length. A phone number is the entire point of its tile, so it
    gets to be big; a paragraph has to be small to show enough of itself to be
    recognised. A uniform 13px made every tile look like an empty box. */
-.gc .tx{font-size:13px;line-height:1.44;font-weight:450;word-break:break-word}
-.gc .tx.s1{font-size:17.5px;line-height:1.3;letter-spacing:-.015em}
-.gc .tx.s2{font-size:15px;line-height:1.38;letter-spacing:-.01em}
+/* THE DENSE TIERS, NOW UNCONDITIONAL — the other half of the same 2026-08-05
+   ruling: "the dense tile-type-scale values (s1 15 / s2 13 / base 11.5, mono one
+   sp less) apply unconditionally now, since every tile is that width." They used
+   to live in a `.g3` block below this one, switched on by the per-section rule
+   the ruling deleted. A tile a third of the screen wide cannot carry 17.5px, so
+   the column count and these numbers are one decision and always were. */
+.gc .tx{font-size:11.5px;line-height:1.44;font-weight:450;word-break:break-word}
+.gc .tx.s1{font-size:15px;line-height:1.3;letter-spacing:-.015em}
+.gc .tx.s2{font-size:13px;line-height:1.38;letter-spacing:-.01em}
 .gc .tx.ind{padding-right:17px}
-.gc .tx.code{font-family:var(--mono);font-size:12px;letter-spacing:-.01em}
-.gc .tx.code.s1{font-size:15px} .gc .tx.code.s2{font-size:13.5px}
-/* text-only grids run 3-across on phone width; tiers scale down to fit */
-.g3 .gc .tx{font-size:11.5px}
-.g3 .gc .tx.s1{font-size:15px}
-.g3 .gc .tx.s2{font-size:13px}
-.g3 .gc .tx.code{font-size:10.5px}
-.g3 .gc .tx.code.s1{font-size:14px} .g3 .gc .tx.code.s2{font-size:12px}
+.gc .tx.code{font-family:var(--mono);font-size:10.5px;letter-spacing:-.01em}
+.gc .tx.code.s1{font-size:14px} .gc .tx.code.s2{font-size:12px}
 .gc .tx .dom{font-weight:650;color:var(--c-lnk)}
 /* long values fade out rather than ending in an ellipsis — gentler in a small square,
    and it reads as "there is more" instead of "this was cut off" */
 .gc.txt.ov::after,.gc.lnk.ov::after{content:"";position:absolute;left:0;right:0;bottom:0;height:32px;
   background:linear-gradient(transparent,var(--surf));pointer-events:none}
-/* images: the picture is the whole tile */
-.gc .shot{position:absolute;inset:0}
+/* images: the picture is the whole tile.
+   FILL AND CROP, NEVER STRETCH. `object-fit:cover` was missing here until
+   2026-08-21 and the default is `fill`, which squashes a tall screenshot into a
+   square instead of cropping it. The prototype got away with it because every
+   `.shot` in the seed data is a gradient div rather than a real picture, so
+   nothing on this page ever had an aspect ratio to distort. Both apps have
+   always cropped — `ContentScale.Crop` in `ItemTile.kt:396`, `.scaledToFill()`
+   in `ItemTile.swift` — so this line records the rule the apps already follow
+   rather than inventing a third opinion. Same category as the 11px gap note
+   above: the prototype was the one out of step. */
+.gc .shot{position:absolute;inset:0;object-fit:cover}
 .gc .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 13px 11px;color:#fff;
   font-size:12.5px;font-weight:600;letter-spacing:-.01em;
   background:linear-gradient(transparent,rgba(0,0,0,.66))}
@@ -223,6 +243,23 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
 .gc .fname{position:absolute;left:0;right:0;bottom:0;padding:0 12px 13px;text-align:center;
   font-size:12px;font-weight:600;color:var(--ink-2);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ═══ selection mode ═══
+   The chosen tile wears the same 2px ring the fresh ring wears, in the accent
+   this app already spends on a deliberate act. One borrowed shape, and no new
+   visual language for a mode that lasts ten seconds. An UNCHOSEN tile stays a
+   normal tile on purpose: dimming the rest would turn a grid of twenty things
+   grey because one was picked. */
+.gc.sel{box-shadow:0 0 0 2px var(--c-lnk),var(--shadow-s),var(--room-edge)}
+.selmark{position:absolute;top:9px;left:9px;z-index:3;width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb,var(--ink) 6%,transparent);
+  border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent)}
+/* over a photograph the well and the ring go black and white instead: a ring
+   derived from the page's ink disappears into whatever the picture happens to
+   be, and the caption scrim already proves that rule on this tile. */
+.gc.img .selmark{background:rgba(0,0,0,.28);border-color:rgba(255,255,255,.85)}
+.selmark.on{background:var(--c-lnk);border-color:var(--c-lnk);color:#fff}
+.dark .selmark.on{color:rgba(0,0,0,.88)}
 .gc .pin{top:11px;right:11px;opacity:.5}
 .gc.img .pin{color:#fff;opacity:.92}
 /* text found inside a picture — the quiet chip a search result wears when the hit
@@ -305,6 +342,10 @@ h1.pt{font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-
   box-shadow:var(--shadow-s),inset 0 1px 0 var(--rim)}
 .act:active{transform:scale(.97)}
 .md .act{border-radius:26px} .ios .act{border-radius:14px}
+/* the delete confirmation's button. `--c-lnk` is dark in the light theme and
+   pale in the dark one, and a fixed white label vanishes into the pale one —
+   the same flip Android applies to the tick on its selection mark. */
+.dark .act.dl{color:rgba(0,0,0,.88)}
 .opt{display:flex;align-items:center;gap:13px;padding:14px 20px;font-size:15px;cursor:pointer}
 /* the two-pass seam: a cut, with the rim light immediately under it — the same idiom
    the ring uses for every seam it has. In forced colours the rim half disappears and
@@ -431,20 +472,16 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
   z-index:30;pointer-events:none;
   background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--ink) 13%,transparent) 9%,
     color-mix(in srgb,var(--ink) 13%,transparent) 91%,transparent)}
-.device-fold .grid,.device-fold .grid.g3{grid-template-columns:repeat(4,1fr);padding:0 26px}
+.device-fold .grid{grid-template-columns:repeat(4,1fr);padding:0 26px}
 .device-fold .sect,.device-fold .lens{padding-left:26px;padding-right:26px}
 .device-fold .big,.device-fold .sub{padding-left:30px;padding-right:30px}
 .device-fold .card,.device-fold .hunt,.device-fold .catch,.device-fold .gauge,.device-fold .set,
 .device-fold .note,.device-fold .ideasrow{margin-left:26px;margin-right:26px}
 .device-fold textarea.ed{width:calc(100% - 52px);margin-left:26px;margin-right:26px}
-/* 4-across (fold) and in-pane 3-across (tablet) tiles sit at phone g3 width,
-   so they wear the existing g3 type tiers — same tier system, not a new one */
-.device-fold .gc .tx,.device-tablet .gc .tx{font-size:11.5px}
-.device-fold .gc .tx.s1,.device-tablet .gc .tx.s1{font-size:15px}
-.device-fold .gc .tx.s2,.device-tablet .gc .tx.s2{font-size:13px}
-.device-fold .gc .tx.code,.device-tablet .gc .tx.code{font-size:10.5px}
-.device-fold .gc .tx.code.s1,.device-tablet .gc .tx.code.s1{font-size:14px}
-.device-fold .gc .tx.code.s2,.device-tablet .gc .tx.code.s2{font-size:12px}
+/* The six type-tier overrides that used to sit here are GONE, not lost: fold and
+   tablet tiles sit at the dense width, and the dense tiers are now what every
+   tile gets by default. These rules restated the base values exactly, so
+   keeping them would leave two places to edit and one of them silently wrong. */
 
 /* Tablet / iPad — EXPANDED: landscape frame, the vault on the left, a docked
    detail panel on the right that replaces the bottom sheet for item actions. */
@@ -456,7 +493,7 @@ textarea.ed.code{font-family:var(--mono);font-size:15px}
 .pane-r::-webkit-scrollbar{display:none}
 .device-tablet .pane-l .sbar{display:none}
 .device-tablet .pane-l .tbar{top:0}
-.device-tablet .grid,.device-tablet .grid.g3{grid-template-columns:repeat(3,1fr)}
+.device-tablet .grid{grid-template-columns:repeat(3,1fr)}
 .dockempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;color:var(--ink-3);font-size:14px}
 .dock{margin:16px 22px 22px;background:var(--surf);box-shadow:var(--shadow-s),var(--room-edge);padding:8px 0 14px}
@@ -663,6 +700,12 @@ let firstOpen=true;   /* the settle bounce plays once, on launch — not on ever
 const st={view:'vault',arg:null,filter:'all',sheet:null,q:'',searching:false,toast:null,pinCap:2,
   noteDismissed:false,tagEdit:false,watch:true,theme:'system',themePicker:false,perm:'unknown',
   flipFlash:null,fillsim:null,
+  /* SELECTION MODE (owner ask 2026-08-09, "mass select for deletion"). Android
+     has shipped this since; iOS is gaining it this round; the prototype had
+     neither. Two fields rather than one nullable list, because "in selection
+     mode with nothing chosen" is a real and reachable state: deselecting the
+     last tile leaves the bar up, and it has its own words for that. */
+  selecting:false,sel:[],confirmDel:false,
   /* the overlay's own settings, mirrored from the app's defaults (compact size,
      sliver handle, ask before keeping a new copy). The handle itself is not drawn
      here — the extensions prototype is where it lives — but the page that
@@ -789,7 +832,14 @@ function saveStore(){try{localStorage.setItem(KEY,
     filter:st.filter,noteDismissed:st.noteDismissed,profile:PROFILE,
     ovl:st.ovl,ovlSize:st.ovlSize,ovlHandle:st.ovlHandle,ovlCatch:st.ovlCatch}))}catch(_){}}
 /* ── inference: the app works out the type, it never asks ── */
-const isUrl=v=>/^(https?:\/\/|www\.)/i.test(v.trim())||/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(v.trim());
+/* The TLD position decides a bare dotted token: `bit.ly` is a host, `0.18278`
+   and `1.2.3` and `192.168.1.1` are not, because an all-digit TLD does not
+   exist. Kept identical to core's Infer.isUrl. */
+const isUrl=v=>{const s=v.trim();
+  if(/^(https?:\/\/|www\.)/i.test(s))return true;
+  if(!/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(s))return false;
+  const host=s.split('/')[0];
+  return /^([A-Za-z]{2,}|xn--[A-Za-z0-9-]+)$/i.test(host.slice(host.lastIndexOf('.')+1));};
 const isCode=v=>{const s=v.trim();
   return s.length<64 && !/\s{2,}/.test(s) && (/\d{4,}/.test(s)||/^[A-Z0-9 -]{8,}$/.test(s)||/[/@:]/.test(s)&&!isUrl(s));};
 const nextId=()=>Math.max(0,...ITEMS.map(i=>i.id))+1;
@@ -801,6 +851,9 @@ const nextPin=()=>{const u=pinned().map(p=>p.pin);for(let n=1;n<=99;n++)if(!u.in
 /* ── actions ── */
 function go(view,arg){st.view=view;st.arg=arg??null;st.sheet=null;st.themePicker=false;
   if(view!=='fillsim')st.fillsim=null;   /* the pretend form resets between visits */
+  /* leaving the vault ends selection, so nobody comes back to a bar they had
+     forgotten was up and a set of things they no longer remember choosing */
+  st.selecting=false;st.sel=[];st.confirmDel=false;
   render();}
 /* Types are lenses, not places (design-decisions 2026-08-06): "landing in a type"
    now means the Vault wearing that lens. Every former go('type',t) call site
@@ -826,6 +879,87 @@ function copy(id){const it=find(id);touchItem(it);
   if(DEVICE!=='tablet')st.sheet=null;   /* the dock keeps its selection after a copy */
   toast(it.sens?'Copied — clears in 60s':'Copied');}
 function del(id){ITEMS=ITEMS.filter(i=>i.id!==id);st.sheet=null;toast('Deleted');}
+
+/* ══════════ SELECTION AND BATCH DELETE ══════════
+   Android's `VaultScreen`/`VaultViewModel` behaviour, drawn here: hold a tile to
+   enter selection, tap to add and remove, a contextual bar in the toolbar's own
+   place, the bin, one confirmation, gone.
+
+   THE BAR STANDS IN THE TOOLBAR'S ROW AND USES THE TOOLBAR'S OWN CLASS. That is
+   what keeps the head at exactly the height it was, so entering selection does
+   not shift the grid under the finger that just held a tile. Same rule Android
+   gives for swapping only that row.
+
+   DELETE IS A PURGE, single or batch — file, thumbnail, content, search index —
+   so the sheet says so rather than implying a bin to fish things back out of. */
+function startSelect(id){
+  st.selecting=true;st.sel=[id];st.sheet=null;render();
+}
+function toggleSelect(id){
+  st.sel=st.sel.indexOf(id)>=0?st.sel.filter(x=>x!==id):st.sel.concat([id]);
+  render();
+}
+function exitSelect(){st.selecting=false;st.sel=[];st.confirmDel=false;render();}
+/* The bin is drawn at rest even with nothing chosen. Hiding it would make the
+   bar reflow the instant a first tile is picked, and a control that appears
+   under the thumb is worse than one that waits. With nothing chosen it simply
+   does not answer. */
+function askDeleteSel(){if(st.sel.length){st.confirmDel=true;render();}}
+function cancelDeleteSel(){st.confirmDel=false;render();}
+function deleteSelected(){
+  const n=st.sel.length,gone=st.sel.slice();
+  ITEMS=ITEMS.filter(i=>gone.indexOf(i.id)<0);
+  st.selecting=false;st.sel=[];st.confirmDel=false;st.sheet=null;
+  toast('Deleted '+n+' '+plural(n,'thing'));
+}
+
+/* The hold, and the tap that has to know whether the hold already happened.
+   `held` is cleared at the start of every press, so a press whose click never
+   arrived — the hold redraws the grid and the element under the finger is
+   replaced — cannot swallow the NEXT tap. */
+let holdT=null,held=false;
+function cardDown(id){
+  held=false;clearTimeout(holdT);
+  holdT=setTimeout(()=>{
+    held=true;
+    if(!st.selecting)startSelect(id);else toggleSelect(id);
+  },420);
+}
+function cardUp(){clearTimeout(holdT);}
+function tapCard(id){
+  if(held){held=false;return;}
+  if(st.selecting)return toggleSelect(id);
+  openSheet(id);
+}
+/* The contextual bar: close on the left, the count in the middle, the bin on the
+   right — the shape One UI uses in Gallery and My Files, so a Galaxy user has
+   already used this. The words are Android's own, character for character. */
+function selbar(){
+  const n=st.sel.length;
+  return `<div class="tbar">
+    <span class="tbtn" onclick="exitSelect()" aria-label="Leave selection">${ic('close',17)}</span>
+    <span style="font-weight:600;font-size:15px">${n===0?'Pick what to delete':n+' selected'}</span>
+    <span class="tbtn" style="opacity:${n?'1':'.38'}" onclick="askDeleteSel()"
+      aria-label="${n?'Delete '+n:'Delete'}">${ic('trash',17)}</span></div>`;
+}
+/* The one confirmation. It says what actually happens, because what happens is
+   unusual: this app destroys the bytes rather than hiding a row, and there is no
+   undo to offer. PENDING VOICE REVIEW — the words are lifted from the shipped
+   Android sheet, which NF has already read there. */
+function confirmDelSheet(){
+  const n=st.sel.length;
+  return `<div class="scrim" onclick="cancelDeleteSel()"></div>
+  <div class="sheet"><div class="grip"></div>
+    <div style="padding:2px 20px 6px">
+      <b style="font-size:17px;font-weight:600">${n===1?'Delete this?':'Delete '+n+' things?'}</b>
+      <div style="font-size:13.5px;color:var(--ink-2);line-height:1.5;margin-top:7px">${n===1
+        ?'It goes for good, file and all. There is no undo.'
+        :'They go for good, files and all. There is no undo.'}</div>
+    </div>
+    <div class="act dl" style="background:var(--c-lnk)" onclick="deleteSelected()">${ic('trash',19)} Delete</div>
+    <div class="opt" onclick="cancelDeleteSel()"><span class="t">Cancel</span></div>
+  </div>`;
+}
 
 /* ── writing: add and edit ── */
 function saveNew(){
@@ -1094,6 +1228,11 @@ const sprow=(title,sub,opts,sel,key)=>`<div class="row inert">
   <span class="tt"><b>${title}</b>${sub?`<span>${sub}</span>`:''}</span>
   <span class="sp">${opts.map(o=>`<span class="${o[0]===sel?'on':''}"
     onclick="setOvl('${key}','${o[0]}')">${o[1]}</span>`).join('')}</span></div>`;
+/* ONE place decides a plural, so a count line added later cannot say "1 things"
+   again. It takes the singular and adds the s, which is all English asks of the
+   words this app counts: things, results, tags. A word with an irregular plural
+   would need its own argument, and none of them do. */
+const plural=(n,word)=>n===1?word:word+'s';
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const eatt=s=>esc(s).replace(/"/g,'&quot;');   /* for value="" attributes */
 const extOf=v=>{const m=v.match(/\.(\w{1,5})$/);return m?m[1].toUpperCase():'FILE'};
@@ -1121,7 +1260,18 @@ const domify=v=>{const m=v.match(/^([^/]+)(\/.*)?$/);
 
 const card=it=>{
   const pin=it.pin?`<span class="pin">${ic('pin',13,1.9)}</span>`:'';
-  const open=`onclick="openSheet(${it.id})"`;
+  const chosen=st.selecting&&st.sel.indexOf(it.id)>=0;
+  const selcls=chosen?' sel':'';
+  /* ONE attribute bundle for every face, so a tile type added later cannot
+     arrive without the hold that enters selection. `pointerleave` cancels it:
+     a finger that started on a tile and moved was scrolling, not choosing. */
+  const open=`data-id="${it.id}" onpointerdown="cardDown(${it.id})" onpointerup="cardUp()"`
+    +` onpointerleave="cardUp()" onpointercancel="cardUp()" oncontextmenu="return false"`
+    +` onclick="tapCard(${it.id})"`;
+  /* The mark appears on every tile the moment selection starts, chosen or not,
+     because a mode you can see is a mode you can leave. */
+  const mark=st.selecting
+    ?`<span class="selmark${chosen?' on':''}">${chosen?ic('ok',13,2.6):''}</span>`:'';
   const fresh=it.fresh?' fresh':'';
   if(it.t==='img'){
     /* a hit that lives only in the picture would look like a mistake in the
@@ -1131,14 +1281,14 @@ const card=it=>{
       &&!it.v.toLowerCase().includes(q)&&!(it.tags||[]).some(t=>t.includes(q));
     const chip=it.ocrPending?'<span class="fin busy">Reading…</span>'
       :insideOnly?'<span class="fin">text inside</span>':'';
-    return `<div class="gc img${fresh}" ${open}>
+    return `<div class="gc img${fresh}${selcls}" ${open}>
     <div class="shot" style="background:${it.g}"></div>
-    ${chip}<div class="cap">${esc(it.v)}</div>${pin}</div>`;
+    ${chip}<div class="cap">${esc(it.v)}</div>${pin}${mark}</div>`;
   }
   if(it.t==='doc'){const k=kindOf(it.v);
-    return `<div class="gc doc${fresh}" style="--fc:${k.c}" ${open}>
+    return `<div class="gc doc${fresh}${selcls}" style="--fc:${k.c}" ${open}>
     <div class="face">${ic(k.g,34,1.5)}<span class="ext">${extOf(it.v)}</span></div>
-    <div class="fname">${esc(it.v.replace(/\.\w{1,5}$/,''))}</div>${pin}</div>`;}
+    <div class="fname">${esc(it.v.replace(/\.\w{1,5}$/,''))}</div>${pin}${mark}</div>`;}
   const body=it.t==='lnk'?domify(wbr(esc(it.v)))
                          :wbr(esc(it.v)).replace(/\n/g,'<br>');
   const n=it.v.length, size=n<=26?' s1':n<=58?' s2':'', ov=n>58?' ov':'';
@@ -1149,11 +1299,17 @@ const card=it=>{
   const tline=it.t==='lnk'?(it.titlePending?'<div class="ltitle pend">Fetching title...</div>'
     :it.title?`<div class="ltitle${it.titleNew?' in':''}">${esc(it.title)}</div>`:''):'';
   const tx=`<div class="tx${it.code?' code':''}${size}${it.pin?' ind':''}">${body}</div>`;
-  return `<div class="gc ${it.t}${fresh}${ov}" ${open}>
-    <div class="face">${tline?`<div class="lstack">${tx}${tline}</div>`:tx}</div>${pin}</div>`;
+  return `<div class="gc ${it.t}${fresh}${ov}${selcls}" ${open}>
+    <div class="face">${tline?`<div class="lstack">${tx}${tline}</div>`:tx}</div>${pin}${mark}</div>`;
 };
-const grid=list=>{const g3=list.length&&list.every(i=>i.t==='txt'||i.t==='lnk')?' g3':'';
-  return `<div class="grid${g3}">${list.map(card).join('')}</div>`;};
+/* THE PER-SECTION JUDGEMENT, DELETED. This used to read
+     const g3 = list.every(i => i.t==='txt' || i.t==='lnk') ? ' g3' : '';
+   which is the dense/wide split by name: a section made only of text and links
+   got three across, and one image or file in it dropped the whole section back
+   to two. That is the exact behaviour the owner ruled out on 2026-08-05 ("three
+   in a row, always") after it read as a bug in dogfood. Every grid is the same
+   grid now, and the width classes above are the only thing that changes it. */
+const grid=list=>`<div class="grid">${list.map(card).join('')}</div>`;
 function noteCard(){
   if(st.noteDismissed)return'';
   return `<div class="note"><span class="ntxt" style="cursor:pointer" onclick="go('ideas','vault')">One screen, search-first - live in this prototype, awaiting the verdict for the app. Vote on the <b>Ideas page</b> in Settings. The plus-button question is still parked.</span>
@@ -1251,7 +1407,7 @@ vault:()=>{const q=st.q.trim().toLowerCase(),f=st.filter;
       +(t==='all'?'':'<span class="cnt">'+byType(t).length+'</span>')+'</div>';
   }).join('')+'</div>';
   const body=q
-    ?(res.length?'<div class="sect">'+res.length+' result'+(res.length>1?'s':'')+'</div>'+grid(res)
+    ?(res.length?'<div class="sect">'+res.length+' '+plural(res.length,'result')+'</div>'+grid(res)
        :'<div class="empty"><div class="e1">No match</div><div class="e2">'
          +(f==='all'?'Nothing here contains':'Nothing in '+TYPE[f]+' contains')
          +' &quot;'+esc(st.q)+'&quot;.</div></div>')
@@ -1268,10 +1424,17 @@ vault:()=>{const q=st.q.trim().toLowerCase(),f=st.filter;
   /* the head is fixed (owner ruling): title, pill and chips never scroll — the
      roll below is the only scroller and carries Pinned + the stream + the quiet
      rows. The chip row rides in the head as control chrome attached to the pill. */
-  return `${sbar()}${tbar('',null,toolsRight)}
+  /* SELECTION TAKES THE TOOLBAR'S ROW AND NOTHING ELSE. Swapping only this row
+     is what keeps the head — title, count, pill, chips — at exactly the height
+     it was, so entering selection never shifts the grid under the finger that
+     just held a tile. */
+  return `${sbar()}${st.selecting?selbar():tbar('',null,toolsRight)}
   <div class="vhead ${firstOpen?'settle':''}" id="vhead">
     <div><h1 class="big" style="font-size:34px">Everything<br>you reuse</h1>
-      <div class="sub">${ITEMS.length} things · ${pinned().length} pinned</div></div>
+      <!-- "1 things" was on this line. A count line is read every time the
+           screen opens, and a vault holding one thing announcing "1 things" is
+           the app failing to speak English at the top of its own home screen. -->
+      <div class="sub">${ITEMS.length} ${plural(ITEMS.length,'thing')} · ${pinned().length} pinned</div></div>
     <div class="hunt${st.searching?' active':''}"${huntAttr}>${hunt}</div>
     ${chips}
   </div>
@@ -1733,11 +1896,13 @@ function render(){
     scrHTML=sbar()
       +`<div class="panes"><div class="pane-l">${(V[st.view]||V.vault)()}</div>`
       +`<div class="pane-r">${dock()}</div></div>`
+      +(st.confirmDel?confirmDelSheet():'')
       +(st.themePicker?themeSheet():'')+(st.shareSim?shareSheet():'')
       +(st.toast?`<div class="toast">${st.toast}</div>`:'');
   }else{
     scrHTML=(V[st.view]||V.vault)()
-      +(st.sheet?(st.tagEdit?tagSheet():sheet()):'')+(st.themePicker?themeSheet():'')
+      +(st.sheet?(st.tagEdit?tagSheet():sheet()):'')
+      +(st.confirmDel?confirmDelSheet():'')+(st.themePicker?themeSheet():'')
       +(st.shareSim?shareSheet():'')
       +(st.toast?`<div class="toast">${st.toast}</div>`:'');
   }
@@ -1762,7 +1927,7 @@ function render(){
   [...document.getElementById('devSeg').children].forEach(b=>b.onclick=()=>{DEVICE=b.dataset.d;relaunch()});
   document.getElementById('notes').innerHTML=`
     <h3>Try these</h3>
-    <p>Tap a <b>chip</b> to put a lens on the one stream — Pinned narrows too, nothing navigates · tap any <b>card</b> for its sheet, then <b>Tags</b> · <b>Pin</b> and watch the Vault reorder · try pinning a <b>third</b> thing · tap the <b>search pill</b> and type "cal", "pdf" or a tag — the lens keeps filtering while you search · the <b>gear</b> opens Settings.</p>
+    <p>Tap a <b>chip</b> to put a lens on the one stream — Pinned narrows too, nothing navigates · tap any <b>card</b> for its sheet, then <b>Tags</b> · <b>Pin</b> and watch the Vault reorder · try pinning a <b>third</b> thing · tap the <b>search pill</b> and type "cal", "pdf" or a tag — the lens keeps filtering while you search · the <b>gear</b> opens Settings · <b>hold a tile</b> to start picking, tap more to add them, and the bin at the top right deletes the lot after one question.</p>
     <h3>One screen, search-first</h3>
     <p><b>Vault:</b> home, inline search, filter chips, the item sheet, manual add — no bottom nav. The head (title, pill, chips) stays fixed; only the stream scrolls. The clipboard watcher is on by default and sits at the bottom as a quiet gauge row; tapping it opens Settings, where the real switch lives.<br>
        <b>Settings</b> (gear, top-right): a short first screen. The two things you touch often stay live on it — the clipboard switch and Theme — and everything set up once sits behind a door that names its own state: <b>The floating overlay</b>, <b>What it keeps</b>, <b>Reach</b>, <b>Your profile</b>, and <b>About</b> at the foot. Plus the <b>Ideas</b> page, ten proposals with yes / no / later votes that stick.</p>
@@ -1773,7 +1938,7 @@ function render(){
     <h3>Device views</h3>
     <p>The third switch tries the same app on other glass. <b>Fold</b> is the inner screen and it is <b>medium</b> (~673dp), not a tablet: grids go 4-across, search sticks to the top, and a hairline marks the hinge — tiles clear it through the middle gap. <b>Tablet / iPad</b> is expanded: vault on the left, and tapping a tile docks its actions on the right instead of raising a sheet. <b>Flip</b> is the cover-screen concept from the Ideas page — top four pins, tap to copy, the phone stays shut.</p>
     <h3>Still to design</h3>
-    <p>Onboarding · the overlay and the keyboard themselves (they live on <a href="../extensions/">the extensions page</a>) · multi-select · Recently deleted · widget gallery · where the plus button lands long-term.</p>`;
+    <p>Onboarding · the overlay and the keyboard themselves (they live on <a href="../extensions/">the extensions page</a>) · Recently deleted · widget gallery · where the plus button lands long-term.</p>`;
 }
 function renderKeepFocus(){
   const el=document.getElementById('q'); const pos=el?el.selectionStart:0;
@@ -1782,6 +1947,7 @@ function renderKeepFocus(){
   if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
 }
 Object.assign(window,{go,goVault,setFilter,vaultEdge,openSearch,closeSearch,openSheet,closeSheet,togglePin,copy,del,toast,renderKeepFocus,st,
+  startSelect,toggleSelect,exitSelect,askDeleteSel,cancelDeleteSel,deleteSelected,cardDown,cardUp,tapCard,
   saveNew,saveEdit,edit,keep,grabClip,toggleWatch,startWatch,stopWatch,dismissNote,attachSim,copyOcr,
   toggleOverlay,setOvl,openPlan,
   openThemePicker,closeThemePicker,setTheme,vote,openTags,closeTags,addTag,removeTag,flipCopy,
