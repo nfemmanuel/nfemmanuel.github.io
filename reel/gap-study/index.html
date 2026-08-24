@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Gap study comparator</title>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     scripts/gap-study/comparator.html — a standalone, offline, single-file
+     page that REPLAYS a frozen corpus of recorded touch streams over a
+     drawn keyboard and shows a per-moment, multi-column story next to it:
+     what was intended, what Samsung Keyboard actually committed (the
+     control, per docs/analysis/keyboard-gap-study-proposal.md section 2 —
+     "control being the good way it works on my phone for both type and
+     swipe"), what OUR pipeline commits under each named constants profile
+     (control = shipped, treatment-* = a candidate fix), and what Apple's
+     QuickType did where a run happened to cover it. This is the front end
+     named in that proposal's section 2 ("the attached front end the agent
+     can control") at the OBSERVATION layer only: every decision shown here
+     is precomputed by the Python mirrors into `comparator-data.js` — this
+     page renders, it never re-derives (proposal section 7, "one derivation
+     law": a second JavaScript implementation of the decoder would drift
+     from the Swift invisibly, exactly where this study needs truth).
+
+     WHO OPENS THIS: NF and any agent working the gap-study lane, in a
+     desktop or mobile browser, from file:// with zero network. It also
+     doubles as submission-video material (proposal section 4's "demo-asset
+     note"), so it is built to look presentable in both themes and at
+     mobile width, not just to be technically correct.
+
+     ═══════════════════════════════════════════════════════════════════════
+     GEOMETRY — `keyCentres(width)` below is copied VERBATIM, six ratio
+     constants and all, from scripts/glide-capture/index.html's own
+     `keyCentres(width)`, which is itself a line-for-line JavaScript
+     transliteration of `key_centres()` in scripts/glide-tune.py. Reusing it
+     here (rather than re-deriving it a third time) is exactly the
+     one-derivation law the proposal's section 7 argues for: this page's
+     "ours" keyboard must land on the identical key positions the Python
+     mirrors compute, or a touch that would hit "e" in the real pipeline
+     could draw as landing on "w" here. See that file's own header comment
+     for the fuller derivation history; nothing about the geometry is
+     re-argued in this file.
+
+     The "samsung" keyboard is drawn from `SAMSUNG_LAYOUT` below, which is
+     the untouched contents of
+     scripts/phone-corpus/session-1-samsung-layout.json (26 fitted letter
+     centres + the space bar, at NF's real 411px viewport) inlined as a JS
+     object literal — inlined, not fetched, because `fetch()` of a sibling
+     file is blocked under file:// in Chromium (no server, no CORS origin),
+     and this page promises to work from a bare double-click with zero
+     network. Per-key box sizes are NOT in that file (it only ever recorded
+     centres) so they are approximated once, geometrically, from the same
+     file's own `rowPitchPx` and the measured column spacing — see
+     `buildSamsungLayout()` below for exactly what is measured vs assumed.
+
+     ═══════════════════════════════════════════════════════════════════════
+     THE DATA CONTRACT (fixed; this page never changes it — the eventual
+     `scripts/gap-study/replay.py` emits exactly this shape):
+
+       window.GAP_DATA = {
+         schema: "gap-study-comparator/1", corpusVersion: "v1",
+         profiles: ["control", "treatment-spacebar"],   // ours columns, in order
+         items: [{ id, kind: "tap"|"swipe"|"mixed", frame: "ours"|"samsung",
+           intended, touches: [{kind:"tap",t,x,y} | {kind:"swipe",t,samples:[[x,y,tRel],...]}],
+           moments: [{ t, intended, samsung: {committed,bar,note} | null,
+                       ours: { <profile>: {committed,bar,decision} },
+                       apple: {committed} | null }],
+           committed: { samsung, ours: {<profile>: ...}, apple } }] };
+
+     Any cell may be null. Null renders as a quiet "not covered" note — see
+     `notCovered()` — never as an empty gap and never as an error, because a
+     blank cell and a covered-but-matching cell would otherwise be visually
+     indistinguishable, and this study's whole point is to be honest about
+     what has and has not been measured yet (proposal section 6: several
+     columns ARE genuinely blank today, by design, not by bug).
+
+     Divergence is judged case-folded against the moment's own `intended`
+     word: an exact match draws plain, a case-only mismatch draws in a
+     LIGHTER tint of the shared --accent token, and a folded mismatch (a
+     different word entirely) draws in a stronger tint of that same token —
+     two weights of the one accent colour, never a second invented hue, via
+     CSS `color-mix()` against --accent (see .cell.diverge-case / .diverge-word
+     below). This mirrors the proposal's own G3 finding: "the mirror has no
+     casing layer YET... itself a finding" (section 0) — casing divergence
+     is a distinct, first-class category here, not folded into "wrong".
+
+     ═══════════════════════════════════════════════════════════════════════
+     WHAT IS DELIBERATELY NOT HERE:
+      - No decoding, no scoring logic, no second copy of KeyboardAutocorrect
+        or KeyboardGlide. Every "committed"/"bar"/"decision" value is data,
+        read and displayed, never computed. See the one-derivation law above.
+      - No network request, no CDN, no web font, no analytics, no
+        `localStorage`. The only external I/O is the optional drag-and-drop
+        of a replacement data file, read locally via FileReader.
+      - No layout-retarget math (Samsung traces replayed against our
+        geometry). The proposal names that as a real, useful toggle
+        ("as recorded" vs "as replayed on ours") but it is a numerical
+        transform owned by the Python mirrors, not a thing this rendering
+        page invents a second copy of. Each item already declares which
+        frame its own touch coordinates live in; this page draws exactly
+        that frame, faithfully, for both frame values — which is the
+        capability premise-check #2 asked this page to prove it has.
+     ═══════════════════════════════════════════════════════════════════ -->
+<style>
+  /* Tokens copied verbatim from scripts/glide-capture/index.html's :root /
+     dark-media blocks, which themselves came from design/app-mockup.html's
+     :root / .dark blocks. Light is default, dark answers
+     prefers-color-scheme (this page, like its precedent, has no manual
+     toggle). --accent / --accent-on are the same sanctioned "doc blue"
+     pair. No colour below is invented; the two divergence tints are
+     color-mix() blends of --accent against the background, not new hues. */
+  :root{
+    color-scheme:light dark;
+    --ground:#F6F6F7; --surf:#FFFFFF; --ink:#14161A; --ink-2:#5C636D; --ink-3:#8B929C; --hair:#E7E8EB;
+    --accent:#356BA6; --accent-on:#E6EFF8;
+    --shadow-s:0 1px 2px rgba(16,20,26,.05),0 4px 12px rgba(16,20,26,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0E1013; --surf:#181B20; --ink:#F0F1F3; --ink-2:#A2A9B3; --ink-3:#767D87; --hair:#272B31;
+      --accent:#8FC6FF; --accent-on:#0F4275;
+      --shadow-s:0 1px 2px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.30);
+    }
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--ground);color:var(--ink);min-height:100vh;
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;padding:24px 14px 60px;
+    overflow-x:hidden}
+
+  .page{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px;
+    min-width:0}
+
+  h1{font-size:19px;margin:0}
+  h2{font-size:14px;margin:0 0 2px;color:var(--ink-2)}
+  .lede{margin:0;color:var(--ink-2);font-size:13.5px;line-height:1.55}
+
+  .panel{background:var(--surf);border:1px solid var(--hair);border-radius:14px;
+    box-shadow:var(--shadow-s);padding:14px;min-width:0}
+
+  /* ---- item picker ---- */
+  .itemList{display:flex;flex-direction:column;gap:6px}
+  .itemRow{display:flex;align-items:center;gap:10px;text-align:left;width:100%;
+    appearance:none;border:1.5px solid var(--hair);background:var(--ground);color:var(--ink);
+    font:inherit;font-size:13px;padding:9px 11px;border-radius:10px;cursor:pointer}
+  .itemRow.active{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 12%, var(--surf))}
+  .itemId{font-weight:600;font-size:12.5px;color:var(--ink-3);min-width:0;flex:0 0 auto}
+  .itemText{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .badge{flex:0 0 auto;font-size:10.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
+    color:var(--ink-2);border:1px solid var(--hair);border-radius:99px;padding:2px 8px}
+  .badge.tap{color:var(--accent);border-color:color-mix(in srgb, var(--accent) 45%, var(--hair))}
+  .badge.swipe{color:var(--accent);border-color:color-mix(in srgb, var(--accent) 45%, var(--hair))}
+  .badge.mixed{color:var(--accent);border-color:color-mix(in srgb, var(--accent) 45%, var(--hair))}
+  .frameNote{font-size:11px;color:var(--ink-3)}
+
+  /* ---- keyboard / replay ---- */
+  #kbOuter{display:flex;justify-content:center}
+  #kbWrap{position:relative;width:393px;max-width:100%}
+  #kbSvg{display:block;width:100%;height:auto}
+
+  .transportRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:12px}
+  .transportBtn{appearance:none;border:1.5px solid var(--hair);background:var(--ground);color:var(--ink);
+    font:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:9px;cursor:pointer}
+  .transportBtn.primary{background:var(--accent);color:var(--accent-on);border-color:transparent}
+  .speedGroup{display:flex;gap:4px;margin-left:auto}
+  .speedBtn{appearance:none;border:1.5px solid var(--hair);background:var(--ground);color:var(--ink-2);
+    font:inherit;font-size:12px;font-weight:600;padding:5px 9px;border-radius:7px;cursor:pointer}
+  .speedBtn.active{color:var(--accent-on);background:var(--accent);border-color:transparent}
+  .scrubRow{display:flex;align-items:center;gap:10px;padding-top:8px}
+  #scrub{flex:1 1 auto;accent-color:var(--accent)}
+  .clock{font-variant-numeric:tabular-nums;font-size:12px;color:var(--ink-2);min-width:7ch;text-align:right}
+
+  /* ---- summary strip ---- */
+  .summaryStrip{display:flex;flex-wrap:wrap;gap:8px;padding-top:12px}
+  .summaryChip{border:1px solid var(--hair);border-radius:10px;padding:7px 10px;flex:1 1 130px;min-width:0}
+  .summaryChip .who{font-size:11px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+  .summaryChip .score{font-size:15px;font-weight:700;margin-top:1px}
+  .summaryChip .caseNote{font-size:11px;color:var(--ink-3)}
+
+  /* ---- story table ---- */
+  .storyScroll{overflow-x:auto;border-radius:10px;border:1px solid var(--hair);margin-top:12px}
+  table.story{border-collapse:collapse;width:100%;min-width:640px;font-size:12.5px}
+  table.story th{position:sticky;top:0;background:var(--surf);text-align:left;font-size:11px;
+    color:var(--ink-3);text-transform:uppercase;letter-spacing:.02em;font-weight:700;
+    padding:8px 10px;border-bottom:1px solid var(--hair);white-space:nowrap}
+  table.story td{vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--hair);min-width:110px}
+  table.story tr:last-child td{border-bottom:0}
+  table.story tr.momentRow{cursor:pointer}
+  table.story tr.momentRow:hover td{background:color-mix(in srgb, var(--accent) 6%, transparent)}
+  table.story tr.passed td{background:color-mix(in srgb, var(--accent) 3%, transparent)}
+  table.story tr.current td{background:color-mix(in srgb, var(--accent) 14%, transparent)}
+  table.story tr.current td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+  .intendedCell{font-weight:700}
+  .cellStack{display:flex;flex-direction:column;gap:2px}
+  .committedWord{font-weight:600}
+  .cell.diverge-case .committedWord{background:color-mix(in srgb, var(--accent) 22%, transparent);
+    border-radius:4px;padding:0 3px;margin:0 -3px}
+  .cell.diverge-word .committedWord{background:color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius:4px;padding:0 3px;margin:0 -3px}
+  .barLine{color:var(--ink-2);font-size:11.5px}
+  .noteLine{color:var(--ink-3);font-size:11px;font-style:italic}
+  .decisionLine{color:var(--ink-3);font-size:11px;text-transform:lowercase}
+  .notCovered{color:var(--ink-3);font-style:italic}
+
+  /* ---- drop target ---- */
+  .dropHint{font-size:11.5px;color:var(--ink-3)}
+  body.dragging::after{content:"Drop a .js or .json corpus file to load it";
+    position:fixed;inset:0;background:color-mix(in srgb, var(--accent) 18%, transparent);
+    color:var(--ink);font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;
+    pointer-events:none;z-index:50;text-align:center;padding:20px}
+
+  .footNote{font-size:11.5px;color:var(--ink-3);line-height:1.6;margin:0}
+</style>
+<meta name="theme-color" content="#F6F6F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1013" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 108 108%22><style>@media(prefers-color-scheme:dark)%7B.i%7Bfill:%23F0F1F3%7D%7D</style><path class=%22i%22 fill=%22%2314161A%22 d=%22M40.5,31.833 A2.5,2.5 0 0 0 38.390,31.871 L28.054,36.912 A2.5,2.5 0 0 0 26.903,40.255 L34.289,55.4 L40.5,55.4 Z%22/><path class=%22i%22 fill=%22%2314161A%22 d=%22M67.5,31.671 Q68.384,31.273 69.610,31.871 L77.699,35.816 L80.001,42.502 L73.711,55.4 L67.5,55.4 Z%22/><path class=%22i%22 fill=%22%2314161A%22 fill-rule=%22evenodd%22 d=%22M44.5,25.5 L58.379,25.5 L64.5,31.621 L64.5,55.4 L43.5,55.4 L43.5,26.5 Q43.5,25.5 44.5,25.5 Z M57.1,28.1 L61.7,32.7 L57.1,32.7 Z%22/><path class=%22i%22 fill=%22%2314161A%22 fill-rule=%22evenodd%22 d=%22M34.25,58 L73.75,58 Q76.5,58 76.5,60.75 Q76.5,63.5 73.75,63.5 L72,63.5 L72,76.5 Q72,81.5 67,81.5 L41,81.5 Q36,81.5 36,76.5 L36,63.5 L34.25,63.5 Q31.5,63.5 31.5,60.75 Q31.5,58 34.25,58 Z M48,70 Q46,70 46,72 L46,73 Q46,75 48,75 L60,75 Q62,75 62,73 L62,72 Q62,70 60,70 Z%22/></svg>">
+<meta name="description" content="A replay tool that plays recorded touches over a drawn keyboard and shows, moment by moment, what Samsung's keyboard committed against what the bothy. pipeline commits under each named profile.">
+<link rel="canonical" href="https://nfemmanuel.com/reel/gap-study/">
+</head>
+<body>
+<div class="page">
+
+  <div>
+    <h1>Gap study comparator</h1>
+    <p class="lede">This replays recorded touches over a drawn keyboard and shows, moment by moment,
+      what Samsung's keyboard committed against what ours commits under each named profile, plus
+      Apple where a run happens to cover it. Every value here is precomputed data, not something this
+      page decides.</p>
+    <p class="lede dropHint" id="dataSourceNote">Loaded from data/comparator-data.js (corpus v1, real replays). Drop a
+      different .js or .json corpus file anywhere on this page to replace it.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Items</h2>
+    <div class="itemList" id="itemList"></div>
+  </div>
+
+  <div class="panel">
+    <h2 id="kbHeading">Replay</h2>
+    <p class="frameNote" id="frameNote"></p>
+    <div id="kbOuter"><div id="kbWrap"><svg id="kbSvg" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
+
+    <div class="transportRow">
+      <button class="transportBtn primary" id="playBtn" type="button">Play</button>
+      <button class="transportBtn" id="resetBtn" type="button">Reset</button>
+      <div class="speedGroup" id="speedGroup">
+        <button class="speedBtn" data-speed="0.5" type="button">0.5x</button>
+        <button class="speedBtn active" data-speed="1" type="button">1x</button>
+        <button class="speedBtn" data-speed="2" type="button">2x</button>
+      </div>
+    </div>
+    <div class="scrubRow">
+      <input type="range" id="scrub" min="0" max="1000" value="0" step="1">
+      <span class="clock" id="clockLabel">0 / 0 ms</span>
+    </div>
+
+    <div class="summaryStrip" id="summaryStrip"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Story</h2>
+    <div class="storyScroll">
+      <table class="story" id="storyTable">
+        <thead><tr id="storyHead"></tr></thead>
+        <tbody id="storyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="footNote">No personal data: every item here is a short prompted sentence, in the style of
+    scripts/phone-corpus/index.html's own prompt list. Coordinates for "samsung"-frame items are the
+    real fitted centres from scripts/phone-corpus/session-1-samsung-layout.json; coordinates for
+    "ours"-frame items were computed from this page's own keyCentres() so they land on the drawn keys.</p>
+
+</div>
+
+<!-- The corpus data. A plain <script src>, per the fixed data contract:
+     it sets window.GAP_DATA and, because script tags run in document
+     order, has already run by the time the block below checks for it. -->
+<script src="data/comparator-data.js"></script>
+<script>
+"use strict";
+
+/* ═══════════════════════════════════════════════════════════════════════
+   1. GEOMETRY — "ours" keyboard. Copied VERBATIM from
+   scripts/glide-capture/index.html's keyCentres(width), which is itself a
+   line-for-line JavaScript transliteration of key_centres() in
+   scripts/glide-tune.py (that file's lines 53-93). Do not edit the
+   constants or the algorithm here independently of that file — see this
+   file's header comment for why a second derivation is exactly what this
+   page must not become.
+   ═══════════════════════════════════════════════════════════════════════ */
+const REFERENCE_WIDTH = 393.0;
+const R_SIDE_MARGIN = 0.016539;
+const R_GAP = 0.015267;
+const R_KEY_HEIGHT = 0.109415;
+const R_ROW_GAP = 0.027990;
+const R_BAND_HEIGHT = 0.132316;
+const R_FUNCTION_KEY_WIDTH = 0.112383;
+
+const TOP_ROW = "qwertyuiop";
+const HOME_ROW = "asdfghjkl";
+const BOTTOM_ROW = "zxcvbnm";
+
+function keyCentres(width) {
+  const sideMargin = width * R_SIDE_MARGIN;
+  const gap = width * R_GAP;
+  const contentWidth = width - 2 * sideMargin;
+  const keyWidth = (contentWidth - 9 * gap) / 10;
+  const keyHeight = width * R_KEY_HEIGHT;
+  const rowGap = width * R_ROW_GAP;
+  const rowPitch = keyHeight + rowGap;
+  const bandHeight = width * R_BAND_HEIGHT;
+  const functionKeyWidth = width * R_FUNCTION_KEY_WIDTH;
+  const inner = 7 * keyWidth + 6 * gap;
+  const flankingGap = (contentWidth - 2 * functionKeyWidth - inner) / 2;
+
+  const centres = {};
+  function addRow(keys, startX, rowIndex) {
+    const y = bandHeight + rowIndex * rowPitch + keyHeight / 2;
+    for (let i = 0; i < keys.length; i++) {
+      centres[keys[i]] = { x: startX + i * (keyWidth + gap) + keyWidth / 2, y: y };
+    }
+  }
+  function centredStart(count) {
+    const rowWidth = count * keyWidth + (count - 1) * gap;
+    return sideMargin + (contentWidth - rowWidth) / 2;
+  }
+  addRow(TOP_ROW, centredStart(TOP_ROW.length), 0);
+  addRow(HOME_ROW, centredStart(HOME_ROW.length), 1);
+  addRow(BOTTOM_ROW, sideMargin + functionKeyWidth + flankingGap, 2);
+
+  const height = bandHeight + 2 * rowPitch + keyHeight + rowGap;
+  return {
+    centres: centres, width: width, height: height,
+    keyWidth: keyWidth, keyHeight: keyHeight, gap: gap, sideMargin: sideMargin,
+    bandHeight: bandHeight, functionKeyWidth: functionKeyWidth, flankingGap: flankingGap,
+    rowPitch: rowPitch
+  };
+}
+
+const OURS_LAYOUT = keyCentres(REFERENCE_WIDTH);
+
+/* ═══════════════════════════════════════════════════════════════════════
+   2. GEOMETRY — "samsung" keyboard. SAMSUNG_LAYOUT below is the untouched
+   contents of scripts/phone-corpus/session-1-samsung-layout.json, inlined
+   (see file-header comment for why inlined rather than fetched). It only
+   ever records CENTRES, not key boxes, so buildSamsungLayout() derives a
+   uniform box size from two things that file DOES measure: `rowPitchPx`
+   for key height, and the median nearest-neighbour distance within the top
+   row for key width. This is an approximation of the real Samsung Honeyboard
+   UI, not a second fitted measurement — it exists only so a tap dot lands
+   inside a visibly labelled key, the same decorative role the flanking
+   function-key blocks play in glide-capture's replica.
+   ═══════════════════════════════════════════════════════════════════ */
+const SAMSUNG_LAYOUT_JSON = {
+  "schema": "phone-corpus-layout/1",
+  "keyboard": "Samsung Honeyboard, fitted from labelled touches",
+  "session": "1787522923898-pbpmfo",
+  "devicePixelRatio": 2.625,
+  "viewport": { "innerWidth": 411, "innerHeight": 799 },
+  "rowPitchPx": 40.68,
+  "keys": {
+    "q": { "cssX": 23.2,   "cssY": 550.92 },
+    "w": { "cssX": 65.29,  "cssY": 547.65 },
+    "e": { "cssX": 101.75, "cssY": 548.85 },
+    "r": { "cssX": 139.32, "cssY": 547.0  },
+    "t": { "cssX": 182.51, "cssY": 551.46 },
+    "y": { "cssX": 229.67, "cssY": 554.84 },
+    "u": { "cssX": 261.61, "cssY": 563.0  },
+    "i": { "cssX": 305.76, "cssY": 557.45 },
+    "o": { "cssX": 340.81, "cssY": 563.11 },
+    "p": { "cssX": 377.07, "cssY": 561.15 },
+    "a": { "cssX": 41.18,  "cssY": 606.41 },
+    "s": { "cssX": 89.19,  "cssY": 603.59 },
+    "d": { "cssX": 125.5,  "cssY": 607.39 },
+    "f": { "cssX": 168.75, "cssY": 610.11 },
+    "g": { "cssX": 211.44, "cssY": 615.66 },
+    "h": { "cssX": 243.68, "cssY": 618.82 },
+    "j": { "cssX": 294.0,  "cssY": 599.88 },
+    "k": { "cssX": 334.79, "cssY": 596.84 },
+    "l": { "cssX": 359.4,  "cssY": 612.29 },
+    "z": { "cssX": 84.77,  "cssY": 664.74 },
+    "x": { "cssX": 130.88, "cssY": 662.13 },
+    "c": { "cssX": 171.96, "cssY": 666.48 },
+    "v": { "cssX": 215.91, "cssY": 663.87 },
+    "b": { "cssX": 250.61, "cssY": 665.83 },
+    "n": { "cssX": 292.9,  "cssY": 646.02 },
+    "m": { "cssX": 321.07, "cssY": 662.13 },
+    " ": { "cssX": 251.26, "cssY": 718.17 }
+  }
+};
+
+function buildSamsungLayout(json) {
+  const keys = json.keys;
+  // median nearest-neighbour column spacing across the top row, for key width
+  const topRow = "qwertyuiop".split("").map(function (ch) { return keys[ch].cssX; }).sort(function (a, b) { return a - b; });
+  const deltas = [];
+  for (let i = 1; i < topRow.length; i++) deltas.push(topRow[i] - topRow[i - 1]);
+  deltas.sort(function (a, b) { return a - b; });
+  const pitchX = deltas[Math.floor(deltas.length / 2)];
+  const keyWidth = pitchX * 0.82;
+  const keyHeight = json.rowPitchPx * 0.78;
+  const spaceWidth = keyWidth * 4.4;
+
+  let maxY = 0;
+  for (const ch in keys) maxY = Math.max(maxY, keys[ch].cssY);
+  const width = json.viewport.innerWidth;
+  const height = maxY + keyHeight; // bottom breathing room below the space bar
+
+  const centres = {};
+  for (const ch in keys) centres[ch] = { x: keys[ch].cssX, y: keys[ch].cssY };
+
+  return { centres: centres, width: width, height: height, keyWidth: keyWidth, keyHeight: keyHeight, spaceWidth: spaceWidth };
+}
+
+const SAMSUNG_LAYOUT = buildSamsungLayout(SAMSUNG_LAYOUT_JSON);
+
+function layoutFor(frame) { return frame === "samsung" ? SAMSUNG_LAYOUT : OURS_LAYOUT; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   3. SVG DRAWING — a fresh <g> per item render; el() matches
+   glide-capture's own helper.
+   ═══════════════════════════════════════════════════════════════════ */
+const SVGNS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("kbSvg");
+
+function el(name, attrs) {
+  const node = document.createElementNS(SVGNS, name);
+  for (const k in attrs) node.setAttribute(k, attrs[k]);
+  return node;
+}
+
+let keyLayer = null;
+let pathLayer = null;
+
+function drawKeyboard(frame) {
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const L = layoutFor(frame);
+  svg.setAttribute("viewBox", "0 0 " + L.width + " " + L.height);
+
+  svg.appendChild(el("rect", { x: 0, y: 0, width: L.width, height: L.height, rx: 14, fill: "var(--hair)" }));
+
+  keyLayer = el("g", { id: "keyLayer" });
+  svg.appendChild(keyLayer);
+
+  for (const ch in L.centres) {
+    const c = L.centres[ch];
+    const isSpace = ch === " ";
+    const w = isSpace ? (L.spaceWidth || L.keyWidth * 4) : L.keyWidth;
+    const h = L.keyHeight;
+    const g = el("g", {});
+    g.appendChild(el("rect", {
+      x: c.x - w / 2, y: c.y - h / 2, width: w, height: h, rx: 8,
+      fill: "var(--surf)", stroke: "var(--hair)", "stroke-width": 1
+    }));
+    if (!isSpace) {
+      const t = el("text", {
+        x: c.x, y: c.y, "text-anchor": "middle", "dominant-baseline": "central",
+        "font-size": Math.round(h * 0.42),
+        "font-family": "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif",
+        fill: "var(--ink)", "pointer-events": "none"
+      });
+      t.textContent = ch;
+      g.appendChild(t);
+    }
+    keyLayer.appendChild(g);
+  }
+
+  pathLayer = el("g", { id: "pathLayer" });
+  svg.appendChild(pathLayer);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   4. TIMELINE — flattening an item's touches into drawable events, and
+   computing its total duration.
+   ═══════════════════════════════════════════════════════════════════ */
+function itemDuration(item) {
+  let end = 0;
+  for (const touch of item.touches) {
+    if (touch.kind === "tap") {
+      end = Math.max(end, touch.t + 400); // a tap dot's own fade tail
+    } else if (touch.kind === "swipe") {
+      const lastSample = touch.samples[touch.samples.length - 1];
+      end = Math.max(end, touch.t + lastSample[2] + 200);
+    }
+  }
+  for (const m of item.moments) end = Math.max(end, m.t);
+  return Math.max(end, 100);
+}
+
+const TAP_FADE_MS = 700;
+const TAP_HOLD_OPACITY = 0.14;
+
+function renderTouchesAt(item, currentT) {
+  while (pathLayer.firstChild) pathLayer.removeChild(pathLayer.firstChild);
+  for (const touch of item.touches) {
+    if (touch.kind === "tap") {
+      if (touch.t > currentT) continue;
+      const age = currentT - touch.t;
+      const opacity = age >= TAP_FADE_MS ? TAP_HOLD_OPACITY : (1 - (age / TAP_FADE_MS) * (1 - TAP_HOLD_OPACITY));
+      pathLayer.appendChild(el("circle", {
+        cx: touch.x, cy: touch.y, r: 7, fill: "var(--accent)", opacity: opacity.toFixed(2)
+      }));
+    } else if (touch.kind === "swipe") {
+      if (touch.t > currentT) continue;
+      const elapsedInSwipe = currentT - touch.t;
+      const pts = [];
+      for (const s of touch.samples) {
+        if (s[2] > elapsedInSwipe) break;
+        pts.push(s[0] + "," + s[1]);
+      }
+      if (pts.length >= 1) {
+        if (pts.length >= 2) {
+          pathLayer.appendChild(el("polyline", {
+            points: pts.join(" "), fill: "none", stroke: "var(--accent)", "stroke-width": 3,
+            "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0.85
+          }));
+        }
+        const first = touch.samples[0];
+        pathLayer.appendChild(el("circle", { cx: first[0], cy: first[1], r: 5, fill: "var(--accent)" }));
+        const lastPt = pts[pts.length - 1].split(",");
+        pathLayer.appendChild(el("circle", { cx: lastPt[0], cy: lastPt[1], r: 5, fill: "var(--ink)" }));
+      }
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   5. STORY TABLE + SUMMARY — comparing every committed word against the
+   moment's own `intended` word, case-folded, with case-only divergence
+   drawn as its own class per the file-header comment.
+   ═══════════════════════════════════════════════════════════════════ */
+function foldEq(a, b) { return typeof a === "string" && typeof b === "string" && a.toLowerCase() === b.toLowerCase(); }
+
+function notCoveredNode() {
+  const span = document.createElement("span");
+  span.className = "notCovered";
+  span.textContent = "not covered";
+  return span;
+}
+
+// Renders one profile's {committed, bar, decision|note} cell into a <td>.
+function renderCell(td, cellData, intended) {
+  td.innerHTML = "";
+  td.classList.remove("diverge-case", "diverge-word");
+  if (!cellData || cellData.committed === null || cellData.committed === undefined) {
+    td.appendChild(notCoveredNode());
+    return;
+  }
+  const stack = document.createElement("div");
+  stack.className = "cellStack";
+
+  const word = document.createElement("div");
+  word.className = "committedWord";
+  word.textContent = cellData.committed;
+  stack.appendChild(word);
+
+  if (foldEq(cellData.committed, intended)) {
+    if (cellData.committed !== intended) td.classList.add("diverge-case");
+  } else {
+    td.classList.add("diverge-word");
+  }
+
+  if ("bar" in cellData) {
+    const bar = document.createElement("div");
+    bar.className = "barLine";
+    if (cellData.bar === null || cellData.bar === undefined) {
+      bar.appendChild(notCoveredNode());
+    } else if (Array.isArray(cellData.bar) && cellData.bar.length) {
+      bar.textContent = cellData.bar.join(", ");
+    } else {
+      bar.appendChild(notCoveredNode());
+    }
+    stack.appendChild(bar);
+  }
+
+  if (cellData.note) {
+    const note = document.createElement("div");
+    note.className = "noteLine";
+    note.textContent = cellData.note;
+    stack.appendChild(note);
+  }
+
+  if (cellData.decision) {
+    const dec = document.createElement("div");
+    dec.className = "decisionLine";
+    dec.textContent = cellData.decision;
+    stack.appendChild(dec);
+  }
+
+  td.appendChild(stack);
+}
+
+function buildStoryHead(item, data) {
+  const head = document.getElementById("storyHead");
+  head.innerHTML = "";
+  const cols = ["Intended", "Samsung"].concat(data.profiles.map(function (p) { return "Ours: " + p; })).concat(["Apple"]);
+  for (const c of cols) {
+    const th = document.createElement("th");
+    th.textContent = c;
+    head.appendChild(th);
+  }
+}
+
+function buildStoryBody(item, data, onSeek) {
+  const body = document.getElementById("storyBody");
+  body.innerHTML = "";
+  item.moments.forEach(function (m, idx) {
+    const tr = document.createElement("tr");
+    tr.className = "momentRow";
+    tr.dataset.t = String(m.t);
+
+    const tdIntended = document.createElement("td");
+    tdIntended.className = "intendedCell";
+    tdIntended.textContent = m.intended;
+    tr.appendChild(tdIntended);
+
+    const tdSamsung = document.createElement("td");
+    tdSamsung.className = "cell";
+    renderCell(tdSamsung, m.samsung, m.intended);
+    tr.appendChild(tdSamsung);
+
+    for (const profile of data.profiles) {
+      const tdProfile = document.createElement("td");
+      tdProfile.className = "cell";
+      const profileData = m.ours ? m.ours[profile] : null;
+      renderCell(tdProfile, profileData, m.intended);
+      tr.appendChild(tdProfile);
+    }
+
+    const tdApple = document.createElement("td");
+    tdApple.className = "cell";
+    renderCell(tdApple, m.apple, m.intended);
+    tr.appendChild(tdApple);
+
+    tr.addEventListener("click", function () { onSeek(m.t); });
+    body.appendChild(tr);
+  });
+}
+
+function updateStoryHighlight(item, currentT) {
+  const rows = document.getElementById("storyBody").querySelectorAll("tr.momentRow");
+  let currentIdx = -1;
+  rows.forEach(function (row, idx) {
+    const t = Number(row.dataset.t);
+    row.classList.toggle("passed", t <= currentT);
+    if (t <= currentT) currentIdx = idx;
+  });
+  rows.forEach(function (row, idx) { row.classList.toggle("current", idx === currentIdx); });
+}
+
+function computeSummary(item, data) {
+  // one column per: samsung, each ours profile, apple
+  const columns = [{ key: "samsung", label: "Samsung", get: function (m) { return m.samsung; } }];
+  data.profiles.forEach(function (p) {
+    columns.push({ key: "ours:" + p, label: "Ours: " + p, get: function (m) { return m.ours ? m.ours[p] : null; } });
+  });
+  columns.push({ key: "apple", label: "Apple", get: function (m) { return m.apple; } });
+
+  return columns.map(function (col) {
+    let covered = 0, right = 0, caseOnly = 0;
+    const total = item.moments.length;
+    for (const m of item.moments) {
+      const cell = col.get(m);
+      if (!cell || cell.committed === null || cell.committed === undefined) continue;
+      covered++;
+      if (foldEq(cell.committed, m.intended)) {
+        if (cell.committed === m.intended) right++;
+        else caseOnly++;
+      }
+    }
+    return { label: col.label, right: right, caseOnly: caseOnly, covered: covered, total: total };
+  });
+}
+
+function renderSummary(item, data) {
+  const strip = document.getElementById("summaryStrip");
+  strip.innerHTML = "";
+  const rows = computeSummary(item, data);
+  for (const r of rows) {
+    const chip = document.createElement("div");
+    chip.className = "summaryChip";
+    const who = document.createElement("div");
+    who.className = "who";
+    who.textContent = r.label;
+    const score = document.createElement("div");
+    score.className = "score";
+    score.textContent = r.covered === 0 ? "not covered" : (r.right + " / " + r.total);
+    const caseNote = document.createElement("div");
+    caseNote.className = "caseNote";
+    caseNote.textContent = r.caseOnly > 0 ? (r.caseOnly + " case-only") : (r.covered > 0 ? "0 case-only" : " ");
+    chip.appendChild(who);
+    chip.appendChild(score);
+    chip.appendChild(caseNote);
+    strip.appendChild(chip);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   6. PLAYBACK ENGINE
+   ═══════════════════════════════════════════════════════════════════ */
+let currentData = null;
+let currentItem = null;
+let currentT = 0;
+let duration = 1000;
+let playing = false;
+let speed = 1;
+let lastFrameTime = null;
+let rafId = null;
+
+const playBtn = document.getElementById("playBtn");
+const resetBtn = document.getElementById("resetBtn");
+const scrub = document.getElementById("scrub");
+const clockLabel = document.getElementById("clockLabel");
+const kbHeading = document.getElementById("kbHeading");
+const frameNote = document.getElementById("frameNote");
+
+function setT(t, opts) {
+  currentT = Math.max(0, Math.min(duration, t));
+  scrub.value = String(Math.round(currentT));
+  clockLabel.textContent = Math.round(currentT) + " / " + Math.round(duration) + " ms";
+  if (currentItem) {
+    renderTouchesAt(currentItem, currentT);
+    updateStoryHighlight(currentItem, currentT);
+  }
+  if (!opts || !opts.silent) { /* no-op hook for future listeners */ }
+}
+
+function pause() {
+  playing = false;
+  playBtn.textContent = "Play";
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  lastFrameTime = null;
+}
+
+function play() {
+  if (currentT >= duration) currentT = 0;
+  playing = true;
+  playBtn.textContent = "Pause";
+  lastFrameTime = null;
+  rafId = requestAnimationFrame(tick);
+}
+
+function tick(now) {
+  if (!playing) return;
+  if (lastFrameTime === null) lastFrameTime = now;
+  const dt = (now - lastFrameTime) * speed;
+  lastFrameTime = now;
+  setT(currentT + dt);
+  if (currentT >= duration) { pause(); return; }
+  rafId = requestAnimationFrame(tick);
+}
+
+playBtn.addEventListener("click", function () { playing ? pause() : play(); });
+resetBtn.addEventListener("click", function () { pause(); setT(0); });
+scrub.addEventListener("input", function () { pause(); setT(Number(scrub.value)); });
+
+document.getElementById("speedGroup").addEventListener("click", function (e) {
+  const btn = e.target.closest(".speedBtn");
+  if (!btn) return;
+  speed = Number(btn.dataset.speed);
+  document.querySelectorAll(".speedBtn").forEach(function (b) { b.classList.toggle("active", b === btn); });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   7. ITEM SELECTION
+   ═══════════════════════════════════════════════════════════════════ */
+function firstWords(text, n) {
+  const words = text.split(/\s+/).slice(0, n);
+  return words.join(" ") + (text.split(/\s+/).length > n ? "…" : "");
+}
+
+function selectItem(item, data) {
+  pause();
+  currentItem = item;
+  duration = itemDuration(item);
+  scrub.max = String(Math.round(duration));
+  currentT = 0;
+
+  drawKeyboard(item.frame);
+  kbHeading.textContent = "Replay: " + item.id;
+  frameNote.textContent = "Frame: " + item.frame + " (" + (item.frame === "samsung" ? "411px, session-1 fitted layout" : "393px, keyCentres()") + ") — " + item.kind;
+
+  buildStoryHead(item, data);
+  buildStoryBody(item, data, function (t) { pause(); setT(t); });
+  renderSummary(item, data);
+
+  setT(0);
+
+  document.querySelectorAll(".itemRow").forEach(function (row) {
+    row.classList.toggle("active", row.dataset.id === item.id);
+  });
+}
+
+function renderItemList(data) {
+  const list = document.getElementById("itemList");
+  list.innerHTML = "";
+  data.items.forEach(function (item, idx) {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "itemRow";
+    row.dataset.id = item.id;
+
+    const idSpan = document.createElement("span");
+    idSpan.className = "itemId";
+    idSpan.textContent = item.id;
+
+    const badge = document.createElement("span");
+    badge.className = "badge " + item.kind;
+    badge.textContent = item.kind;
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "itemText";
+    textSpan.textContent = firstWords(item.intended, 6);
+
+    row.appendChild(badge);
+    row.appendChild(idSpan);
+    row.appendChild(textSpan);
+    row.addEventListener("click", function () { selectItem(item, data); });
+    list.appendChild(row);
+  });
+  if (data.items.length) selectItem(data.items[0], data);
+}
+
+function loadData(data) {
+  currentData = data;
+  renderItemList(data);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   8. DRAG-AND-DROP DATA LOADER — replaces window.GAP_DATA at runtime with
+   a dropped .json (parsed directly) or .js file (a `window.GAP_DATA = ...`
+   assignment, executed the same way a <script src> tag would run it,
+   since this page's own data source IS such a script tag).
+   ═══════════════════════════════════════════════════════════════════ */
+const dataSourceNote = document.getElementById("dataSourceNote");
+
+function handleDroppedFile(file) {
+  const reader = new FileReader();
+  reader.onload = function () {
+    const text = String(reader.result);
+    try {
+      if (/\.json$/i.test(file.name)) {
+        const parsed = JSON.parse(text);
+        loadData(parsed);
+      } else {
+        const priorMarker = window.GAP_DATA;
+        window.GAP_DATA = undefined;
+        const scriptTag = document.createElement("script");
+        scriptTag.textContent = text;
+        document.body.appendChild(scriptTag);
+        document.body.removeChild(scriptTag);
+        const loaded = window.GAP_DATA;
+        window.GAP_DATA = priorMarker;
+        if (!loaded) throw new Error("dropped file did not set window.GAP_DATA");
+        loadData(loaded);
+      }
+      dataSourceNote.textContent = "Loaded from dropped file: " + file.name;
+    } catch (err) {
+      dataSourceNote.textContent = "Could not load " + file.name + ": " + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+["dragenter", "dragover"].forEach(function (evtName) {
+  document.addEventListener(evtName, function (e) {
+    e.preventDefault();
+    document.body.classList.add("dragging");
+  });
+});
+["dragleave", "dragend"].forEach(function (evtName) {
+  document.addEventListener(evtName, function (e) {
+    if (evtName === "dragleave" && e.relatedTarget) return;
+    document.body.classList.remove("dragging");
+  });
+});
+document.addEventListener("drop", function (e) {
+  e.preventDefault();
+  document.body.classList.remove("dragging");
+  const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file) handleDroppedFile(file);
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   9. GO — window.GAP_DATA was set by sample-data/comparator-data.js's own
+   <script src> tag, which sits BEFORE this block in the document (script
+   tags run in source order, so that file has already executed by now).
+   ═══════════════════════════════════════════════════════════════════ */
+if (window.GAP_DATA) {
+  loadData(window.GAP_DATA);
+} else {
+  dataSourceNote.textContent = "No data loaded. Drop a .js or .json corpus file to begin.";
+}
+</script>
+</body>
+</html>
